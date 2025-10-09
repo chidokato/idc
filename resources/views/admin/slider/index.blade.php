@@ -32,11 +32,10 @@
                         <tbody>
                             @foreach($data as $val)
                             <tr>
-                                <td class="thumb"><a href="{{route('slider.edit',[$val->id])}}" class="mr-2"><img src="data/images/{{$val->img}}"></a></td>
+                                <td class="thumb"><a href="{{route('slider.edit',[$val->id])}}" class="mr-2"><img style="width: 500px" src="data/images/{{$val->img}}"></a></td>
                                 <td>
                                     <div><a href="{{route('slider.edit',[$val->id])}}" class="mr-2">{{$val->name}}</a></div>
                                     <div>{{$val->content}}</div>
-                                    <div>User: {{$val->User->yourname}}</div>
                                     <div>Date: {{$val->updated_at}}</div>
                                 </td>
                                 <td>
