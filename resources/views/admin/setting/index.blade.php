@@ -50,14 +50,14 @@
                           </div>
                           <div class="col-md-12">
                               <div class="form-group">
-                                  <label>footer</label>
-                                  <textarea class="form-control" rows="5" name="footer">{!! $data->footer !!}</textarea>
+                                  <label>header</label>
+                                  <textarea class="form-control" rows="5" name="header">{!! $data->header !!}</textarea>
                               </div>
                           </div>
                           <div class="col-md-12">
                               <div class="form-group">
                                   <label>footer</label>
-                                  <textarea class="form-control" rows="5" name="header">{!! $data->footer !!}</textarea>
+                                  <textarea class="form-control" rows="5" name="footer">{!! $data->footer !!}</textarea>
                               </div>
                           </div>
                       </div>
