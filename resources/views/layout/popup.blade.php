@@ -1,4 +1,4 @@
-<!-- <div class="hotline-phone-ring-wrap form-ring-wrap">
+<div class="hotline-phone-ring-wrap form-ring-wrap">
     <div class="hotline-phone-ring ">
         <div class="hotline-phone-ring-circle"></div>
         <div class="hotline-phone-ring-circle-fill"></div>
@@ -15,7 +15,7 @@
     </div>
 </div>
 
-<div class="hotline-phone-ring-wrap zalo-ring-wrap">
+<!-- <div class="hotline-phone-ring-wrap zalo-ring-wrap">
     <div class="hotline-phone-ring">
         <div class="hotline-phone-ring-circle"></div>
         <div class="hotline-phone-ring-circle-fill"></div>
@@ -31,9 +31,9 @@
         </a>
     </div>
     </div>
-</div>
+</div> -->
 
-<div class="hotline-phone-ring-wrap hotline-ring-wrap">
+<!-- <div class="hotline-phone-ring-wrap hotline-ring-wrap">
     <div class="hotline-phone-ring">
         <div class="hotline-phone-ring-circle"></div>
         <div class="hotline-phone-ring-circle-fill"></div>
@@ -49,7 +49,7 @@
         </a>
     </div>
     </div>
-</div>
+</div> -->
 
 
 <div id="popup-banggia" class="popup-overlay">
@@ -82,7 +82,7 @@
         }
     });
 </script>
- -->
+
 
 <div class="zalo-chat-widget" data-oaid="2481470734556094804" data-welcome-message="Rất vui khi được hỗ trợ bạn!" data-autopopup="0" data-width="300" data-height="500"></div>
 

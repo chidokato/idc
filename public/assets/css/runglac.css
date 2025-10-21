@@ -180,7 +180,9 @@
 .zalo-ring-wrap .hotline-phone-ring-circle-fill{ background-color: #00a0cdc7; }
 .zalo-ring-wrap .hotline-phone-ring-img-circle{ background-color: #fff; }
 
-.form-ring-wrap{ bottom:140px }
+.form-ring-wrap{     bottom: 22px;
+    left: auto;
+    right: 231px; }
 .form-ring-wrap .hotline-bar{ background:#135eaccf;     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap; }
@@ -190,7 +192,13 @@
 
 @media (max-width: 480px) {
   .zalo-ring-wrap{ bottom:0px; left:0; z-index:99991 }
-  .form-ring-wrap{ bottom:0px; left:auto; right:0; z-index:99991 }
+  /*.form-ring-wrap{ bottom:0px; left:auto; right:0; z-index:99991 }*/
+  .form-ring-wrap {
+        bottom: 42px;
+        left: 20px;
+        right: auto;
+        z-index: 99991;
+    }
   .hotline-ring-wrap{ left: 50%; bottom: 0px; transform: translate(-50%, 0); background:#fff; width:100%; display:flex; justify-content:center; z-index:9999; box-shadow: 0px -1px 7px #00000030; }
   .hotline-phone-ring-circle{ display:none }
   .hotline-ring-wrap .hotline-phone-ring{ top:-46px }
@@ -198,7 +206,9 @@
   .zalo-ring-wrap .hotline-phone-ring-circle-fill, .form-ring-wrap .hotline-phone-ring-circle-fill{ display:none; }
   .hotline-bar{ background:none; bottom:0; left:0; box-shadow: none; }
   .zalo-ring-wrap .hotline-bar, .form-ring-wrap .hotline-bar{ background:none; left:48%; transform: translate(-50%, 0%); bottom: -38px; padding:0px }
-  .zalo-ring-wrap .hotline-bar a, .form-ring-wrap .hotline-bar a{ color:#000; }
+  /*.zalo-ring-wrap .hotline-bar a, .form-ring-wrap .hotline-bar a{ color:#000; }*/
+  .zalo-ring-wrap .hotline-bar a, .form-ring-wrap .hotline-bar a{ color:#fff; }
+
   .zalo-ring-wrap .hotline-phone-ring-img-circle, .form-ring-wrap .hotline-phone-ring-img-circle{ border: 1px solid #000; animation: none; }
   .hotline-bar > a{ text-indent: inherit; font-size: .7rem; }
 
@@ -206,6 +216,17 @@
   .hotline-ring-wrap .hotline-bar a{ background:red; line-height:20px; padding:0px 5px; border-radius:10px;    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap; }
+    .hotline-phone-ring-img-circle {
+    width: 60px;
+    height: 60px;}
+    .hotline-phone-ring-img-circle .pps-btn-img img {
+    width: 30px;
+    height: 30px;
+}
+.zalo-ring-wrap .hotline-phone-ring-img-circle, .form-ring-wrap .hotline-phone-ring-img-circle{ border:none; }
+.hotline-phone-ring-img-circle {
+    top: 26px;}
+
 }
 
 
