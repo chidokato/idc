@@ -1,4 +1,4 @@
-<div class="hotline-phone-ring-wrap form-ring-wrap">
+<!-- <div class="hotline-phone-ring-wrap form-ring-wrap">
     <div class="hotline-phone-ring ">
         <div class="hotline-phone-ring-circle"></div>
         <div class="hotline-phone-ring-circle-fill"></div>
@@ -82,3 +82,8 @@
         }
     });
 </script>
+ -->
+
+<div class="zalo-chat-widget" data-oaid="2481470734556094804" data-welcome-message="Rất vui khi được hỗ trợ bạn!" data-autopopup="0" data-width="300" data-height="500"></div>
+
+<script src="https://sp.zalo.me/plugins/sdk.js"></script>
