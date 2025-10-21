@@ -54,7 +54,6 @@ class SettingController extends Controller
         $setting->youtube = $data['youtube'];
         $setting->maps = $data['maps'];
         $setting->header = $data['header'];
-        $setting->footer = $data['footer'];
 
         // thêm ảnh
         if ($request->hasFile('img')) {
