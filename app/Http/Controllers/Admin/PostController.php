@@ -267,7 +267,7 @@ class PostController extends Controller
         $post->street_id = $data['street'];
         $post->address = $data['address'];
 
-        $post->maps = $request->has('maps');
+        $post->maps = $data['maps'];
         $post->monopoly = $request->has('monopoly');
         $post->for_sale = $request->has('for_sale');
         $post->new_product = $request->has('new_product');

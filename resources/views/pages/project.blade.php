@@ -63,7 +63,7 @@
             <div class="heading">
                 <div class="left">
                     <h1 class="text-uppercase title-cat">{{$post->name}}</h1>
-                    <div class="address"><i class="icon-location me-1"></i> {{$post->address}}{{ $post->street_id ? ', '.$post->Street->name:'' }}{{$post->ward_id? ', '.$post->Ward->name:''}}{{', '.$post->District->name}}{{', '.$post->Province->name}} <a href="">Xem trên bản đồ</a></div>
+                    <div class="address"><i class="icon-location me-1"></i> {{$post->address}}{{ $post->street_id ? ', '.$post->Street->name:'' }}{{$post->ward_id? ', '.$post->Ward->name:''}}{{', '.$post->District->name}}{{', '.$post->Province->name}} <a target="_blank" href="{{$post->maps ? $post->maps:''}}">Xem trên bản đồ</a></div>
                 </div>
                 <div class="right">
                     <div class="price"> <span style="font-size: 1.2rem;">Giá: </span>
