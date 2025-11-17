@@ -363,7 +363,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <textarea name="maps" id="maps" rows="5" class="form-control" oninput="loadMap()"></textarea>
+                                <textarea id="maps" rows="5" class="form-control" oninput="loadMap()"></textarea>
                             </div>
                         </div>
                         <div class="col-md-6">

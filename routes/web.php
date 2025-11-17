@@ -8,10 +8,12 @@ use App\Http\Controllers\Admin\Users\UserController;
 use App\Http\Controllers\Admin\MainController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\InternalCategoryController;
 use App\Http\Controllers\Admin\CartController;
 use App\Http\Controllers\Admin\OptionController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\PostController;
+use App\Http\Controllers\Admin\InternalPostController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\SectionController;
 use App\Http\Controllers\Admin\SettingController;
@@ -90,6 +92,9 @@ Route::middleware(['admin'])->group(function () {
 
         Route::resource('menu',MenuController::class);
         Route::resource('category',CategoryController::class);
+
+        Route::resource('internalcategory',InternalCategoryController::class);
+        Route::resource('internalpost',InternalPostController::class);
         
         Route::resource('cart',CartController::class);
 

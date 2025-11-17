@@ -29,9 +29,21 @@
     <li class="nav-item">
         <a class="nav-link" href="{{route('news.index')}}"><i class="fas fa-fw fa-chart-area"></i><span>Tin tức</span></a>
     </li>
-    <!-- <li class="nav-item">
-        <a class="nav-link" href="{{route('promotion.index')}}"><i class="fas fa-fw fa-chart-area"></i><span>Sự kiện & Khuyến mãi</span></a>
-    </li> -->
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#Internal"
+            aria-expanded="true" aria-controls="Internal">
+            <i class="fas fa-fw fa-wrench"></i>
+            <span>Internal</span>
+        </a>
+        <div id="Internal" class="collapse" aria-labelledby="headingUtilities"
+            data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="{{route('internalcategory.index')}}">Category</a>
+                <a class="collapse-item" href="{{route('internalpost.index')}}">Post</a>
+            </div>
+        </div>
+    </li>
+
     <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#customer"
             aria-expanded="true" aria-controls="customer">

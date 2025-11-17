@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Auth;
 use Image;
 use File;
 
-use App\Models\Category;
+use App\Models\InternalCategory;
 use App\Models\Section;
-use App\Models\Post;
+use App\Models\InternalPost;
 use App\Models\Images;
 
 use App\Models\Street;
@@ -22,7 +22,7 @@ use App\Models\Province;
 use App\Models\District;
 
 
-class PostController extends Controller
+class internalPostController extends Controller
 {
     function saveImage($file, $path = 'data/images/', $maxWidth = 1500, $maxHeight = 1500) {
         $originalFilename = $file->getClientOriginalName();
@@ -50,12 +50,12 @@ class PostController extends Controller
 
     public function index(Request $request)
     {
-        $category = Category::where('sort_by', 'Product')->where('parent', '0')->orderBy('view', 'DESC')->get();
+        $category = InternalCategory::where('parent', '0')->orderBy('view', 'DESC')->get();
         $perPage = $request->get('per_page', 10); // Mặc định là 20 nếu không có lựa chọn
         $key = $request->get('key', '');
         $sort = $request->get('sort', 'desc'); // Mặc định là sắp xếp giảm dần
         
-        $query = Post::query()->where('sort_by', 'Product')->orderBy('id', 'DESC');
+        $query = InternalPost::query()->orderBy('id', 'DESC');
 
         if ($key) {
             $query->where('name', 'like', '%' . $key . '%');
@@ -66,7 +66,7 @@ class PostController extends Controller
 
         $posts = $query->paginate($perPage);
 
-        return view('admin.post.index', compact(
+        return view('admin.internalpost.index', compact(
             'posts',
             'category',
         ));
@@ -267,7 +267,6 @@ class PostController extends Controller
         $post->street_id = $data['street'];
         $post->address = $data['address'];
 
-        $post->maps = $request->has('maps');
         $post->monopoly = $request->has('monopoly');
         $post->for_sale = $request->has('for_sale');
         $post->new_product = $request->has('new_product');
