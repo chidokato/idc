@@ -114,6 +114,7 @@ class PostController extends Controller
         $post->name = $data['name'];
         $post->slug = Str::slug($data['name'], '-');
         $post->category_id = $data['category_id'];
+        $post->content = $data['content0'];
         
         $post->price = str_replace('.', '', $data['price']);
         $post->price_max = str_replace('.', '', $data['price_max']);
