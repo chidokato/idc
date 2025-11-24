@@ -96,7 +96,17 @@
                     </div>
                     @endif
                     @endforeach
-
+                </div>
+                <div class="paginate-search">
+                    <div>Hiển thị: </div>
+                    <select class="paginate" name="per_page" onchange="this.form.submit()">
+                        <option value="12" {{ request()->per_page == 12 ? 'selected' : '' }}>12</option>
+                        <option value="24" {{ request()->per_page == 24 ? 'selected' : '' }}>24</option>
+                        <option value="48" {{ request()->per_page == 48 ? 'selected' : '' }}>48</option>
+                        <option value="96" {{ request()->per_page == 96 ? 'selected' : '' }}>96</option>
+                    </select>
+                    <div> Từ {{ $posts->firstItem() }} đến {{ $posts->lastItem() }} trên tổng {{ $posts->total() }} </div>
+                    {{ $posts->appends(request()->all())->links() }}
                 </div>
             </div>
             <div class="col-lg-3 d-none d-lg-block">
@@ -111,7 +121,7 @@
 
                 
                 <div class="widget widget-list widget-news mb-3">
-                    <h4><span>Tin xem nhiều</span></h4>
+                    <h4><span>Tin mới nhất</span></h4>
                     @foreach($posts as $key => $val)
                     @if($key == 0)
                     <a href="{{$val->category->slug}}/{{$val->slug}}" class="news-item-captain">

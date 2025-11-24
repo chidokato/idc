@@ -93,7 +93,7 @@ class HomeController extends Controller
                 ));
             }
             if ($data->sort_by == 'News') {
-                $posts = Post::whereIn('category_id', $cat_array)->orderBy('id', 'DESC')->paginate(30);
+                $posts = Post::whereIn('category_id', $cat_array)->orderBy('id', 'DESC')->paginate(10);
                 return view('pages.news', compact(
                     'data',
                     'posts',

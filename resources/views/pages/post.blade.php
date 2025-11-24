@@ -56,7 +56,7 @@
 
                 
                 <div class="widget widget-list widget-news mb-3">
-                    <h4><span>Tin xem nhiều</span></h4>
+                    <h4><span>Tin mới nhất</span></h4>
                     @foreach($related_post as $key => $val)
                     @if($key == 0)
                     <a href="{{$val->category->slug}}/{{$val->slug}}" class="news-item-captain">
