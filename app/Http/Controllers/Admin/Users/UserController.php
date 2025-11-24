@@ -19,8 +19,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::orderBy('id', 'DESC')->get();
-        return view('admin.user.index', compact('users'));
+        $admins = User::where('permission', '<', 6)->orderBy('id', 'DESC')->get();
+        $users = User::where('permission', '=', 6)->orderBy('id', 'DESC')->get();
+        return view('admin.user.index', compact('admins', 'users'));
     }
 
     /**
@@ -131,8 +132,9 @@ class UserController extends Controller
     public function destroy($id)
     {
         User::find($id)->delete();
-        return redirect()->back();
+        return redirect()->back()->with('success','Thành công');
     }
+
 
 
 
@@ -141,4 +143,28 @@ class UserController extends Controller
         Auth::logout();
         return redirect('/');
     }
+
+
+    public function changeStatus(Request $request)
+    {
+        $user = User::find($request->id);
+        
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy user!'
+            ], 404);
+        }
+
+        $user->status = $request->status;  // active / inactive
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cập nhật trạng thái user thành công!'
+        ]);
+    }
+
+
+    
 }

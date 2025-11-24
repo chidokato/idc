@@ -47,6 +47,7 @@
                                     <option value="6">Member</option>
                                     <option value="1">SuperAdmin</option>
                                     <option value="2">Admin</option>
+                                    <option value="3">Editer</option>
                                     
                                   </select>
                               </div>

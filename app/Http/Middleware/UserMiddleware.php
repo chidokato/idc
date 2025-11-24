@@ -16,10 +16,10 @@ class UserMiddleware
 
         $user = Auth::user();
         
-        if ($user->permission == 2 || $user->permission == 1) {
+        if ($user->permission <= 6) {
             return $next($request);
         }
 
-        return redirect()->route('admin.dashboard')->with('error', 'Bạn không có quyền vào trang người dùng');
+        return redirect()->route('home')->with('error', 'Bạn không có quyền vào trang người dùng');
     }
 }

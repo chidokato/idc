@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AdminMiddleware
 {
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next, $level = 1)
     {
         if (!Auth::check()) {
             return redirect()->route('home')->with('error', 'Bạn chưa đăng nhập');
@@ -16,10 +16,10 @@ class AdminMiddleware
 
         $user = Auth::user();
 
-        if ($user->permission == 1) {
+        // kiểm tra quyền
+        if ($user->permission <= $level) {
             return $next($request);
         }
-
-        return redirect()->route('account.main')->with('error', 'Bạn không có quyền vào trang admin');
+        return redirect()->route('admin')->with('error', 'Bạn không có quyền vào trang này');
     }
 }

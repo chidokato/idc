@@ -19,7 +19,8 @@
     <link href="admin_asset/zoom/zoom.css" rel="stylesheet">
     <!-- select2 multiple css -->
     <link href="admin_asset/select2/css/select2.min.css" rel="stylesheet">
-
+    <!-- CSS -->
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
     @yield('css')
 </head>
 
@@ -205,11 +206,7 @@
         });
     </script>
 
-    <!-- ckeditor.com/4.24.0 -->
-    <!-- <script src="https://cdn.ckeditor.com/4.24.0-lts/standard/ckeditor.js"></script>
-    <script>
-            CKEDITOR.replace('editor1');
-    </script> -->
+    @include('admin.alert')
     
     @yield('js')
 </body>

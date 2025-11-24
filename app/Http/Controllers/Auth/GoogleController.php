@@ -46,10 +46,12 @@ class GoogleController extends Controller
                 ]);
             } else {
                 // Tạo user mới
+                $status = Str::endsWith($googleUser->getEmail(), '@dxmb.vn') ? 'active' : 'inactive';
                 $user = User::create([
                     'name' => $googleUser->getName() ?? $googleUser->getNickname() ?? 'User',
                     'email' => $googleUser->getEmail(),
                     'permission' => 6,
+                    'status' => $status, // tự động active nếu email @dxmb.vn
                     'password' => bcrypt(Str::random(24)), // user sẽ login bằng Google, password random
                     'google_id' => $googleUser->getId(),
                     'avatar' => $googleUser->getAvatar(),
@@ -69,15 +71,29 @@ class GoogleController extends Controller
 
         // Login user trong Laravel
         // Auth::login($user, true);
-        
-        // Kiểm tra quyền
+
+        // Login user trong Laravel
+        Auth::login($user, true);
+
+        // Phân luồng theo permission
         if ($user->permission < 6) {
-            Auth::login($user, true);
-            return redirect()->intended('admin/main');
+            // Admin
+            return redirect()->route('admin'); // route admin
+        } elseif ($user->permission == 6) {
+            // User bình thường
+            if ($user->status == 'active') {
+                return redirect()->route('account.main'); // route admin hoặc route giao diện người dùng
+            }
+            else{
+                Auth::logout();
+                return redirect('dangnhap')->with('warning', 'Bạn đã kết nối vào hệ thống thành công. Do hệ thống chỉ lưu hành nội bộ. Bạn cần liên hệ Admin để cấp quyền truy cập cao hơn ! Admin: 0977572947');
+            }
         } else {
-            Auth::logout(); // thoát luôn để tránh user chưa đủ quyền vẫn giữ session
-            return redirect('dangnhap')
-                ->with('error', 'Bạn đã kết nối vào hệ thống thành công. Do hệ thống chỉ lưu hành nội bộ. Bạn cần liên hệ Admin để cấp quyền truy cập cao hơn ! Admin: 0977572947');
+            // Nếu permission > 6, phòng trường hợp không hợp lệ
+            Auth::logout();
+            return redirect('dangnhap')->with('error', 'Tài khoản không hợp lệ');
         }
+        // 
+        
     }
 }

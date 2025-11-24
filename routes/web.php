@@ -78,47 +78,53 @@ Route::group(['prefix'=>'ajax'],function(){
 });
 
 
+Route::prefix('admin')->group(function () {
+    Route::middleware(['admin:1'])->group(function () {
+        Route::resource('users',UserController::class);
+        Route::post('/user/change-status', [UserController::class, 'changeStatus'])->name('user.changeStatus');
+        // khách hàng
+        Route::resource('customer',CustomerController::class);
 
+    });
 
-Route::middleware(['admin'])->group(function () {
-    Route::prefix('admin')->group(function () {
-        // main
-        Route::get('main', [MainController::class, 'index'])->name('admin');
-
+    Route::middleware(['admin:2'])->group(function () {
+        // cấu hình hệ thống
+        Route::resource('setting',SettingController::class);
+        Route::resource('menu',MenuController::class);
+        Route::resource('category',CategoryController::class);
         Route::resource('province',ProvinceController::class);
         Route::resource('district',DistrictController::class);
         Route::resource('ward',WardController::class);
         Route::resource('street',StreetController::class);
-
-        Route::resource('menu',MenuController::class);
-        Route::resource('category',CategoryController::class);
+        Route::resource('slider',SliderController::class);
 
         Route::resource('internalcategory',InternalCategoryController::class);
         Route::resource('internalpost',InternalPostController::class);
-        
-        Route::resource('cart',CartController::class);
 
+        // Route::resource('cart',CartController::class);
         Route::resource('option',OptionController::class);
         Route::get('option/double/{id}', [OptionController::class, 'double']);
+        
+        // Route::resource('promotion',PromotionController::class);
+        
+    });
 
+
+    Route::middleware(['admin:3'])->group(function () {
+        // manin
+        Route::get('main', [MainController::class, 'index'])->name('admin');
+        // quản lý bài viết
         Route::resource('post',PostController::class);
         Route::resource('news',NewsController::class);
         Route::get('post/post_up/{id}', [PostController::class, 'post_up'])->name('post_up');
-
-        Route::resource('product',ProductController::class);
-        Route::resource('customer',CustomerController::class);
-        Route::resource('promotion',PromotionController::class);
-
-        Route::resource('setting',SettingController::class);
-        Route::resource('slider',SliderController::class);
-
-        Route::resource('users',UserController::class);
-
         Route::group(['prefix'=>'section'],function(){
             Route::get('index/{pid}', [SectionController::class, 'index']);
         });
+        // Route::resource('product',ProductController::class);
     });
 });
+
+
 
 // account
 Route::get('dangnhap', [AccountController::class, 'dangnhap'])->name('dangnhap');

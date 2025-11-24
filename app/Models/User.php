@@ -27,6 +27,7 @@ class User extends Authenticatable
         'google_refresh_token',
         'google_token_expires_at',
         'permission', // thêm dòng này
+        'status', // thêm dòng này
     ];
 
     /**

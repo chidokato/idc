@@ -47,6 +47,7 @@
                                   <select name="permission" class="form-control">
                                     <option <?php if($data->permission == 1){echo "selected";} ?> value="1">SuperAdmin</option>
                                     <option <?php if($data->permission == 2){echo "selected";} ?> value="2">Admin</option>
+                                    <option <?php if($data->permission == 3){echo "selected";} ?> value="3">Editer</option>
                                     <option <?php if($data->permission == 6){echo "selected";} ?> value="6">Member</option>
                                   </select>
                               </div>
