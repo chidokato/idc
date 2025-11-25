@@ -8,6 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 class Post extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'user_id',
+        'name',
+        'slug',
+        'sort_by',
+        'status',
+        'category_id',
+    ];
+
     public $timestamps = true;
 
     public function Category()

@@ -14,7 +14,8 @@
         "laravel/sanctum": "^2.11",
         "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.5",
-        "unisharp/laravel-filemanager": "^2.6"
+        "unisharp/laravel-filemanager": "^2.6",
+        "phpoffice/phpspreadsheet": "^4.0"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
@@ -31,7 +32,8 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-            "app/Helpers/helpers.php"
+            "app/Helpers/helpers.php",
+            "app/Helpers/TreeHelper.php"
         ]
     },
     "autoload-dev": {
@@ -64,6 +66,6 @@
         "preferred-install": "dist",
         "sort-packages": true
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }

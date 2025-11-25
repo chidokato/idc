@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\PromotionController;
+use App\Http\Controllers\Admin\DepartmentController;
 
 use App\Http\Controllers\Admin\ProvinceController;
 use App\Http\Controllers\Admin\DistrictController;
@@ -106,6 +107,10 @@ Route::prefix('admin')->group(function () {
         Route::get('option/double/{id}', [OptionController::class, 'double']);
         
         // Route::resource('promotion',PromotionController::class);
+
+        // account
+        Route::resource('departments',DepartmentController::class);
+
         
     });
 
@@ -115,6 +120,8 @@ Route::prefix('admin')->group(function () {
         Route::get('main', [MainController::class, 'index'])->name('admin');
         // quản lý bài viết
         Route::resource('post',PostController::class);
+        Route::post('post/upfile', [PostController::class, 'upfile'])->name('post.upfile');
+        
         Route::resource('news',NewsController::class);
         Route::get('post/post_up/{id}', [PostController::class, 'post_up'])->name('post_up');
         Route::group(['prefix'=>'section'],function(){

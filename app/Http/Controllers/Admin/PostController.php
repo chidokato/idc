@@ -21,6 +21,9 @@ use App\Models\Ward;
 use App\Models\Province;
 use App\Models\District;
 
+use Carbon\Carbon;
+use App\Helpers\SimpleXLSX; // Import thư viện SimpleXLSX
+
 
 class PostController extends Controller
 {
@@ -78,7 +81,7 @@ class PostController extends Controller
         $data = Post::find($id);
         $data->id = $id_max+1;
         $data->save();
-        return redirect()->back()->with('Success','Success');
+        return redirect()->back()->with('success','success');
     }
 
     /**
@@ -103,6 +106,7 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
     public function store(Request $request)
     {
         $data = $request->all();
@@ -192,8 +196,7 @@ class PostController extends Controller
             }
         }
 
-        return redirect('admin/post')->with('Success','Success');
-        // return response()->json(['success' => 'Success']);
+        return redirect('admin/post')->with('success','Thành công');
     }
 
     /**
@@ -202,6 +205,38 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+    public function upfile(Request $request)
+    {
+       // Kiểm tra file hợp lệ
+        $request->validate([
+            'excel_file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        $file = $request->file('excel_file');
+
+        // Đọc file Excel
+        if ($xlsx = SimpleXLSX::parse($file->getRealPath())) {
+            $rows = $xlsx->rows();
+            array_shift($rows); // Bỏ qua dòng tiêu đề
+
+            foreach ($rows as $row) {
+                Post::create([
+                    'user_id'        => Auth::id(),
+                    'name'        => $row[0],
+                    'slug'        => Str::slug($row[0], '-'),
+                    'sort_by'     => 'Product',
+                ]);
+            }
+
+            return back()->with('success', 'File Excel đã được tải lên thành công!');
+        } else {
+            return back()->with('error', 'Không thể đọc file Excel');
+        }
+
+
+    }
+
     public function show($id)
     {
 
