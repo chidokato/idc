@@ -4,7 +4,7 @@
     function showToast(type, message) {
         Swal.fire({
             toast: true,
-            position: 'bottom-end',
+            position: 'bottom-start', // Góc trái
             icon: type,
             title: message,
             showConfirmButton: false,
