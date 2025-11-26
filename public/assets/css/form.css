@@ -67,14 +67,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .search-input .dropdown-menu input:focus {border-color:var(--main-color)}
 
 .select2 {/* padding-top: 1.625rem; */}
-.select2 .select2-selection {border: none !important;background: none !important;}
-.select2-container--default .select2-selection--single .select2-selection__rendered {padding-left: 12px !important; color: #212529!important; line-height: 1.35rem !important;font-size: 14px !important;padding-top: 1.625rem;}
+.select2 .select2-selection {border: 1px solid #ddd !important;background: none !important; padding:7px 10px !important}
 .select2-results__option {display:block}
 .select2-container--default .select2-results__option::first-child {background-color: #ddd !important;}
-.select2-container .select2-selection--single {margin-bottom:30px}
+.select2-container .select2-selection--single { height:auto !important; }
 .select2-container.select2-container--default.select2-container--open {z-index: 10000;}
 .select2-container--open .select2-dropdown--below {box-shadow: 0 2px 8px rgb(0 0 0 / 22%); border-radius: 5px !important; font-size:14px;border-top: 1px solid #aaa !important;}
-
+.select2-container--default .select2-selection--single .select2-selection__arrow{     top: 6px !important;    right: 16px !important; }
 .select2-container--default .select2-selection--single .select2-selection__arrow b {font-family: 'icomoon' !important; font-style: normal; border: none !important; font-size: 22px;color: #555;top: 8px !important;}
 .select2-container--default .select2-selection--single .select2-selection__arrow b::before {content: "\e903";}
 .select2-search--dropdown .select2-search__field {outline-offset: unset; box-shadow: none; outline-width: 0;}

@@ -22,7 +22,7 @@
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{asset('')}}">Indochine</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Tin tức</li>
+                        <li class="breadcrumb-item active" aria-current="page">Account</li>
                         </ol>
                     </nav>
                 </section>
@@ -39,29 +39,13 @@
 
 <section class="card-grid news-sec">
     <div class="container">
-        
         <div class="row">
             <div class="col-lg-3 d-none d-lg-block">
-                <div >
-                    
-                </div>
-                <div class="widget widget-list mb-3">
-                    <h4><span>DANH MỤC</span></h4>
-                    <ul>
-                        <li><a href="tin-thi-truong"><i class="icon-next me-2"></i>Facebook</a></li>
-                        <li><a href="tin-noi-bo"><i class="icon-next me-2"></i>Tin nội bộ</a></li>
-                    </ul>
-                </div>
-
+                @include('account.layout.sitebar')
             </div>
 
             <div class="col-lg-9">
-                <h3 class="text-uppercase title-subpage">{{ Auth::user()->name }}</h3>
-                <hr>
-                <div class="row-btn">
-                    <button class="btn btn-dangky">ĐĂNG KÝ MARKETING</button>
-                    <button class="btn btn-quanly">QUẢN LÝ CHI PHÍ MARKETING</button>
-                </div>
+                
             </div>
             
         </div>

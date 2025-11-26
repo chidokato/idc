@@ -5,8 +5,8 @@
 @include('admin.alert')
 <?php use App\Models\menuTranslation; ?>
 <div class="d-sm-flex align-items-center justify-content-between mb-3 flex">
-    <h2 class="h3 mb-0 text-gray-800 line-1 size-1-3-rem">Phòng ban</h2>
-    <a class="add-iteam" href="{{route('departments.create')}}"><button class="btn-success form-control" type="button"><i class="fa fa-plus" aria-hidden="true"></i> {{__('lang.add')}}</button></a>
+    <h2 class="h3 mb-0 text-gray-800 line-1 size-1-3-rem">Kênh chạy</h2>
+    <a class="add-iteam" href="{{route('channels.create')}}"><button class="btn-success form-control" type="button"><i class="fa fa-plus" aria-hidden="true"></i> {{__('lang.add')}}</button></a>
 </div>
 
 <div class="row">
@@ -21,7 +21,7 @@
             </div>
             <div class="tab-content overflow">
                 <div class="tab-pane active" id="tab2">
-                    @if(count($departments) > 0)
+                    @if(count($channels) > 0)
                     <table class="table">
                             <thead>
                                 <tr>
@@ -34,7 +34,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php dequymenu ($departments,0,$str='',old('parent')); ?>  
+                                <?php dequymenu ($channels,0,$str='',old('parent')); ?>  
                             </tbody>
                     </table>
                     @endif
@@ -55,14 +55,18 @@
                     <tr id="menu" style="border-bottom: 1px solid #f3f6f9;">
                         <input type="hidden" name="id" id="id" value="{{$val->id}}" >
                         <td>{!! isset($val->img) ? '<img data-action="zoom" src="data/menu/'.$val->img.'" class="thumbnail-img align-self-end" alt="">' : '' !!}</td>
-                        <td><a href="{{ route('departments.duplicate', $val->id) }}" class="mr-3" title="Nhân bản"><i class="fas fa-copy" aria-hidden="true"></i></a> <a href="{{route('departments.edit', $val)}}">{{$str}}{{$val->name}}</a> </td>
+                        <td>
+                            <a href="{{ route('channels.duplicate', $val->id) }}" class="mr-3" title="Nhân bản"><i class="fas fa-copy" aria-hidden="true"></i></a> 
+                            {{$str}}
+                                 <input class="change-input" type="text" name="name" value="{{ $val->name }}" data-id="{{ $val->id }}">
+                            </td>
                         <td>{{$val->code}}</td>
                         <td>{{$val->user->name}}</td>
                         <td class="date">{{date('d/m/Y',strtotime($val->created_at))}} <sup title="Sửa lần cuối: {{date('d/m/Y',strtotime($val->updated_at))}}"><i class="fa fa-question-circle-o" aria-hidden="true"></i></sup> </td>
                         <td style="display: flex;">
                             
-                            <a href="{{ route('departments.edit', $val) }}" class="mr-3"><i class="fas fa-edit" aria-hidden="true"></i></a>
-                            <form action="{{ route('departments.destroy', $val) }}"
+                            <a href="{{ route('channels.edit', $val) }}" class="mr-3"><i class="fas fa-edit" aria-hidden="true"></i></a>
+                            <form action="{{ route('channels.destroy', $val) }}"
                                   method="POST"
                                   style="display:inline-block">
                                 @csrf
@@ -79,5 +83,50 @@
         }
     }
 ?>
+
+
+
+
+@endsection
+
+@section('js')
+<script>
+    $(document).ready(function(){
+        $('.change-input').on('blur', function(){
+            var id = $(this).data('id');
+            var name = $(this).val();
+
+            $.ajax({
+                url: 'admin/channels/' + id + '/update-name', // route mình sẽ tạo
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    name: name
+                },
+                success: function(response){
+                    if(response.success){
+                        Swal.fire({
+                            toast: true,
+                            position: 'bottom-end',
+                            icon: 'success',
+                            title: response.message,
+                            showConfirmButton: false,
+                            timer: 2000,
+                            timerProgressBar: true
+                        });
+                    }
+                },
+                error: function(xhr){
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: xhr.responseJSON?.message || 'Có lỗi xảy ra!',
+                        confirmButtonText: 'Đã hiểu'
+                    });
+                }
+            });
+        });
+    });
+</script>
 
 @endsection

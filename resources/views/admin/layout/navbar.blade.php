@@ -68,6 +68,8 @@
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item" href="{{route('setting.index')}}">Cấu hình</a>
                 <a class="collapse-item" href="{{route('departments.index')}}">Phòng ban</a>
+                <a class="collapse-item" href="{{route('suppliers.index')}}">Nhà cung cấp</a>
+                <a class="collapse-item" href="{{route('channels.index')}}">Kênh chạy</a>
                 <a class="collapse-item" href="{{route('menu.index')}}">Menu</a>
                 <!-- <a class="collapse-item" href="{{route('option.index')}}">Tùy chọn</a> -->
                 <a class="collapse-item" href="{{route('slider.show', 'slider')}}">Slider</a>

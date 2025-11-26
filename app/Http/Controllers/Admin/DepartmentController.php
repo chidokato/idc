@@ -12,7 +12,7 @@ class DepartmentController extends Controller
 {
     public function index()
     {
-        $departments = Department::latest()->paginate(10);
+        $departments = Department::latest()->get();
         return view('admin.departments.index', compact('departments'));
     }
 
@@ -26,12 +26,12 @@ class DepartmentController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'code' => 'required|unique:departments,code',
+            // 'code' => 'required|unique:departments,code',
         ]);
 
         Department::create([
             'name'        => $request->name,
-            'code'        => $request->code,
+            'code'        => $request->code ?: 'DEP-' . strtoupper(substr(uniqid(), -6)),
             'description' => $request->description,
             'user_id'     => Auth::User()->id,
             'parent'      => $request->parent,
@@ -41,6 +41,20 @@ class DepartmentController extends Controller
         return redirect()->route('departments.index')
             ->with('success', 'Thêm phòng ban thành công');
     }
+
+    public function duplicate($id)
+    {
+        $department = Department::findOrFail($id);
+
+        // Tạo bản sao
+        $newDepartment = $department->replicate(); // sao chép tất cả các field
+        $newDepartment->code = 'DEP-' . strtoupper(substr(uniqid(), -6)); // nếu code cần mới
+        $newDepartment->save();
+
+        return redirect()->route('departments.index')
+            ->with('success', 'Nhân bản phòng ban thành công');
+    }
+
 
     public function edit($id)
     {
@@ -64,7 +78,7 @@ class DepartmentController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'code' => 'required|unique:departments,code,' . $department->id,
+            // 'code' => 'required|unique:departments,code,' . $department->id,
         ]);
 
         $department->update([

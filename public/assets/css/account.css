@@ -1,7 +1,30 @@
+.container{ max-width:95% !important }
 .account{ min-height:60vh }
 .account button.login{ margin:auto; margin-top:20% }
 
-.row-btn{ display:flex;     justify-content: space-around; }
-.row-btn button{ border:1px solid; padding:20px 50px; font-weight:bold; background-color:#f5f5f5 }
+.row-btn{ display:flex;         flex-direction: column;  }
+.row-btn button{ border:1px solid; padding:10px 20px; font-weight:bold; background-color:#f5f5f5;     margin-bottom: 1rem; }
 .row-btn button:hover{ background:var(--main-color); color:#fff }
 
+.users{ display:flex; align-items: center; gap: 15px; border:1px solid #ddd; border-radius:5px; margin-bottom:1rem; padding:10px; position:relative; }
+.users button{ position:absolute; right:0; bottom:0; background:none; border:none; color:#999; background:#f5f5f5 }
+.users img{ border-radius:100%; width:96px; height:96px; }
+.users h4{ font-size:1rem; font-weight:bold; }
+.users p{ margin-bottom: 3px; font-size:.8rem }
+
+.input-group{ display:flex; align-items: center; margin-bottom:.5rem }
+.form-control{ border:1px solid #ddd; padding:10px 15px }
+button[type=submit]{ background: var(--main-color); color:#fff; border:none; border-radius:5px; padding:10px 15px }
+.required{ color:red }
+
+.flex{ display:flex; }
+.flex .del{ background:#c10505 ;color:#fff }
+.flex .dupple{ background: #05a5c1; color:#fff }
+
+
+
+@media (min-width: 1600px) {
+
+}
+
+@media (min-width: 1201px) {}

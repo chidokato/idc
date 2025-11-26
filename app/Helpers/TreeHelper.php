@@ -49,3 +49,31 @@ class TreeHelper
         return $html;
     }
 }
+
+
+
+class TreeHelper_disabled
+{
+    public static function buildDepartmentOptions($items, $parent = 0, $prefix = '', $selectedId = null)
+    {
+        $html = '';
+
+        foreach ($items as $item) {
+            if ($item->parent == $parent) {
+
+                // kiểm tra nếu có con → disable
+                $disabled = $item->children()->exists() ? 'disabled' : '';
+
+                // chọn option nếu đúng user đang dùng
+                $selected = ($selectedId == $item->id) ? 'selected' : '';
+
+                $html .= "<option value='{$item->id}' {$disabled} {$selected}>{$prefix}{$item->name}</option>";
+
+                // đệ quy xuống cấp dưới
+                $html .= self::buildDepartmentOptions($items, $item->id, $prefix . '-- ', $selectedId);
+            }
+        }
+
+        return $html;
+    }
+}

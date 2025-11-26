@@ -318,11 +318,6 @@ class PostController extends Controller
             $post->img = $filename;
         }
 
-
-
-
-        
-
         // thêm ảnh chi tiết
         if($request->hasFile('imgdetail')){
             foreach ($request->file('imgdetail') as $file) {
@@ -397,7 +392,7 @@ class PostController extends Controller
 
         $post->save();
         
-        return redirect()->back()->with('Success','Success');
+        return redirect()->back()->with('success','Thành công');
     }
 
     /**
@@ -418,6 +413,6 @@ class PostController extends Controller
         }
 
         $Post->delete();
-        return redirect()->back()->with('Success','Success');
+        return redirect()->back()->with('success','Thành công');
     }
 }

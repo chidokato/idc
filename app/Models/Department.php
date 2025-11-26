@@ -29,4 +29,10 @@ class Department extends Model
     {
         return $this->hasMany(Department::class, 'parent');
     }
+
+    public function hasChildren()
+    {
+        return $this->children()->exists();
+    }
+
 }

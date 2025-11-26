@@ -20,14 +20,17 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
+        'address',
         'password',
         'google_id',
         'avatar',
         'google_token',
         'google_refresh_token',
         'google_token_expires_at',
-        'permission', // thêm dòng này
-        'status', // thêm dòng này
+        'permission', 
+        'status', 
+        'department_id',
     ];
 
     /**

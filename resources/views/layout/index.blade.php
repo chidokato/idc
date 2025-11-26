@@ -83,16 +83,13 @@
     <script src="assets/js/custom.js?v=30"></script>
     <script src="assets/js/popup.js?v=30"></script>
     
-    @yield('js')
-
     <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js" type="text/javascript"></script>
     <script src="assets/js/validate.js"></script>
+    
+    @yield('js')
 
-    @if (Session::has('success'))
-    <div class="alert alert-success">
-    {{ Session::get('success') }}
-    </div>
-    @endif
+    @include('admin.alert')
+
     {!! $setting->footer !!}
 </body>
 

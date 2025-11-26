@@ -21,6 +21,8 @@ use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\PromotionController;
 use App\Http\Controllers\Admin\DepartmentController;
+use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\ChannelController;
 
 use App\Http\Controllers\Admin\ProvinceController;
 use App\Http\Controllers\Admin\DistrictController;
@@ -110,6 +112,18 @@ Route::prefix('admin')->group(function () {
 
         // account
         Route::resource('departments',DepartmentController::class);
+        Route::get('departments/{id}/duplicate', [DepartmentController::class, 'duplicate'])->name('departments.duplicate');
+
+        // nhà cung cấp
+        Route::resource('suppliers', SupplierController::class);
+        Route::get('suppliers/{id}/duplicate', [SupplierController::class, 'duplicate'])->name('suppliers.duplicate');
+
+        // kênh chạy
+        Route::resource('channels', ChannelController::class);
+        Route::get('channels/{id}/duplicate', [ChannelController::class, 'duplicate'])->name('channels.duplicate');
+        Route::post('channels/{id}/update-name', [ChannelController::class, 'updateName'])->name('channels.updateName');
+
+
 
         
     });
@@ -138,6 +152,10 @@ Route::get('dangnhap', [AccountController::class, 'dangnhap'])->name('dangnhap')
 Route::middleware(['user'])->group(function () {
     Route::prefix('account')->group(function () {
         Route::get('main', [AccountController::class, 'index'])->name('account.main');
+        Route::get('edit', [AccountController::class, 'edit'])->name('account.edit');
+        Route::post('update', [AccountController::class, 'update'])->name('account.update');
+        // mkt
+        Route::get('mkt-register', [AccountController::class, 'mktregister'])->name('account.mktregister');
         
     });
 });
