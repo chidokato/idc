@@ -78,7 +78,7 @@
                         </td>
                     </tr>
                 <?php
-                dequymenu ($menulist, $val['id'], $str.'_');
+                dequymenu ($menulist, $val['id'], $str.'|-----');
             }
         }
     }
