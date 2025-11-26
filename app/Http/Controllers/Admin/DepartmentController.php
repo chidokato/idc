@@ -74,6 +74,18 @@ class DepartmentController extends Controller
         return view('admin.departments.edit', compact('department', 'options'));
     }
 
+    public function updateName(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $department = Department::findOrFail($id);
+        $department->update(['name' => $request->name]);
+
+        return response()->json(['success' => true, 'message' => 'Cập nhật thành công!' ]);
+    }
+
     public function update(Request $request, Department $department)
     {
         $request->validate([

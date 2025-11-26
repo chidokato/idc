@@ -113,6 +113,7 @@ Route::prefix('admin')->group(function () {
         // account
         Route::resource('departments',DepartmentController::class);
         Route::get('departments/{id}/duplicate', [DepartmentController::class, 'duplicate'])->name('departments.duplicate');
+        Route::post('departments/{id}/update-name', [DepartmentController::class, 'updateName'])->name('departments.updateName');
 
         // nhà cung cấp
         Route::resource('suppliers', SupplierController::class);
