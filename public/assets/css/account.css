@@ -14,17 +14,71 @@
 
 .input-group{ display:flex; align-items: center; margin-bottom:.5rem }
 .form-control{ border:1px solid #ddd; padding:10px 15px }
-button[type=submit]{ background: var(--main-color); color:#fff; border:none; border-radius:5px; padding:10px 15px }
+button[type=submit]{ background: var(--main-color); color:#fff; border:none; border-radius:5px; padding:10px 15px; }
 .required{ color:red }
 
 .flex{ display:flex; }
 .flex .del{ background:#c10505 ;color:#fff }
 .flex .dupple{ background: #05a5c1; color:#fff }
 
+.r-name, .r-date{line-height: 36px;}
 
-
-@media (min-width: 1600px) {
-
+/* Container switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;    margin-top: 7px;
 }
 
-@media (min-width: 1201px) {}
+/* Ẩn checkbox mặc định */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Thanh trượt */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+/* Nút tròn */
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+/* Khi bật */
+input:checked + .slider {
+  background-color: #4CAF50;
+}
+
+/* Khi bật nút tròn chạy sang phải */
+input:checked + .slider:before {
+  transform: translateX(24px);
+}
+
+/* Bo góc toggle */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}

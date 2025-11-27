@@ -36,6 +36,8 @@ use App\Http\Controllers\AjaxController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HomeSystemController;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\ReportController;
 
 Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
      \UniSharp\LaravelFilemanager\Lfm::routes();
@@ -157,6 +159,18 @@ Route::middleware(['user'])->group(function () {
         Route::post('update', [AccountController::class, 'update'])->name('account.update');
         // mkt
         Route::get('mkt-register', [AccountController::class, 'mktregister'])->name('account.mktregister');
+        Route::post('mkt-tasksstore', [AccountController::class, 'storeTask'])->name('account.tasksstore');
+        Route::resource('task',TaskController::class);
+        // report
+        Route::resource('report',ReportController::class);
+        Route::post('/account/report-store', [ReportController::class, 'store'])->name('account.report.store');
+        Route::post('/account/report-update', [ReportController::class, 'update'])->name('account.report.update');
+        Route::post('/account/report-delete', [ReportController::class, 'delete'])->name('account.report.delete');
+        Route::get('/account/load-report', [ReportController::class, 'loadReport'])->name('account.loadReport');
+        Route::post('/account/report-active', [ReportController::class, 'active'])->name('account.report.active');
+
+
+
         
     });
 });

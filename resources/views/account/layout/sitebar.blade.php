@@ -10,13 +10,19 @@
 
 <div class="row-btn">
     <button class="btn btn-dangky" onclick="window.location.href='{{route('account.mktregister')}}'">ĐĂNG KÝ MARKETING</button>
-    <button class="btn btn-quanly" onclick="window.location.href=''">QUẢN LÝ CHI PHÍ MARKETING</button>
+    <button class="btn btn-quanly" onclick="window.location.href='{{route('task.index')}}'">QUẢN LÝ CHI PHÍ MARKETING</button>
+    <button class="btn btn-quanly" onclick="window.location.href='{{route('report.index')}}'">QUẢN LÝ TỔNG</button>
 </div>
 
 <div class="widget widget-list mb-3">
-    <h4><span>DANH MỤC</span></h4>
+    <h4><span>Liên hệ</span></h4>
     <ul>
-        <li><a href="#"><i class="icon-next me-2"></i>Facebook</a></li>
-        <li><a href="#"><i class="icon-next me-2"></i>Tin nội bộ</a></li>
+        <li class="mb-3">Hỗ trợ kỹ thuật: <a href="https://zalo.me/0977572947" target="_blank"><i class="icon-next me-2"></i><strong>Nguyễn Tuấn</strong></a></li>
+        <li class="mb-3">Hỗ trợ đóng tiền MKT: <a href="https://zalo.me/0977572947" target="_blank"><i class="icon-next me-2"></i><strong>Hằng Phan</strong></a></li>
+        <li class="mb-3">Hỗ trợ đăng ký MKT: <a href="https://zalo.me/0977572947" target="_blank"><i class="icon-next me-2"></i><strong>Tống Hồ Phương Thúy</strong></a></li>
+        <li class="mb-3">Hỗ trợ nạp tiền bds.com: 
+            <a href="https://zalo.me/09775729047" target="_blank"><i class="icon-next me-2"></i><strong>Tống Hồ Phương Thúy</strong></a>
+            <a href="https://zalo.me/0977572947" target="_blank"><i class="icon-next me-2"></i><strong>Nguyễn Tuấn</strong></a>
+        </li>
     </ul>
 </div>

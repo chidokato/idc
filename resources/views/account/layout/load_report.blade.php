@@ -1,0 +1,26 @@
+<table class="table table-bordered">
+    <tbody>
+        <tr>
+            <th>Tên báo cáo</th>
+            <th>Thời gian báo cáo</th>
+            <th>Đóng/mở</th>
+        </tr>
+        @foreach($reports as $r)
+        <tr data-id="{{ $r->id }}">
+            <td class="r-name">{{ $r->name }}</td>
+            <td class="r-date">{{ \Carbon\Carbon::parse($r->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($r->time_end)->format('d/m/Y') }}</td>
+            <td>
+                <label class="switch">
+                    <input type="checkbox" class="active-toggle" data-id="{{ $r->id }}" {{ $r->active ? 'checked' : '' }}>
+                    <span class="slider round"></span>
+                </label>
+
+            </td>
+            <td>
+                <button class="edit btn btn-warning">Sửa</button>
+                <button class="del btn btn-danger" data-id="{{ $r->id }}">Xóa</button>
+            </td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
