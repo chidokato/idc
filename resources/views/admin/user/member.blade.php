@@ -20,26 +20,26 @@
             </div>
             <div class="tab-content overflow">
                 <div class="tab-pane active" id="tab1">
-                    @if(count($admins) > 0)
+                    @if(count($users) > 0)
                     <table class="table">
                         <thead>
                             <tr>
                                 <th></th>
                                 <th>Name</th>
                                 <th>Email</th>
-                                <th>Quyền</th>
+                                <!-- <th>Quyền</th> -->
                                 <th>Status</th>
                                 <th>date</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($admins as $val)
+                            @foreach($users as $val)
                             <tr>
                                 <td>{{$val->id}}</td>
                                 <td><a href="{{route('users.edit',[$val->id])}}">{{$val->name}}</a></td>
                                 <td>{{$val->email}}</td>
-                                <td>{{$val->permission}}</td>
+                                <!-- <td>{{$val->permission}}</td> -->
                                 <td>
                                     <label class="container">
                                         <input type="checkbox" class="change-user-status"

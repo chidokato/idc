@@ -52,6 +52,15 @@
                                   </select>
                               </div>
                               <div class="form-group">
+                                  <label>Quyền người dùng</label>
+                                  <select name="rank" class="form-control">
+                                    <option value="">---</option>
+                                    <option <?php if($data->rank == 1){echo "selected";} ?> value="1">Giám Đốc</option>
+                                    <option <?php if($data->rank == 2){echo "selected";} ?> value="2">Trưởng phòng</option>
+                                    <option <?php if($data->rank == 3){echo "selected";} ?> value="3">Nhân viên</option>
+                                  </select>
+                              </div>
+                              <div class="form-group">
                                   <div class="edit_pass"><label>Mật khẩu</label> <label class="cursor_pointer"><input type="checkbox" id='changepassword' name="changepassword" />  <strong>EDIT</strong> </label> </div>
                                   <input disabled name="password" placeholder="Password" type="password" class="form-control pass">
                               </div>

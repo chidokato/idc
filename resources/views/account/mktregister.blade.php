@@ -100,34 +100,72 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <div>
+                        <div >
                             <p><button type="submit" class="">Gửi đăng ký MARKETING</button></p>
-                            <p><span class="required">- Chú ý: Cổng đăng ký chi phí marketing sẽ <strong>ĐÓNG</strong> vào <strong>0h00 ngày 20/12/2025</strong>.</span></p>
-                            <p><span class="required">- Hãy kiểm tra thật kỹ trước khi gửi. Sau khi gửi đăng ký MARKETING bạn sẽ <strong>KHÔNG</strong> còn quyền sửa và xóa (liên hệ Admin để sửa/xóa) những nội dung đã gửi. </span></p>
-                            <p class="required">- Có thể gửi nhiều lần trước khi cổng đăng ký đóng lại. </p>
+                            
                         </div>
                     </form>
                     <hr>
                     @foreach($reports as $report)
-                    <div>
-                        <h3>{{$report->name}} ({{ \Carbon\Carbon::parse($report->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($report->time_end)->format('d/m/Y') }})</h3>
-                        <table class="table">
-                            <tr>
-                                <th>Dự án</th>
-                                <th>Kênh</th>
-                                <th>Ngân sách</th>
-                                <th>Ghi chú</th>
-                            </tr>
-                            @foreach($report->Task as $val)
-                            <tr>
-                                <td>{{$val->Post?->name}}</td>
-                                <td>{{$val->Channel?->name}}</td>
-                                <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td>
-                                <td>{{ $val->content }}</td>
-                            </tr>
-                            @endforeach
-                        </table>
+                    @if($report->Task->isEmpty())
+                    <p>Kỳ này bạn chưa đăng ký dự án nào</p>
+                    @else
+                    <div class="row">
+                        <div class="col-lg-9">
+                            <p class="required"><i>- Chú ý: Cổng đăng ký chi phí marketing sẽ <strong>ĐÓNG</strong> vào <strong>00h00 ngày {{ \Carbon\Carbon::parse($report->time_start)->format('d/m/Y') }}</strong>. Có thể gửi nhiều lần trước khi cổng đăng ký đóng lại.</i></p>
+                            <div>
+                                <h3>{{$report->name}} ({{ \Carbon\Carbon::parse($report->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($report->time_end)->format('d/m/Y') }})</h3>
+                                <table class="table">
+                                    <tr>
+                                        <th>Dự án</th>
+                                        <th>Kênh</th>
+                                        <th>Ngân sách</th>
+                                        <th>Ghi chú</th>
+                                        <th></th>
+                                    </tr>
+                                    @foreach($report->Task()->where('user_id', Auth::id())->get() as $val)
+                                    <tr class="padding16" id="row-{{ $val->id }}">
+                                        <td>{{$val->Post?->name}}</td>
+                                        <td>{{$val->Channel?->name}}</td>
+                                        <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td>
+                                        <td>{{ $val->content }}</td>
+                                        <td>
+                                            @if($val->approved)
+                                                <span class="badge bg-success">Đã duyệt</span>
+                                            @else
+                                                <span class="badge bg-warning">Chờ duyệt</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <form action="{{ route('account.tasks.delete', $val) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="del-db btn btn-danger p-1" data-id="{{ $val->id }}">Xóa</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="widget widget-list mb-3 thongke">
+                                <h4><span>Thống kê</span></h4>
+                                <ul>
+                                    <li class="mb-3">
+                                        <div><span>Tổng số:</span> <span>{{ $report->Task->pluck('post_id')->unique()->count() }} dự án</span></div>
+                                    </li>
+                                    <li class="mb-3">
+                                        <div><span>Tổng tiền:</span> <span class="required">{{ number_format($report->Task->sum('expected_costs')) }} đ</span></div>
+                                    </li>
+                                    <!-- <li class="mb-3">
+                                        <div><span>Tiền đóng (dự kiến):</span> <span>1.000.000</span></div>
+                                    </li> -->
+                                </ul>
+                                <!-- <p class="required"><i>* Số tiền phải đóng phụ thuộc vào số lượng dự án được duyệt và tỷ lệ hỗ trợ mỗi dự án</i></p> -->
+                            </div>
+                        </div>
                     </div>
+                    @endif
                     @endforeach
                     
                 </div>
@@ -225,6 +263,58 @@
 
 
 </script>
+
+
+<script>
+$(document).on('click', '.del-db', function (e) {
+    e.preventDefault();
+
+    let id = $(this).data('id');
+    let row = $("#row-" + id);
+
+    // Lấy trạng thái duyệt của task trong cùng row
+    let approved = row.find('td:nth-child(5) span').hasClass('bg-success'); 
+
+    if (approved) {
+        Swal.fire('Không thể xóa!', 'Tác vụ đã được duyệt, không thể xóa.', 'warning');
+        return; // thoát, không xóa
+    }
+
+    let url = "{{ url('account/tasks/delete') }}/" + id;
+
+    Swal.fire({
+        title: 'Bạn có chắc muốn xóa?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Có',
+        cancelButtonText: 'Không'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function(res) {
+                    if (res.status) {
+                        row.fadeOut(300, function() {
+                            $(this).remove();
+                        });
+                    } else {
+                        Swal.fire('Lỗi!', res.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Lỗi!', 'Không thể kết nối server.', 'error');
+                }
+            });
+        }
+    });
+});
+
+</script>
+
 
 
 

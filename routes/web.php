@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\PromotionController;
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\ChannelController;
+use App\Http\Controllers\Admin\DuanController;
 
 use App\Http\Controllers\Admin\ProvinceController;
 use App\Http\Controllers\Admin\DistrictController;
@@ -86,6 +87,7 @@ Route::group(['prefix'=>'ajax'],function(){
 Route::prefix('admin')->group(function () {
     Route::middleware(['admin:1'])->group(function () {
         Route::resource('users',UserController::class);
+        Route::get('users/member/list', [UserController::class, 'member'])->name('users.member');
         Route::post('/user/change-status', [UserController::class, 'changeStatus'])->name('user.changeStatus');
         // khách hàng
         Route::resource('customer',CustomerController::class);
@@ -126,7 +128,10 @@ Route::prefix('admin')->group(function () {
         Route::get('channels/{id}/duplicate', [ChannelController::class, 'duplicate'])->name('channels.duplicate');
         Route::post('channels/{id}/update-name', [ChannelController::class, 'updateName'])->name('channels.updateName');
 
-
+        // dự án
+        Route::resource('duan', DuanController::class);
+        Route::post('duan/update-rate', [DuanController::class, 'updateRate'])->name('duan.updateRate');
+        Route::post('duan/{id}/update-name', [DuanController::class, 'updateName'])->name('duan.updateName');
 
         
     });
@@ -160,7 +165,12 @@ Route::middleware(['user'])->group(function () {
         // mkt
         Route::get('mkt-register', [AccountController::class, 'mktregister'])->name('account.mktregister');
         Route::post('mkt-tasksstore', [AccountController::class, 'storeTask'])->name('account.tasksstore');
+        
+        // task
         Route::resource('task',TaskController::class);
+        Route::post('tasks/delete/{id}', [AccountController::class, 'delete'])->name('account.tasks.delete');
+        Route::post('task/toggle-approved/{task}', [TaskController::class, 'toggleApproved'])->name('task.toggleApproved');
+
         // report
         Route::resource('report',ReportController::class);
         Route::post('/account/report-store', [ReportController::class, 'store'])->name('account.report.store');

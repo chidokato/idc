@@ -1,0 +1,59 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Session;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
+
+use Image;
+use File;
+
+use App\Models\Category;
+use App\Models\Post;
+
+use Carbon\Carbon;
+use App\Helpers\SimpleXLSX; // Import thư viện SimpleXLSX
+
+
+class DuanController extends Controller
+{
+    public function index(Request $request)
+    {
+        $posts = Post::where('sort_by', 'Product')->orderBy('id', 'DESC')->paginate(20);
+        return view('admin.duan.index', compact(
+            'posts',
+        ));
+    }
+
+    public function updateRate(Request $request)
+    {
+        $post = Post::find($request->id);
+
+        if (!$post) {
+            return response()->json(['status' => false, 'message' => 'Không tìm thấy bài viết']);
+        }
+
+        $post->rate = $request->rate;
+        $post->save();
+
+        return response()->json(['status' => true, 'message' => 'Đã lưu thành công']);
+    }
+
+    public function updateName(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $post = Post::findOrFail($id);
+        $post->update(['name' => $request->name]);
+
+        // return response()->json(['success' => true, 'name' => $channel->name]);
+
+        return response()->json(['success' => true, 'message' => 'Cập nhật thành công!' ]);
+    }
+
+}

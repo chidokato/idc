@@ -6,7 +6,6 @@
 @section('content')
 @include('admin.layout.header')
 @include('admin.alert')
-<?php use App\Models\Category; ?>
 <div class="d-sm-flex align-items-center justify-content-between mb-3 flex">
     <h2 class="h3 mb-0 text-gray-800 line-1 size-1-3-rem">Quản lý sản phẩm</h2>
     <div class="flex">
@@ -55,20 +54,6 @@
 
 <div class="row">
 <form class="width100" action="{{ url()->current() }}" method="GET">
-    <div class="col-xl-12 col-lg-12 search flex-start">
-        <input type="text" value="{{ request()->key ?? '' }}" placeholder="Tìm kiếm..." class="form-control" name="key" onchange="this.form.submit()">
-        <select class="form-control" name="category_id">
-            <option value="">...</option>
-            @foreach($category as $val)
-            <option {{isset(request()->category_id) && request()->category_id== $val->id ? 'selected':''}} value="{{$val->id}}">{{$val->name}}</option>
-            @endforeach
-        </select>
-        <button type="submit" class="btn btn-success mr-2">Tìm kiếm</button>
-        <a href="{{ url()->current() }}" class="btn btn-warning">
-            Reset
-        </a>
-    </div>
-    
     <div class="col-xl-12 col-lg-12">
         <div class="card shadow mb-4">
             <div class="card-header d-flex flex-row align-items-center justify-content-between">
@@ -95,43 +80,31 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th></th>
                                 <th>Name</th>
-                                <th></th>
-                                <th>Price</th>
-                                <th>Category</th>
-                                <th>Hot</th>
+                                <th>Hỗ trợ MKT</th>
                                 <th>Status</th>
-                                <th>date</th>
                                 <th>User</th>
                                 <th></th>
                             </tr>
                         </thead>
-                        <tbody id="post-data">
+                        <tbody>
                             @foreach($posts as $val)
-                            <tr id="post">
-                                <input type="hidden" name="id" id="id" value="{{$val->id}}" >
-                                <td class="thumb"><img src="data/images/{{$val->img}}"></td>
+                            <tr>
+                                <td><input class="change-input" type="text" name="name" value="{{ $val->name }}" data-id="{{ $val->id }}"></td>
                                 <td>
-                                    <div class="name"><a href="{{route('post.edit',[$val->id])}}" >{{$val->name}}</a></div>
-                                    
-                                </td>
-                                <td><div class="slug">{{$val->slug}}</div></td>
-                                <td>{{ $val->price ? number_format($val->price) : ''}} 
-                                    <div class="slug" style="color:red">{{$val->sale?'sale: '.$val->sale.'%':''}}</div>
-                                </td>
-                                <td>{{$val->category?->name}}</td>
-                                <td>
-                                    <label class="container"><input <?php if($val->hot == 'true'){echo "checked";} ?> type="checkbox" id='hot_post' ><span class="checkmark"></span></label>
-                                </td>
-                                <td>
-                                    <label class="container"><input <?php if($val->status == 'true'){echo "checked";} ?> type="checkbox" id='status_post' ><span class="checkmark"></span></label>
+                                    <select class="rate-select" data-id="{{ $val->id }}">
+                                        <option value="">...</option>
+                                        <option value="100%" {{ $val->rate == '100%' ? 'selected' : '' }}>100%</option>
+                                        <option value="90%"  {{ $val->rate == '90%' ? 'selected' : '' }}>90%</option>
+                                        <option value="80%"  {{ $val->rate == '80%' ? 'selected' : '' }}>80%</option>
+                                        <option value="60%"  {{ $val->rate == '60%' ? 'selected' : '' }}>60%</option>
+                                        <option value="50%"  {{ $val->rate == '50%' ? 'selected' : '' }}>50%</option>
+                                    </select>
                                 </td>
                                 <td>{{date_format($val->updated_at,"d/m/Y")}}</td>
-                                <td>{{ $val->user?->yourname }}</td>
+                                <td>{{$val->User?->yourname}}</td>
                                 <td style="display: flex;">
-                                    <!-- <a href="{{route('post_up', [$val->id])}}" class="mr-3"><i class="fas fa-arrow-up" aria-hidden="true"></i></a>  -->
-                                    <a href="{{route('post.edit',[$val->id])}}" class="mr-2"><i class="fas fa-edit" aria-hidden="true"></i></a>
+                                    <!-- <a href="{{route('post.edit',[$val->id])}}" class="mr-2"><i class="fas fa-edit" aria-hidden="true"></i></a> -->
                                     <form action="{{route('post.destroy', [$val->id])}}" method="POST">
                                       @method('DELETE')
                                       @csrf
@@ -155,9 +128,80 @@
 
 @section('js')
 <script>
-    document.getElementById("excel-file").addEventListener("change", function () {
-        let fileLabel = document.getElementById("file-label-text");
-        fileLabel.textContent = this.files.length > 0 ? this.files[0].name : "Kéo thả file vào đây hoặc tải lên từ thiết bị";
+$(document).on('change', '.rate-select', function() {
+
+    let id = $(this).data('id');
+    let rate = $(this).val();
+
+    $.ajax({
+        url: "{{ route('duan.updateRate') }}",
+        type: "POST",
+        data: {
+            _token: "{{ csrf_token() }}",
+            id: id,
+            rate: rate
+        },
+        success: function(response){
+            if(response.success){
+                Swal.fire({
+                    toast: true,
+                    position: 'bottom-end',
+                    icon: 'success',
+                    title: response.message,
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+            }
+        },
+        error: function(xhr){
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: xhr.responseJSON?.message || 'Có lỗi xảy ra!',
+                confirmButtonText: 'Đã hiểu'
+            });
+        }
+    });
+
+});
+</script>
+<script>
+    $(document).ready(function(){
+        $('.change-input').on('blur', function(){
+            var id = $(this).data('id');
+            var name = $(this).val();
+
+            $.ajax({
+                url: 'admin/duan/' + id + '/update-name', // route mình sẽ tạo
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    name: name
+                },
+                success: function(response){
+                    if(response.success){
+                        Swal.fire({
+                            toast: true,
+                            position: 'bottom-end',
+                            icon: 'success',
+                            title: response.message,
+                            showConfirmButton: false,
+                            timer: 2000,
+                            timerProgressBar: true
+                        });
+                    }
+                },
+                error: function(xhr){
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: xhr.responseJSON?.message || 'Có lỗi xảy ra!',
+                        confirmButtonText: 'Đã hiểu'
+                    });
+                }
+            });
+        });
     });
 </script>
 

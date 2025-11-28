@@ -87,7 +87,7 @@
                                     <h5 class="card-title"><a href="{{$val->category->slug}}/{{$val->slug}}">{{$val->name}}</a></h5>
                                     <div class="card-info">
                                         <span><i class="icon-time me-2"></i>{{date_format($val->updated_at,"d/m/Y")}}</span>
-                                        <span><i class="icon-user me-2"></i>{{$val->User->yourname}}</span>
+                                        <span><i class="icon-user me-2"></i>{{$val->User?->yourname}}</span>
                                     </div>
                                     <p class="mb-0 text-truncate-set text-truncate-set-2">Chính chủ cần chuyển nhượng gấp căn 2 ngủ diện tích thông thủy 78m2 full đồ, khách mua chỉ cần dọn quần áo đến có thể ở ngay</p>
                                 </div>

@@ -59,7 +59,7 @@
                         <td><a href="{{route('menu.edit',[$val->id])}}">{{$str}}{{$val->name}}</a></td>
                         <td>{{$val->slug}}</td>
                         <td><input type="text" id="menu_view" value="{{$val->view}}" name="" class="form-control cat_view"></td>
-                        <td>{{$val->user->name}}</td>
+                        <td>{{$val->user?->name}}</td>
                         <td class="date">{{date('d/m/Y',strtotime($val->created_at))}} <sup title="Sửa lần cuối: {{date('d/m/Y',strtotime($val->updated_at))}}"><i class="fa fa-question-circle-o" aria-hidden="true"></i></sup> </td>
                         <td style="display: flex;">
                             <a href="{{route('menu.edit',[$val->id])}}" class="mr-3"><i class="fas fa-edit" aria-hidden="true"></i></a>

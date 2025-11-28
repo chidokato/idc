@@ -4,14 +4,50 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Task;
+use App\Models\User;
+use App\Models\Department;
+use Illuminate\Support\Facades\Auth;
 
 class TaskController extends HomeController
 {
-    // Hiển thị danh sách tác vụ
     public function index()
     {
-        $tasks = Task::orderBy('thoi_gian','desc')->get();
+        $user = Auth::user();
+        $depLv3 = $user->department;
+        $depLv2 = $depLv3?->parentDepartment;
+
+        if (!$depLv2) {
+            $tasks = Task::with(['User.department.parentDepartment', 'Post', 'Channel'])
+                         ->where('user_id', $user->id)
+                         ->orderBy('id','desc')
+                         ->get();
+        } else {
+            $tasks = Task::with(['User.department.parentDepartment', 'Post', 'Channel'])
+                ->whereHas('User', function($qUser) use ($depLv2) {
+                    // user có department là 1 trong các group lv3 của phòng lv2
+                    $qUser->whereHas('department', function($qDept) use ($depLv2) {
+                        $qDept->where('parent', $depLv2->id);
+                    });
+                })
+                ->orderBy('id','desc')
+                ->get();
+        }
+            
         return view('account.tasks', compact('tasks'));
+    }
+
+    public function toggleApproved(Request $request, Task $task)
+    {
+        // Lấy trạng thái từ request
+        $approved = $request->input('approved') == 'true' ? 1 : 0;
+
+        $task->approved = $approved;
+        $task->save();
+
+        return response()->json([
+            'success' => true,
+            'approved' => $task->approved,
+        ]);
     }
 
     // Form tạo mới

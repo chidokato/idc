@@ -70,6 +70,7 @@
                 <a class="collapse-item" href="{{route('departments.index')}}">Phòng ban</a>
                 <a class="collapse-item" href="{{route('suppliers.index')}}">Nhà cung cấp</a>
                 <a class="collapse-item" href="{{route('channels.index')}}">Kênh chạy</a>
+                <a class="collapse-item" href="{{route('duan.index')}}">Dự án</a>
                 <a class="collapse-item" href="{{route('menu.index')}}">Menu</a>
                 <!-- <a class="collapse-item" href="{{route('option.index')}}">Tùy chọn</a> -->
                 <a class="collapse-item" href="{{route('slider.show', 'slider')}}">Slider</a>
@@ -131,8 +132,22 @@
         </div>
     </li> -->
     <li class="nav-item">
-        <a class="nav-link" href="{{route('users.index')}}"><i class="fas fa-fw fa-chart-area"></i><span>Người dùng</span></a>
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#users"
+            aria-expanded="true" aria-controls="users">
+            <i class="fas fa-fw fa-wrench"></i>
+            <span>Người dùng</span>
+        </a>
+        <div id="users" class="collapse" aria-labelledby="headingUtilities"
+            data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="{{route('users.index')}}">Admin</a>
+                <a class="collapse-item" href="{{route('users.member')}}">Member</a>
+            </div>
+        </div>
     </li>
+    <!-- <li class="nav-item">
+        <a class="nav-link" href="{{route('users.index')}}"><i class="fas fa-fw fa-chart-area"></i><span>Người dùng</span></a>
+    </li> -->
 
     
 

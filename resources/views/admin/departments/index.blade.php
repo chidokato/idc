@@ -58,10 +58,9 @@
                         <td>
                             <a href="{{ route('departments.duplicate', $val->id) }}" class="mr-3" title="Nhân bản"><i class="fas fa-copy" aria-hidden="true"></i></a>
                             {{$str}}<input class="change-input" type="text" name="name" value="{{ $val->name }}" data-id="{{ $val->id }}">
-                            <!-- <a href="{{route('departments.edit', $val)}}">{{$str}}{{$val->name}}</a>  -->
                         </td>
                         <td>{{$val->code}}</td>
-                        <td>{{$val->user->name}}</td>
+                        <td>{{$val->user?->name}}</td>
                         <td class="date">{{date('d/m/Y',strtotime($val->created_at))}} <sup title="Sửa lần cuối: {{date('d/m/Y',strtotime($val->updated_at))}}"><i class="fa fa-question-circle-o" aria-hidden="true"></i></sup> </td>
                         <td style="display: flex;">
                             

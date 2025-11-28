@@ -57,7 +57,7 @@
                                     <label class="container"><input <?php if($val->status == 'true'){echo "checked";} ?> type="checkbox" id='status_post' ><span class="checkmark"></span></label>
                                 </td>
                                 <td>{{date_format($val->updated_at,"d/m/Y")}}</td>
-                                <td>{{$val->User->yourname}}</td>
+                                <td>{{$val->User?->yourname}}</td>
                                 <td style="display: flex;">
                                     <!-- <a href="{{route('post_up', [$val->id])}}" class="mr-3"><i class="fas fa-arrow-up" aria-hidden="true"></i></a>  -->
                                     <a href="{{route('news.edit',[$val->id])}}" class="mr-2"><i class="fas fa-edit" aria-hidden="true"></i></a>

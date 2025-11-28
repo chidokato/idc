@@ -1,13 +1,13 @@
 <table class="table table-bordered">
     <tbody>
         <tr>
-            <th>Tên báo cáo</th>
-            <th>Thời gian báo cáo</th>
+            <th>Tên</th>
+            <th>Thời gian</th>
             <th>Đóng/mở</th>
         </tr>
         @foreach($reports as $r)
         <tr data-id="{{ $r->id }}">
-            <td class="r-name">{{ $r->name }}</td>
+            <td class="r-name"><a href="account/report/{{ $r->id }}">{{ $r->name }}</a></td>
             <td class="r-date">{{ \Carbon\Carbon::parse($r->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($r->time_end)->format('d/m/Y') }}</td>
             <td>
                 <label class="switch">

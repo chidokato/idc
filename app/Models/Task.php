@@ -24,19 +24,23 @@ class Task extends Model
         'content',
     ];
 
-    public function Report()
+    public function User()
     {
-        return $this->belongsTo(Report::class, 'report_id', 'id');
-    }
-    // Task thuộc về 1 Post (dự án)
-    public function Post()
-    {
-        return $this->belongsTo(Post::class, 'post_id', 'id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    // Task thuộc về 1 Channel
+    public function Post()
+    {
+        return $this->belongsTo(Post::class, 'post_id');
+    }
+
     public function Channel()
     {
-        return $this->belongsTo(Channel::class, 'channel_id', 'id');
+        return $this->belongsTo(Channel::class, 'channel_id');
+    }
+
+    public function Report()
+    {
+        return $this->belongsTo(Report::class, 'report_id');
     }
 }

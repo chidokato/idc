@@ -594,4 +594,4 @@ label {color: #46515F;}
 .paginate-search{ position:absolute; top:-6px; right:10px }
 
 
-.change-input{ border: none; border-bottom:1px solid #ddd; }
+.change-input{ border: none; border-bottom:1px solid #ddd; max-width: 100%; }

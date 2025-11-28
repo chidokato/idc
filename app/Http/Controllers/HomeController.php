@@ -39,8 +39,8 @@ class HomeController extends Controller
     public function index()
     {
         $slider = Slider::orderBy('id', 'desc')->get();
-        $product = Post::where('hot', 'true')->where('sort_by', 'Product')->orderBy('id', 'desc')->take(8)->get();
-        $news = Post::where('sort_by', 'News')->orderBy('id', 'desc')->take(5)->get();
+        $product = Post::where('hot', 'true')->where('status', 'true')->where('sort_by', 'Product')->orderBy('id', 'desc')->take(8)->get();
+        $news = Post::where('sort_by', 'News')->where('status', 'true')->orderBy('id', 'desc')->take(5)->get();
         $provinces = Province::where('home', 'true')->get();
 
         return view('pages.home', compact(
@@ -76,7 +76,7 @@ class HomeController extends Controller
                 $provinces = Province::get();
 
                 $cat_array = $request->input('categories', $cat_array);
-                $query = Post::query()->orderBy('id', 'DESC');
+                $query = Post::query()->orderBy('id', 'DESC')->where('status', 'true');
                 if ($key = $request->get('key', '')) {
                     $query->where('name', 'like', '%' . $key . '%');
                 }
@@ -93,7 +93,7 @@ class HomeController extends Controller
                 ));
             }
             if ($data->sort_by == 'News') {
-                $posts = Post::whereIn('category_id', $cat_array)->orderBy('id', 'DESC')->paginate(10);
+                $posts = Post::whereIn('category_id', $cat_array)->where('status', 'true')->orderBy('id', 'DESC')->paginate(10);
                 return view('pages.news', compact(
                     'data',
                     'posts',
@@ -109,7 +109,7 @@ class HomeController extends Controller
         $cats = Category::where('sort_by','Product')->where('parent','>',0)->get();
         $provinces = Province::get();
         $data = Province::where('slug', $slug)->first();
-        $posts = Post::where('province_id', $data->id)->orderBy('id', 'DESC')->paginate(30);
+        $posts = Post::where('province_id', $data->id)->where('status', 'true')->orderBy('id', 'DESC')->paginate(30);
         return view('pages.category', compact(
             'cats',
             'provinces',
@@ -122,7 +122,7 @@ class HomeController extends Controller
     {
         $post = Post::where('slug', $slug)->first();
         $sections = Section::where('post_id', $post->id)->orderBy('stt', 'asc')->get();
-        $related_post = Post::where('category_id', $post->category_id)->whereNotIn('id', [$post->id])->orderBy('id', 'desc')->take(10)->get();
+        $related_post = Post::where('category_id', $post->category_id)->whereNotIn('id', [$post->id])->where('status', 'true')->orderBy('id', 'desc')->take(10)->get();
         if ($post->sort_by == 'Product') {
             return view('pages.project', compact(
                 'post',

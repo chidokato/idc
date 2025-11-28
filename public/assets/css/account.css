@@ -21,14 +21,13 @@ button[type=submit]{ background: var(--main-color); color:#fff; border:none; bor
 .flex .del{ background:#c10505 ;color:#fff }
 .flex .dupple{ background: #05a5c1; color:#fff }
 
-.r-name, .r-date{line-height: 36px;}
 
 /* Container switch */
 .switch {
   position: relative;
   display: inline-block;
   width: 50px;
-  height: 26px;    margin-top: 7px;
+  height: 26px; 
 }
 
 /* Ẩn checkbox mặc định */
@@ -82,3 +81,15 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+td {
+    vertical-align: middle;
+}
+
+
+.thongke li div{ display:flex;     justify-content: space-between; }
+.thongke li div span{ font-size:1rem }
+.thongke li div span{}
+.thongke li div span{}
+.thongke p{ font-size:.8rem }
+.thongke h4{ font-size:1.5rem; border-bottom:1px solid; margin-bottom:2rem }

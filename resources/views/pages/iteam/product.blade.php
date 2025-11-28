@@ -1,6 +1,6 @@
 
     <div class="card card-s card-s4 ">
-        <a href="{{$val->category->slug}}/{{$val->slug}}">
+        <a href="{{$val->category?->slug}}/{{$val->slug}}">
             <span><img src="assets/images/space-3.gif" class="card-img-top" style="background-image: url('data/images/{{$val->img?$val->img:'no_image.jpg'}}');" alt="..."></span>
             <span class="cat">
                 {!! $val->monopoly?'<span class="room-status bg-red">Độc quyền</span>':'' !!}
@@ -16,8 +16,8 @@
         </a>
         <div class="card-body">
             <div class="card-body-wrap">
-                <h5 class="card-title"><a href="{{$val->category->slug}}/{{$val->slug}}" class="text-truncate">{{$val->name}}</a></h5>
-                <div class="card-info" title="{{$val->address}}{{ $val->street_id ? ', '.$val->Street->name:'' }}{{$val->ward_id? ', '.$val->Ward->name:''}}{{', '.$val->District->name}}{{', '.$val->Province->name}}">
+                <h5 class="card-title"><a href="{{$val->category?->slug}}/{{$val->slug}}" class="text-truncate">{{$val->name}}</a></h5>
+                <div class="card-info" title="{{$val->address}}{{ $val->street_id ? ', '.$val->Street?->name:'' }}{{$val->ward_id? ', '.$val->Ward?->name:''}}{{', '.$val->District?->name}}{{', '.$val->Province?->name}}">
                     <span class="text-truncate-set text-truncate-set-1">
                         {{$val->address}}
                         {{ $val->street_id ? ($val->address?', ':'').$val->Street->name:'' }}

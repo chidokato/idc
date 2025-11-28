@@ -415,4 +415,5 @@ class PostController extends Controller
         $Post->delete();
         return redirect()->back()->with('success','Thành công');
     }
+
 }

@@ -48,7 +48,7 @@
 
         <table class="table">
             <tr>
-                <td><input class="form-control" name="name" type="text" placeholder="Tên báo cáo"></td>
+                <td><input class="form-control" name="name" type="text" placeholder="Tên"></td>
                 <td><input class="form-control" name="date" id="date-range" type="text" placeholder="Thời gian"></td>
                 <td>
                     <button type="submit" class="btn btn-primary">Lưu lại</button>

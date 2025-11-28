@@ -51,6 +51,7 @@ class GoogleController extends Controller
                     'name' => $googleUser->getName() ?? $googleUser->getNickname() ?? 'User',
                     'email' => $googleUser->getEmail(),
                     'permission' => 6,
+                    'rank' => 3,
                     'status' => $status, // tự động active nếu email @dxmb.vn
                     'password' => bcrypt(Str::random(24)), // user sẽ login bằng Google, password random
                     'google_id' => $googleUser->getId(),

@@ -43,11 +43,50 @@
             <div class="col-lg-3 d-none d-lg-block">
                 @include('account.layout.sitebar')
             </div>
-
             <div class="col-lg-9">
-                
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Họ Tên</th>
+                            <th>Sàn/Nhóm</th>
+                            <th>Dự án</th>
+                            <th>Kênh</th>
+                            <th>Chi phí</th>
+                            <th>Hỗ trợ</th>
+                            <th>Ghi chú</th>
+                            <th>KPI</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($tasks as $task)
+                            @php
+                                $dep3 = $task->User?->department;
+                                $dep2 = $dep3?->parentDepartment;
+                                $dep1 = $dep2?->parentDepartment;
+                            @endphp
+                            <tr>
+                                <td>{{ $task->User?->name }}</td>
+                                <!-- <td>{{ $dep1?->name ?? '-' }}</td> -->
+                                <td>{{ $dep3?->name ?? '-' }}</td>
+                                <td>{{ $task->Post?->name }}</td>
+                                <td>{{ $task->Channel?->name }}</td>
+                                <td>{{ number_format($task->expected_costs,0,',','.') }}đ</td>
+                                <td>{{ $task->content }}</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>
+                                    @if($task->approved)
+                                        <span class="badge bg-success">Đã duyệt</span>
+                                    @else
+                                        <span class="badge bg-warning">Chờ duyệt</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
-            
         </div>
     </div>
 </section>

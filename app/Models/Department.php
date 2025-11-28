@@ -25,14 +25,30 @@ class Department extends Model
         return $this->belongsTo(Department::class, 'parent');
     }
 
+    // Quan hệ cha
+    public function parent()
+    {
+        return $this->belongsTo(Department::class, 'parent');
+    }
+
+    // Quan hệ con
     public function children()
     {
         return $this->hasMany(Department::class, 'parent');
     }
 
-    public function hasChildren()
+    // Lấy từng cấp
+    public function getHierarchyLevelsAttribute()
     {
-        return $this->children()->exists();
+        $level3 = $this; // chính nó
+        $level2 = $level3->parentDepartment;
+        $level1 = $level2?->parentDepartment;
+
+        return [
+            'level1' => $level1?->name,
+            'level2' => $level2?->name,
+            'level3' => $level3?->name,
+        ];
     }
 
 }

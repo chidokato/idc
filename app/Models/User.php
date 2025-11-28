@@ -31,6 +31,7 @@ class User extends Authenticatable
         'permission', 
         'status', 
         'department_id',
+        'rank',
     ];
 
     /**
@@ -68,6 +69,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Cart::class, 'user_id', 'id');
     }
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'department_id');
+    }
+    
 }
 
 

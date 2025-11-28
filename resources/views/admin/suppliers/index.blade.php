@@ -60,7 +60,7 @@
                         <td><a href="{{ route('suppliers.duplicate', $val->id) }}" class="mr-3" title="Nhân bản"><i class="fas fa-copy" aria-hidden="true"></i></a> <a href="{{route('suppliers.edit', $val)}}">{{$str}}{{$val->name}}</a> </td>
                         <td>{{$val->code}}</td>
                         <td><input type="text" id="menu_view" value="{{$val->view}}" name="" class="form-control cat_view"></td>
-                        <td>{{$val->user->name}}</td>
+                        <td>{{$val->user?->name}}</td>
                         <td class="date">{{date('d/m/Y',strtotime($val->created_at))}} <sup title="Sửa lần cuối: {{date('d/m/Y',strtotime($val->updated_at))}}"><i class="fa fa-question-circle-o" aria-hidden="true"></i></sup> </td>
                         <td style="display: flex;">
                             <a href="{{ route('suppliers.edit', $val) }}" class="mr-3"><i class="fas fa-edit" aria-hidden="true"></i></a>

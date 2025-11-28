@@ -71,15 +71,13 @@ class AccountController extends HomeController
         if (Auth::User()->department_id == null) {
             return redirect()->route('account.edit')->with('center_error','Cần cập nhật [ Sàn / Nhóm ] trước khi đăng ký MKT');
         }else{
-            $posts = Post::where('sort_by', 'Product')->orderBy('name', 'asc')->get();
+            $posts = Post::where('sort_by', 'Product')->where('rate', '!=', null)->orderBy('name', 'asc')->get();
             $channels = Channel::all();
             $reports = Report::where('active', 1)->orderBy('id', 'desc')->get();
-            $tasks = Task::where('user_id',Auth::User()->id)->get();
             return view('account.mktregister', compact(
                 'channels',
                 'posts',
                 'reports',
-                'tasks',
             ));
         }
         
@@ -110,6 +108,7 @@ class AccountController extends HomeController
                 'user_id' => auth()->id(),
                 'post_id' => $postId,
                 'channel_id' => $data['channel_id'][$key] ?? null,
+                'department_id' => auth()->user()->department_id, // <--- sửa ở đây
                 'content' => $data['content'][$key] ?? null,
                 'expected_costs' => isset($data['expected_costs'][$key]) 
                     ? str_replace(['.', ' đ'], '', $data['expected_costs'][$key]) 
@@ -120,4 +119,18 @@ class AccountController extends HomeController
 
         return redirect()->back()->with('success', 'Đã lưu tác vụ thành công!');
     }
+
+    public function delete($id)
+    {
+        $task = Task::find($id);
+
+        if (!$task) {
+            return response()->json(['status' => false, 'message' => 'Task không tồn tại']);
+        }
+
+        $task->delete();
+
+        return response()->json(['status' => true, 'message' => 'Xóa thành công']);
+    }
+
 }

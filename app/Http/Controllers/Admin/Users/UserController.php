@@ -20,8 +20,12 @@ class UserController extends Controller
     public function index()
     {
         $admins = User::where('permission', '<', 6)->orderBy('id', 'DESC')->get();
+        return view('admin.user.index', compact('admins'));
+    }
+    public function member()
+    {
         $users = User::where('permission', '=', 6)->orderBy('id', 'DESC')->get();
-        return view('admin.user.index', compact('admins', 'users'));
+        return view('admin.user.member', compact('users'));
     }
 
     /**
@@ -56,6 +60,7 @@ class UserController extends Controller
         $User->email = $request->email;
         $User->password = bcrypt($request->password);
         $User->permission = $request->permission;
+        
         $User->yourname = $request->yourname;
         $User->address = $request->address;
         $User->phone = $request->phone;
@@ -115,6 +120,7 @@ class UserController extends Controller
         $User->email = $request->email;
         $User->permission = $request->permission;
         $User->yourname = $request->yourname;
+        $User->rank = $request->rank;
         $User->address = $request->address;
         $User->phone = $request->phone;
         $User->facebook = $request->facebook;

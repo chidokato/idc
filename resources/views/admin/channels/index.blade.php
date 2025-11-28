@@ -58,22 +58,16 @@
                         <td>
                             <a href="{{ route('channels.duplicate', $val->id) }}" class="mr-3" title="Nhân bản"><i class="fas fa-copy" aria-hidden="true"></i></a> 
                             {{$str}}
-                                 <input class="change-input" type="text" name="name" value="{{ $val->name }}" data-id="{{ $val->id }}">
-                            </td>
+                             <input class="change-input" type="text" name="name" value="{{ $val->name }}" data-id="{{ $val->id }}">
+                        </td>
                         <td>{{$val->code}}</td>
-                        <td>{{$val->user->name}}</td>
+                        <td>{{$val->user?->name}}</td>
                         <td class="date">{{date('d/m/Y',strtotime($val->created_at))}} <sup title="Sửa lần cuối: {{date('d/m/Y',strtotime($val->updated_at))}}"><i class="fa fa-question-circle-o" aria-hidden="true"></i></sup> </td>
                         <td style="display: flex;">
                             
                             <a href="{{ route('channels.edit', $val) }}" class="mr-3"><i class="fas fa-edit" aria-hidden="true"></i></a>
-                            <form action="{{ route('channels.destroy', $val) }}"
-                                  method="POST"
-                                  style="display:inline-block">
-                                @csrf
-                                @method('DELETE')
-                                <button onclick="return confirm('Bạn chắc chắn?')" class="button_none">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                            <form>
+                                <button type="button" class="del btn btn-danger" data-id="{{ $val->id }}">Xóa</button>
                             </form>
                         </td>
                     </tr>

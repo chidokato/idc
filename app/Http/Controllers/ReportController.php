@@ -43,6 +43,18 @@ class ReportController extends HomeController
         return view('account.layout.load_report', compact('reports'));
     }
 
+    public function show($id)
+    {
+        $report = Report::find($id);
+        $days = Carbon::parse($report->time_start)->diffInDays(Carbon::parse($report->time_end)) + 1;
+        $task = Task::with([
+            'User.department.parent.parent', // lấy department + 2 cấp cha
+            'Post',
+            'Channel'
+        ])->where('report_id', $id)->get();
+        return view('account.showreport', compact('report', 'task', 'days'));
+    }
+
 
     public function update(Request $request)
     {
