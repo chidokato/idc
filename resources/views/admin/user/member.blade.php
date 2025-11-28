@@ -37,7 +37,7 @@
                             @foreach($users as $val)
                             <tr>
                                 <td>{{$val->id}}</td>
-                                <td><a href="{{route('users.edit',[$val->id])}}">{{$val->name}}</a></td>
+                                <td><a href="{{route('users.edit',[$val->id])}}">{{$val->yourname}}</a></td>
                                 <td>{{$val->email}}</td>
                                 <!-- <td>{{$val->permission}}</td> -->
                                 <td>

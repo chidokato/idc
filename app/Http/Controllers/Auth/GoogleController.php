@@ -48,7 +48,7 @@ class GoogleController extends Controller
                 // Tạo user mới
                 $status = Str::endsWith($googleUser->getEmail(), '@dxmb.vn') ? 'active' : 'inactive';
                 $user = User::create([
-                    'name' => $googleUser->getName() ?? $googleUser->getNickname() ?? 'User',
+                    'yourname' => $googleUser->getName() ?? $googleUser->getNickname() ?? 'User',
                     'email' => $googleUser->getEmail(),
                     'permission' => 6,
                     'rank' => 3,
