@@ -83,7 +83,7 @@ input:checked + .slider:before {
 }
 
 td {
-    vertical-align: middle;
+    vertical-align: middle; font-size: .9rem;
 }
 
 

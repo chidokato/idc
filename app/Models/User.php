@@ -33,6 +33,7 @@ class User extends Authenticatable
         'status', 
         'department_id',
         'rank',
+        'employee_code',
     ];
 
     /**

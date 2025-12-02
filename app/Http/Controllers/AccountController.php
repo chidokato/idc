@@ -60,7 +60,7 @@ class AccountController extends HomeController
 
         $user = User::find(Auth::id());
 
-        $user->update($request->only(['yourname', 'phone', 'address', 'department_id']));
+        $user->update($request->only(['yourname', 'phone', 'address', 'department_id', 'employee_code']));
 
         return redirect()->back()->with('success', 'Thành công!');
     }

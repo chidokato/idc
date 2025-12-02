@@ -34,13 +34,14 @@
                 <table class="table">
                     <thead>
                         <tr>
+                            <th>Thời gian</th>
                             <th>Họ Tên</th>
-                            <th>Nhóm</th>
+                            <th>Phòng/Nhóm</th>
                             <th>Dự án</th>
-                            <th>Kênh</th>
-                            <th>Chi phí</th>
                             <th>Hỗ trợ</th>
-                            <th>Thành tiền</th>
+                            <th>Kênh</th>
+                            <th>Số ngày</th>
+                            <th>Chi phí</th>
                             <th>KPI</th>
                             <th>Ghi chú</th>
                             <th></th>
@@ -54,13 +55,14 @@
                                 $dep1 = $dep2?->parentDepartment;
                             @endphp
                             <tr>
+                                <td>{{date('d/m/Y',strtotime($task->Report->time_start))}} - {{date('d/m/Y',strtotime($task->Report->time_end))}}</td>
                                 <td>{{ $task->User?->yourname }}</td>
                                 <td>{{ $dep3?->name ?? '-' }}</td>
                                 <td>{{ $task->Post?->name }}</td>
+                                <td>{{ $task->Post?->rate }}%</td>
                                 <td>{{ $task->Channel?->name }}</td>
-                                <td>{{ number_format($task->expected_costs,0,',','.') }}đ</td>
-                                <td>{{ $task->Post?->rate }}</td>
-                                <td>{{ number_format(((float) ($task->Post->rate ?? 0)) * ((float) ($task->expected_costs ?? 0)), 0, ',', '.') }}đ</td>
+                                <td>{{ $task->Report->days }}</td>
+                                <td>{{ number_format($task->Report->days * $task->expected_costs,0,',','.') }}đ</td>
                                 <td>{{ $task->content }}</td>
                                 <td></td>
                                 <td>

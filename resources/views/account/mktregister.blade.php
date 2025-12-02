@@ -183,12 +183,33 @@
                                     @endforeach
                                 </table>
                             </div>
-                            <hr>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="widget widget-list mb-3 thongke">
+                                <h4><span>Thống kê</span></h4>
+                                <ul>
+                                    <li class="mb-3">
+                                        <div><span>Tổng số:</span> <span>{{ $tasks->pluck('post_id')->unique()->count() }} dự án</span></div>
+                                    </li>
+                                    <li class="mb-3">
+                                        <div><span>Tổng tiền:</span> <span class="">{{ number_format($total_expected, 0, ',', '.') }} đ</span></div>
+                                    </li>
+                                    <li class="mb-3">
+                                        <div><span>Tổng tiền phải nộp (dự kiến):</span> <span class="required">{{ number_format($total_pay, 0, ',', '.') }} đ</span></div>
+                                    </li>
+                                </ul>
+                                <!-- <p class="required"><i>* Số tiền phải đóng phụ thuộc vào số lượng dự án được duyệt và tỷ lệ hỗ trợ mỗi dự án</i></p> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-lg-12 widget widget-list">
                             <div>
-                                <h3>Danh sách tác vụ của cả sàn</h3>
+                                <h3>Danh sách tác vụ: {{ Auth::user()->Department->Parent->name }}</h3>
                                 <table class="table">
                                     <tr>
                                         <th>Nhân viên</th>
+                                        <th>Phòng/Nhóm</th>
                                         <th>Dự án</th>
                                         <th>Hỗ trợ</th>
                                         <th>Kênh</th>
@@ -201,6 +222,7 @@
                                     @foreach($tasks_all as $val)
                                     <tr class="padding16" id="row-{{ $val->id }}">
                                         <td>{{$val->handler?->yourname ?? '-'}}</td>
+                                        <td>{{ $val->Department->name }}</td>
                                         <td>{{$val->Post?->name}}</td>
                                         <td>{{$val->rate}}%</td>
                                         <td>{{$val->Channel?->name}}</td>
@@ -220,23 +242,7 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="col-lg-3">
-                            <div class="widget widget-list mb-3 thongke">
-                                <h4><span>Thống kê</span></h4>
-                                <ul>
-                                    <li class="mb-3">
-                                        <div><span>Tổng số:</span> <span>{{ $report->Task->pluck('post_id')->unique()->count() }} dự án</span></div>
-                                    </li>
-                                    <li class="mb-3">
-                                        <div><span>Tổng tiền:</span> <span class="">{{ number_format($total_expected, 0, ',', '.') }} đ</span></div>
-                                    </li>
-                                    <li class="mb-3">
-                                        <div><span>Tổng tiền phải nộp (dự kiến):</span> <span class="required">{{ number_format($total_pay, 0, ',', '.') }} đ</span></div>
-                                    </li>
-                                </ul>
-                                <!-- <p class="required"><i>* Số tiền phải đóng phụ thuộc vào số lượng dự án được duyệt và tỷ lệ hỗ trợ mỗi dự án</i></p> -->
-                            </div>
-                        </div>
+                        
                     </div>
                     @endif
                     @endforeach

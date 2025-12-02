@@ -30,13 +30,17 @@
                         <div class="col-md-5"><h3>Sửa thông tin tài khoản</h3></div>
                     </div>
                     <div class="row input-group">
+                        <div class="col-md-2"><label>Mã nhân viên <span class="required">(*)</span></label></div>
+                        <div class="col-md-5"><input required type="text" name="employee_code" class="form-control" value="{{ $user->employee_code }}" placeholder="VD: IDC0116"></div>
+                    </div>
+                    <div class="row input-group">
                         <div class="col-md-2"><label>Họ tên <span class="required">(*)</span></label></div>
                         <div class="col-md-5"><input required type="text" name="yourname" class="form-control" value="{{ $user->yourname }}" placeholder="Họ & Tên"></div>
                     </div>
                     <div class="row input-group">
                         <div class="col-md-2"><label>Nhóm / Sàn <span class="required">(*)</span> </label></div>
                         <div class="col-md-5">
-                            <select {{ $user->department_id? 'required':'' }} class="form-control select2" name="department_id" required>
+                            <select {{ $user->department_id? 'disabled':'' }} class="form-control" name="department_id" required>
                                 <option value="">---</option>
                                 {!! $departmentOptions !!}
                             </select>
