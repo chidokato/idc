@@ -13,45 +13,24 @@
 @endsection
 
 @section('content')
-
-<section class="floating-label sec-fiter-search">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <!------------------- BREADCRUMB ------------------->
-                <section class="sec-breadcrumb">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{asset('')}}">Indochine</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Account</li>
-                        </ol>
-                    </nav>
-                </section>
-                <!------------------- END: BREADCRUMB ------------------->
-            </div>
-            <div class="col-md-6">
-                
-            </div>
-        </div>
-        
-    </div>
-</section>
-
-
 <section class="card-grid news-sec">
     <div class="container">
         <div class="row">
-            <div class="col-lg-3 d-none d-lg-block">
+            <div class="col-lg-2 d-none d-lg-block">
                 @include('account.layout.sitebar')
             </div>
-                <div class="col-lg-9">
+                <div class="col-lg-10">
                     <form action="{{ route('account.tasksstore') }}" method="POST">
                         @csrf
                         <input type="hidden" name="" value="">
                         <table class="table" id="myTable">
                             <thead>
                                 <tr>
+                                    @if(Auth::user()->rank < 3)
+                                    <th>Nhân viên</th>
+                                    @endif
                                     <th>Dự án <span class="required">(*)</span></th>
+                                    <th>Hỗ trợ</th>
                                     <th>Kênh <span class="required">(*)</span></th>
                                     <th>Ngân sách/ngày <span class="required">(*)</span></th>
                                     <th>Ghi chú</th>
@@ -61,14 +40,48 @@
                             </thead>
                             <tbody>
                                 <tr>
+                                    @if(Auth::user()->rank < 3)
                                     <td>
-                                        <select name="post_id[]" required class="form-control">
+                                        <select name="user_id[]" required class="form-control user-select">
+                                            <option value="">---</option>
+                                            @foreach($users as $val)
+                                            <option <?php if(Auth::user()->id == $val->id){ echo "selected"; } ?> value="{{ $val->id }}" data-department="{{ $val->department_id }}">
+                                                {{ $val->yourname }}
+                                            </option>
+                                            @endforeach
+                                        </select>
+                                        <input type="hidden" name="department_id[]" class="department-id" value="{{ Auth::user()->department_id }}">
+                                    </td>
+                                    @else
+                                    <input type="hidden" name="user_id[]" class="department-id" value="{{ Auth::user()->id }}">
+                                    <input type="hidden" name="department_id[]" class="department-id" value="{{ Auth::user()->department_id }}">
+                                    @endif
+                                    <td>
+                                        <select name="post_id[]" required class="form-control post-select">
                                             <option value="">---</option>
                                             @foreach($posts as $val)
-                                            <option value="{{$val->id}}">{{$val->name}}</option>
+                                            <option value="{{ $val->id }}" data-rate="{{ $val->rate }}">
+                                                {{ $val->name }}
+                                            </option>
                                             @endforeach
                                         </select>
                                     </td>
+
+                                    <td>
+                                        <select name="rate[]" required class="form-control rate-select">
+                                            <option value="">-</option>
+                                            <option value="100">100%</option>
+                                            <option value="95">95%</option>
+                                            <option value="90">90%</option>
+                                            <option value="80">80%</option>
+                                            <option value="70">70%</option>
+                                            <option value="60">60%</option>
+                                            <option value="50">50%</option>
+                                            <option value="30">30%</option>
+                                            <option value="0">0%</option>
+                                        </select>
+                                    </td>
+
                                     <td>
                                         <select name="channel_id[]" required class="form-control">
                                             <option value="">---</option>
@@ -110,24 +123,39 @@
                     @if($report->Task->isEmpty())
                     <p>Kỳ này bạn chưa đăng ký dự án nào</p>
                     @else
+                    <?php
+                        $tasks_all = $report->Task()->whereIn('department_id', $groupIds)->get();
+                        $tasks = $report->Task()->where('user', Auth::id())->get();
+                        $total_expected = 0;   // tổng tiền gốc
+                        $total_pay = 0;        // tổng tiền phải nộp
+                    ?>
                     <div class="row">
-                        <div class="col-lg-9">
-                            <p class="required"><i>- Chú ý: Cổng đăng ký chi phí marketing sẽ <strong>ĐÓNG</strong> vào <strong>00h00 ngày {{ \Carbon\Carbon::parse($report->time_start)->format('d/m/Y') }}</strong>. Có thể gửi nhiều lần trước khi cổng đăng ký đóng lại.</i></p>
+                        <div class="col-lg-9 widget widget-list">
+                            <p class="required"><i>- Chú ý: Cổng đăng ký chi phí marketing sẽ <strong>TỰ ĐỘNG ĐÓNG</strong> vào <strong>00h00 ngày {{ \Carbon\Carbon::parse($report->time_start)->format('d/m/Y') }}</strong>. Có thể gửi nhiều lần trước khi cổng đăng ký đóng lại.</i></p>
                             <div>
                                 <h3>{{$report->name}} ({{ \Carbon\Carbon::parse($report->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($report->time_end)->format('d/m/Y') }})</h3>
                                 <table class="table">
                                     <tr>
+                                        <th>Nhân viên</th>
                                         <th>Dự án</th>
+                                        <th>Hỗ trợ</th>
                                         <th>Kênh</th>
                                         <th>Ngân sách</th>
+                                        <th>Tổng tiền</th>
+                                        <th>Tiền phải nộp</th>
                                         <th>Ghi chú</th>
                                         <th></th>
+                                        <th></th>
                                     </tr>
-                                    @foreach($report->Task()->where('user_id', Auth::id())->get() as $val)
+                                    @foreach($tasks as $val)
                                     <tr class="padding16" id="row-{{ $val->id }}">
+                                        <td>{{$val->handler?->yourname ?? '-'}}</td>
                                         <td>{{$val->Post?->name}}</td>
+                                        <td>{{$val->rate}}%</td>
                                         <td>{{$val->Channel?->name}}</td>
                                         <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td>
+                                        <td>{{ number_format(($report->days * $val->expected_costs), 0, ',', '.') }} đ</td>
+                                        <td>{{ number_format(($report->days * $val->expected_costs * (1 - $val->Post?->rate/100)), 0, ',', '.') }} đ</td>
                                         <td>{{ $val->content }}</td>
                                         <td>
                                             @if($val->approved)
@@ -143,6 +171,51 @@
                                             </form>
                                         </td>
                                     </tr>
+
+                                    <?php
+                                        $expected = $report->days * $val->expected_costs;
+                                        $pay = $report->days * $val->expected_costs * (1 - ($val->Post->rate ?? 0) / 100);
+
+                                        $total_expected += $expected;
+                                        $total_pay += $pay;
+                                    ?>
+
+                                    @endforeach
+                                </table>
+                            </div>
+                            <hr>
+                            <div>
+                                <h3>Danh sách tác vụ của cả sàn</h3>
+                                <table class="table">
+                                    <tr>
+                                        <th>Nhân viên</th>
+                                        <th>Dự án</th>
+                                        <th>Hỗ trợ</th>
+                                        <th>Kênh</th>
+                                        <th>Ngân sách</th>
+                                        <th>Tổng tiền</th>
+                                        <th>Tiền phải nộp</th>
+                                        <th>Ghi chú</th>
+                                        <th></th>
+                                    </tr>
+                                    @foreach($tasks_all as $val)
+                                    <tr class="padding16" id="row-{{ $val->id }}">
+                                        <td>{{$val->handler?->yourname ?? '-'}}</td>
+                                        <td>{{$val->Post?->name}}</td>
+                                        <td>{{$val->rate}}%</td>
+                                        <td>{{$val->Channel?->name}}</td>
+                                        <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td>
+                                        <td>{{ number_format(($report->days * $val->expected_costs), 0, ',', '.') }} đ</td>
+                                        <td>{{ number_format(($report->days * $val->expected_costs * (1 - $val->Post?->rate/100)), 0, ',', '.') }} đ</td>
+                                        <td>{{ $val->content }}</td>
+                                        <td>
+                                            @if($val->approved)
+                                                <span class="badge bg-success">Đã duyệt</span>
+                                            @else
+                                                <span class="badge bg-warning">Chờ duyệt</span>
+                                            @endif
+                                        </td>
+                                    </tr>
                                     @endforeach
                                 </table>
                             </div>
@@ -155,11 +228,11 @@
                                         <div><span>Tổng số:</span> <span>{{ $report->Task->pluck('post_id')->unique()->count() }} dự án</span></div>
                                     </li>
                                     <li class="mb-3">
-                                        <div><span>Tổng tiền:</span> <span class="required">{{ number_format($report->Task->sum('expected_costs')) }} đ</span></div>
+                                        <div><span>Tổng tiền:</span> <span class="">{{ number_format($total_expected, 0, ',', '.') }} đ</span></div>
                                     </li>
-                                    <!-- <li class="mb-3">
-                                        <div><span>Tiền đóng (dự kiến):</span> <span>1.000.000</span></div>
-                                    </li> -->
+                                    <li class="mb-3">
+                                        <div><span>Tổng tiền phải nộp (dự kiến):</span> <span class="required">{{ number_format($total_pay, 0, ',', '.') }} đ</span></div>
+                                    </li>
                                 </ul>
                                 <!-- <p class="required"><i>* Số tiền phải đóng phụ thuộc vào số lượng dự án được duyệt và tỷ lệ hỗ trợ mỗi dự án</i></p> -->
                             </div>
@@ -312,6 +385,21 @@ $(document).on('click', '.del-db', function (e) {
         }
     });
 });
+
+</script>
+
+
+<script> 
+    $(document).on('change', '.user-select', function() {
+        let departmentId = $(this).find(':selected').data('department'); 
+        $(this).closest('td').find('.department-id').val(departmentId);
+    }); // gán id phòng thuộc người dùng
+
+    $(document).on('change', '.post-select', function() {
+        let rate = $(this).find(':selected').data('rate'); // Lấy rate từ post
+        let rateSelect = $(this).closest('tr').find('.rate-select');
+        rateSelect.val(rate); // Set selected option phù hợp
+    }); // Gán tỷ lệ hỗ trợ theo dự án
 
 </script>
 

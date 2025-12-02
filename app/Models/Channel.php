@@ -26,4 +26,18 @@ class Channel extends Model
     {
         return $this->hasMany(Channel::class, 'parent');
     }
+    /**
+     * Lấy tất cả id của department con + chính nó
+     */
+    public static function getChildIds($id)
+    {
+        $ids = [$id];
+        $children = self::where('parent', $id)->get();
+
+        foreach ($children as $child) {
+            $ids = array_merge($ids, self::getChildIds($child->id));
+        }
+
+        return $ids;
+    }
 }

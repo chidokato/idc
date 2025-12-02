@@ -53,14 +53,14 @@ class AccountController extends HomeController
     public function update(Request $request)
     {
         $request->validate([
-            'name'   => 'required|max:255',
+            'yourname'   => 'required|max:255',
             'phone'  => 'nullable',
             'address' => 'nullable',
         ]);
 
         $user = User::find(Auth::id());
 
-        $user->update($request->only(['name', 'phone', 'address', 'department_id']));
+        $user->update($request->only(['yourname', 'phone', 'address', 'department_id']));
 
         return redirect()->back()->with('success', 'Thành công!');
     }
@@ -71,16 +71,50 @@ class AccountController extends HomeController
         if (Auth::User()->department_id == null) {
             return redirect()->route('account.edit')->with('center_error','Cần cập nhật [ Sàn / Nhóm ] trước khi đăng ký MKT');
         }else{
-            $posts = Post::where('sort_by', 'Product')->where('rate', '!=', null)->orderBy('name', 'asc')->get();
-            $channels = Channel::all();
-            $reports = Report::where('active', 1)->orderBy('id', 'desc')->get();
-            return view('account.mktregister', compact(
-                'channels',
-                'posts',
-                'reports',
-            ));
+            $groupIds = Department::where('parent', Auth::user()->Department->parent)->pluck('id')->toArray();
+            // dd($groupIds);
+            $r = Report::where('active', 1)->count();
+            if ($r > 0) {
+                $users = User::get();
+                $posts = Post::where('sort_by', 'Product')->where('rate', '!=', null)->orderBy('name', 'asc')->get();
+                $channels = Channel::where('parent', '!=', 0)->get();
+                $reports = Report::where('active', 1)->orderBy('id', 'desc')->get();
+                return view('account.mktregister', compact(
+                    'users',
+                    'channels',
+                    'posts',
+                    'reports',
+                    'groupIds',
+                ));
+            }else{
+                return redirect()->route('account.edit')->with('center_error','Các kỳ đăng ký Marketing đã đóng hoặc chưa mở kỳ mới, Vui lòng thử lại sau');
+            }
         }
         
+    }
+
+    public function storeTask(Request $request)
+    {
+        $data = $request->all();
+
+        // Lặp qua từng dòng trong form
+        foreach ($data['post_id'] as $key => $postId) {
+            Task::create([
+                'user_id' => Auth::id(),
+                'user' => $data['user_id'][$key] ?? null,
+                'post_id' => $postId,
+                'channel_id' => $data['channel_id'][$key] ?? null,
+                'rate' => $data['rate'][$key] ?? null,
+                'department_id' => $data['department_id'][$key] ?? null,
+                'content' => $data['content'][$key] ?? null,
+                'expected_costs' => isset($data['expected_costs'][$key]) 
+                    ? str_replace(['.', ' đ'], '', $data['expected_costs'][$key]) 
+                    : 0,
+                'report_id' => $data['report_id'][$key] ?? null,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Đã lưu tác vụ thành công!');
     }
 
     public function mktlist()
@@ -96,28 +130,6 @@ class AccountController extends HomeController
             ));
         }
         
-    }
-
-    public function storeTask(Request $request)
-    {
-        $data = $request->all();
-
-        // Lặp qua từng dòng trong form
-        foreach ($data['post_id'] as $key => $postId) {
-            Task::create([
-                'user_id' => auth()->id(),
-                'post_id' => $postId,
-                'channel_id' => $data['channel_id'][$key] ?? null,
-                'department_id' => auth()->user()->department_id, // <--- sửa ở đây
-                'content' => $data['content'][$key] ?? null,
-                'expected_costs' => isset($data['expected_costs'][$key]) 
-                    ? str_replace(['.', ' đ'], '', $data['expected_costs'][$key]) 
-                    : 0,
-                'report_id' => $data['report_id'][$key] ?? null,
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'Đã lưu tác vụ thành công!');
     }
 
     public function delete($id)

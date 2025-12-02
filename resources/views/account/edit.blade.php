@@ -14,38 +14,15 @@
 
 @section('content')
 
-<section class="floating-label sec-fiter-search">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <!------------------- BREADCRUMB ------------------->
-                <section class="sec-breadcrumb">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{asset('')}}">Indochine</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Account</li>
-                        </ol>
-                    </nav>
-                </section>
-                <!------------------- END: BREADCRUMB ------------------->
-            </div>
-            <div class="col-md-6">
-                
-            </div>
-        </div>
-        
-    </div>
-</section>
-
 
 <section class="card-grid news-sec">
     <div class="container">
         <div class="row">
-            <div class="col-lg-3 d-none d-lg-block">
+            <div class="col-lg-2 d-none d-lg-block">
                 @include('account.layout.sitebar')
             </div>
 
-            <div class="col-lg-9">
+            <div class="col-lg-10">
                 <form action="{{ route('account.update') }}" method="POST">
                     @csrf
                     <div class="row input-group">
@@ -54,7 +31,7 @@
                     </div>
                     <div class="row input-group">
                         <div class="col-md-2"><label>Họ tên <span class="required">(*)</span></label></div>
-                        <div class="col-md-5"><input required type="text" name="name" class="form-control" value="{{ $user->name }}" placeholder="Họ & Tên"></div>
+                        <div class="col-md-5"><input required type="text" name="yourname" class="form-control" value="{{ $user->yourname }}" placeholder="Họ & Tên"></div>
                     </div>
                     <div class="row input-group">
                         <div class="col-md-2"><label>Nhóm / Sàn <span class="required">(*)</span> </label></div>

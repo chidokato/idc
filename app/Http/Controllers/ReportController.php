@@ -5,7 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Models\Report;
+use App\Models\Post;
+use App\Models\Channel;
+use App\Models\Department;
 use Carbon\Carbon;
+use App\Helpers\TreeHelper;
 
 class ReportController extends HomeController
 {
@@ -26,12 +30,13 @@ class ReportController extends HomeController
         $dates = explode(' - ', $request->date); // ["01/11/2025", "15/11/2025"]
         $time_start = isset($dates[0]) ? \Carbon\Carbon::createFromFormat('d/m/Y', $dates[0])->format('Y-m-d') : null;
         $time_end   = isset($dates[1]) ? \Carbon\Carbon::createFromFormat('d/m/Y', $dates[1])->format('Y-m-d') : null;
-
+        $days = Carbon::parse($time_start)->diffInDays(Carbon::parse($time_end)) + 1;
         // Lưu báo cáo
         Report::create([
             'name' => $request->name,
             'time_start' => $time_start,
             'time_end' => $time_end,
+            'days' => $days,
         ]);
 
         return response()->json(['success' => true, 'message' => 'Đã lưu báo cáo']);
@@ -43,27 +48,89 @@ class ReportController extends HomeController
         return view('account.layout.load_report', compact('reports'));
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $report = Report::find($id);
+
+        if (!$report) {
+            abort(404, 'Report not found');
+        }
+
         $days = Carbon::parse($report->time_start)->diffInDays(Carbon::parse($report->time_end)) + 1;
-        $task = Task::with([
-            'User.department.parent.parent', // lấy department + 2 cấp cha
+
+        // Base query
+        $query = Task::with([
+            'User.department.parent.parent', // giữ nguyên quan hệ cũ
             'Post',
             'Channel'
-        ])->where('report_id', $id)->get();
-        return view('account.showreport', compact('report', 'task', 'days'));
+        ])
+        ->where('report_id', $id);
+
+        // ============================
+        // 2️⃣ Lọc theo department lv3
+        // ============================
+        if ($request->department_id) {
+            $departmentIds = Department::getChildIds($request->department_id);
+            $query->whereHas('department', function($q) use ($departmentIds) {
+                $q->whereIn('id', $departmentIds);
+            });
+
+        }
+
+        // ============================
+        // 3️⃣ Lọc theo dự án
+        // ============================
+        if ($request->post_id) {
+            $query->where('post_id', $request->post_id);
+        }
+
+        // ============================
+        // 4️⃣ Lọc theo kênh
+        // ============================
+        if ($request->channel_id) {
+            $channelIds = Channel::getChildIds($request->channel_id); // lấy tất cả con
+            $query->whereIn('channel_id', $channelIds);
+        }
+
+        // ============================
+        // 5️⃣ Phân trang
+        // ============================
+        $task = $query->paginate(1000)->appends($request->query());
+
+        // Select filter
+        $departments = Department::all();
+        $departmentOptions = TreeHelper::buildOptions($departments,0,'',$request->department_id);
+
+        $posts       = Post::where('sort_by', 'Product')->where('rate', '!=', Null)->get();
+        $channels    = Channel::all();
+        $channelsOptions = TreeHelper::buildOptions($channels,0,'',$request->channel_id);
+
+        return view('account.showreport', compact(
+            'report',
+            'task',
+            'days',
+            'departmentOptions',
+            'posts',
+            'channelsOptions',
+        ));
     }
+
 
 
     public function update(Request $request)
     {
         $dates = explode(' - ', $request->date);
 
+        $start = Carbon::createFromFormat('d/m/Y', $dates[0]);
+        $end   = Carbon::createFromFormat('d/m/Y', $dates[1]);
+
+        $days = $start->diffInDays($end) + 1; // tính cả 2 ngày
+
         Report::where('id', $request->id)->update([
             'name' => $request->name,
-            'time_start' => Carbon::createFromFormat('d/m/Y', $dates[0])->format('Y-m-d'),
-            'time_end'   => Carbon::createFromFormat('d/m/Y', $dates[1])->format('Y-m-d'),
+            'time_start' => $start->format('Y-m-d'),
+            'time_end'   => $end->format('Y-m-d'),
+            'days' => $days,
         ]);
 
         // return back()->with('success', 'Đã lưu thành công!');

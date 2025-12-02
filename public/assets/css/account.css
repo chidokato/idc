@@ -1,4 +1,4 @@
-.container{ max-width:95% !important }
+.container{ max-width:100% !important }
 .account{ min-height:60vh }
 .account button.login{ margin:auto; margin-top:20% }
 
@@ -13,7 +13,7 @@
 .users p{ margin-bottom: 3px; font-size:.8rem }
 
 .input-group{ display:flex; align-items: center; margin-bottom:.5rem }
-.form-control{ border:1px solid #ddd; padding:10px 15px }
+.form-control{ border:1px solid #ddd; padding:9px 10px }
 button[type=submit]{ background: var(--main-color); color:#fff; border:none; border-radius:5px; padding:10px 15px; }
 .required{ color:red }
 
@@ -93,3 +93,11 @@ td {
 .thongke li div span{}
 .thongke p{ font-size:.8rem }
 .thongke h4{ font-size:1.5rem; border-bottom:1px solid; margin-bottom:2rem }
+
+.button-search{ width:auto; color:#fff; font-weight:bold; }
+.button-search:hover{ color:#fff }
+.space-between{ justify-content: space-between; align-items: center; }
+
+small{ font-size:.8rem }
+
+.news-sec{ padding-top:50px }

@@ -94,11 +94,11 @@
                                 <td>
                                     <select class="rate-select" data-id="{{ $val->id }}">
                                         <option value="">...</option>
-                                        <option value="100%" {{ $val->rate == '100%' ? 'selected' : '' }}>100%</option>
-                                        <option value="90%"  {{ $val->rate == '90%' ? 'selected' : '' }}>90%</option>
-                                        <option value="80%"  {{ $val->rate == '80%' ? 'selected' : '' }}>80%</option>
-                                        <option value="60%"  {{ $val->rate == '60%' ? 'selected' : '' }}>60%</option>
-                                        <option value="50%"  {{ $val->rate == '50%' ? 'selected' : '' }}>50%</option>
+                                        <option value="100" {{ $val->rate == '100' ? 'selected' : '' }}>100%</option>
+                                        <option value="90"  {{ $val->rate == '90' ? 'selected' : '' }}>90%</option>
+                                        <option value="80"  {{ $val->rate == '80' ? 'selected' : '' }}>80%</option>
+                                        <option value="60"  {{ $val->rate == '60' ? 'selected' : '' }}>60%</option>
+                                        <option value="50"  {{ $val->rate == '50' ? 'selected' : '' }}>50%</option>
                                     </select>
                                 </td>
                                 <td>{{date_format($val->updated_at,"d/m/Y")}}</td>

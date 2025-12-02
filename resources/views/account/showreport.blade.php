@@ -9,35 +9,44 @@
 
 @section('content')
 
-<section class="floating-label sec-fiter-search">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <!------------------- BREADCRUMB ------------------->
-                <section class="sec-breadcrumb">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{asset('')}}">Indochine</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Account</li>
-                        </ol>
-                    </nav>
-                </section>
-                <!------------------- END: BREADCRUMB ------------------->
-            </div>
-            <div class="col-md-6">
-                
-            </div>
-        </div>
-        
-    </div>
-</section>
-
-
 <section class="card-grid news-sec">
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
-                <h3 class="mb-4">{{ $report->name }} ({{ \Carbon\Carbon::parse($report->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($report->time_end)->format('d/m/Y') }}) <button type="button" onclick="window.location.href='{{route('report.index')}}'" class="btn btn-primary">Thoát trình duyệt MKT</button></h3>
+                <h3 class="mb-4 flex space-between"><button type="button" onclick="window.location.href='{{route('report.index')}}'" class="btn btn-primary">Trở về trang trước</button> {{ $report->name }} ({{ \Carbon\Carbon::parse($report->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($report->time_end)->format('d/m/Y') }}) </h3>
+                <hr>
+                <form method="GET" class="row g-2 mb-3">
+                    <div class="col-md-2">
+                        <select name="department_id" class="form-control select2">
+                            <option value="">-- Sàn / Nhóm --</option>
+                            {!! $departmentOptions !!}
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <select name="post_id" class="form-control select2">
+                            <option value="">-- Dự án --</option>
+                            @foreach($posts as $p)
+                                <option value="{{ $p->id }}" {{ request('post_id') == $p->id ? 'selected' : '' }}>
+                                    {{ $p->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <select name="channel_id" class="form-control select2">
+                            <option value="">-- Kênh --</option>
+                            {!! $channelsOptions !!}
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <button class="btn button-search form-control bg-success">Lọc</button>
+                    </div>
+
+                </form>
+
                 <table class="table">
                     <thead>
                         <tr>
@@ -52,20 +61,25 @@
                             <th>Ghi chú</th>
                             <th>KPI</th>
                             <th>Duyệt</th>
+                            <th></th>
                         </tr>
                     </thead>
+
                     <tbody>
                         @foreach($task as $val)
-                        <?php $levels = $val->User?->department?->hierarchy_levels ?? []; ?>
+                        <?php $levels = $val->department?->hierarchy_levels ?? []; ?>
                         <tr>
-                            <td>{{ $val->User?->name }}</td>
-                            <td>{{ $levels['level3'] ?? '-' }} <br> <small>{{ $levels['level2'] ?? '-' }}</small></td>
+                            <td>{{ $val->handler?->yourname ?? '---' }} <br> <small>{{ $val->handler?->email }}</small> </td>
+                            <td>{{ $levels['level3'] ?? '-' }} <br>
+                                <small>{{ $levels['level2'] ?? '-' }}</small>
+                            </td>
+
                             <td>{{ $val->Post?->name }}</td>
                             <td>{{ $val->Channel?->name }}</td>
-                            <td>{{ number_format($val->expected_costs, 0, ',', '.') }}đ</td>
+                            <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td>
                             <td>{{ $days }}</td>
                             <td>{{ number_format($val->total_costs ?? $days*$val->expected_costs, 0, ',', '.') }} đ</td>
-                            <td>{{ number_format($val->support_money ?? 0, 0, ',', '.') }}đ</td>
+                            <td>{{ number_format($val->support_money ?? 0, 0, ',', '.') }} đ</td>
                             <td>{{ $val->content }}</td>
                             <td>{{ $val->kpi ?? '-' }}</td>
                             <td>
@@ -74,17 +88,16 @@
                                     <span class="slider round"></span>
                                 </label>
                             </td>
-                            <td>
-                                @if($val->approved)
-                                    <span class="badge bg-success">Đã duyệt</span>
-                                @else
-                                    <span class="badge bg-warning">Chờ duyệt</span>
-                                @endif
-                            </td>
+                            <td> @if($val->approved) <span class="badge bg-success">Đã duyệt</span> @else <span class="badge bg-warning">Chờ duyệt</span> @endif </td>
                         </tr>
                         @endforeach
                     </tbody>
                 </table>
+
+                <div class="mt-3">
+                    {{ $task->links() }}
+                </div>
+
 
             </div>
         </div>
@@ -98,10 +111,14 @@
 <link href="assets/css/widget.css" rel="stylesheet">
 <link href="assets/css/account.css" rel="stylesheet">
 <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" /> -->
-
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 @endsection
 @section('js')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
+    $(document).ready(function() {
+        $('.select2').select2();
+    });
 $(document).ready(function() {
     $('.active-toggle').on('change', function() {
         let checkbox = $(this);
@@ -134,4 +151,5 @@ $(document).ready(function() {
     });
 });
 </script>
+
 @endsection

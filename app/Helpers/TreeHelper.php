@@ -4,18 +4,6 @@ namespace App\Helpers;
 
 class TreeHelper
 {
-    /**
-     * Build select options from a tree structure
-     *
-     * @param \Illuminate\Support\Collection $items
-     * @param int $parentId
-     * @param string $prefix
-     * @param int|null $selectedId
-     * @param string $idField
-     * @param string $parentField
-     * @param string $nameField
-     * @return string
-     */
     public static function buildOptions(
         $items,
         $parentId = 0,

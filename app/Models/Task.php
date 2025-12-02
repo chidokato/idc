@@ -29,6 +29,11 @@ class Task extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function handler()
+    {
+        return $this->belongsTo(User::class, 'user'); // người sử dụng tác vụ
+    }
+
     public function Post()
     {
         return $this->belongsTo(Post::class, 'post_id');
@@ -43,4 +48,9 @@ class Task extends Model
     {
         return $this->belongsTo(Report::class, 'report_id');
     }
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'department_id');
+    }
+
 }

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Models\User;
 use App\Models\Department;
+use App\Models\Report;
 use Illuminate\Support\Facades\Auth;
 
 class TaskController extends HomeController
@@ -15,7 +16,8 @@ class TaskController extends HomeController
         $user = Auth::user();
         $depLv3 = $user->department;
         $depLv2 = $depLv3?->parentDepartment;
-
+        $depLv1 = $depLv2?->parentDepartment;
+        $reports = Report::orderBy('id','desc')->get();
         if (!$depLv2) {
             $tasks = Task::with(['User.department.parentDepartment', 'Post', 'Channel'])
                          ->where('user_id', $user->id)
@@ -33,7 +35,14 @@ class TaskController extends HomeController
                 ->get();
         }
             
-        return view('account.tasks', compact('tasks'));
+        return view('account.tasks', compact(
+            'tasks',
+            'user',
+            'depLv3',
+            'depLv2',
+            'depLv1',
+            'reports',
+        ));
     }
 
     public function toggleApproved(Request $request, Task $task)

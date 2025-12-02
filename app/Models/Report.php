@@ -14,6 +14,7 @@ class Report extends Model
         'name',
         'time_start',
         'time_end',
+        'days',
         'status',
     ];
 
