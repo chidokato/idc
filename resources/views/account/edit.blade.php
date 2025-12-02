@@ -36,7 +36,7 @@
                     <div class="row input-group">
                         <div class="col-md-2"><label>Nhóm / Sàn <span class="required">(*)</span> </label></div>
                         <div class="col-md-5">
-                            <select class="form-control select2" name="department_id" required>
+                            <select {{ $user->department_id? 'required':'' }} class="form-control select2" name="department_id" required>
                                 <option value="">---</option>
                                 {!! $departmentOptions !!}
                             </select>
