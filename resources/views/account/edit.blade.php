@@ -58,7 +58,7 @@
                         <div class="col-md-2"></div>
                         <div class="col-md-5">
                             <button type="submit">Lưu thay đổi</button>
-                            <p class="required">Nhóm / Sàn chỉ thay đổi được 1 lần. Vui lòng kiểm tra kỹ trước khi cập nhật !!!</p>
+                            <p class="required mt-2">Nhóm / Sàn chỉ thay đổi được 1 lần. Vui lòng kiểm tra kỹ trước khi cập nhật !!!</p>
                             <p class="mt-2"><i>Lỗi hoặc không thực hiện được xin liên hệ: 0977572947 (zalo)</i></p>
                         </div>
                     </div>
