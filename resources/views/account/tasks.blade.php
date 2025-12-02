@@ -35,6 +35,7 @@
                     <thead>
                         <tr>
                             <th>Thời gian</th>
+                            <th>Mã NV</th>
                             <th>Họ Tên</th>
                             <th>Phòng/Nhóm</th>
                             <th>Dự án</th>
@@ -56,6 +57,7 @@
                             @endphp
                             <tr>
                                 <td>{{date('d/m/Y',strtotime($task->Report->time_start))}} - {{date('d/m/Y',strtotime($task->Report->time_end))}}</td>
+                                <td>{{ $task->User?->employee_code }}</td>
                                 <td>{{ $task->User?->yourname }}</td>
                                 <td>{{ $dep3?->name ?? '-' }}</td>
                                 <td>{{ $task->Post?->name }}</td>
