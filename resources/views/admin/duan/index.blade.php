@@ -59,10 +59,12 @@
             <div class="card-header d-flex flex-row align-items-center justify-content-between">
                 <ul class="nav nav-pills">
                     <li><a data-toggle="tab" class="nav-link active" href="#tab1">Tất cả</a></li>
-                    <!-- <li><a data-toggle="tab" class="nav-link " href="#tab2">Hiển thị</a></li> -->
-                    <!-- <li><a data-toggle="tab" class="nav-link" href="#tab3">Ẩn</a></li> -->
+                    <li style="padding-left:15px;display: flex; align-items: center;">
+                        <input type="text" id="quickSearch" class="form-control" placeholder="Tìm kiếm nhanh..." style="width:200px;">
+                    </li>
                 </ul>
             </div>
+
             <div class="tab-content">
                 <div class="tab-pane overflow active" id="tab2">
                     @if(count($posts) > 0)
@@ -168,6 +170,14 @@ $(document).on('change', '.rate-select', function() {
 </script>
 <script>
     $(document).ready(function(){
+        // Chặn Enter ở tất cả input.change-input
+        $(document).on('keydown', '.change-input', function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
         $('.change-input').on('blur', function(){
             var id = $(this).data('id');
             var name = $(this).val();
@@ -204,5 +214,48 @@ $(document).on('change', '.rate-select', function() {
         });
     });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const search = document.getElementById("quickSearch");
+
+    // Chặn Enter
+    search.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+            e.preventDefault(); // chặn submit form
+            return false;
+        }
+    });
+
+    search.addEventListener("keyup", function () {
+        const keyword = this.value.toLowerCase();
+
+        document.querySelectorAll("#tab2 table tbody tr").forEach(row => {
+
+            // Lấy text của toàn row (text, date, user...)
+            let rowText = row.innerText.toLowerCase();
+
+            // Lấy tất cả input trong row
+            row.querySelectorAll("input").forEach(inp => {
+                rowText += " " + inp.value.toLowerCase();
+            });
+
+            // Lấy tất cả select trong row
+            row.querySelectorAll("select").forEach(sel => {
+                rowText += " " + sel.options[sel.selectedIndex].text.toLowerCase();
+            });
+
+            // So sánh
+            row.style.display = rowText.includes(keyword) ? "" : "none";
+        });
+
+    });
+
+});
+</script>
+
+
+
 
 @endsection
