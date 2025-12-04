@@ -87,7 +87,7 @@ class GoogleController extends Controller
             }
             else{
                 Auth::logout();
-                return redirect('dangnhap')->with('center_error', 'Bạn đã kết nối vào hệ thống thành công. Do hệ thống chỉ lưu hành nội bộ. Bạn cần liên hệ Admin để cấp quyền truy cập cao hơn ! Admin: 0977572947');
+                return redirect('dangnhap')->with('center_warning', 'Bạn đã kết nối vào hệ thống thành công. Do hệ thống chỉ lưu hành nội bộ. Bạn cần liên hệ Admin để cấp quyền truy cập cao hơn ! Admin: 0977572947');
             }
         } else {
             // Nếu permission > 6, phòng trường hợp không hợp lệ

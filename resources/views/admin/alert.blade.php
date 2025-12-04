@@ -13,6 +13,9 @@
         });
     }
 
+
+
+
     document.addEventListener('DOMContentLoaded', function() {
         @if (session('success'))
             showToast('success', '{{ session('success') }}');
@@ -43,9 +46,20 @@
             showCenterError('{{ session('center_error') }}');
         @endif
     });
+
+    function showCenterWarning(message) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Cảnh báo',
+            text: message,
+            confirmButtonText: 'OK',
+            position: 'center',
+            backdrop: true
+        });
+    }
     document.addEventListener('DOMContentLoaded', function() {
         @if (session('center_warning'))
-            showToast('{{ session('center_warning') }}');
+            showCenterWarning('{{ session('center_warning') }}');
         @endif
     });
 </script>

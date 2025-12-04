@@ -87,7 +87,7 @@ class AccountController extends HomeController
                     'groupIds',
                 ));
             }else{
-                return redirect()->route('account.edit')->with('center_error','Các kỳ đăng ký Marketing đã đóng hoặc chưa mở kỳ mới, Vui lòng thử lại sau');
+                return redirect()->route('account.edit')->with('center_warning','Các kỳ đăng ký Marketing đã đóng hoặc chưa mở kỳ mới, Vui lòng thử lại sau');
             }
         }
         
@@ -120,7 +120,7 @@ class AccountController extends HomeController
     public function mktlist()
     {
         if (Auth::User()->department_id == null) {
-            return redirect()->route('account.edit')->with('center_error','Cần cập nhật [ Sàn / Nhóm ] trước khi đăng ký MKT');
+            return redirect()->route('account.edit')->with('center_warning','Cần cập nhật thông tin cá nhân trước khi đăng ký marketing');
         }else{
             $posts = Post::where('sort_by', 'Product')->orderBy('name', 'asc')->get();
             $channels = Channel::all();
