@@ -122,6 +122,24 @@ small{ font-size:.8rem }
 
 .menu-account{ display:none; }
 
+.table-responsive-mobile::-webkit-scrollbar {
+    height: 5px; /* chiều cao thanh cuộn ngang */
+}
+
+.table-responsive-mobile::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.table-responsive-mobile::-webkit-scrollbar-thumb {
+    background: #999;
+    border-radius: 4px;
+}
+
+.table-responsive-mobile::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+
+
 @media (max-width: 1860px) {
   .users>div{ width:100%; overflow: hidden; }
 }

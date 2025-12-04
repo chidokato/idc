@@ -21,6 +21,9 @@
                 @include('account.layout.sitebar')
             </div>
                 <div class="col-lg-10 ">
+                    <div class="widget-list">
+                        
+                    
                     <form action="{{ route('account.tasksstore') }}" method="POST">
                         @csrf
                         <input type="hidden" name="" value="">
@@ -118,11 +121,11 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div >
+                        <div class="mt-3">
                             <p><button type="submit" class="">Gửi đăng ký MARKETING</button></p>
-                            
                         </div>
                     </form>
+                    </div>
                     <hr>
                     @foreach($reports as $report)
                     @if($report->Task->isEmpty())
