@@ -12,7 +12,7 @@
 @endsection
 
 @section('content')
-
+@include('account.layout.menu')
 <section class="card-grid news-sec">
     <div class="container">
         <div class="row">
@@ -31,10 +31,12 @@
                         </select>
                     </div>
                 </div>
+                <div class="table-responsive-mobile">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Thời gian</th>
+                            <th></th>
+                            
                             <th>Mã NV</th>
                             <th>Họ Tên</th>
                             <th>Phòng/Nhóm</th>
@@ -45,7 +47,7 @@
                             <th>Chi phí</th>
                             <th>KPI</th>
                             <th>Ghi chú</th>
-                            <th></th>
+                            <th>Thời gian</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -56,7 +58,14 @@
                                 $dep1 = $dep2?->parentDepartment;
                             @endphp
                             <tr>
-                                <td>{{date('d/m/Y',strtotime($task->Report->time_start))}} - {{date('d/m/Y',strtotime($task->Report->time_end))}}</td>
+                                <td>
+                                    @if($task->approved)
+                                        <span class="badge bg-success">Đã duyệt</span>
+                                    @else
+                                        <span class="badge bg-warning">Chờ duyệt</span>
+                                    @endif
+                                </td>
+                                
                                 <td>{{ $task->User?->employee_code }}</td>
                                 <td>{{ $task->User?->yourname }}</td>
                                 <td>{{ $dep3?->name ?? '-' }}</td>
@@ -67,17 +76,12 @@
                                 <td>{{ number_format($task->Report->days * $task->expected_costs,0,',','.') }}đ</td>
                                 <td>{{ $task->content }}</td>
                                 <td></td>
-                                <td>
-                                    @if($task->approved)
-                                        <span class="badge bg-success">Đã duyệt</span>
-                                    @else
-                                        <span class="badge bg-warning">Chờ duyệt</span>
-                                    @endif
-                                </td>
+                                <td>{{date('d/m/Y',strtotime($task->Report->time_start))}} - {{date('d/m/Y',strtotime($task->Report->time_end))}}</td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
+            </div>
             </div>
         </div>
     </div>

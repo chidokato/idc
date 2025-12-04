@@ -8,7 +8,7 @@
 
 
 @section('content')
-
+@include('account.layout.menu')
 
 
 

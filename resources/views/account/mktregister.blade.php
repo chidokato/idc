@@ -13,6 +13,7 @@
 @endsection
 
 @section('content')
+@include('account.layout.menu')
 <section class="card-grid news-sec">
     <div class="container">
         <div class="row">
@@ -132,7 +133,10 @@
                         $total_pay = 0;        // tổng tiền phải nộp
                     ?>
                     <div class="row">
-                        <div class="col-lg-9 widget widget-list mb-3">
+                        <div class="col-lg-9 widget mb-3">
+                            <div class="widget-list">
+                                
+                            
                             <p class="required"><i>- Chú ý: Cổng đăng ký chi phí marketing sẽ <strong>TỰ ĐỘNG ĐÓNG</strong> vào <strong>00h00 ngày {{ \Carbon\Carbon::parse($report->time_start)->format('d/m/Y') }}</strong>. Có thể gửi nhiều lần trước khi cổng đăng ký đóng lại.</i></p>
                             <div>
                                 <h3>{{$report->name}} ({{ \Carbon\Carbon::parse($report->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($report->time_end)->format('d/m/Y') }})</h3>
@@ -188,9 +192,10 @@
                                 </table>
                             </div>
                             </div>
+                            </div>
                         </div>
-                        <div class="col-lg-3 widget widget-list">
-                            <div class=" mb-3 thongke">
+                        <div class="col-lg-3 widget ">
+                            <div class=" mb-3 thongke widget-list">
                                 <h4><span>Thống kê</span></h4>
                                 <ul>
                                     <li class="mb-3">
@@ -208,8 +213,8 @@
                         </div>
                     </div>
                     <div class="row mt-3">
-                        <div class="col-lg-12 widget widget-list">
-                            <div>
+                        <div class="col-lg-12 widget ">
+                            <div class="widget-list">
                                 <h3>Danh sách tác vụ: {{ Auth::user()->Department->Parent->name }}</h3>
                                 <div class="table-responsive-mobile">
                                 <table class="table">

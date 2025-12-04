@@ -119,3 +119,20 @@ small{ font-size:.8rem }
     width: max-content; /* mở rộng đủ nội dung để cuộn ngang */
     min-width: 100%;
 }
+
+.menu-account{ display:none; }
+
+@media (max-width: 480px) {
+  .news-sec {padding-top: 20px;}
+  .menu-account{ display:block; position:fixed; bottom:0; z-index:9999; background:var(--main-color); width:100%   }
+  .menu-account *{ color:#fff }
+  .menu-account ul{ display:flex; align-items: center; justify-content: space-around; }
+  .menu-account ul li{ padding:7px }
+  .menu-account ul li a{ padding:8px }
+
+
+
+
+
+
+}

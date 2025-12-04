@@ -13,7 +13,7 @@
 @endsection
 
 @section('content')
-
+@include('account.layout.menu')
 
 <section class="card-grid news-sec">
     <div class="container">
