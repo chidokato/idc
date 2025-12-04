@@ -182,7 +182,7 @@
 
                                     <?php
                                         $expected = $report->days * $val->expected_costs;
-                                        $pay = $report->days * $val->expected_costs * (1 - ($val->Post->rate ?? 0) / 100);
+                                        $pay = $report->days * $val->expected_costs * (1 - ($val->rate ?? 0) / 100);
 
                                         $total_expected += $expected;
                                         $total_pay += $pay;
