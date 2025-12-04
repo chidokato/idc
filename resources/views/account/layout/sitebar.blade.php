@@ -1,8 +1,8 @@
 <div class="users">
     <div><img src="{{ Auth::user()->avatar }}" alt="user"></div>
     <div>
-        <h4>{{ Auth::user()->yourname }}</h4>
-        <p>{{ Auth::user()->email }}</p>
+        <h4 class="text-truncate-set text-truncate-set-1">{{ Auth::user()->yourname }}</h4>
+        <p class="text-truncate-set text-truncate-set-1">{{ Auth::user()->email }}</p>
         <p>{{ Auth::user()->phone }}</p>
     </div>
     <button class="edit" onclick="window.location.href='{{ route('account.edit') }}'">sửa</button>
@@ -14,6 +14,7 @@
     @if(Auth::User()->rank < 3)<button class="btn btn-quanly" onclick="window.location.href='{{route('task.index')}}'">QUẢN LÝ ĐÓNG TIỀN</button>@endif
     @if(Auth::User()->rank == 1)<button class="btn btn-quanly" onclick="window.location.href='{{route('report.index')}}'">QUẢN LÝ TỔNG</button>@endif
 </div>
+
 
 <div class="widget widget-list mb-3">
     <h4><span>Liên hệ</span></h4>
