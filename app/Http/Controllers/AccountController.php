@@ -69,7 +69,7 @@ class AccountController extends HomeController
     public function mktregister()
     {
         if (Auth::User()->department_id == null) {
-            return redirect()->route('account.edit')->with('center_error','Cần cập nhật thông tin cá nhân trước khi đăng ký marketing');
+            return redirect()->route('account.edit')->with('center_warning','Cần cập nhật thông tin cá nhân trước khi đăng ký marketing');
         }else{
             $groupIds = Department::where('parent', Auth::user()->Department->parent)->pluck('id')->toArray();
             // dd($groupIds);

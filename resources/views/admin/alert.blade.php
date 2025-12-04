@@ -43,4 +43,9 @@
             showCenterError('{{ session('center_error') }}');
         @endif
     });
+    document.addEventListener('DOMContentLoaded', function() {
+        @if (session('center_warning'))
+            showToast('{{ session('center_warning') }}');
+        @endif
+    });
 </script>
