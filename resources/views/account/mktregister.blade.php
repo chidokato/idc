@@ -239,7 +239,7 @@
                                         <td>{{$val->Channel?->name}}</td>
                                         <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td>
                                         <td>{{ number_format(($report->days * $val->expected_costs), 0, ',', '.') }} đ</td>
-                                        <td>{{ number_format(($report->days * $val->expected_costs * (1 - $val->Post?->rate/100)), 0, ',', '.') }} đ</td>
+                                        <td>{{ number_format(($report->days * $val->expected_costs * (1 - $val->rate/100)), 0, ',', '.') }} đ</td>
                                         <td>{{ $val->content }}</td>
                                         <td>
                                             @if($val->approved)
