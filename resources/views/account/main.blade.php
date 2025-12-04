@@ -16,7 +16,7 @@
 <section class="card-grid news-sec">
     <div class="container">
         <div class="row">
-            <div class="col-lg-2 d-none d-lg-block">
+            <div class="col-lg-2">
                 @include('account.layout.sitebar')
             </div>
 
