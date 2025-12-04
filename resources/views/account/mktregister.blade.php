@@ -19,100 +19,102 @@
             <div class="col-lg-2 d-none d-lg-block">
                 @include('account.layout.sitebar')
             </div>
-                <div class="col-lg-10">
+                <div class="col-lg-10 ">
                     <form action="{{ route('account.tasksstore') }}" method="POST">
                         @csrf
                         <input type="hidden" name="" value="">
-                        <table class="table" id="myTable">
-                            <thead>
-                                <tr>
-                                    @if(Auth::user()->rank < 3)
-                                    <th>Nhân viên</th>
-                                    @endif
-                                    <th>Dự án <span class="required">(*)</span></th>
-                                    <th>Hỗ trợ</th>
-                                    <th>Kênh <span class="required">(*)</span></th>
-                                    <th>Ngân sách/ngày <span class="required">(*)</span></th>
-                                    <th>Ghi chú</th>
-                                    <th>Thời gian chạy</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    @if(Auth::user()->rank < 3)
-                                    <td>
-                                        <select name="user_id[]" required class="form-control user-select">
-                                            <option value="">---</option>
-                                            @foreach($users as $val)
-                                            <option <?php if(Auth::user()->id == $val->id){ echo "selected"; } ?> value="{{ $val->id }}" data-department="{{ $val->department_id }}">
-                                                {{ $val->yourname }}
-                                            </option>
-                                            @endforeach
-                                        </select>
+                        <div class="table-responsive-mobile">
+                            <table class="table" id="myTable">
+                                <thead>
+                                    <tr>
+                                        @if(Auth::user()->rank < 3)
+                                        <th>Nhân viên</th>
+                                        @endif
+                                        <th>Dự án <span class="required">(*)</span></th>
+                                        <th>Hỗ trợ</th>
+                                        <th>Kênh <span class="required">(*)</span></th>
+                                        <th>Ngân sách/ngày <span class="required">(*)</span></th>
+                                        <th>Ghi chú</th>
+                                        <th>Thời gian chạy</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        @if(Auth::user()->rank < 3)
+                                        <td>
+                                            <select name="user_id[]" required class="form-control user-select">
+                                                <option value="">---</option>
+                                                @foreach($users as $val)
+                                                <option <?php if(Auth::user()->id == $val->id){ echo "selected"; } ?> value="{{ $val->id }}" data-department="{{ $val->department_id }}">
+                                                    {{ $val->yourname }}
+                                                </option>
+                                                @endforeach
+                                            </select>
+                                            <input type="hidden" name="department_id[]" class="department-id" value="{{ Auth::user()->department_id }}">
+                                        </td>
+                                        @else
+                                        <input type="hidden" name="user_id[]" class="department-id" value="{{ Auth::user()->id }}">
                                         <input type="hidden" name="department_id[]" class="department-id" value="{{ Auth::user()->department_id }}">
-                                    </td>
-                                    @else
-                                    <input type="hidden" name="user_id[]" class="department-id" value="{{ Auth::user()->id }}">
-                                    <input type="hidden" name="department_id[]" class="department-id" value="{{ Auth::user()->department_id }}">
-                                    @endif
-                                    <td>
-                                        <select name="post_id[]" required class="form-control post-select">
-                                            <option value="">---</option>
-                                            @foreach($posts as $val)
-                                            <option value="{{ $val->id }}" data-rate="{{ $val->rate }}">
-                                                {{ $val->name }}
-                                            </option>
-                                            @endforeach
-                                        </select>
-                                    </td>
+                                        @endif
+                                        <td>
+                                            <select name="post_id[]" required class="form-control post-select">
+                                                <option value="">---</option>
+                                                @foreach($posts as $val)
+                                                <option value="{{ $val->id }}" data-rate="{{ $val->rate }}">
+                                                    {{ $val->name }}
+                                                </option>
+                                                @endforeach
+                                            </select>
+                                        </td>
 
-                                    <td>
-                                        <select name="rate[]" required class="form-control rate-select">
-                                            <option value="">-</option>
-                                            <option value="100">100%</option>
-                                            <option value="95">95%</option>
-                                            <option value="90">90%</option>
-                                            <option value="80">80%</option>
-                                            <option value="70">70%</option>
-                                            <option value="60">60%</option>
-                                            <option value="50">50%</option>
-                                            <option value="30">30%</option>
-                                            <option value="0">0%</option>
-                                        </select>
-                                    </td>
+                                        <td>
+                                            <select name="rate[]" required class="form-control rate-select">
+                                                <option value="">-</option>
+                                                <option value="100">100%</option>
+                                                <option value="95">95%</option>
+                                                <option value="90">90%</option>
+                                                <option value="80">80%</option>
+                                                <option value="70">70%</option>
+                                                <option value="60">60%</option>
+                                                <option value="50">50%</option>
+                                                <option value="30">30%</option>
+                                                <option value="0">0%</option>
+                                            </select>
+                                        </td>
 
-                                    <td>
-                                        <select name="channel_id[]" required class="form-control">
-                                            <option value="">---</option>
-                                            @foreach($channels as $val)
-                                            <option value="{{$val->id}}">{{$val->name}}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select name="expected_costs[]" required class="form-control">
-                                            <option value="">---</option>
-                                            <option value="1000000">1.000.000 đ</option>
-                                            <option value="500000">500.000 đ</option>
-                                            <option value="300000">300.000 đ</option>
-                                        </select>
-                                    </td>
-                                    <td><input class="form-control" type="text" name="content[]" placeholder="Hỗ trợ, chạy chung ..."></td>
-                                    <td>
-                                        <select name="report_id[]" required class="form-control">
-                                            @foreach($reports as $val)
-                                            <option value="{{ $val->id }}">{{ $val->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td class="flex">
-                                        <button type="button" class="form-control del">xóa</button>
-                                        <button type="button" class="form-control dupple">Nhân</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                        <td>
+                                            <select name="channel_id[]" required class="form-control">
+                                                <option value="">---</option>
+                                                @foreach($channels as $val)
+                                                <option value="{{$val->id}}">{{$val->name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select name="expected_costs[]" required class="form-control">
+                                                <option value="">---</option>
+                                                <option value="1000000">1.000.000 đ</option>
+                                                <option value="500000">500.000 đ</option>
+                                                <option value="300000">300.000 đ</option>
+                                            </select>
+                                        </td>
+                                        <td><input class="form-control" type="text" name="content[]" placeholder="Hỗ trợ, chạy chung ..."></td>
+                                        <td>
+                                            <select name="report_id[]" required class="form-control">
+                                                @foreach($reports as $val)
+                                                <option value="{{ $val->id }}">{{ $val->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td class="flex">
+                                            <button type="button" class="form-control del">xóa</button>
+                                            <button type="button" class="form-control dupple">Nhân</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                         <div >
                             <p><button type="submit" class="">Gửi đăng ký MARKETING</button></p>
                             
@@ -130,12 +132,14 @@
                         $total_pay = 0;        // tổng tiền phải nộp
                     ?>
                     <div class="row">
-                        <div class="col-lg-9 widget widget-list">
+                        <div class="col-lg-9 widget widget-list mb-3">
                             <p class="required"><i>- Chú ý: Cổng đăng ký chi phí marketing sẽ <strong>TỰ ĐỘNG ĐÓNG</strong> vào <strong>00h00 ngày {{ \Carbon\Carbon::parse($report->time_start)->format('d/m/Y') }}</strong>. Có thể gửi nhiều lần trước khi cổng đăng ký đóng lại.</i></p>
                             <div>
                                 <h3>{{$report->name}} ({{ \Carbon\Carbon::parse($report->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($report->time_end)->format('d/m/Y') }})</h3>
+                                <div class="table-responsive-mobile">
                                 <table class="table">
                                     <tr>
+                                        <th></th>
                                         <th>Nhân viên</th>
                                         <th>Dự án</th>
                                         <th>Hỗ trợ</th>
@@ -145,10 +149,16 @@
                                         <th>Tiền phải nộp</th>
                                         <th>Ghi chú</th>
                                         <th></th>
-                                        <th></th>
                                     </tr>
                                     @foreach($tasks as $val)
                                     <tr class="padding16" id="row-{{ $val->id }}">
+                                        <td>
+                                            @if($val->approved)
+                                                <span class="badge bg-success">Đã duyệt</span>
+                                            @else
+                                                <span class="badge bg-warning">Chờ duyệt</span>
+                                            @endif
+                                        </td>
                                         <td>{{$val->handler?->yourname ?? '-'}}</td>
                                         <td>{{$val->Post?->name}}</td>
                                         <td>{{$val->rate}}%</td>
@@ -157,13 +167,7 @@
                                         <td>{{ number_format(($report->days * $val->expected_costs), 0, ',', '.') }} đ</td>
                                         <td>{{ number_format(($report->days * $val->expected_costs * (1 - $val->Post?->rate/100)), 0, ',', '.') }} đ</td>
                                         <td>{{ $val->content }}</td>
-                                        <td>
-                                            @if($val->approved)
-                                                <span class="badge bg-success">Đã duyệt</span>
-                                            @else
-                                                <span class="badge bg-warning">Chờ duyệt</span>
-                                            @endif
-                                        </td>
+                                        
                                         <td>
                                             <form action="{{ route('account.tasks.delete', $val) }}" method="POST">
                                                 @csrf
@@ -183,9 +187,10 @@
                                     @endforeach
                                 </table>
                             </div>
+                            </div>
                         </div>
-                        <div class="col-lg-3">
-                            <div class="widget widget-list mb-3 thongke">
+                        <div class="col-lg-3 widget widget-list">
+                            <div class=" mb-3 thongke">
                                 <h4><span>Thống kê</span></h4>
                                 <ul>
                                     <li class="mb-3">
@@ -206,6 +211,7 @@
                         <div class="col-lg-12 widget widget-list">
                             <div>
                                 <h3>Danh sách tác vụ: {{ Auth::user()->Department->Parent->name }}</h3>
+                                <div class="table-responsive-mobile">
                                 <table class="table">
                                     <tr>
                                         <th>Nhân viên</th>
@@ -240,6 +246,7 @@
                                     </tr>
                                     @endforeach
                                 </table>
+                            </div>
                             </div>
                         </div>
                         

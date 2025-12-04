@@ -101,3 +101,21 @@ td {
 small{ font-size:.8rem }
 
 .news-sec{ padding-top:50px }
+
+
+.table-responsive-mobile {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* mượt trên iOS */
+    display: block;
+}
+
+.table-responsive-mobile table th,
+.table-responsive-mobile table td {
+    white-space: nowrap !important; /* Không xuống dòng */
+}
+
+.table-responsive-mobile table {
+    width: max-content; /* mở rộng đủ nội dung để cuộn ngang */
+    min-width: 100%;
+}
