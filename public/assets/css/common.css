@@ -530,6 +530,7 @@ header, a, a h5, .notify-num, .navbar .navbar-brand, .nav-link, .sec-nav .navbar
 @media (max-width: 480px) {
 	.cover-man {width: 36vw;}
 	.cover-man ~ .cover-content {padding-left: 32vw !important;}
+	
 }
 
 @media (max-width: 320px) {
