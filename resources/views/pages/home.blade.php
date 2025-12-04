@@ -11,7 +11,7 @@
 @endsection
 
 @section('content')
-
+@include('layout.popup')
 <!------------------- HERO ------------------->
 <section class="sec-hero">
     <div class="hero-slider">

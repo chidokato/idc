@@ -14,7 +14,7 @@
 @endsection
 
 @section('content')
-
+@include('layout.popup')
 <section class="sec-img bg">
     <div style="--swiper-navigation-color: #fff; --swiper-pagination-color: #fff" class="swiper mySwiper-product">
         <div class="swiper-wrapper">
