@@ -28,6 +28,7 @@
                             <table class="table" id="myTable">
                                 <thead>
                                     <tr>
+                                        <th></th>
                                         @if(Auth::user()->rank < 3)
                                         <th>Nhân viên</th>
                                         @endif
@@ -37,11 +38,15 @@
                                         <th>Ngân sách/ngày <span class="required">(*)</span></th>
                                         <th>Ghi chú</th>
                                         <th>Thời gian chạy</th>
-                                        <th></th>
+                                        
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
+                                        <td class="flex">
+                                            <button type="button" class="form-control del">xóa</button>
+                                            <button type="button" class="form-control dupple">Nhân</button>
+                                        </td>
                                         @if(Auth::user()->rank < 3)
                                         <td>
                                             <select name="user_id[]" required class="form-control user-select">
@@ -108,10 +113,7 @@
                                                 @endforeach
                                             </select>
                                         </td>
-                                        <td class="flex">
-                                            <button type="button" class="form-control del">xóa</button>
-                                            <button type="button" class="form-control dupple">Nhân</button>
-                                        </td>
+                                        
                                     </tr>
                                 </tbody>
                             </table>
