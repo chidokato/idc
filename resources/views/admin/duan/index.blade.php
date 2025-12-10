@@ -92,7 +92,7 @@
                         <tbody>
                             @foreach($posts as $val)
                             <tr>
-                                <td><input class="change-input" type="text" name="name" value="{{ $val->name }}" data-id="{{ $val->id }}"></td>
+                                <td><input style="width: 100%;" class="change-input" type="text" name="name" value="{{ $val->name }}" data-id="{{ $val->id }}"></td>
                                 <td>
                                     <select class="rate-select" data-id="{{ $val->id }}">
                                         <option value="">...</option>

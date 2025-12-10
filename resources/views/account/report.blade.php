@@ -133,7 +133,7 @@ $(document).ready(function () {
     $(document).on('click', '.del', function () {
         let id = $(this).data('id');
         Swal.fire({
-            title: "Bạn có chắc muốn xóa?",
+            title: "Dữ liệu quan trong, xóa có thể ảnh hưởng đến dữ liệu khác. Bạn có chắc muốn xóa?",
             text: "Thao tác này không thể hoàn tác!",
             icon: "warning",
             showCancelButton: true,
