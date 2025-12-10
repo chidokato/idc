@@ -24,7 +24,7 @@
                 <form id="report-form">
                     @csrf
                     <input type="hidden" name="id" id="report_id">
-                    <div class="widget-list mb-5">
+                    <div class="widget-list mb-3">
                         <table class="table">
                             <tr>
                                 <td><input class="form-control" name="name" type="text" placeholder="Tên"></td>
