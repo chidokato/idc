@@ -19,26 +19,28 @@
                 @include('account.layout.sitebar')
             </div>
 
-            <div class="col-lg-10">
+            <div class="col-lg-10 ">
 
-    <form id="report-form">
-        @csrf
-        <input type="hidden" name="id" id="report_id">
+                <form id="report-form">
+                    @csrf
+                    <input type="hidden" name="id" id="report_id">
+                    <div class="widget-list mb-5">
+                        <table class="table">
+                            <tr>
+                                <td><input class="form-control" name="name" type="text" placeholder="Tên"></td>
+                                <td><input class="form-control" name="date" id="date-range" type="text" placeholder="Thời gian"></td>
+                                <td>
+                                    <button type="submit" class="btn btn-primary">Lưu lại</button>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                </form>
 
-        <table class="table">
-            <tr>
-                <td><input class="form-control" name="name" type="text" placeholder="Tên"></td>
-                <td><input class="form-control" name="date" id="date-range" type="text" placeholder="Thời gian"></td>
-                <td>
-                    <button type="submit" class="btn btn-primary">Lưu lại</button>
-                </td>
-            </tr>
-        </table>
-    </form>
+                <div id="load_report" class="widget-list"></div>
 
-    <div id="load_report"></div>
-
-</div>
+            </div>
         </div>
     </div>
 </section>
