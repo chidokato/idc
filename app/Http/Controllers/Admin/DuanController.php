@@ -28,6 +28,21 @@ class DuanController extends Controller
         ));
     }
 
+    public function store(Request $request)
+    {
+        $data = $request->all();
+        $post = new Post();
+        $post->user_id = Auth::User()->id;
+        $post->status = 'false';
+        $post->sort_by = 'Product';
+        $post->name = $data['name'];
+        $post->rate = $data->rate;
+        $post->slug = Str::slug($data['name'], '-');
+
+        $post->save();
+        return redirect('admin/duan')->with('success','updated successfully');
+    }
+
     public function updateRate(Request $request)
     {
         $post = Post::find($request->id);

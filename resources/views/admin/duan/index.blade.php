@@ -6,16 +6,38 @@
 @section('content')
 @include('admin.layout.header')
 @include('admin.alert')
-<div class="d-sm-flex align-items-center justify-content-between mb-3 flex">
-    <h2 class="h3 mb-0 text-gray-800 line-1 size-1-3-rem">Quản lý sản phẩm</h2>
-    <div class="flex">
+<div class="align-items-center justify-content-between mb-3">
+    <div class="h3 mb-0 text-gray-800 line-1 size-1-3-rem">
+        <form method="post" action="{{route('duan.store')}}">
+            @csrf
+            <div class="row">
+                <div class="col-xl-3"><input class="form-control" type="" name="name" placeholder="Thêm dự án"></div>
+                <div class="col-xl-1">
+                    <select name="rate" class="form-control">
+                        <option value="">Hỗ trợ</option>
+                        <option value="100">100%</option>
+                        <option value="95">95%</option>
+                        <option value="90">90%</option>
+                        <option value="80">80%</option>
+                        <option value="70">70%</option>
+                        <option value="60">60%</option>
+                        <option value="50">50%</option>
+                        <option value="30">30%</option>
+                        <option value="0">0%</option>
+                    </select>
+                </div>
+                <div class="col-xl-1"><button type="submit" class="form-control btn-success">Thêm</button> </div>
+            </div>
+        </form>
+    </div>
+    <!-- <div class="flex">
         <button type="button" class="btn btn-primary mr-2" data-toggle="modal" data-target="#exampleModal"><i class="fa fa-upload" aria-hidden="true"></i> Upload Excel</button>
         <a class="add-iteam" href="{{route('post.create')}}"><button class="btn-success form-control" type="button"><i class="fa fa-plus" aria-hidden="true"></i> Thêm mới</button></a>
-    </div>
+    </div> -->
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form action="{{ route('post.upfile') }}" method="POST" enctype="multipart/form-data">
@@ -50,7 +72,7 @@
             </form>
         </div>
     </div>
-</div>
+</div> -->
 
 <div class="row">
 <form class="width100" action="{{ url()->current() }}" method="GET">
