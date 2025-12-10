@@ -36,7 +36,7 @@ class DuanController extends Controller
         $post->status = 'false';
         $post->sort_by = 'Product';
         $post->name = $data['name'];
-        $post->rate = $data->rate;
+        $post->rate = $data['rate'];
         $post->slug = Str::slug($data['name'], '-');
 
         $post->save();
