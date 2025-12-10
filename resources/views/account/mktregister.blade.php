@@ -123,7 +123,7 @@
                         </div>
                         <div class="mt-3">
                             <p><button type="submit" class="">Gửi đăng ký MARKETING</button></p>
-                            <p>Nếu không đăng ký được, thiếu dự án, thiếu trường nhập dữ liệu liên hệ ngay <a href="https://zalo.me/0977572947" target="_blank"><strong>Nguyễn Tuấn</strong></a> để được hỗ trợ kỹ thuật</p>
+                            <p>Nếu không đăng ký được, thiếu dự án, thiếu trường nhập dữ liệu. Liên hệ ngay <a href="https://zalo.me/0977572947" target="_blank"><strong>Nguyễn Tuấn</strong></a> để được hỗ trợ kỹ thuật</p>
                         </div>
                     </form>
                     </div>
