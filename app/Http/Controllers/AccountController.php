@@ -132,6 +132,23 @@ class AccountController extends HomeController
         
     }
 
+    public function stats()
+    {
+        $tasks = auth()->user()->tasks()->with(['Post'])->get();
+        $total_expected = 0;
+        $total_pay = 0;
+
+        foreach ($tasks as $val) {
+            $expected = $val->report->days * $val->expected_costs;
+            $pay = $val->report->days * $val->expected_costs * (1 - ($val->rate ?? 0) / 100);
+
+            $total_expected += $expected;
+            $total_pay += $pay;
+        }
+        return view('account.partials.stats', compact('tasks', 'total_expected', 'total_pay'));
+    }
+
+
     public function delete($id)
     {
         $task = Task::find($id);
@@ -142,7 +159,38 @@ class AccountController extends HomeController
 
         $task->delete();
 
-        return response()->json(['status' => true, 'message' => 'Xóa thành công']);
+        $user = Auth::user();
+
+        // Lấy report đang xem
+        $report = Report::find($task->report_id); // hoặc theo cách bạn đang lấy
+
+        $tasks = Task::where('department_id', $user->department_id)
+                    ->where('report_id', $report->id)
+                    ->get();
+
+        $total_expected = 0;
+        $total_pay = 0;
+
+        foreach ($tasks as $val) {
+            $expected = $report->days * $val->expected_costs;
+            $pay = $report->days * $val->expected_costs * (1 - ($val->rate ?? 0) / 100);
+
+            $total_expected += $expected;
+            $total_pay += $pay;
+        }
+
+        $total_project = $tasks->pluck('post_id')->unique()->count();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Xóa thành công',
+            'stats' => [
+                'total_project' => $total_project,
+                'total_expected' => number_format($total_expected, 0, ',', '.'),
+                'total_pay' => number_format($total_pay, 0, ',', '.'),
+            ]
+        ]);
     }
+
 
 }

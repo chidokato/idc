@@ -184,7 +184,6 @@
                                             </form>
                                         </td>
                                     </tr>
-
                                     <?php
                                         $expected = $report->days * $val->expected_costs;
                                         $pay = $report->days * $val->expected_costs * (1 - ($val->rate ?? 0) / 100);
@@ -192,28 +191,15 @@
                                         $total_expected += $expected;
                                         $total_pay += $pay;
                                     ?>
-
                                     @endforeach
                                 </table>
                             </div>
                             </div>
                             </div>
                         </div>
-                        <div class="col-lg-3 widget ">
-                            <div class=" mb-3 thongke widget-list">
-                                <h4><span>Thống kê</span></h4>
-                                <ul>
-                                    <li class="mb-3">
-                                        <div><span>Tổng số:</span> <span>{{ $tasks->pluck('post_id')->unique()->count() }} dự án</span></div>
-                                    </li>
-                                    <li class="mb-3">
-                                        <div><span>Tổng tiền:</span> <span class="">{{ number_format($total_expected, 0, ',', '.') }} đ</span></div>
-                                    </li>
-                                    <li class="mb-3">
-                                        <div><span>Tổng tiền phải nộp (dự kiến):</span> <span class="required">{{ number_format($total_pay, 0, ',', '.') }} đ</span></div>
-                                    </li>
-                                </ul>
-                                <!-- <p class="required"><i>* Số tiền phải đóng phụ thuộc vào số lượng dự án được duyệt và tỷ lệ hỗ trợ mỗi dự án</i></p> -->
+                        <div class="col-lg-3 widget">
+                            <div id="stats-box">
+                                @include('account.partials.stats')
                             </div>
                         </div>
                     </div>
@@ -368,12 +354,11 @@ $(document).on('click', '.del-db', function (e) {
     let id = $(this).data('id');
     let row = $("#row-" + id);
 
-    // Lấy trạng thái duyệt của task trong cùng row
     let approved = row.find('td:nth-child(5) span').hasClass('bg-success'); 
 
     if (approved) {
         Swal.fire('Không thể xóa!', 'Tác vụ đã được duyệt, không thể xóa.', 'warning');
-        return; // thoát, không xóa
+        return;
     }
 
     let url = "{{ url('account/tasks/delete') }}/" + id;
@@ -386,17 +371,23 @@ $(document).on('click', '.del-db', function (e) {
         cancelButtonText: 'Không'
     }).then((result) => {
         if (result.isConfirmed) {
+
             $.ajax({
                 url: url,
                 type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}"
-                },
+                data: { _token: "{{ csrf_token() }}" },
                 success: function(res) {
                     if (res.status) {
+
                         row.fadeOut(300, function() {
                             $(this).remove();
+
+                            // Cập nhật giao diện số liệu
+                            $("#tongduan").text(res.stats.total_project + " dự án");
+                            $("#tongtien").text(res.stats.total_expected + " đ");
+                            $("#tongphainop").text(res.stats.total_pay + " đ");
                         });
+
                     } else {
                         Swal.fire('Lỗi!', res.message, 'error');
                     }
@@ -405,9 +396,11 @@ $(document).on('click', '.del-db', function (e) {
                     Swal.fire('Lỗi!', 'Không thể kết nối server.', 'error');
                 }
             });
+
         }
     });
 });
+
 
 </script>
 

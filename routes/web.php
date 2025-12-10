@@ -165,11 +165,13 @@ Route::middleware(['user'])->group(function () {
         // mkt
         Route::get('mkt-register', [AccountController::class, 'mktregister'])->name('account.mktregister');
         Route::post('mkt-tasksstore', [AccountController::class, 'storeTask'])->name('account.tasksstore');
+        Route::get('tasks-stats', [AccountController::class, 'stats'])->name('account.tasks.stats');
         
         // task
         Route::resource('task',TaskController::class);
         Route::post('tasks/delete/{id}', [AccountController::class, 'delete'])->name('account.tasks.delete');
         Route::post('task/toggle-approved/{task}', [TaskController::class, 'toggleApproved'])->name('task.toggleApproved');
+
 
         // report
         Route::resource('report',ReportController::class);
