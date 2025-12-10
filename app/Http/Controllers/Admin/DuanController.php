@@ -30,6 +30,12 @@ class DuanController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'name' => 'required|unique:posts,name',
+        ], [
+            'name.unique' => 'Tên dự án đã tồn tại!',
+        ]);
+                
         $data = $request->all();
         $post = new Post();
         $post->user_id = Auth::User()->id;
