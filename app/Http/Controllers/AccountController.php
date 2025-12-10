@@ -164,9 +164,8 @@ class AccountController extends HomeController
         // Lấy report đang xem
         $report = Report::find($task->report_id); // hoặc theo cách bạn đang lấy
 
-        $tasks = Task::where('department_id', $user->department_id)
-                    ->where('report_id', $report->id)
-                    ->get();
+        // $tasks = Task::where('department_id', $user->department_id)->where('report_id', $report->id)->get();
+        $tasks = $report->Task()->where('user', Auth::id())->get();
 
         $total_expected = 0;
         $total_pay = 0;
