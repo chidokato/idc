@@ -22,7 +22,7 @@ class DuanController extends Controller
 {
     public function index(Request $request)
     {
-        $posts = Post::where('sort_by', 'Product')->orderBy('rate', 'DESC')->paginate(20);
+        $posts = Post::where('sort_by', 'Product')->orderBy('rate', 'DESC')->paginate(100);
         return view('admin.duan.index', compact(
             'posts',
         ));
