@@ -32,6 +32,8 @@ class User extends Authenticatable
         'permission', 
         'status', 
         'department_id',
+        'department_lv1',
+        'department_lv2',
         'rank',
         'employee_code',
     ];

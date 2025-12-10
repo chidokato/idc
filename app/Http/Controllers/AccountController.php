@@ -52,18 +52,36 @@ class AccountController extends HomeController
 
     public function update(Request $request)
     {
+        $data = $request->all();
+
         $request->validate([
             'yourname'   => 'required|max:255',
-            'phone'  => 'nullable',
-            'address' => 'nullable',
+            'phone'      => 'nullable',
+            'address'    => 'nullable',
+            'department_id' => 'required|integer'
         ]);
 
         $user = User::find(Auth::id());
 
-        $user->update($request->only(['yourname', 'phone', 'address', 'department_id', 'employee_code']));
+        // Lấy department theo form gửi lên (KHÔNG phải theo user cũ)
+        $deptLv3 = Department::find($data['department_id']);
+        $deptLv2 = $deptLv3?->parentDepartment;
+        $deptLv1 = $deptLv2?->parentDepartment;
+
+        // Cập nhật user
+        $user->update([
+            'yourname'        => $data['yourname'],
+            'phone'           => $data['phone'],
+            'address'         => $data['address'],
+            'department_id'   => $data['department_id'],      // LV3
+            'employee_code'   => $data['employee_code'] ?? null,
+            'department_lv1'  => $deptLv1?->id,               // ID
+            'department_lv2'  => $deptLv2?->id,               // ID
+        ]);
 
         return redirect()->back()->with('success', 'Thành công!');
     }
+
 
 
     public function mktregister()
@@ -105,7 +123,6 @@ class AccountController extends HomeController
 
             $deptLv2 = $deptLv3->parentDepartment;   // OK
             $deptLv1 = $deptLv2?->parentDepartment;  // OK
-            // dd($deptLv2);
 
             Task::create([
                 'user_id' => Auth::id(),
