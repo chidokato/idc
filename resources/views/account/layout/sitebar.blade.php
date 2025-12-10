@@ -11,7 +11,7 @@
 <div class="row-btn">
     <button class="btn btn-dangky" onclick="window.location.href='{{route('account.mktregister')}}'">ĐĂNG KÝ MARKETING</button>
     <button class="btn btn-quanly" onclick="window.location.href='{{route('task.index')}}'">QUẢN LÝ TÁC VỤ</button>
-    @if(Auth::User()->rank < 3)<button class="btn btn-quanly" onclick="window.location.href='{{route('task.index')}}'">QUẢN LÝ ĐÓNG TIỀN</button>@endif
+    <!-- @if(Auth::User()->rank < 3)<button class="btn btn-quanly" onclick="window.location.href='{{route('task.index')}}'">QUẢN LÝ ĐÓNG TIỀN</button>@endif -->
     @if(Auth::User()->rank == 1)<button class="btn btn-quanly" onclick="window.location.href='{{route('report.index')}}'">QUẢN LÝ TỔNG</button>@endif
 </div>
 
