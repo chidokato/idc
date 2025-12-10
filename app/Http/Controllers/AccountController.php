@@ -99,13 +99,25 @@ class AccountController extends HomeController
 
         // Lặp qua từng dòng trong form
         foreach ($data['post_id'] as $key => $postId) {
+            
+            $deptLv3 = Department::find($data['department_id'][$key]);
+            if (!$deptLv3) continue;
+
+            $deptLv2 = $deptLv3->parentDepartment;   // OK
+            $deptLv1 = $deptLv2?->parentDepartment;  // OK
+            // dd($deptLv2);
+
             Task::create([
                 'user_id' => Auth::id(),
                 'user' => $data['user_id'][$key] ?? null,
                 'post_id' => $postId,
                 'channel_id' => $data['channel_id'][$key] ?? null,
                 'rate' => $data['rate'][$key] ?? null,
-                'department_id' => $data['department_id'][$key] ?? null,
+                
+                'department_id' => $deptLv3->id,              // lv3
+                'department_lv2' => $deptLv2?->id,            // lv2
+                'department_lv1' => $deptLv1?->id,            // lv1
+
                 'content' => $data['content'][$key] ?? null,
                 'expected_costs' => isset($data['expected_costs'][$key]) 
                     ? str_replace(['.', ' đ'], '', $data['expected_costs'][$key]) 

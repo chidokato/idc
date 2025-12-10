@@ -65,10 +65,7 @@ class ReportController extends HomeController
             'Channel'
         ])
         ->where('report_id', $id);
-
-        // ============================
-        // 2️⃣ Lọc theo department lv3
-        // ============================
+       
         if ($request->department_id) {
             $departmentIds = Department::getChildIds($request->department_id);
             $query->whereHas('department', function($q) use ($departmentIds) {
@@ -77,24 +74,15 @@ class ReportController extends HomeController
 
         }
 
-        // ============================
-        // 3️⃣ Lọc theo dự án
-        // ============================
         if ($request->post_id) {
             $query->where('post_id', $request->post_id);
         }
 
-        // ============================
-        // 4️⃣ Lọc theo kênh
-        // ============================
         if ($request->channel_id) {
             $channelIds = Channel::getChildIds($request->channel_id); // lấy tất cả con
             $query->whereIn('channel_id', $channelIds);
         }
 
-        // ============================
-        // 5️⃣ Phân trang
-        // ============================
         $task = $query->paginate(1000)->appends($request->query());
 
         // Select filter

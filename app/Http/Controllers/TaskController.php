@@ -66,33 +66,33 @@ class TaskController extends HomeController
     }
 
     // Lưu tác vụ
-    public function store(Request $request)
-    {
-        $request->validate([
-            'du_an' => 'required',
-            'kenh' => 'required',
-        ]);
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         'du_an' => 'required',
+    //         'kenh' => 'required',
+    //     ]);
 
-        $projects = $request->input('du_an');
-        $channels = $request->input('kenh');
-        $budgets = $request->input('ngan_sach');
-        $notes = $request->input('ghi_chu');
-        $times = $request->input('thoi_gian');
+    //     $projects = $request->input('du_an');
+    //     $channels = $request->input('kenh');
+    //     $budgets = $request->input('ngan_sach');
+    //     $notes = $request->input('ghi_chu');
+    //     $times = $request->input('thoi_gian');
 
-        foreach($projects as $key => $projectId){
-            Task::create([
-                'user_id' => auth()->id(),
-                'user' => auth()->user()->name,
-                'du_an' => $projectId,
-                'kenh' => $channels[$key] ?? null,
-                'chi_phi_du_kien' => str_replace(['.', ' đ'], '', $budgets[$key] ?? 0),
-                'ghi_chu' => $notes[$key] ?? null,
-                'thoi_gian' => $times[$key] ?? now(),
-            ]);
-        }
+    //     foreach($projects as $key => $projectId){
+    //         Task::create([
+    //             'user_id' => auth()->id(),
+    //             'user' => auth()->user()->name,
+    //             'du_an' => $projectId,
+    //             'kenh' => $channels[$key] ?? null,
+    //             'chi_phi_du_kien' => str_replace(['.', ' đ'], '', $budgets[$key] ?? 0),
+    //             'ghi_chu' => $notes[$key] ?? null,
+    //             'thoi_gian' => $times[$key] ?? now(),
+    //         ]);
+    //     }
 
-        return redirect()->back()->with('success','Đã lưu tác vụ thành công!');
-    }
+    //     return redirect()->back()->with('success','Đã lưu tác vụ thành công!');
+    // }
 
     // Form edit
     public function edit($id)
@@ -117,19 +117,19 @@ class TaskController extends HomeController
     }
 
     // Báo cáo tổng hợp
-    public function report()
-    {
-        $report = Task::select(
-            'du_an',
-            'kenh',
-            \DB::raw('SUM(chi_phi_du_kien) as tong_chi_phi_du_kien'),
-            \DB::raw('SUM(chi_phi_thuc_te) as tong_chi_phi_thuc_te'),
-            \DB::raw('AVG(ti_le_ho_tro) as ti_le_ho_tro_tb'),
-            \DB::raw('SUM(xac_nhan) as tong_xac_nhan')
-        )
-        ->groupBy('du_an','kenh')
-        ->get();
+    // public function report()
+    // {
+    //     $report = Task::select(
+    //         'du_an',
+    //         'kenh',
+    //         \DB::raw('SUM(chi_phi_du_kien) as tong_chi_phi_du_kien'),
+    //         \DB::raw('SUM(chi_phi_thuc_te) as tong_chi_phi_thuc_te'),
+    //         \DB::raw('AVG(ti_le_ho_tro) as ti_le_ho_tro_tb'),
+    //         \DB::raw('SUM(xac_nhan) as tong_xac_nhan')
+    //     )
+    //     ->groupBy('du_an','kenh')
+    //     ->get();
 
-        return view('tasks.report', compact('report'));
-    }
+    //     return view('tasks.report', compact('report'));
+    // }
 }

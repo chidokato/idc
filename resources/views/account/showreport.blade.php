@@ -51,7 +51,8 @@
                     <thead>
                         <tr>
                             <th>Họ Tên</th>
-                            <th>Sàn/Nhóm</th>
+                            <th>Sàn</th>
+                            <th>Nhóm</th>
                             <th>Dự án</th>
                             <th>Kênh</th>
                             <th>Chi phí</th>
@@ -66,14 +67,19 @@
                     </thead>
 
                     <tbody>
+                        <?php
+                            $task = $task->sortBy([
+                                fn($a, $b) => strcmp($a->department?->hierarchy_levels['level2'] ?? '', $b->department?->hierarchy_levels['level2'] ?? ''),
+                                fn($a, $b) => strcmp($a->department?->hierarchy_levels['level3'] ?? '', $b->department?->hierarchy_levels['level3'] ?? ''),
+                            ]);
+
+                        ?>
                         @foreach($task as $val)
                         <?php $levels = $val->department?->hierarchy_levels ?? []; ?>
                         <tr>
-                            <td>{{ $val->handler?->yourname ?? '---' }} <br> <small>{{ $val->handler?->email }}</small> </td>
-                            <td>{{ $levels['level3'] ?? '-' }} <br>
-                                <small>{{ $levels['level2'] ?? '-' }}</small>
-                            </td>
-
+                            <td>{{ $val->handler?->yourname ?? '---' }}</td>
+                            <td>{{ $levels['level2'] ?? '-' }}</td>
+                            <td>{{ $levels['level3'] ?? '-' }}</td>
                             <td>{{ $val->Post?->name }}</td>
                             <td>{{ $val->Channel?->name }}</td>
                             <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td>
@@ -95,7 +101,6 @@
                 </table>
 
                 <div class="mt-3">
-                    {{ $task->links() }}
                 </div>
 
 

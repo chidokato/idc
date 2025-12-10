@@ -19,6 +19,8 @@ class Task extends Model
         'active',
         'channel_id',
         'department_id',
+        'department_lv1',
+        'department_lv2',
         'report_id',
         'cost_type',
         'content',
