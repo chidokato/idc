@@ -63,7 +63,7 @@
                             <th>KPI</th>
                             <th>Duyệt</th>
                             <th></th>
-                            <th></th>
+                            <!-- <th></th> -->
                         </tr>
                     </thead>
 
@@ -96,12 +96,12 @@
                                 </label>
                             </td>
                             <td> @if($val->approved) <span class="badge bg-success">Đã duyệt</span> @else <span class="badge bg-warning">Chờ duyệt</span> @endif </td>
-                            <td>
+                            <!-- <td>
                                 <form action="{{ route('account.tasks.delete', $val) }}" method="POST">
                                     @csrf
                                     <button type="submit" class="del-db btn btn-danger p-1" data-id="{{ $val->id }}">Xóa</button>
                                 </form>
-                            </td>
+                            </td> -->
                         </tr>
                         @endforeach
                     </tbody>
