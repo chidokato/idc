@@ -55,29 +55,38 @@ class AccountController extends HomeController
         $data = $request->all();
 
         $request->validate([
-            'yourname'   => 'required|max:255',
+            'yourname'   => 'required',
             'phone'      => 'nullable',
             'address'    => 'nullable',
-            'department_id' => 'required|integer'
         ]);
 
         $user = User::find(Auth::id());
+        if (isset($data['department_id'])) {
+            // Lấy department theo form gửi lên (KHÔNG phải theo user cũ)
+            $deptLv3 = Department::find($data['department_id']);
+            $deptLv2 = $deptLv3?->parentDepartment;
+            $deptLv1 = $deptLv2?->parentDepartment;
 
-        // Lấy department theo form gửi lên (KHÔNG phải theo user cũ)
-        $deptLv3 = Department::find($data['department_id']);
-        $deptLv2 = $deptLv3?->parentDepartment;
-        $deptLv1 = $deptLv2?->parentDepartment;
-
-        // Cập nhật user
-        $user->update([
-            'yourname'        => $data['yourname'],
-            'phone'           => $data['phone'],
-            'address'         => $data['address'],
-            'department_id'   => $data['department_id'],      // LV3
-            'employee_code'   => $data['employee_code'] ?? null,
-            'department_lv1'  => $deptLv1?->id,               // ID
-            'department_lv2'  => $deptLv2?->id,               // ID
-        ]);
+            // Cập nhật user
+            $user->update([
+                'yourname'        => $data['yourname'],
+                'phone'           => $data['phone'],
+                'address'         => $data['address'],
+                'department_id'   => $data['department_id'],      // LV3
+                'employee_code'   => $data['employee_code'] ?? null,
+                'department_lv1'  => $deptLv1?->id,               // ID
+                'department_lv2'  => $deptLv2?->id,               // ID
+            ]);
+        }else{
+            // Cập nhật user
+            $user->update([
+                'yourname'        => $data['yourname'],
+                'phone'           => $data['phone'],
+                'address'         => $data['address'],
+                'employee_code'   => $data['employee_code'] ?? null,
+            ]);
+        }
+        
 
         return redirect()->back()->with('success', 'Thành công!');
     }
