@@ -63,6 +63,7 @@
                             <th>KPI</th>
                             <th>Duyệt</th>
                             <th></th>
+                            <th></th>
                         </tr>
                     </thead>
 
@@ -76,7 +77,7 @@
                         ?>
                         @foreach($task as $val)
                         <?php $levels = $val->department?->hierarchy_levels ?? []; ?>
-                        <tr>
+                        <tr class="padding16" id="row-{{ $val->id }}">
                             <td>{{ $val->handler?->yourname ?? '---' }}</td>
                             <td>{{ $levels['level2'] ?? '-' }}</td>
                             <td>{{ $levels['level3'] ?? '-' }}</td>
@@ -95,6 +96,12 @@
                                 </label>
                             </td>
                             <td> @if($val->approved) <span class="badge bg-success">Đã duyệt</span> @else <span class="badge bg-warning">Chờ duyệt</span> @endif </td>
+                            <td>
+                                <form action="{{ route('account.tasks.delete', $val) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="del-db btn btn-danger p-1" data-id="{{ $val->id }}">Xóa</button>
+                                </form>
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -153,6 +160,61 @@ $(document).ready(function() {
                 checkbox.prop('checked', !approved);
             }
         });
+    });
+});
+</script>
+
+<script>
+$(document).on('click', '.del-db', function (e) {
+    e.preventDefault();
+
+    let id = $(this).data('id');
+    let row = $("#row-" + id);
+
+    let approved = row.find('td:nth-child(5) span').hasClass('bg-success'); 
+
+    if (approved) {
+        Swal.fire('Không thể xóa!', 'Tác vụ đã được duyệt, không thể xóa.', 'warning');
+        return;
+    }
+
+    let url = "{{ url('account/tasks/delete') }}/" + id;
+
+    Swal.fire({
+        title: 'Bạn có chắc muốn xóa?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Có',
+        cancelButtonText: 'Không'
+    }).then((result) => {
+        if (result.isConfirmed) {
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: { _token: "{{ csrf_token() }}" },
+                success: function(res) {
+                    if (res.status) {
+
+                        row.fadeOut(300, function() {
+                            $(this).remove();
+
+                            // Cập nhật giao diện số liệu
+                            $("#tongduan").text(res.stats.total_project + " dự án");
+                            $("#tongtien").text(res.stats.total_expected + " đ");
+                            $("#tongphainop").text(res.stats.total_pay + " đ");
+                        });
+
+                    } else {
+                        Swal.fire('Lỗi!', res.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Lỗi!', 'Không thể kết nối server.', 'error');
+                }
+            });
+
+        }
     });
 });
 </script>

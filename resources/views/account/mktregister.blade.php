@@ -41,7 +41,6 @@
                                         <th>Ngân sách/ngày <span class="required">(*)</span></th>
                                         <th>Ghi chú</th>
                                         <th>Thời gian chạy</th>
-                                        
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -401,8 +400,6 @@ $(document).on('click', '.del-db', function (e) {
         }
     });
 });
-
-
 </script>
 
 
