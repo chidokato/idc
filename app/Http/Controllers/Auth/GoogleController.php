@@ -83,7 +83,8 @@ class GoogleController extends Controller
         } elseif ($user->permission == 6) {
             // User bình thường
             if ($user->status == 'active') {
-                return redirect()->route('account.main'); // route admin hoặc route giao diện người dùng
+                // return redirect()->route('account.main'); // route admin hoặc route giao diện người dùng
+                return redirect()->route('account.edit'); // Chuyển đến sửa thông tin cá nhân
             }
             else{
                 Auth::logout();

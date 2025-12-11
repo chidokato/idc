@@ -44,7 +44,9 @@
                                 <td>{{$val->Department?->name}}</td>
                                 <td>{{$val->departmentlv2?->name}}</td>
                                 <td>{{$val->departmentlv1?->name}}</td>
-                                <td>{{$val->leve}}</td>
+                                <td>
+                                    {{ $val->rank == 3 ? 'Nhân viên' : ($val->rank == 2 ? 'Trưởng nhóm' : ($val->rank == 1 ? 'Giám đốc' : '')) }}
+                                </td>
                                 <td>{{$val->email}}</td>
                                 <td>
                                     <label class="container">
