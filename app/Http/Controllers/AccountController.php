@@ -93,7 +93,7 @@ class AccountController extends HomeController
             // dd($groupIds);
             $r = Report::where('active', 1)->count();
             if ($r > 0) {
-                $users = User::get();
+                $users = User::where('department_lv2', Auth::User()->department_lv2)->get();
                 $posts = Post::where('sort_by', 'Product')->where('rate', '!=', null)->orderBy('name', 'asc')->get();
                 $channels = Channel::where('parent', '!=', 0)->get();
                 $reports = Report::where('active', 1)->orderBy('id', 'desc')->get();
