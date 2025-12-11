@@ -10,7 +10,9 @@
 @section('content')
 @include('account.layout.menu')
 
-
+<style>
+    #report-form td{ border:none !important }
+</style>
 
 <section class="card-grid news-sec">
     <div class="container">
@@ -20,7 +22,6 @@
             </div>
 
             <div class="col-lg-10 ">
-
                 <form id="report-form">
                     @csrf
                     <input type="hidden" name="id" id="report_id">
@@ -35,7 +36,6 @@
                             </tr>
                         </table>
                     </div>
-                    
                 </form>
 
                 <div id="load_report" class="widget-list"></div>

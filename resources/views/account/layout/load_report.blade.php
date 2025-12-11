@@ -4,6 +4,7 @@
     <thead>
         <tr>
              <th>Đóng/mở</th>
+             <th>Khu vực cho: GĐ / admin / MKT</th>
             <th>Tên</th>
             <th>Thời gian</th>
             <th>Số ngày</th>
@@ -20,7 +21,13 @@
                 </label>
 
             </td>
-            <td class="r-name"><a href="account/report/{{ $r->id }}">{{ $r->name }}</a></td>
+            <td>
+                <a href="account/report/{{ $r->id }}"><button class="btn-info btn">Duyệt MKT</button></a>
+                <a href="account/report/{{ $r->id }}"><button class="btn-info btn">Quản lý đóng tiền</button></a>
+                <a href="account/report/{{ $r->id }}"><button class="btn-info btn">Chi phí thực tế</button></a>
+                <a href="account/report/{{ $r->id }}"><button class="btn-info btn">Tất cả</button></a>
+            </td>
+            <td class="r-name"><strong>{{ $r->name }}</strong></td>
             <td class="r-date">{{ \Carbon\Carbon::parse($r->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($r->time_end)->format('d/m/Y') }}</td>
             <td>{{ $r->days }}</td>
             
