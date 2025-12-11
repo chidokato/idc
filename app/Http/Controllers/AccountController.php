@@ -93,7 +93,7 @@ class AccountController extends HomeController
             // dd($groupIds);
             $r = Report::where('active', 1)->count();
             if ($r > 0) {
-                $users = User::whereNotNull('department_lv2')->where('department_lv2', Auth::User()->department_lv2)->get();
+                $users = User::where('department_lv2', Auth::User()->department_lv2)->whereNotNull('department_lv2')->where('department_lv2', '!=', '')->get();
                 $posts = Post::where('sort_by', 'Product')->where('rate', '!=', null)->orderBy('name', 'asc')->get();
                 $channels = Channel::where('parent', '!=', 0)->get();
                 $reports = Report::where('active', 1)->orderBy('id', 'desc')->get();
@@ -130,6 +130,7 @@ class AccountController extends HomeController
                 'post_id' => $postId,
                 'channel_id' => $data['channel_id'][$key] ?? null,
                 'rate' => $data['rate'][$key] ?? null,
+                'days' => $data['days'][$key] ?? null,
                 
                 'department_id' => $deptLv3->id,              // lv3
                 'department_lv2' => $deptLv2?->id,            // lv2

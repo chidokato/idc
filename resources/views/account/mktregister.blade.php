@@ -92,12 +92,13 @@
                                         </td>
 
                                         <td>
-                                            <select name="channel_id[]" required class="form-control">
+                                            <select name="channel_id[]" required  class="form-control channel_id">
                                                 <option value="">---</option>
                                                 @foreach($channels as $val)
                                                 <option value="{{$val->id}}">{{$val->name}}</option>
                                                 @endforeach
                                             </select>
+                                            <input type="hidden" name="days[]" class="days" value="">
                                         </td>
                                         <td>
                                             <select name="expected_costs[]" required class="form-control">
@@ -109,11 +110,12 @@
                                         </td>
                                         <td><input class="form-control" type="text" name="content[]" placeholder="Hỗ trợ, chạy chung ..."></td>
                                         <td>
-                                            <select name="report_id[]" required class="form-control">
+                                            <select name="report_id[]" class="form-control report_id" required>
                                                 @foreach($reports as $val)
-                                                <option value="{{ $val->id }}">{{ $val->name }}</option>
+                                                <option value="{{ $val->id }}" data-days="{{ $val->days }}">{{ $val->name }}</option>
                                                 @endforeach
                                             </select>
+                                            
                                         </td>
                                         
                                     </tr>
@@ -414,6 +416,29 @@ $(document).on('click', '.del-db', function (e) {
         let rateSelect = $(this).closest('tr').find('.rate-select');
         rateSelect.val(rate); // Set selected option phù hợp
     }); // Gán tỷ lệ hỗ trợ theo dự án
+
+</script>
+
+
+<script>
+$(document).on('change', '.channel_id', function () {
+    const row = $(this).closest('tr');
+    const channelId = parseInt($(this).val());
+    let days = 1; // mặc định
+
+    // Nếu channel_id = 2,3,4 -> lấy days theo report_id
+    if ([2, 3, 4].includes(channelId)) {
+        const selectedReport = row.find('.report_id').find(':selected');
+        const reportDays = parseInt(selectedReport.data('days'));
+
+        if (!Number.isNaN(reportDays)) {
+            days = reportDays;
+        }
+    }
+
+    row.find('.days').val(days);
+});
+
 
 </script>
 

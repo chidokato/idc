@@ -16,6 +16,7 @@ class Task extends Model
         'expected_costs',
         'actual_costs',
         'rate',
+        'days',
         'active',
         'channel_id',
         'department_id',
