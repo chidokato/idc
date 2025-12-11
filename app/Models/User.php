@@ -77,6 +77,14 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Department::class, 'department_id');
     }
+    public function departmentlv2()
+    {
+        return $this->belongsTo(Department::class, 'department_lv2');
+    }
+    public function departmentlv1()
+    {
+        return $this->belongsTo(Department::class, 'department_lv1');
+    }
 
     public function tasks()
     {

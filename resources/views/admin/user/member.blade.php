@@ -26,8 +26,11 @@
                             <tr>
                                 <th></th>
                                 <th>Name</th>
+                                <th>Phòng/Nhóm</th>
+                                <th>Sàn</th>
+                                <th>Cty</th>
+                                <th>Chức vụ</th>
                                 <th>Email</th>
-                                <!-- <th>Quyền</th> -->
                                 <th>Status</th>
                                 <th>date</th>
                                 <th></th>
@@ -38,8 +41,11 @@
                             <tr>
                                 <td>{{$val->id}}</td>
                                 <td><a href="{{route('users.edit',[$val->id])}}">{{$val->yourname}}</a></td>
+                                <td>{{$val->Department?->name}}</td>
+                                <td>{{$val->departmentlv2?->name}}</td>
+                                <td>{{$val->departmentlv1?->name}}</td>
+                                <td>{{$val->leve}}</td>
                                 <td>{{$val->email}}</td>
-                                <!-- <td>{{$val->permission}}</td> -->
                                 <td>
                                     <label class="container">
                                         <input type="checkbox" class="change-user-status"
