@@ -144,7 +144,9 @@ small{ font-size:.8rem }
     background: #f5f5f5;
     border-color: #999;
 }
-td.ghichu{ width:200px; overflow:none }
+td.ghichu{ width:200px; overflow:none; overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; }
 
 @media (max-width: 1860px) {
   .users>div{ width:100%; overflow: hidden; }
