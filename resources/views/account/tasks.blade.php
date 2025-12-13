@@ -41,10 +41,9 @@
                             @if(Auth::User()->rank < 3) <th>Họ Tên</th> @endif
                             <th>Phòng/Nhóm</th>
                             <th>Dự án</th>
-                            <th>Hỗ trợ</th>
                             <th>Kênh</th>
-                            <th>Số ngày</th>
-                            <th>Chi phí</th>
+                            <th>Tổng tiền</th>
+                            <th>Hỗ trợ</th>
                             <th>Tiền phải nộp</th>
                             <th>KPI</th>
                             <th>Ghi chú</th>
@@ -61,9 +60,9 @@
                             <tr>
                                 <td>
                                     @if($task->approved)
-                                        <span class="badge bg-success">Đã duyệt</span>
+                                        <span class="badge bg-success">Duyệt</span>
                                     @else
-                                        <span class="badge bg-warning">Chờ duyệt</span>
+                                        <span class="badge bg-warning">Chờ</span>
                                     @endif
                                 </td>
                                 
@@ -71,11 +70,13 @@
                                 @if(Auth::User()->rank < 3) <td>{{ $task->User?->yourname }}</td> @endif
                                 <td>{{ $dep3?->name ?? '-' }}</td>
                                 <td>{{ $task->Post?->name }}</td>
-                                <td>{{ $task->rate }}%</td>
                                 <td>{{ $task->Channel?->name }}</td>
-                                <td>{{ $task->Report->days }}</td>
-                                <td>{{ number_format($task->Report->days * $task->expected_costs,0,',','.') }}đ</td>
-                                <td>{{ number_format(($task->Report->days * $task->expected_costs * (1 - $task->rate/100)), 0, ',', '.') }} đ</td>
+                                <td title="{{ number_format($task->expected_costs, 0, ',', '.') }}đ * {{ $task->days }} ngày">
+                                    {{ number_format($task->total_costs ?? $task->days*$task->expected_costs, 0, ',', '.') }}đ <span class="note">?</span>
+                                </td>
+                                <td>{{ $task->rate }}%</td>
+                                <td>{{ number_format(($task->days * $task->expected_costs * (1 - $task->rate/100)), 0, ',', '.') }}đ</td>
+                                
                                 <td>{{ $task->content }}</td>
                                 <td></td>
                                 <td>{{date('d/m/Y',strtotime($task->Report->time_start))}} - {{date('d/m/Y',strtotime($task->Report->time_end))}}</td>
