@@ -37,7 +37,7 @@
                             <tr>
                                 <th>Duyệt?</th>
                                 <th>Mã NV</th>
-                                @if(Auth::User()->rank < 3) <th>Họ Tên</th> @endif
+                               <th>Họ Tên</th>
                                 <th>Phòng/Nhóm</th>
                                 <th>Dự án</th>
                                 <th>Kênh</th>
