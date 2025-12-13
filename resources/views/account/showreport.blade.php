@@ -90,8 +90,15 @@
                             <td>
                                 <select name="rate" class="rate-select form-select form-select-sm" data-id="{{ $val->id }}">
                                     <option value="100" {{ $val->rate == 100 ? 'selected' : '' }}>100%</option>
+                                    <option value="90"  {{ $val->rate == 95  ? 'selected' : '' }}>95%</option>
                                     <option value="90"  {{ $val->rate == 90  ? 'selected' : '' }}>90%</option>
+                                    <option value="80"  {{ $val->rate == 88  ? 'selected' : '' }}>88%</option>
                                     <option value="80"  {{ $val->rate == 80  ? 'selected' : '' }}>80%</option>
+                                    <option value="80"  {{ $val->rate == 70  ? 'selected' : '' }}>70%</option>
+                                    <option value="80"  {{ $val->rate == 68  ? 'selected' : '' }}>68%</option>
+                                    <option value="80"  {{ $val->rate == 60  ? 'selected' : '' }}>60%</option>
+                                    <option value="80"  {{ $val->rate == 50  ? 'selected' : '' }}>50%</option>
+                                    <option value="80"  {{ $val->rate == 0  ? 'selected' : '' }}>0%</option>
                                 </select>
                             </td>
 
