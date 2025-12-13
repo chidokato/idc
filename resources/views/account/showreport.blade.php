@@ -93,6 +93,7 @@
                                     <option value="90"  {{ $val->rate == 95  ? 'selected' : '' }}>95%</option>
                                     <option value="90"  {{ $val->rate == 90  ? 'selected' : '' }}>90%</option>
                                     <option value="80"  {{ $val->rate == 88  ? 'selected' : '' }}>88%</option>
+                                    <option value="80"  {{ $val->rate == 85  ? 'selected' : '' }}>85%</option>
                                     <option value="80"  {{ $val->rate == 80  ? 'selected' : '' }}>80%</option>
                                     <option value="80"  {{ $val->rate == 70  ? 'selected' : '' }}>70%</option>
                                     <option value="80"  {{ $val->rate == 68  ? 'selected' : '' }}>68%</option>
