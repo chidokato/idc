@@ -26,6 +26,7 @@
                             <tr>
                                 <th></th>
                                 <th>Name</th>
+                                <th>Phòng/sàn</th>
                                 <th>Email</th>
                                 <th>Quyền</th>
                                 <th>Status</th>
@@ -38,6 +39,9 @@
                             <tr>
                                 <td>{{$val->id}}</td>
                                 <td><a href="{{route('users.edit',[$val->id])}}">{{$val->yourname}}</a></td>
+                                <td>
+                                    {{ $val->Department->name }} / {{ $val->Departmentlv2->name }} / {{ $val->Departmentlv1->name }}
+                                </td>
                                 <td>{{$val->email}}</td>
                                 <td>{{$val->permission}}</td>
                                 <td>

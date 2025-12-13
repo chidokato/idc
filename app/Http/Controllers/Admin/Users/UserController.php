@@ -7,8 +7,9 @@ use Illuminate\Http\Request;
 use Session;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
-
+use App\Models\Department;
 use App\Models\User;
+use App\Helpers\TreeHelper;
 
 class UserController extends Controller
 {
@@ -90,8 +91,24 @@ class UserController extends Controller
     {
         //
         $data = User::find($id);
+
+        $department = Department::findOrFail($data->department_id);
+        $items = Department::all();
+
+        $options = TreeHelper::buildOptions(
+            items: $items,
+            parentId: 0,
+            prefix: '',
+            selectedId: $data->department_id, 
+            idField: 'id',
+            parentField: 'parent',
+            nameField: 'name'
+        );
+
         return view('admin.user.edit', compact(
             'data',
+            'department',
+            'options'
         ));
     }
 
@@ -117,6 +134,9 @@ class UserController extends Controller
             $User->password = bcrypt($request->password);
         }
 
+        $departmentLv3 = Department::with('parentDepartment.parentDepartment')->findOrFail($request->department_id);
+
+
         $User->email = $request->email;
         $User->permission = $request->permission;
         $User->yourname = $request->yourname;
@@ -124,6 +144,9 @@ class UserController extends Controller
         $User->address = $request->address;
         $User->phone = $request->phone;
         $User->facebook = $request->facebook;
+        $User->department_id = $departmentLv3->id; // lv3
+        $User->department_lv2 = $departmentLv3->parentDepartment?->id; // lv2
+        $User->department_lv1 = $departmentLv3->parentDepartment?->parentDepartment?->id; // lv1
         $User->save();
         return redirect()->back()->with('success','Thành công');
         // return redirect('admin/users')->with('success','successfully');
