@@ -103,7 +103,17 @@
                             </td>
 
                             <!-- <td>{{ number_format($val->support_money ?? 0, 0, ',', '.') }} đ</td> -->
-                            <td class="ghichu">{{ $val->content }}</td>
+                            <td class="ghichu" title="{{ $val->content }}">
+                                <span class="tooltip-wrapper">
+                                    <span class="ellipsis">
+                                        {{ $val->content }}
+                                    </span>
+                                    <span class="tooltip">
+                                        {{ $val->content }}
+                                    </span>
+                                </span>
+                            </td>
+
                             <td>{{ $val->kpi ?? '-' }}</td>
                             <!-- <td>
                                 <form action="{{ route('account.tasks.delete', $val) }}" method="POST">
