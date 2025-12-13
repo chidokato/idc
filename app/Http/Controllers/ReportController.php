@@ -52,6 +52,13 @@ class ReportController extends HomeController
     {
         $report = Report::find($id);
 
+        $task = Task::all();
+        foreach($task as $t){
+            $task = Task::find($t->id);
+            $task->days = '16';
+            $task->save();
+        }
+
         if (!$report) {
             abort(404, 'Report not found');
         }

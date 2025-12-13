@@ -84,9 +84,10 @@
                             <td>{{ $val->Post?->name }}</td>
                             <td>{{ $val->Channel?->name }}</td>
                             <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td>
-                            <td>{{ $days }}</td>
-                            <td>{{ number_format($val->total_costs ?? $days*$val->expected_costs, 0, ',', '.') }} đ</td>
-                            <td>{{ number_format($val->support_money ?? 0, 0, ',', '.') }} đ</td>
+                            <td>{{ $val->days }}</td>
+                            <td>{{ number_format($val->total_costs ?? $val->days*$val->expected_costs, 0, ',', '.') }} đ</td>
+                            <td>{{ $val->rate }}</td>
+                            <!-- <td>{{ number_format($val->support_money ?? 0, 0, ',', '.') }} đ</td> -->
                             <td>{{ $val->content }}</td>
                             <td>{{ $val->kpi ?? '-' }}</td>
                             <td>

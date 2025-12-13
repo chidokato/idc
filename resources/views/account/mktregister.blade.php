@@ -22,7 +22,6 @@
             </div>
                 <div class="col-lg-10 ">
                     <div class="widget-list">
-                        
                     
                     <form action="{{ route('account.tasksstore') }}" method="POST">
                         @csrf
@@ -175,8 +174,8 @@
                                         <td>{{$val->rate}}%</td>
                                         <td>{{$val->Channel?->name}}</td>
                                         <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td>
-                                        <td>{{ number_format(($report->days * $val->expected_costs), 0, ',', '.') }} đ</td>
-                                        <td>{{ number_format(($report->days * $val->expected_costs * (1 - $val->rate/100)), 0, ',', '.') }} đ</td>
+                                        <td>{{ number_format(($val->days * $val->expected_costs), 0, ',', '.') }} đ</td>
+                                        <td>{{ number_format(($val->days * $val->expected_costs * (1 - $val->rate/100)), 0, ',', '.') }} đ</td>
                                         <td>{{ $val->content }}</td>
                                         
                                         <td>
@@ -188,7 +187,7 @@
                                     </tr>
                                     <?php
                                         $expected = $report->days * $val->expected_costs;
-                                        $pay = $report->days * $val->expected_costs * (1 - ($val->rate ?? 0) / 100);
+                                        $pay = $val->days * $val->expected_costs * (1 - ($val->rate ?? 0) / 100);
 
                                         $total_expected += $expected;
                                         $total_pay += $pay;
@@ -231,7 +230,7 @@
                                         <td>{{$val->rate}}%</td>
                                         <td>{{$val->Channel?->name}}</td>
                                         <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td>
-                                        <td>{{ number_format(($report->days * $val->expected_costs), 0, ',', '.') }} đ</td>
+                                        <td>{{ number_format(($val->days * $val->expected_costs), 0, ',', '.') }} đ</td>
                                         <td>{{ number_format(($report->days * $val->expected_costs * (1 - $val->rate/100)), 0, ',', '.') }} đ</td>
                                         <td>{{ $val->content }}</td>
                                         <td>
