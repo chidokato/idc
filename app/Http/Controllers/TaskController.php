@@ -132,4 +132,22 @@ class TaskController extends HomeController
 
     //     return view('tasks.report', compact('report'));
     // }
+
+    public function updateRate(Request $request)
+    {
+        $request->validate([
+            'id'   => 'required|exists:tasks,id',
+            'rate' => 'required|numeric|min:0|max:100'
+        ]);
+
+        $task = Task::find($request->id);
+        $task->rate = $request->rate;
+        $task->save();
+
+        return response()->json([
+            'success' => true,
+            'rate' => $task->rate
+        ]);
+    }
+
 }

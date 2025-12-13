@@ -171,6 +171,8 @@ Route::middleware(['user'])->group(function () {
         Route::resource('task',TaskController::class);
         Route::post('tasks/delete/{id}', [AccountController::class, 'delete'])->name('account.tasks.delete');
         Route::post('task/toggle-approved/{task}', [TaskController::class, 'toggleApproved'])->name('task.toggleApproved');
+        Route::post('tasks/update-rate', [TaskController::class, 'updateRate'])->name('tasks.updateRate');
+
 
 
         // report

@@ -55,8 +55,8 @@
                             <th>Nhóm</th>
                             <th>Dự án</th>
                             <th>Kênh</th>
-                            <th>Chi phí</th>
-                            <th>Số ngày</th>
+                            <!-- <th>Chi phí</th> -->
+                            <!-- <th>Số ngày</th> -->
                             <th>Tổng tiền</th>
                             <th>Hỗ trợ</th>
                             <th>Ghi chú</th>
@@ -83,10 +83,17 @@
                             <td>{{ $levels['level3'] ?? '-' }}</td>
                             <td>{{ $val->Post?->name }}</td>
                             <td>{{ $val->Channel?->name }}</td>
-                            <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td>
-                            <td>{{ $val->days }}</td>
-                            <td>{{ number_format($val->total_costs ?? $val->days*$val->expected_costs, 0, ',', '.') }} đ</td>
-                            <td>{{ $val->rate }}</td>
+                            <!-- <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td> -->
+                            <!-- <td>{{ $val->days }}</td> -->
+                            <td>{{ number_format($val->total_costs ?? $val->days*$val->expected_costs, 0, ',', '.') }}đ <span title="{{ number_format($val->expected_costs, 0, ',', '.') }}đ * {{ $val->days }} ngày" class="note">?</span></td>
+                            <td>
+                                <select name="rate" class="rate-select form-select form-select-sm" data-id="{{ $val->id }}">
+                                    <option value="100" {{ $val->rate == 100 ? 'selected' : '' }}>100%</option>
+                                    <option value="90"  {{ $val->rate == 90  ? 'selected' : '' }}>90%</option>
+                                    <option value="80"  {{ $val->rate == 80  ? 'selected' : '' }}>80%</option>
+                                </select>
+                            </td>
+
                             <!-- <td>{{ number_format($val->support_money ?? 0, 0, ',', '.') }} đ</td> -->
                             <td>{{ $val->content }}</td>
                             <td>{{ $val->kpi ?? '-' }}</td>
@@ -219,5 +226,33 @@ $(document).on('click', '.del-db', function (e) {
     });
 });
 </script>
+
+<script>
+$(document).on('change', '.rate-select', function () {
+    let rate = $(this).val();
+    let taskId = $(this).data('id');
+
+    $.ajax({
+        url: "{{ route('tasks.updateRate') }}",
+        method: "POST",
+        data: {
+            _token: "{{ csrf_token() }}",
+            id: taskId,
+            rate: rate
+        },
+        success: function (res) {
+            if (res.success) {
+                showToast('success', 'Đã cập nhật rate ' + rate + '%');
+            } else {
+                showToast('warning', 'Cập nhật rate không thành công');
+            }
+        },
+        error: function () {
+            showToast('error', 'Lỗi khi cập nhật rate');
+        }
+    });
+});
+</script>
+
 
 @endsection
