@@ -42,9 +42,9 @@
                             <th>Phòng/Nhóm</th>
                             <th>Dự án</th>
                             <th>Kênh</th>
-                            <th>Tổng tiền</th>
+                            <th>Tổng tiền (đ)</th>
                             <th>Hỗ trợ</th>
-                            <th>Tiền phải nộp</th>
+                            <th>Tiền nộp (đ)</th>
                             <th>KPI</th>
                             <th>Ghi chú</th>
                             <th>Thời gian</th>
@@ -72,10 +72,10 @@
                                 <td>{{ $task->Post?->name }}</td>
                                 <td>{{ $task->Channel?->name }}</td>
                                 <td title="{{ number_format($task->expected_costs, 0, ',', '.') }}đ * {{ $task->days }} ngày">
-                                    {{ number_format($task->total_costs ?? $task->days*$task->expected_costs, 0, ',', '.') }}đ <span class="note">?</span>
+                                    {{ number_format($task->total_costs ?? $task->days*$task->expected_costs, 0, ',', '.') }} <span class="note">?</span>
                                 </td>
                                 <td>{{ $task->rate }}%</td>
-                                <td>{{ number_format(($task->days * $task->expected_costs * (1 - $task->rate/100)), 0, ',', '.') }}đ</td>
+                                <td>{{ number_format(($task->days * $task->expected_costs * (1 - $task->rate/100)), 0, ',', '.') }}</td>
                                 
                                 <td>{{ $task->content }}</td>
                                 <td></td>
