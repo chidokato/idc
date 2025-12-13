@@ -14,33 +14,11 @@ class TaskController extends HomeController
     public function index()
     {
         $user = Auth::user();
-        $depLv3 = $user->department;
-        $depLv2 = $depLv3?->parentDepartment;
-        $depLv1 = $depLv2?->parentDepartment;
         $reports = Report::orderBy('id','desc')->get();
-        if (!$depLv2) {
-            $tasks = Task::with(['User.department.parentDepartment', 'Post', 'Channel'])
-                         ->where('user_id', $user->id)
-                         ->orderBy('id','desc')
-                         ->get();
-        } else {
-            $tasks = Task::with(['User.department.parentDepartment', 'Post', 'Channel'])
-                ->whereHas('User', function($qUser) use ($depLv2) {
-                    // user có department là 1 trong các group lv3 của phòng lv2
-                    $qUser->whereHas('department', function($qDept) use ($depLv2) {
-                        $qDept->where('parent', $depLv2->id);
-                    });
-                })
-                ->orderBy('id','desc')
-                ->get();
-        }
-            
+        $tasks = Task::where('department_lv2', $user->department_lv2)->orderBy('department_id','desc')->get();
         return view('account.tasks', compact(
             'tasks',
             'user',
-            'depLv3',
-            'depLv2',
-            'depLv1',
             'reports',
         ));
     }

@@ -57,7 +57,7 @@
                             <th>Kênh</th>
                             <!-- <th>Chi phí</th> -->
                             <!-- <th>Số ngày</th> -->
-                            <th>Tổng tiền</th>
+                            <th>Tổng tiền (đ)</th>
                             <th>Hỗ trợ</th>
                             <th>Ghi chú</th>
                             <th>KPI</th>
@@ -85,7 +85,7 @@
                             <td>{{ $val->Channel?->name }}</td>
                             <!-- <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td> -->
                             <!-- <td>{{ $val->days }}</td> -->
-                            <td>{{ number_format($val->total_costs ?? $val->days*$val->expected_costs, 0, ',', '.') }}đ <span title="{{ number_format($val->expected_costs, 0, ',', '.') }}đ * {{ $val->days }} ngày" class="note">?</span></td>
+                            <td>{{ number_format($val->total_costs ?? $val->days*$val->expected_costs, 0, ',', '.') }} <span title="{{ number_format($val->expected_costs, 0, ',', '.') }}đ * {{ $val->days }} ngày" class="note">?</span></td>
                             <td>
                                 <select name="rate" class="rate-select form-select form-select-sm" data-id="{{ $val->id }}">
                                     <option value="100" {{ $val->rate == 100 ? 'selected' : '' }}>100%</option>
