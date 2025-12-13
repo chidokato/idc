@@ -25,6 +25,7 @@
                         <thead>
                             <tr>
                                 <th></th>
+                                <th>Mã NV</th>
                                 <th>Name</th>
                                 <th>Phòng/Nhóm</th>
                                 <th>Sàn</th>
@@ -40,6 +41,7 @@
                             @foreach($users as $val)
                             <tr>
                                 <td>{{$val->id}}</td>
+                                <td>{{$val->employee_code}}</td>
                                 <td><a href="{{route('users.edit',[$val->id])}}">{{$val->yourname}}</a></td>
                                 <td>{{$val->Department?->name}}</td>
                                 <td>{{$val->departmentlv2?->name}}</td>
