@@ -138,6 +138,7 @@ class UserController extends Controller
 
 
         $User->email = $request->email;
+        $User->employee_code = $request->employee_code;
         $User->permission = $request->permission;
         $User->yourname = $request->yourname;
         $User->rank = $request->rank;

@@ -77,6 +77,10 @@
                               </div>
                           </div>
                           <div class="col-md-6">
+                            <div class="form-group">
+                                  <label>Mã NV</label>
+                                  <input value="{{$data->employee_code}}" name="employee_code" placeholder="..." type="text" class="form-control">
+                              </div>
                               <div class="form-group">
                                   <label>Họ & Tên</label>
                                   <input value="{{$data->yourname}}" name="yourname" placeholder="..." type="text" class="form-control">
