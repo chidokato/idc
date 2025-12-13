@@ -40,7 +40,7 @@
                                 <td>{{$val->id}}</td>
                                 <td><a href="{{route('users.edit',[$val->id])}}">{{$val->yourname}}</a></td>
                                 <td>
-                                    {{ $val->Department->name }} / {{ $val->Departmentlv2?->name }} / {{ $val->Departmentlv1?->name }}
+                                    {{ $val->Department?->name }} / {{ $val->Departmentlv2?->name }} / {{ $val->Departmentlv1?->name }}
                                 </td>
                                 <td>{{$val->email}}</td>
                                 <td>{{$val->permission}}</td>
