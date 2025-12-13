@@ -61,9 +61,10 @@
                             <th>Hỗ trợ</th>
                             <th>Ghi chú</th>
                             <th>KPI</th>
+                            <th></th>
                             <th>Duyệt</th>
                             <th></th>
-                            <!-- <th></th> -->
+                            
                         </tr>
                     </thead>
 
@@ -98,18 +99,19 @@
                             <td>{{ $val->content }}</td>
                             <td>{{ $val->kpi ?? '-' }}</td>
                             <td>
+                                <form action="{{ route('account.tasks.delete', $val) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="del-db btn btn-danger p-1" data-id="{{ $val->id }}">Xóa</button>
+                                </form>
+                            </td>
+                            <td>
                                 <label class="switch">
                                     <input type="checkbox" class="active-toggle" data-id="{{ $val->id }}" {{ $val->approved ? 'checked' : '' }}>
                                     <span class="slider round"></span>
                                 </label>
                             </td>
                             <td> @if($val->approved) <span class="badge bg-success">Đã duyệt</span> @else <span class="badge bg-warning">Chờ duyệt</span> @endif </td>
-                            <!-- <td>
-                                <form action="{{ route('account.tasks.delete', $val) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="del-db btn btn-danger p-1" data-id="{{ $val->id }}">Xóa</button>
-                                </form>
-                            </td> -->
+                            
                         </tr>
                         @endforeach
                     </tbody>
