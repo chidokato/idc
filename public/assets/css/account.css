@@ -148,8 +148,19 @@ small{ font-size:.8rem }
 .ghichu{ max-width:150px }
 
 table {
-    border-collapse: inherit;
+    border-collapse: unset;
+    border-spacing: 0; /* phòng trường hợp dùng separate */
 }
+
+table tr,
+table td,
+table th {
+    padding: 0;
+    margin: 0;
+    border: 0; /* nếu không muốn viền */
+}
+tbody tr td{ border-bottom: 1px solid #d3d6d9; }
+
 
 .thead{
   position: sticky;
@@ -158,6 +169,58 @@ table {
   z-index: 9999;
 }
 
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 34px;
+    height: 18px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .2s;
+    border-radius: 18px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .2s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #4CAF50;
+}
+
+input:checked + .slider:before {
+    transform: translateX(16px);
+}
+
+.table>:not(caption)>*>* { padding: .3rem .3rem !important;}
+.switch {
+    margin-top: 4px;
+}
+.table .thead tr th{ padding: .6rem .3rem !important }
+.font-lighter{ font-weight:lighter; font-size:.8rem }
 
 @media (max-width: 1860px) {
   .users>div{ width:100%; overflow: hidden; }

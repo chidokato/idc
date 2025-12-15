@@ -100,6 +100,10 @@ class ReportController extends HomeController
         $channels    = Channel::all();
         $channelsOptions = TreeHelper::buildOptions($channels,0,'',$request->channel_id);
 
+        $tongTien = $task->sum(function ($val) {
+            return $val->total_costs ?? ($val->days * $val->expected_costs);
+        });
+
         return view('account.showreport', compact(
             'report',
             'task',
@@ -107,6 +111,7 @@ class ReportController extends HomeController
             'departmentOptions',
             'posts',
             'channelsOptions',
+            'tongTien'
         ));
     }
 

@@ -57,18 +57,31 @@
                             <th>Kênh</th>
                             <!-- <th>Chi phí</th> -->
                             <!-- <th>Số ngày</th> -->
-                            <th>Tổng tiền (đ)</th>
+                            <th>Tổng tiền </th>
                             <th>Hỗ trợ</th>
                             <th>Ghi chú</th>
                             <th>KPI</th>
                             <!-- <th></th> -->
                             <th>Duyệt</th>
                             <th></th>
-                            
                         </tr>
+                        
                     </thead>
 
                     <tbody>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>{{ number_format($tongTien, 0, ',', '.') }}đ</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>   
+                        </tr>
                         <?php
                             $task = $task->sortBy([
                                 fn($a, $b) => strcmp($a->department?->hierarchy_levels['level2'] ?? '', $b->department?->hierarchy_levels['level2'] ?? ''),
