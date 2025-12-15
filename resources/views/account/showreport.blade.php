@@ -47,7 +47,7 @@
 
                 </form>
 
-                <table class="table">
+                <table class="table table-hover">
                     <thead class="thead">
                         <tr >
                             <th>Họ Tên</th>
