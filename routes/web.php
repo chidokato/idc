@@ -86,9 +86,12 @@ Route::group(['prefix'=>'ajax'],function(){
 
 Route::prefix('admin')->group(function () {
     Route::middleware(['admin:1'])->group(function () {
+        // user
         Route::resource('users',UserController::class);
         Route::get('users/member/list', [UserController::class, 'member'])->name('users.member');
-        Route::post('/user/change-status', [UserController::class, 'changeStatus'])->name('user.changeStatus');
+        Route::post('user/change-status', [UserController::class, 'changeStatus'])->name('user.changeStatus');
+        Route::post('users/update-name', [UserController::class, 'updateName'])->name('users.updateName');
+
         // khách hàng
         Route::resource('customer',CustomerController::class);
 

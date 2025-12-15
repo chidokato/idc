@@ -42,7 +42,13 @@
                             <tr>
                                 <td>{{$val->id}}</td>
                                 <td>{{$val->employee_code}}</td>
-                                <td><a href="{{route('users.edit',[$val->id])}}">{{$val->yourname}}</a></td>
+                                <td>
+                                    <input type="text"
+                                       value="{{ $val->yourname }}"
+                                       class="user-name-input"
+                                       data-id="{{ $val->id }}">
+
+                                </td>
                                 <td>{{$val->Department?->name}}</td>
                                 <td>{{$val->departmentlv2?->name}}</td>
                                 <td>{{$val->departmentlv1?->name}}</td>
@@ -116,4 +122,58 @@
     });
 
 </script>
+
+<script>
+
+$(document).on('focusout', '.user-name-input', function () {
+
+    let input = $(this);
+    let userId = input.data('id');
+    let name = input.val();
+
+    console.log('Blur chạy:', userId, name); // debug
+
+    if (!userId) {
+        showToast('error', 'Không xác định được user!');
+        return;
+    }
+
+    if (name.trim() === '') {
+        showToast('error', 'Tên không được để trống!');
+        return;
+    }
+
+    $.ajax({
+        url: "{{ route('users.updateName') }}",
+        method: "POST",
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            id: userId,
+            yourname: name
+        },
+        success: function(response) {
+            console.log("Server trả về:", response);
+
+            showToast('success', 'Cập nhật tên thành công!');
+            input.css('border', '1px solid #28a745');
+        },
+        error: function(xhr) {
+            console.log("Lỗi:", xhr.responseText);
+
+            showToast('error', 'Có lỗi xảy ra khi cập nhật!');
+            input.css('border', '1px solid red');
+        }
+    });
+});
+
+// Enter để lưu
+$(document).on('keypress', '.user-name-input', function (e) {
+    if (e.which === 13) {
+        $(this).blur();
+    }
+});
+</script>
+
+
+
 @endsection

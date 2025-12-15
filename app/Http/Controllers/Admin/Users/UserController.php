@@ -195,6 +195,18 @@ class UserController extends Controller
         return redirect('/');
     }
 
+    public function updateName(Request $request)
+    {
+        $user = User::find($request->id);
+        $user->yourname = $request->yourname;
+        $user->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Cập nhật tên thành công'
+        ]);
+    }
+
 
     public function changeStatus(Request $request)
     {

@@ -40,7 +40,9 @@
                             <tr>
                                 <td>{{$val->id}}</td>
                                 <td>{{$val->employee_code}}</td>
-                                <td><a href="{{route('users.edit',[$val->id])}}">{{$val->yourname}}</a></td>
+                                <td>
+                                    <input type="text" value="{{$val->yourname}}" name="name">
+                                </td>
                                 <td>
                                     {{ $val->Department?->name }} / {{ $val->Departmentlv2?->name }} / {{ $val->Departmentlv1?->name }}
                                 </td>
@@ -112,4 +114,60 @@
     });
 
 </script>
+
+
+<script>
+$(document).ready(function () {
+    $('.user-name-input').on('change blur', function () {
+        let input = $(this);
+        let userId = input.data('id');
+        let name = input.val();
+
+        // Không gửi nếu name rỗng
+        if (name.trim() === '') {
+            showToast('error', 'Tên không được để trống!');
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('users.updateName') }}",
+            method: "POST",
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                id: userId,
+                yourname: name
+            },
+            success: function(response) {
+                console.log("Server trả về:", response);
+
+                // 🔥 Thông báo thành công
+                showToast('success', 'Cập nhật tên thành công!');
+
+                // Optional: viền xanh
+                input.css('border', '1px solid #28a745');
+            },
+            error: function(xhr) {
+                console.log("Lỗi:", xhr.responseText);
+
+                // ❌ Thông báo lỗi
+                showToast('error', 'Có lỗi xảy ra khi cập nhật!');
+
+                // Optional: viền đỏ
+                input.css('border', '1px solid red');
+            }
+        });
+    });
+
+    // Enter để lưu
+    $('.user-name-input').on('keypress', function (e) {
+        if (e.which === 13) {
+            $(this).blur();
+        }
+    });
+
+});
+</script>
+
+
+
 @endsection

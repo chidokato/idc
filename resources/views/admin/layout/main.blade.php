@@ -9,6 +9,8 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>SB Admin 2 - Dashboard</title>
 
     <!-- Custom fonts for this template-->
