@@ -52,14 +52,14 @@ class ReportController extends HomeController
     {
         $report = Report::find($id);
 
-        $task = Task::all();
-        foreach($task as $t){
-            if ($t->approved == null) {
-                $task = Task::find($t->id);
-                $task->approved = '0';
-                $task->save();
-            }
-        }
+        // $task = Task::all();
+        // foreach($task as $t){
+        //     if ($t->approved == null) {
+        //         $task = Task::find($t->id);
+        //         $task->approved = '0';
+        //         $task->save();
+        //     }
+        // }
 
         if (!$report) {
             abort(404, 'Report not found');
