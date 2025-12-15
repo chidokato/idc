@@ -33,7 +33,7 @@
                 </div>
                 <div class="table-responsive-mobile">
                     <table class="table">
-                        <thead>
+                        <thead class="thead">
                             <tr>
                                 <th>Duyệt?</th>
                                 <th>Mã NV</th>
