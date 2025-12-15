@@ -140,6 +140,7 @@ class AccountController extends HomeController
                 'channel_id' => $data['channel_id'][$key] ?? null,
                 'rate' => $data['rate'][$key] ?? null,
                 'days' => $data['days'][$key] ?? null,
+                'approved' => 0,
                 
                 'department_id' => $deptLv3->id,              // lv3
                 'department_lv2' => $deptLv2?->id,            // lv2

@@ -25,6 +25,7 @@ class Task extends Model
         'report_id',
         'cost_type',
         'content',
+        'approved',
     ];
 
     public function User()
