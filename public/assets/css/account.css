@@ -147,6 +147,13 @@ small{ font-size:.8rem }
 
 .ghichu{ max-width:150px }
 
+.thead{
+  position: sticky;
+  top: 58px;
+  background: #ddd;
+  z-index: 9999;
+}
+
 
 @media (max-width: 1860px) {
   .users>div{ width:100%; overflow: hidden; }

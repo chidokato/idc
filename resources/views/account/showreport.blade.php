@@ -48,7 +48,7 @@
                 </form>
 
                 <table class="table">
-                    <thead>
+                    <thead class="thead">
                         <tr>
                             <th>Họ Tên</th>
                             <th>Sàn</th>
