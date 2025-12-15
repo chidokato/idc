@@ -36,7 +36,14 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('admin.user.create');
+        $departments = Department::with('children')->get();
+        $departmentOptions = \App\Helpers\TreeHelper_disabled::buildDepartmentOptions(
+            $departments,
+            parent: 0,
+            prefix: '',
+        );
+
+        return view('admin.user.create', compact('departmentOptions'));
     }
 
     /**
@@ -56,16 +63,25 @@ class UserController extends Controller
         [
             'email.unique'=>'Email đã tồn tại',
         ] );
+
         $data = $request->all();
+
+        $departmentLv3 = Department::with('parentDepartment.parentDepartment')->findOrFail($request->department_id);
+
         $User = new User();
         $User->email = $request->email;
         $User->password = bcrypt($request->password);
         $User->permission = $request->permission;
-        
+        $User->rank = $request->rank;
         $User->yourname = $request->yourname;
         $User->address = $request->address;
         $User->phone = $request->phone;
         $User->facebook = $request->facebook;
+        
+        $User->department_id = $departmentLv3->id; // lv3
+        $User->department_lv2 = $departmentLv3->parentDepartment?->id; // lv2
+        $User->department_lv1 = $departmentLv3->parentDepartment?->parentDepartment?->id; // lv1
+
         $User->save();
         return redirect('admin/users')->with('success','successfully');
     }
@@ -89,17 +105,21 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        //
-        $data = User::find($id);
+        $data = User::findOrFail($id);
 
-        $department = Department::findOrFail($data->department_id);
+        // Nếu department_id null thì không find
+        $department = null;
+        if (!empty($data->department_id)) {
+            $department = Department::find($data->department_id);
+        }
+
         $items = Department::all();
 
         $options = TreeHelper::buildOptions(
             items: $items,
             parentId: 0,
             prefix: '',
-            selectedId: $data->department_id, 
+            selectedId: $data->department_id ?? 0, // null => ROOT
             idField: 'id',
             parentField: 'parent',
             nameField: 'name'
@@ -111,6 +131,7 @@ class UserController extends Controller
             'options'
         ));
     }
+
 
     /**
      * Update the specified resource in storage.

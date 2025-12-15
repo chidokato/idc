@@ -61,12 +61,14 @@
                                   </select>
                               </div>
                               <div class="form-group">
-                                  <label class="">Phòng/nhóm</label>
-                                  <select name="department_id" class="form-control select2">
-                                    <option value="0">-- ROOT --</option>
-                                    {!! $options !!}
-                                </select>
+                                <select name="department_id" class="form-control select2">
+                                  <option value="0" {{ empty($data->department_id) ? 'selected' : '' }}>
+                                      -- ROOT --
+                                  </option>
+                                  {!! $options !!}
+                              </select>
                               </div>
+                              
                               <div class="form-group">
                                   <div class="edit_pass"><label>Mật khẩu</label> <label class="cursor_pointer"><input type="checkbox" id='changepassword' name="changepassword" />  <strong>EDIT</strong> </label> </div>
                                   <input disabled name="password" placeholder="Password" type="password" class="form-control pass">
