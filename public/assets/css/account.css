@@ -222,6 +222,8 @@ input:checked + .slider:before {
 .table .thead tr th{ padding: .6rem .3rem !important }
 .font-lighter{ font-weight:lighter; font-size:.8rem }
 
+.form-select-sm{ padding: 0.1rem 0.2rem; }
+
 @media (max-width: 1860px) {
   .users>div{ width:100%; overflow: hidden; }
 }

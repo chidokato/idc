@@ -70,7 +70,16 @@
                                     <td>{{ $task->rate }}%</td>
                                     <td>{{ number_format(($task->days * $task->expected_costs * (1 - $task->rate/100)), 0, ',', '.') }}</td>
                                     
-                                    <td>{{ $task->content }}</td>
+                                    <td class="ghichu" title="{{ $val->content }}">
+                                <span class="tooltip-wrapper">
+                                    <span class="text-truncate-set-1 text-truncate-set">
+                                        {{ $val->content }}
+                                    </span>
+                                    <span class="tooltip">
+                                        {{ $val->content }}
+                                    </span>
+                                </span>
+                            </td>
                                     <td></td>
                                     <td>{{date('d/m/Y',strtotime($task->Report->time_start))}} - {{date('d/m/Y',strtotime($task->Report->time_end))}}</td>
                                 </tr>
