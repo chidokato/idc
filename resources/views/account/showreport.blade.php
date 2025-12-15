@@ -40,6 +40,20 @@
                             {!! $channelsOptions !!}
                         </select>
                     </div>
+                    <div class="col-md-1">
+                        <select name="approved" class="form-control select2">
+                            <option value="" {{ request()->filled('approved') ? '' : 'selected' }}>
+                                -- Duyệt ?? --
+                            </option>
+                            <option value="1" {{ request('approved') === '1' ? 'selected' : '' }}>
+                                Đã duyệt
+                            </option>
+                            <option value="0" {{ request('approved') === '0' ? 'selected' : '' }}>
+                                Chưa duyệt
+                            </option>
+                        </select>
+                    </div>
+
 
                     <div class="col-md-2">
                         <button class="btn button-search form-control bg-success">Lọc</button>
@@ -87,7 +101,6 @@
                                 fn($a, $b) => strcmp($a->department?->hierarchy_levels['level2'] ?? '', $b->department?->hierarchy_levels['level2'] ?? ''),
                                 fn($a, $b) => strcmp($a->department?->hierarchy_levels['level3'] ?? '', $b->department?->hierarchy_levels['level3'] ?? ''),
                             ]);
-
                         ?>
                         @foreach($task as $val)
                         <?php $levels = $val->department?->hierarchy_levels ?? []; ?>

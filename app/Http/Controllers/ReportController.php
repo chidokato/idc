@@ -90,6 +90,11 @@ class ReportController extends HomeController
             $query->whereIn('channel_id', $channelIds);
         }
 
+        if ($request->filled('approved')) {
+            $query->where('approved', $request->approved);
+        }
+
+
         $task = $query->paginate(1000)->appends($request->query());
 
         // Select filter
