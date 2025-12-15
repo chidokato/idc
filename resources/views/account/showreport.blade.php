@@ -106,7 +106,7 @@
                             <!-- <td>{{ number_format($val->support_money ?? 0, 0, ',', '.') }} đ</td> -->
                             <td class="ghichu" title="{{ $val->content }}">
                                 <span class="tooltip-wrapper">
-                                    <span class="ellipsis">
+                                    <span class="text-truncate-set-1 text-truncate-set">
                                         {{ $val->content }}
                                     </span>
                                     <span class="tooltip">
