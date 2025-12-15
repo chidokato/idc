@@ -150,7 +150,7 @@ small{ font-size:.8rem }
 .thead{
   position: sticky;
   top: 58px;
-  background: #ddd;
+  background: #dee2e6;
   z-index: 9999;
 }
 
