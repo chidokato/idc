@@ -73,10 +73,10 @@
                                     <td class="ghichu" title="{{ $val->content }}">
                                 <span class="tooltip-wrapper">
                                     <span class="text-truncate-set-1 text-truncate-set">
-                                        {{ $val->content }}
+                                        {{ $task->content }}
                                     </span>
                                     <span class="tooltip">
-                                        {{ $val->content }}
+                                        {{ $task->content }}
                                     </span>
                                 </span>
                             </td>
