@@ -48,8 +48,8 @@
                 </form>
 
                 <table class="table">
-                    <thead >
-                        <tr class="thead">
+                    <thead class="thead">
+                        <tr >
                             <th>Họ Tên</th>
                             <th>Sàn</th>
                             <th>Nhóm</th>

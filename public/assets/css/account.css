@@ -147,6 +147,10 @@ small{ font-size:.8rem }
 
 .ghichu{ max-width:150px }
 
+table {
+    border-collapse: inherit;
+}
+
 .thead{
   position: sticky;
   top: 58px;

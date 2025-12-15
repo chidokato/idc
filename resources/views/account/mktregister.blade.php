@@ -150,7 +150,6 @@
                                 <table class="table">
                                     <tr>
                                         <th></th>
-                                        <th>Nhân viên</th>
                                         <th>Dự án</th>
                                         <th>Hỗ trợ</th>
                                         <th>Kênh</th>
@@ -169,14 +168,22 @@
                                                 <span class="badge bg-warning">Chờ duyệt</span>
                                             @endif
                                         </td>
-                                        <td>{{$val->handler?->yourname ?? '-'}}</td>
                                         <td>{{$val->Post?->name}}</td>
                                         <td>{{$val->rate}}%</td>
                                         <td>{{$val->Channel?->name}}</td>
                                         <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td>
                                         <td>{{ number_format(($val->days * $val->expected_costs), 0, ',', '.') }} đ</td>
                                         <td>{{ number_format(($val->days * $val->expected_costs * (1 - $val->rate/100)), 0, ',', '.') }} đ</td>
-                                        <td>{{ $val->content }}</td>
+                                        <td class="ghichu" title="{{ $val->content }}">
+                                            <span class="tooltip-wrapper">
+                                                <span class="text-truncate-set-1 text-truncate-set">
+                                                    {{ $val->content }}
+                                                </span>
+                                                <span class="tooltip">
+                                                    {{ $val->content }}
+                                                </span>
+                                            </span>
+                                        </td>
                                         
                                         <td>
                                             <form action="{{ route('account.tasks.delete', $val) }}" method="POST">
@@ -232,7 +239,16 @@
                                         <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td>
                                         <td>{{ number_format(($val->days * $val->expected_costs), 0, ',', '.') }} đ</td>
                                         <td>{{ number_format(($val->days * $val->expected_costs * (1 - $val->rate/100)), 0, ',', '.') }} đ</td>
-                                        <td>{{ $val->content }}</td>
+                                        <td class="ghichu" title="{{ $val->content }}">
+                                            <span class="tooltip-wrapper">
+                                                <span class="text-truncate-set-1 text-truncate-set">
+                                                    {{ $val->content }}
+                                                </span>
+                                                <span class="tooltip">
+                                                    {{ $val->content }}
+                                                </span>
+                                            </span>
+                                        </td>
                                         <td>
                                             @if($val->approved)
                                                 <span class="badge bg-success">Đã duyệt</span>
