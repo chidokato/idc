@@ -86,10 +86,26 @@ class User extends Authenticatable
         return $this->belongsTo(Department::class, 'department_lv1');
     }
 
+    // public function tasks()
+    // {
+    //     return $this->hasMany(Department::class, 'user_id', 'id'); 
+    // }
+
+    public function wallet()
+    {
+        return $this->hasOne(Wallet::class);
+    }
+
+    public function deposits()
+    {
+        return $this->hasMany(Deposit::class);
+    }
+
     public function tasks()
     {
-        return $this->hasMany(Department::class, 'user_id', 'id'); 
+        return $this->hasMany(Task::class, 'user');
     }
+
     
 }
 

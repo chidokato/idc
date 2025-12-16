@@ -39,6 +39,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HomeSystemController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\WalletController;
 
 Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
      \UniSharp\LaravelFilemanager\Lfm::routes();
@@ -176,8 +177,6 @@ Route::middleware(['user'])->group(function () {
         Route::post('task/toggle-approved/{task}', [TaskController::class, 'toggleApproved'])->name('task.toggleApproved');
         Route::post('tasks/update-rate', [TaskController::class, 'updateRate'])->name('tasks.updateRate');
 
-
-
         // report
         Route::resource('report',ReportController::class);
         Route::post('/account/report-store', [ReportController::class, 'store'])->name('account.report.store');
@@ -186,7 +185,11 @@ Route::middleware(['user'])->group(function () {
         Route::get('/account/load-report', [ReportController::class, 'loadReport'])->name('account.loadReport');
         Route::post('/account/report-active', [ReportController::class, 'active'])->name('account.report.active');
 
-
+        // wallet
+        Route::get('wallet', [WalletController::class, 'index'])->name('wallet.index');
+        Route::get('wallet/deposit', [WalletController::class, 'depositForm'])->name('wallet.deposit.form');
+        Route::post('wallet/deposit', [WalletController::class, 'depositSubmit'])->name('wallet.deposit.submit');
+        Route::get('wallet/deposits', [WalletController::class, 'myDeposits'])->name('wallet.deposits');
 
         
     });

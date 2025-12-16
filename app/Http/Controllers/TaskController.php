@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Department;
 use App\Models\Report;
 use Illuminate\Support\Facades\Auth;
+use App\Helpers\TreeHelper;
 
 class TaskController extends HomeController
 {
@@ -15,11 +16,30 @@ class TaskController extends HomeController
     {
         $user = Auth::user();
         $reports = Report::orderBy('id','desc')->get();
-        $tasks = Task::where('department_lv2', $user->department_lv2)->orderBy('department_id','desc')->get();
+
+        $user_department = User::where('department_lv2', $user->department_lv2)
+            ->with([
+                'tasks' => function ($q) {
+                    $q->where('approved', 1)
+                      ->with(['department', 'Post', 'Channel', 'Report']);
+                }
+            ])
+            ->get();
+
+
+        $departments = Department::orderBy('name')->get();
+        $departmentOptions = TreeHelper::buildOptions(
+            $departments,
+            0,
+            '',
+            $user->department_lv2
+        );
+        
         return view('account.tasks', compact(
-            'tasks',
+            'user_department',
             'user',
             'reports',
+            'departmentOptions',
         ));
     }
 
@@ -42,35 +62,6 @@ class TaskController extends HomeController
     {
         return view('tasks.create');
     }
-
-    // Lưu tác vụ
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'du_an' => 'required',
-    //         'kenh' => 'required',
-    //     ]);
-
-    //     $projects = $request->input('du_an');
-    //     $channels = $request->input('kenh');
-    //     $budgets = $request->input('ngan_sach');
-    //     $notes = $request->input('ghi_chu');
-    //     $times = $request->input('thoi_gian');
-
-    //     foreach($projects as $key => $projectId){
-    //         Task::create([
-    //             'user_id' => auth()->id(),
-    //             'user' => auth()->user()->name,
-    //             'du_an' => $projectId,
-    //             'kenh' => $channels[$key] ?? null,
-    //             'chi_phi_du_kien' => str_replace(['.', ' đ'], '', $budgets[$key] ?? 0),
-    //             'ghi_chu' => $notes[$key] ?? null,
-    //             'thoi_gian' => $times[$key] ?? now(),
-    //         ]);
-    //     }
-
-    //     return redirect()->back()->with('success','Đã lưu tác vụ thành công!');
-    // }
 
     // Form edit
     public function edit($id)

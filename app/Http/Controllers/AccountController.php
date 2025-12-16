@@ -40,7 +40,6 @@ class AccountController extends HomeController
     {
         $user = User::find(Auth::id());
         $departments = Department::with('children')->get();
-        // Convert thành dạng tree option
         $departmentOptions = \App\Helpers\TreeHelper_disabled::buildDepartmentOptions(
             $departments,
             parent: 0,

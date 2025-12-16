@@ -224,6 +224,14 @@ input:checked + .slider:before {
 
 .form-select-sm{ padding: 0.1rem 0.2rem; }
 
+.gap1{ gap: 1rem; }
+
+
+.thead1{background-color: rgb(244, 246, 248); }
+
+.totall{ font-size:1.3rem; font-weight:bold; color:red }
+
+
 @media (max-width: 1860px) {
   .users>div{ width:100%; overflow: hidden; }
 }

@@ -26,16 +26,6 @@ use File;
 
 class HomeController extends Controller
 {
-    function __construct()
-    {
-        $setting = Setting::find('1');
-        $menu = Menu::orderBy('view', 'asc')->get();
-        view()->share( [
-            'setting'=>$setting,
-            'menu'=>$menu,
-        ]);
-    }
-
     public function index()
     {
         $slider = Slider::orderBy('id', 'desc')->get();
