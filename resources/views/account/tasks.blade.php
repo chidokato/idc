@@ -106,7 +106,7 @@
                             @if($totalGrossUser > 0)
                             <tr class="totall bg-light">
                                 <td colspan="6">
-                                   Tổng {{ $user->yourname }}
+                                   {{ $user->yourname }}
                                 </td>
                                 <td class="text-end">
                                     {{ number_format($totalGrossUser, 0, ',', '.') }}
