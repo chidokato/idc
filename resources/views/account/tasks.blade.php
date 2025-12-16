@@ -122,6 +122,48 @@
                         </tbody>
                     </table>
                 </div>
+
+
+                <!-- <div class="table-responsive-mobile widget-list">
+                    <table class="table table-task">
+                        <thead class="thead1">
+                            <tr>
+                                <th>Duyệt?</th>
+                                <th>Mã NV</th>
+                                <th>Họ Tên</th>
+                                <th>Phòng/Nhóm</th>
+                                <th>Dự án</th>
+                                <th>Kênh</th>
+                                <th>Tổng tiền (đ)</th>
+                                <th>Hỗ trợ</th>
+                                <th>Tiền nộp (đ)</th>
+                                <th>Ghi chú</th>
+                                <th>Thời gian</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($tasks as $t)
+                            <tr>
+                                <td><span class="badge bg-success">Duyệt</span></td>
+                                <td>{{ $t->handler?->employee_code }}</td>
+                                <td>{{ $t->handler?->yourname }}</td>
+                                <td>{{ $t->department?->name }}</td>
+                                <td>{{ $t->Post?->name }}</td>
+                                <td>{{ $t->Channel?->name }}</td>
+                                <td>{{ number_format($t->gross_cost, 0, ',', '.') }}</td>
+                                <td>{{ $t->rate }}%</td>
+                                <td>{{ number_format($t->net_cost, 0, ',', '.') }}</td>
+                                <td>{{ $t->content }}</td>
+                                <td>
+                                    {{ date('d/m/Y', strtotime($t->Report->time_start)) }}
+                                    -
+                                    {{ date('d/m/Y', strtotime($t->Report->time_end)) }}
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div> -->
             </div>
         </div>
     </div>

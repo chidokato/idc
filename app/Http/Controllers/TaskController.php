@@ -34,9 +34,15 @@ class TaskController extends HomeController
             '',
             $user->department_lv2
         );
+
+        $tasks = Task::where('approved', 0)
+            ->where('user', $user->id)
+            ->with(['handler', 'department', 'Post', 'Channel', 'Report'])
+            ->get();
         
         return view('account.tasks', compact(
             'user_department',
+            'tasks',
             'user',
             'reports',
             'departmentOptions',
