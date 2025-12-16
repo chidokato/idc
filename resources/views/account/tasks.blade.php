@@ -36,7 +36,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="table-responsive-mobile widget-list">
+                <div class="table-responsive-mobile">
                     <table class="table table-task">
                         @php
                             $totalGrossDepartment = 0; // tổng tiền gốc cả phòng
