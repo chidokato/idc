@@ -52,25 +52,25 @@
                             @endforeach
                         @endforeach
                         <thead class="thead1">
-                            <tr>
+                            <tr class="text-white bg-secondary">
                                 <th>Duyệt?</th>
                                 <th>Mã NV</th>
                                 <th>Họ Tên</th>
                                 <th>Phòng/Nhóm</th>
                                 <th>Dự án</th>
-                                <th>Kênh</th>
-                                <th>Tổng tiền (đ)</th>
-                                <th>Hỗ trợ</th>
-                                <th>Tiền nộp (đ)</th>
+                                <th class="text-center">Kênh</th>
+                                <th class="text-end">Tổng tiền (đ)</th>
+                                <th class="text-end">Hỗ trợ</th>
+                                <th class="text-end">Tiền nộp (đ)</th>
                                 <th>Ghi chú</th>
                                 <th>Thời gian</th>
                             </tr>
-                            <tr class="bg-dark text-white">
-                                <th colspan="6">TỔNG CHI PHÍ CẢ PHÒNG</th>
-                                <th>{{ number_format($totalGrossDepartment, 0, ',', '.') }}</th>
-                                <th></th>
-                                <th>{{ number_format($totalNetDepartment, 0, ',', '.') }}</th>
-                                <th colspan="2"></th>
+                            <tr class="bg-light.bg-gradient totall">
+                                <td colspan="6">TỔNG CHI PHÍ CẢ PHÒNG</td>
+                                <td class="text-end">{{ number_format($totalGrossDepartment, 0, ',', '.') }}</td>
+                                <td></td>
+                                <td class="text-end">{{ number_format($totalNetDepartment, 0, ',', '.') }}</td>
+                                <td colspan="2"></td>
                             </tr>
                         </thead>
                         <tbody>
@@ -90,10 +90,10 @@
                                     <td>{{ $user->yourname }}</td>
                                     <td>{{ $task->department?->name }}</td>
                                     <td>{{ $task->Post?->name }}</td>
-                                    <td>{{ $task->Channel?->name }}</td>
-                                    <td>{{ number_format($task->gross_cost, 0, ',', '.') }}</td>
-                                    <td>{{ $task->rate }}%</td>
-                                    <td>{{ number_format($task->net_cost, 0, ',', '.') }}</td>
+                                    <td class="text-center">{{ $task->Channel?->name }}</td>
+                                    <td class="text-end">{{ number_format($task->gross_cost, 0, ',', '.') }}</td>
+                                    <td class="text-end">{{ $task->rate }}%</td>
+                                    <td class="text-end">{{ number_format($task->net_cost, 0, ',', '.') }}</td>
                                     <td>{{ $task->content }}</td>
                                     <td>
                                         {{ date('d/m/Y', strtotime($task->Report->time_start)) }}
@@ -106,14 +106,14 @@
                             @if($totalGrossUser > 0)
                             <tr class="totall bg-light">
                                 <td colspan="6">
-                                    <strong>Tổng {{ $user->yourname }}</strong>
+                                   Tổng {{ $user->yourname }}
                                 </td>
-                                <td>
-                                    <strong>{{ number_format($totalGrossUser, 0, ',', '.') }}</strong>
+                                <td class="text-end">
+                                    {{ number_format($totalGrossUser, 0, ',', '.') }}
                                 </td>
                                 <td></td>
-                                <td>
-                                    <strong>{{ number_format($totalNetUser, 0, ',', '.') }}</strong>
+                                <td class="text-end">
+                                    {{ number_format($totalNetUser, 0, ',', '.') }}
                                 </td>
                                 <td colspan="2"></td>
                             </tr>

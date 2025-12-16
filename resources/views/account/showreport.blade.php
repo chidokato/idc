@@ -68,10 +68,10 @@
                             <th>Sàn</th>
                             <th>Nhóm</th>
                             <th>Dự án</th>
-                            <th>Kênh</th>
+                            <th class="text-center">Kênh</th>
                             <!-- <th>Chi phí</th> -->
                             <!-- <th>Số ngày</th> -->
-                            <th>Tổng tiền </th>
+                            <th class="text-end">Tổng tiền </th>
                             <th>Hỗ trợ</th>
                             <th>Ghi chú</th>
                             <th>KPI</th>
@@ -89,7 +89,7 @@
                             <td></td>
                             <td></td>
                             <td></td>
-                            <td>{{ number_format($tongTien, 0, ',', '.') }}đ</td>
+                            <td class="text-end">{{ number_format($tongTien, 0, ',', '.') }}</td>
                             <td></td>
                             <td></td>
                             <td></td>
@@ -109,10 +109,10 @@
                             <td>{{ $levels['level2'] ?? '-' }}</td>
                             <td>{{ $levels['level3'] ?? '-' }}</td>
                             <td>{{ $val->Post?->name }}</td>
-                            <td>{{ $val->Channel?->name }}</td>
+                            <td class="text-center">{{ $val->Channel?->name }}</td>
                             <!-- <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td> -->
                             <!-- <td>{{ $val->days }}</td> -->
-                            <td>{{ number_format($val->total_costs ?? $val->days*$val->expected_costs, 0, ',', '.') }} <span title="{{ number_format($val->expected_costs, 0, ',', '.') }}đ * {{ $val->days }} ngày" class="note">?</span></td>
+                            <td class="text-end">{{ number_format($val->total_costs ?? $val->days*$val->expected_costs, 0, ',', '.') }} <span title="{{ number_format($val->expected_costs, 0, ',', '.') }}đ * {{ $val->days }} ngày" class="note">?</span></td>
                             <td>
                                 <select name="rate" class="rate-select form-select form-select-sm" data-id="{{ $val->id }}">
                                     <option value="100" {{ $val->rate == 100 ? 'selected' : '' }}>100%</option>
