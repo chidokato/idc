@@ -142,7 +142,7 @@
                             </td>
 
                             <td>
-                                <input type="text" class="task-kpi" value="{{ $val->kpi ?? '' }}" data-id="{{ $val->id }}" placeholder="..." >
+                                <input type="text" class="task-kpi form-control form-select-sm" value="{{ $val->kpi ?? '' }}" data-id="{{ $val->id }}" placeholder="..." >
                             </td>
                             <!-- <td>
                                 <form action="{{ route('account.tasks.delete', $val) }}" method="POST">
