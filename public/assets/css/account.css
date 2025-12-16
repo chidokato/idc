@@ -231,6 +231,7 @@ input:checked + .slider:before {
 
 .totall{ font-size:1.3rem; font-weight:bold; color:red }
 
+.table-task{position: relative;}
 
 @media (max-width: 1860px) {
   .users>div{ width:100%; overflow: hidden; }

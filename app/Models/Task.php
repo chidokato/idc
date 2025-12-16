@@ -57,4 +57,17 @@ class Task extends Model
         return $this->belongsTo(Department::class, 'department_id');
     }
 
+
+    public function getGrossCostAttribute()
+    {
+        return $this->days * $this->expected_costs;
+    }
+
+    public function getNetCostAttribute()
+    {
+        return $this->days
+            * $this->expected_costs
+            * (1 - $this->rate / 100);
+    }
+
 }

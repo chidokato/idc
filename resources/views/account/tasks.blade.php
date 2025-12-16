@@ -37,7 +37,20 @@
                     </div>
                 </div>
                 <div class="table-responsive-mobile widget-list">
-                    <table class="table">
+                    <table class="table table-task">
+                        @php
+                            $totalGrossDepartment = 0; // tổng tiền gốc cả phòng
+                            $totalNetDepartment   = 0; // tổng tiền sau hỗ trợ cả phòng
+                        @endphp
+
+                        @foreach($user_department as $user)
+                            @foreach($user->tasks as $task)
+                                @php
+                                    $totalGrossDepartment += $task->gross_cost;
+                                    $totalNetDepartment   += $task->net_cost;
+                                @endphp
+                            @endforeach
+                        @endforeach
                         <thead class="thead1">
                             <tr>
                                 <th>Duyệt?</th>
@@ -52,26 +65,25 @@
                                 <th>Ghi chú</th>
                                 <th>Thời gian</th>
                             </tr>
+                            <tr class="bg-dark text-white">
+                                <th colspan="6">TỔNG CHI PHÍ CẢ PHÒNG</th>
+                                <th>{{ number_format($totalGrossDepartment, 0, ',', '.') }}</th>
+                                <th></th>
+                                <th>{{ number_format($totalNetDepartment, 0, ',', '.') }}</th>
+                                <th colspan="2"></th>
+                            </tr>
                         </thead>
                         <tbody>
-
-                        @php $totalDepartment = 0; @endphp
-
                         @foreach($user_department as $user)
-
-                            @php $totalUser = 0; @endphp
-
+                            @php
+                                $totalGrossUser = 0;
+                                $totalNetUser   = 0;
+                            @endphp
                             @foreach($user->tasks as $task)
-
                                 @php
-                                    $money = $task->days
-                                        * $task->expected_costs
-                                        * (1 - $task->rate / 100);
-
-                                    $totalUser += $money;
-                                    $totalDepartment += $money;
+                                    $totalGrossUser += $task->gross_cost;
+                                    $totalNetUser   += $task->net_cost;
                                 @endphp
-
                                 <tr>
                                     <td><span class="badge bg-success">Duyệt</span></td>
                                     <td>{{ $user->employee_code }}</td>
@@ -79,46 +91,35 @@
                                     <td>{{ $task->department?->name }}</td>
                                     <td>{{ $task->Post?->name }}</td>
                                     <td>{{ $task->Channel?->name }}</td>
-                                    <td>
-                                        {{ number_format($task->days * $task->expected_costs, 0, ',', '.') }}
-                                    </td>
+                                    <td>{{ number_format($task->gross_cost, 0, ',', '.') }}</td>
                                     <td>{{ $task->rate }}%</td>
-                                    <td>{{ number_format($money, 0, ',', '.') }}</td>
+                                    <td>{{ number_format($task->net_cost, 0, ',', '.') }}</td>
                                     <td>{{ $task->content }}</td>
                                     <td>
-                                        {{ date('d/m/Y',strtotime($task->Report->time_start)) }} -
-                                        {{ date('d/m/Y',strtotime($task->Report->time_end)) }}
+                                        {{ date('d/m/Y', strtotime($task->Report->time_start)) }}
+                                        -
+                                        {{ date('d/m/Y', strtotime($task->Report->time_end)) }}
                                     </td>
                                 </tr>
-
                             @endforeach
-
                             {{-- TỔNG THEO USER --}}
-                            @if($totalUser > 0)
+                            @if($totalGrossUser > 0)
                             <tr class="totall bg-light">
-                                <td colspan="8">
-                                    <strong>Tổng chi phí: {{ $user->yourname }}</strong>
+                                <td colspan="6">
+                                    <strong>Tổng {{ $user->yourname }}</strong>
                                 </td>
                                 <td>
-                                    <strong>{{ number_format($totalUser, 0, ',', '.') }}</strong>
+                                    <strong>{{ number_format($totalGrossUser, 0, ',', '.') }}</strong>
+                                </td>
+                                <td></td>
+                                <td>
+                                    <strong>{{ number_format($totalNetUser, 0, ',', '.') }}</strong>
                                 </td>
                                 <td colspan="2"></td>
                             </tr>
                             @endif
-
                         @endforeach
-
-                        {{-- TỔNG CẢ PHÒNG --}}
-                        <tr class="totall bg-dark text-white">
-                            <td colspan="8"><strong>TỔNG CHI PHÍ CẢ PHÒNG</strong></td>
-                            <td>
-                                <strong>{{ number_format($totalDepartment, 0, ',', '.') }}</strong>
-                            </td>
-                            <td colspan="2"></td>
-                        </tr>
-
                         </tbody>
-
                     </table>
                 </div>
             </div>
