@@ -125,4 +125,22 @@ class TaskController extends HomeController
         ]);
     }
 
+
+    public function updateKpi(Request $request)
+    {
+        $request->validate([
+            'task_id' => 'required|exists:tasks,id',
+            'kpi' => 'nullable|string|max:255',
+        ]);
+
+        $task = Task::find($request->task_id);
+        $task->kpi = $request->kpi;
+        $task->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Cập nhật KPI thành công'
+        ]);
+    }
+
 }

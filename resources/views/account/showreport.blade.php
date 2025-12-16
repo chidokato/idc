@@ -141,7 +141,15 @@
                                 </span>
                             </td>
 
-                            <td>{{ $val->kpi ?? '-' }}</td>
+                            <td>
+    <input
+        type="text"
+        class="task-kpi"
+        value="{{ $val->kpi ?? '' }}"
+        data-id="{{ $val->id }}"
+        placeholder="Nhập KPI"
+    >
+</td>
                             <!-- <td>
                                 <form action="{{ route('account.tasks.delete', $val) }}" method="POST">
                                     @csrf
@@ -299,6 +307,34 @@ $(document).on('change', '.rate-select', function () {
     });
 });
 </script>
+
+<script>
+$(document).on('change', '.task-kpi', function () {
+    let input = $(this);
+    let kpi = input.val();
+    let taskId = input.data('id');
+
+    $.ajax({
+        url: "{{ route('task.updateKpi') }}",
+        method: "POST",
+        data: {
+            _token: "{{ csrf_token() }}",
+            task_id: taskId,
+            kpi: kpi
+        },
+        success: function (res) {
+            if (res.status) {
+                input.css('border', '1px solid #28a745');
+            }
+        },
+        error: function () {
+            alert('Lỗi khi lưu KPI');
+            input.css('border', '1px solid red');
+        }
+    });
+});
+</script>
+
 
 
 @endsection
