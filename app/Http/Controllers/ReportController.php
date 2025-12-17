@@ -174,7 +174,7 @@ class ReportController extends HomeController
         /**
          * Tổng task theo PHÒNG
          */
-        $taskByDepartment = DB::table('tasks')->where('report_id', $id)
+        $taskByDepartment = DB::table('tasks')->where('report_id', $id)->where('approved',1)
             ->select(
                 'department_id',
                 DB::raw('SUM(days * expected_costs) as gross_cost'),
@@ -187,7 +187,7 @@ class ReportController extends HomeController
         /**
          * Tổng task theo USER
          */
-        $taskByUser = DB::table('tasks')->where('report_id', $id)
+        $taskByUser = DB::table('tasks')->where('report_id', $id)->where('approved',1)
             ->select(
                 'user_id',
                 DB::raw('SUM(days * expected_costs) as gross_cost'),
