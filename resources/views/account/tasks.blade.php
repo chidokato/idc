@@ -24,7 +24,6 @@
     <div class="text-uppercase title-cat flex gap1">
         <div>
             <select class="form-control" name="department_id" onchange="this.form.submit()">
-                <option value="">Tất cả sàn</option>
                 {!! $departmentOptions !!}
             </select>
         </div>
