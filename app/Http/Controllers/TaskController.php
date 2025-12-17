@@ -17,7 +17,7 @@ class TaskController extends HomeController
         $user = Auth::user();
         $reports = Report::orderBy('id','desc')->get();
 
-        $user_department = User::where('department_lv2', $user->department_lv2)
+        $user_department = User::where('department_lv2', $user->department_lv2)->orderBy('department_id','asc')
             ->with([
                 'tasks' => function ($q) {
                     $q->where('approved', 1)
@@ -34,7 +34,6 @@ class TaskController extends HomeController
         );
 
         $tasks = Task::where('approved', 0)
-            ->orderBy('department_lv2','desc')
             ->where('user', $user->id)
             ->with(['handler', 'department', 'Post', 'Channel', 'Report'])
             ->get();
