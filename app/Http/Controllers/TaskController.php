@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Models\Department;
 use App\Models\Report;
 use Illuminate\Support\Facades\Auth;
-use App\Helpers\TreeHelper;
+use App\Helpers\TreeHelperLv2Only;
 
 class TaskController extends HomeController
 {
@@ -28,10 +28,8 @@ class TaskController extends HomeController
 
 
         $departments = Department::orderBy('name')->get();
-        $departmentOptions = TreeHelper::buildOptions(
+        $departmentOptions = TreeHelperLv2Only::buildOptions(
             $departments,
-            0,
-            '',
             $user->department_lv2
         );
 

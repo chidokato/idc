@@ -23,7 +23,6 @@
                 <div class="text-uppercase title-cat flex gap1">
                     <div>
                         <select class="form-control" name="department_id">
-                            <option value="">Tất cả</option>
                             {!! $departmentOptions !!}
                         </select>
                     </div>
@@ -66,7 +65,7 @@
                                 <th>Thời gian</th>
                             </tr>
                             <tr class="bg-light.bg-gradient totall">
-                                <td colspan="6">TỔNG CHI PHÍ CẢ PHÒNG</td>
+                                <td colspan="6">TỔNG CHI PHÍ CẢ SÀN (CHI NHÁNH)</td>
                                 <td class="text-end">{{ number_format($totalGrossDepartment, 0, ',', '.') }}</td>
                                 <td></td>
                                 <td class="text-end">{{ number_format($totalNetDepartment, 0, ',', '.') }}</td>
