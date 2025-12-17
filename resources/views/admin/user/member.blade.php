@@ -9,13 +9,31 @@
 </div>
 
 <div class="row">
+    <form method="GET" action="{{ url()->current() }}">
+        <div class="col-xl-12 col-lg-12 search flex-start">
+            <input
+                type="text"
+                value="{{ request('key') }}"
+                placeholder="Tìm kiếm tên / email..."
+                class="form-control"
+                name="key"
+            >
+
+            <select class="form-control" name="category_id">
+                <option value="">Tất cả phòng ban</option>
+                {!! $departmentOptions !!}
+            </select>
+
+            <button type="submit" class="btn btn-success mr-2">Tìm kiếm</button>
+
+            <a href="{{ url()->current() }}" class="btn btn-warning">Reset</a>
+        </div>
+    </form>
     <div class="col-xl-12 col-lg-12">
         <div class="card shadow mb-4">
             <div class="card-header d-flex flex-row align-items-center justify-content-between">
                 <ul class="nav nav-pills">
                     <li><a data-toggle="tab" class="nav-link active" href="#tab1">Admin</a></li>
-                    <!-- <li><a data-toggle="tab" class="nav-link " href="#tab2">User</a></li> -->
-                    <!-- <li><a data-toggle="tab" class="nav-link" href="#tab3">Ẩn</a></li> -->
                 </ul>
             </div>
             <div class="tab-content overflow">

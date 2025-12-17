@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Department;
 use App\Models\User;
 use App\Helpers\TreeHelper;
+use App\Helpers\TreeHelper_disabled;
 
 class UserController extends Controller
 {
@@ -23,11 +24,51 @@ class UserController extends Controller
         $admins = User::where('permission', '<', 6)->orderBy('id', 'DESC')->get();
         return view('admin.user.index', compact('admins'));
     }
-    public function member()
-    {
-        $users = User::where('permission', '=', 6)->orderBy('id', 'DESC')->get();
-        return view('admin.user.member', compact('users'));
+    public function member(Request $request)
+{
+    $departments = Department::orderBy('name')->get();
+
+    $departmentOptions = TreeHelper::buildOptions(
+        $departments,
+        0,
+        '',
+        $request->category_id
+    );
+
+    $users = User::where('permission', 6);
+
+    // 🔍 Tìm theo keyword
+    if ($request->filled('key')) {
+        $key = $request->key;
+        $users->where(function ($q) use ($key) {
+            $q->where('name', 'like', "%{$key}%")
+              ->orWhere('email', 'like', "%{$key}%")
+              ->orWhere('phone', 'like', "%{$key}%");
+        });
     }
+
+    // 🏢 Lọc phòng ban LV1 + LV2
+    if ($request->filled('category_id')) {
+        $departmentId = $request->category_id;
+        $department = $departments->firstWhere('id', $departmentId);
+
+        if ($department) {
+            if ($department->parent == 0) {
+                $users->where('department_lv1', $departmentId);
+            } else {
+                $users->where('department_lv2', $departmentId);
+            }
+        }
+    }
+
+    $users = $users->orderByDesc('id')->get();
+
+    return view('admin.user.member', compact(
+        'users',
+        'departmentOptions'
+    ));
+}
+
 
     /**
      * Show the form for creating a new resource.
@@ -37,7 +78,7 @@ class UserController extends Controller
     public function create()
     {
         $departments = Department::with('children')->get();
-        $departmentOptions = \App\Helpers\TreeHelper_disabled::buildDepartmentOptions(
+        $departmentOptions = TreeHelper_disabled::buildDepartmentOptions(
             $departments,
             parent: 0,
             prefix: '',
