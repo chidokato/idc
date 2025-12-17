@@ -170,6 +170,7 @@ class ReportController extends HomeController
         $ctys = Department::where('parent', 0)->get();
 
         $lv1Totals = DB::table('tasks')
+        ->where('approved', 1)
         ->where('report_id', $id)
         ->select(
             'department_lv1',
