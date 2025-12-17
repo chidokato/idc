@@ -57,14 +57,14 @@
                                 <th class="text-end">Hỗ trợ</th>
                                 <th class="text-end">Tiền nộp (đ)</th>
                                 <th>Ghi chú</th>
-                                <th>Thời gian</th>
+                                <!-- <th>Thời gian</th> -->
                             </tr>
                             <tr class="bg-light.bg-gradient totall">
                                 <td colspan="6">TỔNG CHI PHÍ CẢ PHÒNG</td>
                                 <td class="text-end">{{ number_format($totalGrossDepartment, 0, ',', '.') }}</td>
                                 <td></td>
                                 <td class="text-end">{{ number_format($totalNetDepartment, 0, ',', '.') }}</td>
-                                <td colspan="2"></td>
+                                <td colspan="1"></td>
                             </tr>
                         </thead>
                         <tbody>
@@ -89,11 +89,11 @@
                                     <td class="text-end">{{ $task->rate }}%</td>
                                     <td class="text-end">{{ number_format($task->net_cost, 0, ',', '.') }}</td>
                                     <td>{{ $task->content }}</td>
-                                    <td>
+                                    <!-- <td>
                                         {{ date('d/m/Y', strtotime($task->Report->time_start)) }}
                                         -
                                         {{ date('d/m/Y', strtotime($task->Report->time_end)) }}
-                                    </td>
+                                    </td> -->
                                 </tr>
                             @endforeach
                             {{-- TỔNG THEO USER --}}
@@ -109,7 +109,7 @@
                                 <td class="text-end">
                                     {{ number_format($totalNetUser, 0, ',', '.') }}
                                 </td>
-                                <td colspan="2"></td>
+                                <td colspan="1"></td>
                             </tr>
                             @endif
                         @endforeach
