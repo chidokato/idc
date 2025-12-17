@@ -63,7 +63,7 @@
     @php $lv1Key = 'lv1_'.$lv1['id']; @endphp
 
     {{-- LV1 subtotal --}}
-    <tr class="bg-dark text-white" style="cursor:pointer" onclick="toggleGroup('{{ $lv1Key }}')">
+    <tr class="bg-secondary text-white" style="cursor:pointer" onclick="toggleGroup('{{ $lv1Key }}')">
         <td colspan="6"><b>▶ {{ $lv1['name'] }}</b></td>
         <td class="text-end"><b>{{ number_format($lv1['gross'],0,',','.') }}</b></td>
         <td></td>
