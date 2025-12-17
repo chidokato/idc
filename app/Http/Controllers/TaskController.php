@@ -10,42 +10,126 @@ use App\Models\Report;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\TreeHelperLv2Only;
 
-class TaskController extends HomeController
+class TaskController extends Controller
 {
-    public function index()
-    {
-        $user = Auth::user();
-        $reports = Report::orderBy('id','desc')->get();
+    public function index(Request $request)
+{
+    $user = Auth::user();
 
-        $user_department = User::where('department_lv2', $user->department_lv2)->orderBy('department_id','asc')
-            ->with([
-                'tasks' => function ($q) {
-                    $q->where('approved', 1)
-                      ->with(['department', 'Post', 'Channel', 'Report']);
-                }
-            ])
-            ->get();
+    $reports = Report::orderByDesc('id')->get();
+    $selectedReportId = $request->input('report_id', optional($reports->first())->id);
 
+    // filter sàn (lv2) từ dropdown
+    $selectedLv2 = $request->input('department_id', $user->department_lv2);
 
-        $departments = Department::orderBy('name')->get();
-        $departmentOptions = TreeHelperLv2Only::buildOptions(
-            $departments,
-            $user->department_lv2
-        );
+    $departments = Department::orderBy('name')->get();
+    $departmentOptions = TreeHelperLv2Only::buildOptions($departments, $selectedLv2);
 
-        $tasks = Task::where('approved', 0)
-            ->where('user', $user->id)
-            ->with(['handler', 'department', 'Post', 'Channel', 'Report'])
-            ->get();
-        
-        return view('account.tasks', compact(
-            'user_department',
-            'tasks',
-            'user',
-            'reports',
-            'departmentOptions',
-        ));
+    // lấy users + tasks
+    $users = User::query()
+        ->where('department_lv2', $selectedLv2)
+        ->orderBy('department_id', 'asc')
+        ->with([
+            'tasks' => function ($q) use ($selectedReportId) {
+                $q->where('approved', 1)
+                  ->when($selectedReportId, fn($qq) => $qq->where('report_id', $selectedReportId))
+                  ->with(['department', 'Post', 'Channel', 'Report']);
+            }
+        ])
+        ->get();
+
+    // ===== build cây: lv2 -> room(task.department_id) -> user -> tasks =====
+    $grandGross = 0;
+    $grandNet   = 0;
+
+    $lv2Tree = []; // array cho nhanh
+
+    foreach ($users as $u) {
+        foreach ($u->tasks as $t) {
+
+            $lv2Id   = (int) $u->department_lv2;
+            $roomId  = (int) ($t->department_id ?? 0); // phòng/nhóm (lv3)
+
+            $lv2Name = $departments->firstWhere('id', $lv2Id)?->name ?? ('Sàn #' . $lv2Id);
+            $roomName = $t->department?->name
+                ?? $departments->firstWhere('id', $roomId)?->name
+                ?? ('Phòng #' . $roomId);
+
+            // init lv2
+            if (!isset($lv2Tree[$lv2Id])) {
+                $lv2Tree[$lv2Id] = [
+                    'id' => $lv2Id,
+                    'name' => $lv2Name,
+                    'gross' => 0,
+                    'net' => 0,
+                    'rooms' => []
+                ];
+            }
+
+            // init room
+            if (!isset($lv2Tree[$lv2Id]['rooms'][$roomId])) {
+                $lv2Tree[$lv2Id]['rooms'][$roomId] = [
+                    'id' => $roomId,
+                    'name' => $roomName,
+                    'gross' => 0,
+                    'net' => 0,
+                    'users' => []
+                ];
+            }
+
+            // init user node inside room
+            if (!isset($lv2Tree[$lv2Id]['rooms'][$roomId]['users'][$u->id])) {
+                $lv2Tree[$lv2Id]['rooms'][$roomId]['users'][$u->id] = [
+                    'id' => $u->id,
+                    'employee_code' => $u->employee_code,
+                    'yourname' => $u->yourname,
+                    'gross' => 0,
+                    'net' => 0,
+                    'tasks' => []
+                ];
+            }
+
+            // push task
+            $lv2Tree[$lv2Id]['rooms'][$roomId]['users'][$u->id]['tasks'][] = $t;
+
+            // cộng tổng user
+            $lv2Tree[$lv2Id]['rooms'][$roomId]['users'][$u->id]['gross'] += (int) $t->gross_cost;
+            $lv2Tree[$lv2Id]['rooms'][$roomId]['users'][$u->id]['net']   += (int) $t->net_cost;
+
+            // cộng tổng room
+            $lv2Tree[$lv2Id]['rooms'][$roomId]['gross'] += (int) $t->gross_cost;
+            $lv2Tree[$lv2Id]['rooms'][$roomId]['net']   += (int) $t->net_cost;
+
+            // cộng tổng lv2
+            $lv2Tree[$lv2Id]['gross'] += (int) $t->gross_cost;
+            $lv2Tree[$lv2Id]['net']   += (int) $t->net_cost;
+
+            // tổng toàn sàn
+            $grandGross += (int) $t->gross_cost;
+            $grandNet   += (int) $t->net_cost;
+        }
     }
+
+    // đổi về collection cho dễ foreach
+    $lv2Tree = collect($lv2Tree)->map(function ($lv2) {
+        $lv2['rooms'] = collect($lv2['rooms'])->map(function ($room) {
+            $room['users'] = collect($room['users']);
+            return $room;
+        });
+        return $lv2;
+    });
+
+    return view('account.tasks', compact(
+        'user',
+        'reports',
+        'selectedReportId',
+        'departmentOptions',
+        'lv2Tree',
+        'grandGross',
+        'grandNet'
+    ));
+}
+
 
     public function toggleApproved(Request $request, Task $task)
     {

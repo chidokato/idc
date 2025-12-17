@@ -20,149 +20,124 @@
                 @include('account.layout.sitebar')
             </div>
             <div class="col-lg-10">
-                <div class="text-uppercase title-cat flex gap1">
-                    <div>
-                        <select class="form-control" name="department_id">
-                            {!! $departmentOptions !!}
-                        </select>
-                    </div>
-                    <div>
-                        <select class="form-control">
-                            <!-- <option value="">Tất cả</option> -->
-                            @foreach($reports as $key => $val)
-                            <option <?php if($key==0){echo "selected";} ?> value="{{$val->id}}">{{$val->name}} ({{date('d/m/Y',strtotime($val->time_start))}} - {{date('d/m/Y',strtotime($val->time_end))}})</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
+                <form method="GET" action="{{ url()->current() }}">
+    <div class="text-uppercase title-cat flex gap1">
+        <div>
+            <select class="form-control" name="department_id" onchange="this.form.submit()">
+                <option value="">Tất cả sàn</option>
+                {!! $departmentOptions !!}
+            </select>
+        </div>
+
+        <div>
+            <select class="form-control" name="report_id" onchange="this.form.submit()">
+                @foreach($reports as $val)
+                    <option value="{{ $val->id }}" {{ (int)$selectedReportId === (int)$val->id ? 'selected' : '' }}>
+                        {{ $val->name }} ({{ date('d/m/Y',strtotime($val->time_start)) }} - {{ date('d/m/Y',strtotime($val->time_end)) }})
+                    </option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+</form>
+
                 <div class="table-responsive-mobile">
-                    <table class="table table-task">
-                        @php
-                            $totalGrossDepartment = 0; // tổng tiền gốc cả phòng
-                            $totalNetDepartment   = 0; // tổng tiền sau hỗ trợ cả phòng
-                        @endphp
+    <table class="table table-task">
+        <thead class="thead1">
+    <tr class="text-white bg-secondary">
+        <th></th>
+        <th>Mã NV</th>
+        <th>Họ Tên</th>
+        <th>Phòng/Nhóm</th>
+        <th>Dự án</th>
+        <th class="text-center">Kênh</th>
+        <th class="text-end">Tổng tiền (đ)</th>
+        <th class="text-end">Hỗ trợ</th>
+        <th class="text-end">Tiền nộp (đ)</th>
+        <th>Ghi chú</th>
+        <th>Thời gian</th>
+    </tr>
 
-                        @foreach($user_department as $user)
-                            @foreach($user->tasks as $task)
-                                @php
-                                    $totalGrossDepartment += $task->gross_cost;
-                                    $totalNetDepartment   += $task->net_cost;
-                                @endphp
-                            @endforeach
-                        @endforeach
-                        <thead class="thead1">
-                            <tr class="text-white bg-secondary">
-                                <th>Duyệt?</th>
-                                <th>Mã NV</th>
-                                <th>Họ Tên</th>
-                                <th>Phòng/Nhóm</th>
-                                <th>Dự án</th>
-                                <th class="text-center">Kênh</th>
-                                <th class="text-end">Tổng tiền (đ)</th>
-                                <th class="text-end">Hỗ trợ</th>
-                                <th class="text-end">Tiền nộp (đ)</th>
-                                <th>Ghi chú</th>
-                                <th>Thời gian</th>
-                            </tr>
-                            <tr class="bg-light.bg-gradient totall">
-                                <td colspan="6">TỔNG CHI PHÍ CẢ SÀN (CHI NHÁNH)</td>
-                                <td class="text-end">{{ number_format($totalGrossDepartment, 0, ',', '.') }}</td>
-                                <td></td>
-                                <td class="text-end">{{ number_format($totalNetDepartment, 0, ',', '.') }}</td>
-                                <td colspan="2"></td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($user_department as $user)
-                            @php
-                                $totalGrossUser = 0;
-                                $totalNetUser   = 0;
-                            @endphp
-                            @foreach($user->tasks as $task)
-                                @php
-                                    $totalGrossUser += $task->gross_cost;
-                                    $totalNetUser   += $task->net_cost;
-                                @endphp
-                                <tr>
-                                    <td><span class="badge bg-success">Duyệt</span></td>
-                                    <td>{{ $user->employee_code }}</td>
-                                    <td>{{ $user->yourname }}</td>
-                                    <td>{{ $task->department?->name }}</td>
-                                    <td>{{ $task->Post?->name }}</td>
-                                    <td class="text-center">{{ $task->Channel?->name }}</td>
-                                    <td class="text-end">{{ number_format($task->gross_cost, 0, ',', '.') }}</td>
-                                    <td class="text-end">{{ $task->rate }}%</td>
-                                    <td class="text-end">{{ number_format($task->net_cost, 0, ',', '.') }}</td>
-                                    <td>{{ $task->content }}</td>
-                                    <td>
-                                        {{ date('d/m/Y', strtotime($task->Report->time_start)) }}
-                                        -
-                                        {{ date('d/m/Y', strtotime($task->Report->time_end)) }}
-                                    </td>
-                                </tr>
-                            @endforeach
-                            {{-- TỔNG THEO USER --}}
-                            @if($totalGrossUser > 0)
-                            <tr class="totall bg-light">
-                                <td colspan="6">
-                                   {{ $user->yourname }}
-                                </td>
-                                <td class="text-end">
-                                    {{ number_format($totalGrossUser, 0, ',', '.') }}
-                                </td>
-                                <td></td>
-                                <td class="text-end">
-                                    {{ number_format($totalNetUser, 0, ',', '.') }}
-                                </td>
-                                <td colspan="2"></td>
-                            </tr>
-                            @endif
-                        @endforeach
-                        </tbody>
-                    </table>
-                </div>
+    <tr class="bg-light bg-gradient totall">
+        <td colspan="6"><b>TỔNG CHI PHÍ TOÀN SÀN</b></td>
+        <td class="text-end"><b>{{ number_format($grandGross, 0, ',', '.') }}</b></td>
+        <td></td>
+        <td class="text-end"><b>{{ number_format($grandNet, 0, ',', '.') }}</b></td>
+        <td colspan="2"></td>
+    </tr>
+</thead>
 
+<tbody>
+@foreach($lv2Tree as $lv2)
+    @php $lv2Key = 'lv2_'.$lv2['id']; @endphp
 
-                <!-- <div class="table-responsive-mobile widget-list">
-                    <table class="table table-task">
-                        <thead class="thead1">
-                            <tr>
-                                <th>Duyệt?</th>
-                                <th>Mã NV</th>
-                                <th>Họ Tên</th>
-                                <th>Phòng/Nhóm</th>
-                                <th>Dự án</th>
-                                <th>Kênh</th>
-                                <th>Tổng tiền (đ)</th>
-                                <th>Hỗ trợ</th>
-                                <th>Tiền nộp (đ)</th>
-                                <th>Ghi chú</th>
-                                <th>Thời gian</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($tasks as $t)
-                            <tr>
-                                <td><span class="badge bg-success">Duyệt</span></td>
-                                <td>{{ $t->handler?->employee_code }}</td>
-                                <td>{{ $t->handler?->yourname }}</td>
-                                <td>{{ $t->department?->name }}</td>
-                                <td>{{ $t->Post?->name }}</td>
-                                <td>{{ $t->Channel?->name }}</td>
-                                <td>{{ number_format($t->gross_cost, 0, ',', '.') }}</td>
-                                <td>{{ $t->rate }}%</td>
-                                <td>{{ number_format($t->net_cost, 0, ',', '.') }}</td>
-                                <td>{{ $t->content }}</td>
-                                <td>
-                                    {{ date('d/m/Y', strtotime($t->Report->time_start)) }}
-                                    -
-                                    {{ date('d/m/Y', strtotime($t->Report->time_end)) }}
-                                </td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-                </div> -->
+    {{-- LV2 subtotal --}}
+    <tr class="bg-primary text-white" style="cursor:pointer"
+        onclick="toggleGroup('{{ $lv2Key }}')">
+        <td colspan="6"><b>▶ {{ $lv2['name'] }}</b></td>
+        <td class="text-end"><b>{{ number_format($lv2['gross'], 0, ',', '.') }}</b></td>
+        <td></td>
+        <td class="text-end"><b>{{ number_format($lv2['net'], 0, ',', '.') }}</b></td>
+        <td colspan="2"></td>
+    </tr>
+
+    @foreach($lv2['rooms'] as $room)
+        @php $roomKey = $lv2Key.'_room_'.$room['id']; @endphp
+
+        {{-- PHÒNG subtotal (cái bạn cần thêm) --}}
+        <tr class="bg-warning bg-gradient" data-group="{{ $lv2Key }}" style="cursor:pointer"
+            onclick="toggleGroup('{{ $roomKey }}')">
+            <td colspan="6"><b>— {{ $room['name'] }}</b></td>
+            <td class="text-end"><b>{{ number_format($room['gross'], 0, ',', '.') }}</b></td>
+            <td></td>
+            <td class="text-end"><b>{{ number_format($room['net'], 0, ',', '.') }}</b></td>
+            <td colspan="2"></td>
+        </tr>
+
+        @foreach($room['users'] as $uNode)
+            @php $userKey = $roomKey.'_u_'.$uNode['id']; @endphp
+
+            {{-- USER subtotal --}}
+            <tr class="bg-light" data-group="{{ $lv2Key }}" data-subgroup="{{ $roomKey }}"
+                style="cursor:pointer" onclick="toggleGroup('{{ $userKey }}')">
+                <td></td>
+                <td>{{ $uNode['employee_code'] }}</td>
+                <td><b>—— {{ $uNode['yourname'] }}</b></td>
+                <td colspan="3"></td>
+                <td class="text-end"><b>{{ number_format($uNode['gross'], 0, ',', '.') }}</b></td>
+                <td></td>
+                <td class="text-end"><b>{{ number_format($uNode['net'], 0, ',', '.') }}</b></td>
+                <td colspan="2"></td>
+            </tr>
+
+            {{-- TASK rows --}}
+            @foreach($uNode['tasks'] as $task)
+                <tr data-group="{{ $lv2Key }}" data-subgroup="{{ $roomKey }}" data-leaf="{{ $userKey }}">
+                    <td><span class="badge bg-success">Duyệt</span></td>
+                    <td>{{ $uNode['employee_code'] }}</td>
+                    <td>——— {{ $uNode['yourname'] }}</td>
+                    <td>{{ $task->department?->name }}</td>
+                    <td>{{ $task->Post?->name }}</td>
+                    <td class="text-center">{{ $task->Channel?->name }}</td>
+                    <td class="text-end">{{ number_format($task->gross_cost, 0, ',', '.') }}</td>
+                    <td class="text-end">{{ $task->rate }}%</td>
+                    <td class="text-end">{{ number_format($task->net_cost, 0, ',', '.') }}</td>
+                    <td>{{ $task->content }}</td>
+                    <td>
+                        {{ date('d/m/Y', strtotime($task->Report->time_start)) }}
+                        -
+                        {{ date('d/m/Y', strtotime($task->Report->time_end)) }}
+                    </td>
+                </tr>
+            @endforeach
+        @endforeach
+    @endforeach
+@endforeach
+</tbody>
+    </table>
+</div>
+
+              
             </div>
         </div>
     </div>
@@ -173,5 +148,14 @@
 
 
 @section('script')
+<script>
+function toggleGroup(key){
+    const rows = document.querySelectorAll(
+        `[data-group="${key}"], [data-subgroup="${key}"], [data-leaf="${key}"]`
+    );
+    rows.forEach(r => r.style.display = (r.style.display === 'none' ? '' : 'none'));
+}
+</script>
+
 
 @endsection
