@@ -177,6 +177,8 @@ Route::middleware(['user'])->group(function () {
         Route::post('task/toggle-approved/{task}', [TaskController::class, 'toggleApproved'])->name('task.toggleApproved');
         Route::post('tasks/update-rate', [TaskController::class, 'updateRate'])->name('tasks.updateRate');
         Route::post('task/update-kpi', [TaskController::class, 'updateKpi'])->name('task.updateKpi');
+        Route::post('task/update-expected-cost', [TaskController::class, 'updateExpectedCost'])->name('task.updateExpectedCost');
+
 
         // report
         Route::resource('report',ReportController::class);

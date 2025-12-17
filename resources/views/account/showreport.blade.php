@@ -69,7 +69,7 @@
                             <th>Nhóm</th>
                             <th>Dự án</th>
                             <th class="text-center">Kênh</th>
-                            <!-- <th>Chi phí</th> -->
+                            <th>Chi phí</th>
                             <!-- <th>Số ngày</th> -->
                             <th class="text-end">Tổng tiền </th>
                             <th>Hỗ trợ</th>
@@ -84,6 +84,7 @@
 
                     <tbody>
                         <tr>
+                            <td></td>
                             <td></td>
                             <td></td>
                             <td></td>
@@ -110,9 +111,22 @@
                             <td>{{ $levels['level3'] ?? '-' }}</td>
                             <td>{{ $val->Post?->name }}</td>
                             <td class="text-center">{{ $val->Channel?->name }}</td>
-                            <!-- <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td> -->
+                            <td class="text-end"><input type="text" style="width: 80px" class="form-control form-select-sm expected-cost-input" value="{{ number_format($val->expected_costs, 0, ',', '.') }}" data-id="{{ $val->id }}">
+                            </td>
                             <!-- <td>{{ $val->days }}</td> -->
-                            <td class="text-end">{{ number_format($val->total_costs ?? $val->days*$val->expected_costs, 0, ',', '.') }} <span title="{{ number_format($val->expected_costs, 0, ',', '.') }}đ * {{ $val->days }} ngày" class="note">?</span></td>
+                            <td class="text-end total-cost-cell"
+    data-days="{{ $val->days }}"
+    data-rate="{{ $val->rate }}"
+>
+    <span class="total-cost-text">
+        {{ number_format($val->total_costs ?? $val->days * $val->expected_costs, 0, ',', '.') }}
+    </span>
+    <span
+        title="{{ number_format($val->expected_costs, 0, ',', '.') }}đ * {{ $val->days }} ngày"
+        class="note"
+    >?</span>
+</td>
+
                             <td>
                                 <select name="rate" class="rate-select form-select form-select-sm" data-id="{{ $val->id }}">
                                     @foreach(config('rates') as $value => $label)
@@ -323,6 +337,61 @@ $(document).on('change', '.task-kpi', function () {
 });
 </script>
 
+<script>
+$(document).on('blur', '.expected-cost-input', function () {
+    let input = $(this);
+    let taskId = input.data('id');
+
+    // bỏ dấu chấm
+    let rawValue = input.val().replace(/\./g, '');
+
+    if (rawValue === '' || isNaN(rawValue)) {
+        alert('Số tiền không hợp lệ');
+        return;
+    }
+
+    $.ajax({
+        url: "{{ route('task.updateExpectedCost') }}",
+        method: "POST",
+        data: {
+            _token: "{{ csrf_token() }}",
+            task_id: taskId,
+            expected_costs: rawValue
+        },
+        success: function (res) {
+            if (res.status) {
+
+                // format lại input
+                input.val(res.expected_costs);
+
+                let row = input.closest('tr');
+
+                let expected = parseInt(res.raw_expected_costs); // server trả về
+                let days = row.find('.total-cost-cell').data('days');
+                let rate = row.find('.total-cost-cell').data('rate');
+
+                let gross = expected * days;
+                let net = Math.round(gross);
+
+                // update số tiền
+                row.find('.total-cost-text').text(
+                    net.toLocaleString('vi-VN')
+                );
+
+                // update tooltip
+                row.find('.note').attr(
+                    'title',
+                    expected.toLocaleString('vi-VN') + 'đ * ' + days + ' ngày'
+                );
+            }
+        },
+        error: function () {
+            alert('Lỗi khi lưu chi phí');
+            input.css('border', '1px solid red');
+        }
+    });
+});
+</script>
 
 
 @endsection

@@ -143,4 +143,23 @@ class TaskController extends HomeController
         ]);
     }
 
+    public function updateExpectedCost(Request $request)
+    {
+        $request->validate([
+            'task_id' => 'required|exists:tasks,id',
+            'expected_costs' => 'required|numeric|min:0',
+        ]);
+
+        $task = Task::find($request->task_id);
+        $task->expected_costs = $request->expected_costs;
+        $task->save();
+
+        return response()->json([
+            'status' => true,
+            'expected_costs' => number_format($task->expected_costs, 0, ',', '.'),
+            'raw_expected_costs' => $task->expected_costs,
+        ]);
+
+    }
+
 }

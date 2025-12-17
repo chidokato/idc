@@ -20,100 +20,57 @@
                 @include('account.layout.sitebar')
             </div>
             <div class="col-lg-10">
-                <div class="text-uppercase title-cat flex gap1">
-                    <div>
-                        <select class="form-control">
-                            <!-- <option value="">Tất cả</option> -->
-                            @foreach($reports as $key => $val)
-                            <option <?php if($key==0){echo "selected";} ?> value="{{$val->id}}">{{$val->name}} ({{date('d/m/Y',strtotime($val->time_start))}} - {{date('d/m/Y',strtotime($val->time_end))}})</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="table-responsive-mobile">
-                    <table class="table table-task">
-                        @php
-                            $totalGrossDepartment = 0; // tổng tiền gốc cả phòng
-                            $totalNetDepartment   = 0; // tổng tiền sau hỗ trợ cả phòng
-                        @endphp
-
-                        @foreach($user_department as $user)
-                            @foreach($user->tasks as $task)
-                                @php
-                                    $totalGrossDepartment += $task->gross_cost;
-                                    $totalNetDepartment   += $task->net_cost;
-                                @endphp
-                            @endforeach
-                        @endforeach
-                        <thead class="thead1">
-                            <tr class="text-white bg-secondary">
-                                <th>Duyệt?</th>
-                                <th>Mã NV</th>
-                                <th>Họ Tên</th>
-                                <th>Phòng/Nhóm</th>
-                                <th>Dự án</th>
-                                <th class="text-center">Kênh</th>
-                                <th class="text-end">Tổng tiền (đ)</th>
-                                <th class="text-end">Hỗ trợ</th>
-                                <th class="text-end">Tiền nộp (đ)</th>
-                                <th>Ghi chú</th>
-                                <!-- <th>Thời gian</th> -->
-                            </tr>
-                            <tr class="bg-light.bg-gradient totall">
-                                <td colspan="6">TỔNG CHI PHÍ CẢ PHÒNG</td>
-                                <td class="text-end">{{ number_format($totalGrossDepartment, 0, ',', '.') }}</td>
-                                <td></td>
-                                <td class="text-end">{{ number_format($totalNetDepartment, 0, ',', '.') }}</td>
-                                <td colspan="1"></td>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover table-sm">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Sàn</th>
+                                <th>Phòng</th>
+                                <th>Nhóm</th>
+                                <th>Người</th>
+                                <th class="text-end">Chi phí dự kiến</th>
+                                <th class="text-end">Tiền hỗ trợ</th>
+                                <th class="text-end">Chi phí ròng</th>
+                                <th class="text-end">Chi phí thực tế</th>
                             </tr>
                         </thead>
                         <tbody>
-                        @foreach($user_department as $user)
                             @php
-                                $totalGrossUser = 0;
-                                $totalNetUser   = 0;
+                                $totalGross = 0;
+                                $totalNet = 0;
+                                $totalSupport = 0;
+                                $totalActual = 0;
                             @endphp
-                            @foreach($user->tasks as $task)
+
+                            @foreach($summary as $row)
                                 @php
-                                    $totalGrossUser += $task->gross_cost;
-                                    $totalNetUser   += $task->net_cost;
+                                    $totalGross += $row->gross_cost;
+                                    $totalNet += $row->net_cost;
+                                    $totalSupport += $row->support_cost;
+                                    $totalActual += $row->actual_cost;
                                 @endphp
                                 <tr>
-                                    <td><span class="badge bg-success">Duyệt</span></td>
-                                    <td>{{ $user->employee_code }}</td>
-                                    <td>{{ $user->yourname }}</td>
-                                    <td>{{ $task->department?->name }}</td>
-                                    <td>{{ $task->Post?->name }}</td>
-                                    <td class="text-center">{{ $task->Channel?->name }}</td>
-                                    <td class="text-end">{{ number_format($task->gross_cost, 0, ',', '.') }}</td>
-                                    <td class="text-end">{{ $task->rate }}%</td>
-                                    <td class="text-end">{{ number_format($task->net_cost, 0, ',', '.') }}</td>
-                                    <td>{{ $task->content }}</td>
-                                    <!-- <td>
-                                        {{ date('d/m/Y', strtotime($task->Report->time_start)) }}
-                                        -
-                                        {{ date('d/m/Y', strtotime($task->Report->time_end)) }}
-                                    </td> -->
+                                    <td>{{ $row->department_lv1 }}</td>
+                                    <td>{{ $row->department_lv2 }}</td>
+                                    <td>{{ $row->department->name ?? '-' }}</td>
+                                    <td>{{ $row->user->name ?? '-' }}</td>
+                                    <td class="text-end">{{ number_format($row->gross_cost) }}</td>
+                                    <td class="text-end text-success">{{ number_format($row->support_cost) }}</td>
+                                    <td class="text-end">{{ number_format($row->net_cost) }}</td>
+                                    <td class="text-end text-danger">{{ number_format($row->actual_cost) }}</td>
                                 </tr>
                             @endforeach
-                            {{-- TỔNG THEO USER --}}
-                            @if($totalGrossUser > 0)
-                            <tr class="totall bg-light">
-                                <td colspan="6">
-                                   {{ $user->yourname }}
-                                </td>
-                                <td class="text-end">
-                                    {{ number_format($totalGrossUser, 0, ',', '.') }}
-                                </td>
-                                <td></td>
-                                <td class="text-end">
-                                    {{ number_format($totalNetUser, 0, ',', '.') }}
-                                </td>
-                                <td colspan="1"></td>
-                            </tr>
-                            @endif
-                        @endforeach
                         </tbody>
+
+                        <tfoot class="table-secondary fw-bold">
+                            <tr>
+                                <td colspan="4" class="text-end">TỔNG</td>
+                                <td class="text-end">{{ number_format($totalGross) }}</td>
+                                <td class="text-end text-success">{{ number_format($totalSupport) }}</td>
+                                <td class="text-end">{{ number_format($totalNet) }}</td>
+                                <td class="text-end text-danger">{{ number_format($totalActual) }}</td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
 
