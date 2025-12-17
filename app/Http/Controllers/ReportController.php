@@ -8,6 +8,7 @@ use App\Models\Report;
 use App\Models\Post;
 use App\Models\Channel;
 use App\Models\Department;
+use App\Models\User;
 use Carbon\Carbon;
 use App\Helpers\TreeHelper;
 
@@ -160,6 +161,24 @@ class ReportController extends HomeController
         ]);
 
         return response()->json(['success' => true]);
+    }
+
+    public function payment($id)
+    {
+        $reports = Report::orderBy('id','desc')->get();
+        
+        $user_department = User::with([
+                'tasks' => function ($q) {
+                    $q->where('approved', 1)
+                      ->with(['department', 'Post', 'Channel', 'Report']);
+                }
+            ])
+            ->get();
+
+        return view('account.report.payment', compact(
+            'user_department',
+            'reports',
+        ));
     }
 
 

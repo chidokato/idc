@@ -23,7 +23,7 @@
             </td>
             <td>
                 <a href="account/report/{{ $r->id }}"><button class="btn-info btn">Duyệt MKT</button></a>
-                <a href="account/report/{{ $r->id }}"><button class="btn-info btn">Quản lý đóng tiền</button></a>
+                <a href="account/report/payment/{{ $r->id }}"><button class="btn-info btn">Quản lý đóng tiền</button></a>
                 <a href="account/report/{{ $r->id }}"><button class="btn-info btn">Chi phí thực tế</button></a>
                 <a href="account/report/{{ $r->id }}"><button class="btn-info btn">Tất cả</button></a>
             </td>

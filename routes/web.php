@@ -185,6 +185,7 @@ Route::middleware(['user'])->group(function () {
         Route::post('/account/report-delete', [ReportController::class, 'delete'])->name('account.report.delete');
         Route::get('/account/load-report', [ReportController::class, 'loadReport'])->name('account.loadReport');
         Route::post('/account/report-active', [ReportController::class, 'active'])->name('account.report.active');
+        Route::get('report/payment/{id}', [ReportController::class, 'payment'])->name('account.report.payment');
 
         // wallet
         Route::get('wallet', [WalletController::class, 'index'])->name('wallet.index');
