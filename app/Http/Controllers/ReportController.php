@@ -165,30 +165,42 @@ class ReportController extends HomeController
         return response()->json(['success' => true]);
     }
 
-    public function payment(Request $request, $id)
+    public function payment($id)
     {
-        $ctys = Department::where('parent', 0)->get();
+        // CTY (LV1)
+        $ctys = Department::where('parent', 0)
+            ->with('children.children')
+            ->get();
+        /**
+         * Tổng task theo PHÒNG
+         */
+        $taskByDepartment = DB::table('tasks')->where('report_id', $id)
+            ->select(
+                'department_id',
+                DB::raw('SUM(days * expected_costs) as gross_cost'),
+                DB::raw('SUM(days * expected_costs * (1 - rate/100)) as net_cost')
+            )
+            ->groupBy('department_id')
+            ->get()
+            ->keyBy('department_id');
 
-        $lv1Totals = DB::table('tasks')
-        ->where('approved', 1)
-        ->where('report_id', $id)
-        ->select(
-            'department_lv1',
-            DB::raw('SUM(COALESCE(days,0) * COALESCE(expected_costs,0)) as gross_cost'),
-            DB::raw('SUM(
-                COALESCE(days,0)
-                * COALESCE(expected_costs,0)
-                * (1 - COALESCE(rate,0)/100)
-            ) as net_cost'),
-            DB::raw('SUM(COALESCE(actual_costs,0)) as actual_cost')
-        )
-        ->groupBy('department_lv1')
-        ->get()
-        ->keyBy('department_lv1');
+        /**
+         * Tổng task theo USER
+         */
+        $taskByUser = DB::table('tasks')->where('report_id', $id)
+            ->select(
+                'user_id',
+                DB::raw('SUM(days * expected_costs) as gross_cost'),
+                DB::raw('SUM(days * expected_costs * (1 - rate/100)) as net_cost')
+            )
+            ->groupBy('user_id')
+            ->get()
+            ->keyBy('user_id');
 
         return view('account.report.payment', compact(
             'ctys',
-            'lv1Totals',
+            'taskByDepartment',
+            'taskByUser'
         ));
     }
 

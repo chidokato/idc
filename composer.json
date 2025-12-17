@@ -33,7 +33,8 @@
         },
         "files": [
             "app/Helpers/helpers.php",
-            "app/Helpers/TreeHelper.php"
+            "app/Helpers/TreeHelper.php",
+            "app/Helpers/CostHelper.php"
         ]
     },
     "autoload-dev": {

@@ -21,30 +21,70 @@
             </div>
             <div class="col-lg-10">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover table-sm">
+                    <table class="table table-bordered">
                         <thead class="table-dark">
                             <tr>
-                                <th>Name</th>
-                                <th class="text-end">Tổng tiền</th>
-                                <th class="text-end">Tỷ lệ hộ trợ</th>
-                                <th class="text-end">Tiền nộp</th>
+                                <th>Đơn vị</th>
+                                <th class="text-end">Chi phí dự kiến</th>
+                                <th class="text-end">Tiền hỗ trợ</th>
+                                <th class="text-end">Chi phí ròng</th>
                             </tr>
                         </thead>
+
                         <tbody>
-                            @foreach($ctys as $cty)
-                            @php
-                                $total = $lv1Totals->get($cty->id);
-                                $gross = $total->gross_cost ?? 0;
-                                $net = $total->net_cost ?? 0;
-                                $support = $gross - $net;
-                            @endphp
-                            <tr>
+                        @foreach($ctys as $cty)
+                            @php $ctyTotal = sumDepartmentCost($cty->id, $taskByDepartment); @endphp
+
+                            {{-- CTY --}}
+                            <tr class="fw-bold bg-light">
                                 <td>{{ $cty->name }}</td>
-                                <td class="text-end">{{ number_format($gross) }}</td>
-                                <td class="text-end text-success">{{ number_format($support) }}</td>
-                                <td class="text-end">{{ number_format($net) }}</td>
+                                <td class="text-end">{{ number_format($ctyTotal['gross']) }}</td>
+                                <td class="text-end text-success">{{ number_format($ctyTotal['support']) }}</td>
+                                <td class="text-end">{{ number_format($ctyTotal['net']) }}</td>
                             </tr>
+
+                            {{-- SÀN --}}
+                            @foreach($cty->children as $san)
+                                @php $sanTotal = sumDepartmentCost($san->id, $taskByDepartment); @endphp
+
+                                <tr>
+                                    <td class="ps-4 fw-bold">— {{ $san->name }}</td>
+                                    <td class="text-end">{{ number_format($sanTotal['gross']) }}</td>
+                                    <td class="text-end text-success">{{ number_format($sanTotal['support']) }}</td>
+                                    <td class="text-end">{{ number_format($sanTotal['net']) }}</td>
+                                </tr>
+
+                                {{-- PHÒNG --}}
+                                @foreach($san->children as $phong)
+                                    @php $phongTotal = sumDepartmentCost($phong->id, $taskByDepartment); @endphp
+
+                                    <tr>
+                                        <td class="ps-5">—— {{ $phong->name }}</td>
+                                        <td class="text-end">{{ number_format($phongTotal['gross']) }}</td>
+                                        <td class="text-end text-success">{{ number_format($phongTotal['support']) }}</td>
+                                        <td class="text-end">{{ number_format($phongTotal['net']) }}</td>
+                                    </tr>
+
+                                    {{-- USER --}}
+                                    @foreach($taskByUser as $userId => $userTotal)
+                                        @php
+                                            $user = \App\Models\User::find($userId);
+                                        @endphp
+                                        @if($user && $user->department_id == $phong->id)
+                                            <tr class="text-muted">
+                                                <td class="ps-6">——— {{ $user->name }}</td>
+                                                <td class="text-end">{{ number_format($userTotal->gross_cost) }}</td>
+                                                <td class="text-end text-success">
+                                                    {{ number_format($userTotal->gross_cost - $userTotal->net_cost) }}
+                                                </td>
+                                                <td class="text-end">{{ number_format($userTotal->net_cost) }}</td>
+                                            </tr>
+                                        @endif
+                                    @endforeach
+
+                                @endforeach
                             @endforeach
+                        @endforeach
                         </tbody>
                     </table>
                 </div>
