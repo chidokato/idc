@@ -54,7 +54,7 @@ class PostController extends Controller
     public function index(Request $request)
     {
         $category = Category::where('sort_by', 'Product')->where('parent', '0')->orderBy('view', 'DESC')->get();
-        $perPage = $request->get('per_page', 10); // Mặc định là 20 nếu không có lựa chọn
+        $perPage = $request->get('per_page', 100); // Mặc định là 20 nếu không có lựa chọn
         $key = $request->get('key', '');
         $sort = $request->get('sort', 'desc'); // Mặc định là sắp xếp giảm dần
         
