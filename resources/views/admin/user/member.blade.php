@@ -61,9 +61,9 @@
                                 <td>{{$val->id}}</td>
                                 <td>{{$val->employee_code}}</td>
                                 <td>
-                                    <input type="text"
+                                    <input type="text" 
                                        value="{{ $val->yourname }}"
-                                       class="user-name-input"
+                                       class="user-name-input "
                                        data-id="{{ $val->id }}">
 
                                 </td>
