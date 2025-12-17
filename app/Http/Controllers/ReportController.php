@@ -167,60 +167,28 @@ class ReportController extends HomeController
 
     public function payment(Request $request, $id)
     {
-        $query = Task::where('report_id', $id)
-            ->select(
-                'department_lv1',
-                'department_lv2',
-                'department_id',
-                'user_id',
+        $ctys = Department::where('parent', 0)->get();
 
-                // ✅ Chi phí dự kiến
-                DB::raw('SUM(COALESCE(days,0) * COALESCE(expected_costs,0)) as gross_cost'),
+        $lv1Totals = DB::table('tasks')
+        ->where('report_id', $id)
+        ->select(
+            'department_lv1',
+            DB::raw('SUM(COALESCE(days,0) * COALESCE(expected_costs,0)) as gross_cost'),
+            DB::raw('SUM(
+                COALESCE(days,0)
+                * COALESCE(expected_costs,0)
+                * (1 - COALESCE(rate,0)/100)
+            ) as net_cost'),
+            DB::raw('SUM(COALESCE(actual_costs,0)) as actual_cost')
+        )
+        ->groupBy('department_lv1')
+        ->get()
+        ->keyBy('department_lv1');
 
-                // ✅ Chi phí ròng (sau hỗ trợ)
-                DB::raw('SUM(
-                    COALESCE(days,0)
-                    * COALESCE(expected_costs,0)
-                    * (1 - COALESCE(rate,0)/100)
-                ) as net_cost'),
-
-                // ✅ Chi phí thực tế
-                DB::raw('SUM(COALESCE(actual_costs,0)) as actual_cost')
-            )
-            ->with(['user', 'department']);
-
-        // 🔎 Filter (giữ nguyên)
-        if ($request->filled('department_lv1')) {
-            $query->where('department_lv1', $request->department_lv1);
-        }
-
-        if ($request->filled('department_lv2')) {
-            $query->where('department_lv2', $request->department_lv2);
-        }
-
-        if ($request->filled('department_id')) {
-            $query->where('department_id', $request->department_id);
-        }
-
-        if ($request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
-        }
-
-        $summary = $query
-            ->groupBy(
-                'department_lv1',
-                'department_lv2',
-                'department_id',
-                'user_id'
-            )
-            ->get()
-            ->map(function ($item) {
-                // ✅ Tiền hỗ trợ
-                $item->support_cost = $item->gross_cost - $item->net_cost;
-                return $item;
-            });
-
-        return view('account.report.payment', compact('summary'));
+        return view('account.report.payment', compact(
+            'ctys',
+            'lv1Totals',
+        ));
     }
 
 
