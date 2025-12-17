@@ -20,8 +20,8 @@
                 @include('account.layout.sitebar')
             </div>
             <div class="col-lg-10">
-                <div class="table-responsive">
-                    <table class="table table-bordered">
+                <div class="table-responsive-mobile">
+                    <table class="table">
                         <thead class="table-dark">
                             <tr>
                                 <th>Đơn vị</th>
