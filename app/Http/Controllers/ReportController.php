@@ -171,10 +171,12 @@ class ReportController extends HomeController
         $ctys = Department::where('parent', 0)
             ->with('children.children')
             ->get();
+
         /**
          * Tổng task theo PHÒNG
          */
-        $taskByDepartment = DB::table('tasks')->where('report_id', $id)->where('approved',1)
+        $taskByDepartment = DB::table('tasks')->where('report_id', $id)
+            ->where('approved', 1)
             ->select(
                 'department_id',
                 DB::raw('SUM(days * expected_costs) as gross_cost'),
@@ -187,7 +189,8 @@ class ReportController extends HomeController
         /**
          * Tổng task theo USER
          */
-        $taskByUser = DB::table('tasks')->where('report_id', $id)->where('approved',1)
+        $taskByUser = DB::table('tasks')->where('report_id', $id)
+            ->where('approved', 1)
             ->select(
                 'user_id',
                 DB::raw('SUM(days * expected_costs) as gross_cost'),
@@ -197,10 +200,28 @@ class ReportController extends HomeController
             ->get()
             ->keyBy('user_id');
 
+        /**
+         * TASK theo PHÒNG → USER
+         */
+        $tasks = Task::where('report_id', $id)
+            ->where('approved', 1)
+            ->with('user') // ✅ OK
+            ->get()
+            ->groupBy(['department_id', 'user_id']);
+
+        /**
+         * USER theo PHÒNG
+         */
+        $usersByDepartment = User::whereIn('id', $taskByUser->keys())
+            ->get()
+            ->groupBy('department_id');
+
         return view('account.report.payment', compact(
             'ctys',
             'taskByDepartment',
-            'taskByUser'
+            'taskByUser',
+            'tasks',
+            'usersByDepartment'
         ));
     }
 

@@ -66,21 +66,44 @@
                                     </tr>
 
                                     {{-- USER --}}
-                                    @foreach($taskByUser as $userId => $userTotal)
+                                    @foreach($usersByDepartment[$phong->id] ?? [] as $user)
                                         @php
-                                            $user = \App\Models\User::find($userId);
+                                            $userTotal = $taskByUser[$user->id] ?? null;
                                         @endphp
-                                        @if($user && $user->department_id == $phong->id)
+
+                                        @if($userTotal)
                                             <tr class="text-muted">
-                                                <td class="ps-6">——— {{ $user->yourname }}</td>
+                                                <td class="ps-6 fw-bold">——— {{ $user->yourname }}</td>
                                                 <td class="text-end">{{ number_format($userTotal->gross_cost) }}</td>
                                                 <td class="text-end text-success">
                                                     {{ number_format($userTotal->gross_cost - $userTotal->net_cost) }}
                                                 </td>
                                                 <td class="text-end">{{ number_format($userTotal->net_cost) }}</td>
                                             </tr>
+
+                                            {{-- TASK --}}
+                                            @foreach($tasks[$phong->id][$user->id] ?? [] as $task)
+                                                <tr class="text-secondary">
+                                                    <td class="ps-7">• {{ $task->name }}</td>
+                                                    <td class="text-end">
+                                                        {{ number_format($task->days * $task->expected_costs) }}
+                                                    </td>
+                                                    <td class="text-end text-success">
+                                                        {{ number_format(
+                                                            ($task->days * $task->expected_costs)
+                                                            - ($task->days * $task->expected_costs * (1 - $task->rate / 100))
+                                                        ) }}
+                                                    </td>
+                                                    <td class="text-end">
+                                                        {{ number_format(
+                                                            $task->days * $task->expected_costs * (1 - $task->rate / 100)
+                                                        ) }}
+                                                    </td>
+                                                </tr>
+                                            @endforeach
                                         @endif
                                     @endforeach
+
 
                                 @endforeach
                             @endforeach
