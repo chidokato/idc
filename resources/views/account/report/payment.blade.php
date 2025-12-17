@@ -72,7 +72,7 @@
                                         @endphp
                                         @if($user && $user->department_id == $phong->id)
                                             <tr class="text-muted">
-                                                <td class="ps-6">——— {{ $user->name }}</td>
+                                                <td class="ps-6">——— {{ $user->yourname }}</td>
                                                 <td class="text-end">{{ number_format($userTotal->gross_cost) }}</td>
                                                 <td class="text-end text-success">
                                                     {{ number_format($userTotal->gross_cost - $userTotal->net_cost) }}
