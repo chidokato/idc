@@ -19,7 +19,7 @@
                 name="key"
             >
 
-            <select class="form-control" name="category_id">
+            <select class="form-control" name="department_id">
                 <option value="">Tất cả phòng ban</option>
                 {!! $departmentOptions !!}
             </select>

@@ -25,49 +25,48 @@ class UserController extends Controller
         return view('admin.user.index', compact('admins'));
     }
     public function member(Request $request)
-{
-    $departments = Department::orderBy('name')->get();
+    {
+        $departments = Department::orderBy('name')->get();
 
-    $departmentOptions = TreeHelper::buildOptions(
-        $departments,
-        0,
-        '',
-        $request->category_id
-    );
+        $departmentOptions = TreeHelper::buildOptions(
+            $departments,
+            0,
+            '',
+            $request->department_id
+        );
 
-    $users = User::where('permission', 6);
+        $users = User::where('permission', 6);
 
-    // 🔍 Tìm theo keyword
-    if ($request->filled('key')) {
-        $key = $request->key;
-        $users->where(function ($q) use ($key) {
-            $q->where('name', 'like', "%{$key}%")
-              ->orWhere('email', 'like', "%{$key}%")
-              ->orWhere('phone', 'like', "%{$key}%");
-        });
-    }
-
-    // 🏢 Lọc phòng ban LV1 + LV2
-    if ($request->filled('category_id')) {
-        $departmentId = $request->category_id;
-        $department = $departments->firstWhere('id', $departmentId);
-
-        if ($department) {
-            if ($department->parent == 0) {
-                $users->where('department_lv1', $departmentId);
-            } else {
-                $users->where('department_lv2', $departmentId);
-            }
+        // 🔍 Tìm theo keyword
+        if ($request->filled('key')) {
+            $key = $request->key;
+            $users->where(function ($q) use ($key) {
+                $q->where('name', 'like', "%{$key}%")
+                  ->orWhere('email', 'like', "%{$key}%")
+                  ->orWhere('phone', 'like', "%{$key}%");
+            });
         }
+
+        // 🏢 Lọc phòng ban (LV1 + LV2 + LV3)
+        if ($request->filled('department_id')) {
+
+            $departmentId = $request->department_id;
+
+            $users->where(function ($q) use ($departmentId) {
+                $q->where('department_lv1', $departmentId)
+                  ->orWhere('department_lv2', $departmentId)
+                  ->orWhere('department_id',  $departmentId);
+            });
+        }
+
+
+        $users = $users->orderByDesc('id')->get();
+
+        return view('admin.user.member', compact(
+            'users',
+            'departmentOptions'
+        ));
     }
-
-    $users = $users->orderByDesc('id')->get();
-
-    return view('admin.user.member', compact(
-        'users',
-        'departmentOptions'
-    ));
-}
 
 
     /**
