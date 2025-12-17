@@ -34,6 +34,7 @@ class TaskController extends HomeController
         );
 
         $tasks = Task::where('approved', 0)
+            ->orderBy('department_lv2','desc')
             ->where('user', $user->id)
             ->with(['handler', 'department', 'Post', 'Channel', 'Report'])
             ->get();
