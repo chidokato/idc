@@ -57,14 +57,6 @@
         <th>Ghi chú</th>
         <th>Thời gian</th>
     </tr>
-
-    <tr class="bg-light bg-gradient totall">
-        <td colspan="6"><b>TỔNG CHI PHÍ TOÀN SÀN</b></td>
-        <td class="text-end"><b>{{ number_format($grandGross, 0, ',', '.') }}</b></td>
-        <td></td>
-        <td class="text-end"><b>{{ number_format($grandNet, 0, ',', '.') }}</b></td>
-        <td colspan="2"></td>
-    </tr>
 </thead>
 
 <tbody>
