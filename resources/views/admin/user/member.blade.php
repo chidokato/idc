@@ -44,6 +44,7 @@
                                 <th></th>
                                 <th>Mã NV</th>
                                 <th>Name</th>
+                                <th>Trạng thái</th>
                                 <th>Phòng/Nhóm</th>
                                 <th>Sàn</th>
                                 <th>Cty</th>
@@ -66,6 +67,18 @@
                                        data-id="{{ $val->id }}">
 
                                 </td>
+                               <td class="text-center">
+                                    <label class="switch">
+                                        <input
+                                            type="checkbox"
+                                            class="work-status-toggle"
+                                            data-id="{{ $val->id }}"
+                                            {{ $val->is_working ? 'checked' : '' }}
+                                        >
+                                        <span class="slider"></span>
+                                    </label>
+                                </td>
+
                                 <td>{{$val->Department?->name}}</td>
                                 <td>{{$val->departmentlv2?->name}}</td>
                                 <td>{{$val->departmentlv1?->name}}</td>
@@ -73,12 +86,12 @@
                                     {{ $val->rank == 3 ? 'Nhân viên' : ($val->rank == 2 ? 'Trưởng nhóm' : ($val->rank == 1 ? 'Giám đốc' : '')) }}
                                 </td>
                                 <td>{{$val->email}}</td>
-                                <td>
-                                    <label class="container">
+                                <td class="text-center">
+                                    <label class="switch">
                                         <input type="checkbox" class="change-user-status"
                                                data-id="{{ $val->id }}"
                                                {{ $val->status == 'active' ? 'checked' : '' }}>
-                                        <span class="checkmark"></span>
+                                        <span class="slider"></span>
                                     </label>
                                 </td>
                                 
@@ -188,6 +201,36 @@ $(document).on('keypress', '.user-name-input', function (e) {
     if (e.which === 13) {
         $(this).blur();
     }
+});
+</script>
+
+<script>
+$(document).on('change', '.work-status-toggle', function () {
+
+    let userId = $(this).data('id');
+    let isWorking = $(this).is(':checked') ? 1 : 0;
+
+    $.ajax({
+        url: "{{ route('admin.user.updateWorkStatus') }}",
+        type: "POST",
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            user_id: userId,
+            is_working: isWorking
+        },
+        success: function(response) {
+            console.log("Server trả về:", response);
+
+            // 🔥 Thông báo thành công
+            showToast('success', 'Cập nhật trạng thái thành công!');
+        },
+        error: function(xhr) {
+            console.log("Lỗi:", xhr.responseText);
+
+            // ❌ Thông báo lỗi
+            showToast('error', 'Có lỗi xảy ra khi cập nhật!');
+        }
+    });
 });
 </script>
 

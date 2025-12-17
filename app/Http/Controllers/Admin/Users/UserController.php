@@ -268,6 +268,23 @@ class UserController extends Controller
         ]);
     }
 
+public function updateWorkStatus(Request $request)
+{
+    $request->validate([
+        'user_id'    => 'required|exists:users,id',
+        'is_working' => 'required|boolean',
+    ]);
+
+    $user = User::findOrFail($request->user_id);
+    $user->is_working = $request->is_working;
+    $user->save();
+
+    return response()->json([
+        'status'  => true,
+        'message' => 'Cập nhật trạng thái thành công'
+    ]);
+}
+
 
     
 }

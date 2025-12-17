@@ -92,7 +92,8 @@ Route::prefix('admin')->group(function () {
         Route::get('users/member/list', [UserController::class, 'member'])->name('users.member');
         Route::post('user/change-status', [UserController::class, 'changeStatus'])->name('user.changeStatus');
         Route::post('users/update-name', [UserController::class, 'updateName'])->name('users.updateName');
-
+        Route::post('user/update-work-status', [UserController::class,'updateWorkStatus'])->name('admin.user.updateWorkStatus');
+        
         // khách hàng
         Route::resource('customer',CustomerController::class);
 

@@ -595,3 +595,71 @@ label {color: #46515F;}
 
 
 .change-input{ border: none; border-bottom:1px solid #ddd; max-width: 100%; }
+
+
+
+/* Switch nhỏ gọn */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 34px;
+    height: 18px;
+}
+
+/* Ẩn checkbox gốc */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Thanh trượt */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: #dc3545; /* nghỉ việc */
+    transition: 0.25s;
+    border-radius: 20px;
+}
+
+/* Nút tròn */
+.slider::before {
+    content: "";
+    position: absolute;
+    height: 14px;
+    width: 14px;
+    left: 2px;
+    bottom: 2px;
+    background-color: #fff;
+    transition: 0.25s;
+    border-radius: 50%;
+}
+
+/* Trạng thái đang làm */
+.switch input:checked + .slider {
+    background-color: #28a745;
+}
+
+/* Dịch nút */
+.switch input:checked + .slider::before {
+    transform: translateX(16px);
+}
+
+
+.table th,
+.table td {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    vertical-align: middle;
+}
+
+
+.td-center {
+    display: flex;
+    align-items: center;     /* căn giữa theo chiều dọc */
+    justify-content: center; /* căn giữa ngang */
+}
+.switch {
+    vertical-align: middle;
+}
