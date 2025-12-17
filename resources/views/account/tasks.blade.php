@@ -44,18 +44,18 @@
                 <div class="table-responsive-mobile">
     <table class="table table-task">
         <thead class="thead1">
-    <tr class="text-white bg-secondary">
+    <tr class="text-white bg-dark">
         <th></th>
         <th>Mã NV</th>
         <th>Họ Tên</th>
         <th>Phòng/Nhóm</th>
         <th>Dự án</th>
         <th class="text-center">Kênh</th>
-        <th class="text-end">Tổng tiền (đ)</th>
+        <th class="text-end">Tổng tiền</th>
         <th class="text-end">Hỗ trợ</th>
-        <th class="text-end">Tiền nộp (đ)</th>
+        <th class="text-end">Tiền nộp</th>
         <th>Ghi chú</th>
-        <th>Thời gian</th>
+        <!-- <th>Thời gian</th> -->
     </tr>
 </thead>
 
@@ -77,7 +77,7 @@
         @php $roomKey = $lv2Key.'_room_'.$room['id']; @endphp
 
         {{-- PHÒNG subtotal (cái bạn cần thêm) --}}
-        <tr class="bg-warning bg-gradient" data-group="{{ $lv2Key }}" style="cursor:pointer"
+        <tr class="bg-info text-white" data-group="{{ $lv2Key }}" style="cursor:pointer"
             onclick="toggleGroup('{{ $roomKey }}')">
             <td colspan="6"><b>— {{ $room['name'] }}</b></td>
             <td class="text-end"><b>{{ number_format($room['gross'], 0, ',', '.') }}</b></td>
@@ -115,11 +115,11 @@
                     <td class="text-end">{{ $task->rate }}%</td>
                     <td class="text-end">{{ number_format($task->net_cost, 0, ',', '.') }}</td>
                     <td>{{ $task->content }}</td>
-                    <td>
+                    <!-- <td>
                         {{ date('d/m/Y', strtotime($task->Report->time_start)) }}
                         -
                         {{ date('d/m/Y', strtotime($task->Report->time_end)) }}
-                    </td>
+                    </td> -->
                 </tr>
             @endforeach
         @endforeach
