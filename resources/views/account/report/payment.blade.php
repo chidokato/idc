@@ -84,7 +84,7 @@
                                             {{-- TASK --}}
                                             @foreach($tasks[$phong->id][$user->id] ?? [] as $task)
                                                 <tr class="text-secondary">
-                                                    <td class="ps-7">• {{ $task->Post->name }}</td>
+                                                    <td class="ps-7">{{ $task->Post->name }}</td>
                                                     <td class="text-end">
                                                         {{ number_format($task->days * $task->expected_costs) }}
                                                     </td>
