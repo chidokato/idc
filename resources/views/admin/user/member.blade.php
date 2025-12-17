@@ -10,7 +10,7 @@
 
 <div class="row">
     <form method="GET" action="{{ url()->current() }}">
-        <div class="col-xl-12 col-lg-12 search flex-start">
+        <div class="col-xl-12 col-lg-12 search">
             <input
                 type="text"
                 value="{{ request('key') }}"
@@ -18,7 +18,6 @@
                 class="form-control"
                 name="key"
             >
-
             <select class="form-control" name="department_id">
                 <option value="">Tất cả phòng ban</option>
                 {!! $departmentOptions !!}
