@@ -14,7 +14,7 @@
             <input
                 type="text"
                 value="{{ request('key') }}"
-                placeholder="Tìm kiếm tên / email..."
+                placeholder="Mã NV / tên / email"
                 class="form-control"
                 name="key"
             >
