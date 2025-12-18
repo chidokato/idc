@@ -115,17 +115,17 @@
                             </td>
                             <!-- <td>{{ $val->days }}</td> -->
                             <td class="text-end total-cost-cell"
-    data-days="{{ $val->days }}"
-    data-rate="{{ $val->rate }}"
->
-    <span class="total-cost-text">
-        {{ number_format($val->total_costs ?? $val->days * $val->expected_costs, 0, ',', '.') }}
-    </span>
-    <span
-        title="{{ number_format($val->expected_costs, 0, ',', '.') }}đ * {{ $val->days }} ngày"
-        class="note"
-    >?</span>
-</td>
+                                data-days="{{ $val->days }}"
+                                data-rate="{{ $val->rate }}"
+                            >
+                                <span class="total-cost-text">
+                                    {{ number_format($val->total_costs ?? $val->days * $val->expected_costs, 0, ',', '.') }}
+                                </span>
+                                <span
+                                    title="{{ number_format($val->expected_costs, 0, ',', '.') }}đ * {{ $val->days }} ngày"
+                                    class="note"
+                                >?</span>
+                            </td>
 
                             <td>
                                 <select name="rate" class="rate-select form-select form-select-sm" data-id="{{ $val->id }}">
