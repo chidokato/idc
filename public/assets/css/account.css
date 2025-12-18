@@ -234,8 +234,8 @@ input:checked + .slider:before {
 .table-task{position: relative;}
 
 .bg-dark{ background:#1a2c5e !important }
-.bg-secondary{ background:#243f89 !important }
-.bg-primary{ background:#2a5adb !important }
+.bg-secondary{ background:#2358e7cf !important }
+.bg-primary{ background:#2a5adba3 !important }
 .bg-warning{ background:#2a5adb4a !important }
 
 @media (max-width: 1860px) {
