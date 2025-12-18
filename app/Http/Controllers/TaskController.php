@@ -261,4 +261,28 @@ class TaskController extends Controller
 
     }
 
+
+    public function updatePaid(Request $request, $id)
+    {
+        $user = auth()->user();
+
+        if (!$user || !in_array($user->rank, [1, 2])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bạn không có quyền thực hiện thao tác này.'
+            ], 403);
+        }
+
+        $task = Task::findOrFail($id);
+
+        $task->paid = !$task->paid;
+        $task->save();
+
+        return response()->json([
+            'success' => true,
+            'paid' => (bool) $task->paid,
+            'message' => $task->paid ? 'Chuyển sang trạng thái: Đã thanh toán' : 'Chuyển sang trạng thái: Chưa thanh toán',
+        ]);
+    }
+
 }

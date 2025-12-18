@@ -20,98 +20,7 @@
                 @include('account.layout.sitebar')
             </div>
             <div class="col-lg-10">
-                <div class="table-responsive-mobile">
-                    <table class="table">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Đơn vị</th>
-                                <th class="text-end">Chi phí dự kiến</th>
-                                <th class="text-end">Tiền hỗ trợ</th>
-                                <th class="text-end">Chi phí ròng</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                        @foreach($ctys as $cty)
-                            @php $ctyTotal = sumDepartmentCost($cty->id, $taskByDepartment); @endphp
-
-                            {{-- CTY --}}
-                            <tr class="fw-bold bg-light">
-                                <td>{{ $cty->name }}</td>
-                                <td class="text-end">{{ number_format($ctyTotal['gross']) }}</td>
-                                <td class="text-end text-success">{{ number_format($ctyTotal['support']) }}</td>
-                                <td class="text-end">{{ number_format($ctyTotal['net']) }}</td>
-                            </tr>
-
-                            {{-- SÀN --}}
-                            @foreach($cty->children as $san)
-                                @php $sanTotal = sumDepartmentCost($san->id, $taskByDepartment); @endphp
-
-                                <tr>
-                                    <td class="ps-4 fw-bold">— {{ $san->name }}</td>
-                                    <td class="text-end">{{ number_format($sanTotal['gross']) }}</td>
-                                    <td class="text-end text-success">{{ number_format($sanTotal['support']) }}</td>
-                                    <td class="text-end">{{ number_format($sanTotal['net']) }}</td>
-                                </tr>
-
-                                {{-- PHÒNG --}}
-                                @foreach($san->children as $phong)
-                                    @php $phongTotal = sumDepartmentCost($phong->id, $taskByDepartment); @endphp
-
-                                    <tr>
-                                        <td class="ps-5">—— {{ $phong->name }}</td>
-                                        <td class="text-end">{{ number_format($phongTotal['gross']) }}</td>
-                                        <td class="text-end text-success">{{ number_format($phongTotal['support']) }}</td>
-                                        <td class="text-end">{{ number_format($phongTotal['net']) }}</td>
-                                    </tr>
-
-                                    {{-- USER --}}
-                                    @foreach($usersByDepartment[$phong->id] ?? [] as $user)
-                                        @php
-                                            $userTotal = $taskByUser[$user->id] ?? null;
-                                        @endphp
-
-                                        @if($userTotal)
-                                            <tr class="text-muted">
-                                                <td class="ps-6 fw-bold">——— {{ $user->yourname }}</td>
-                                                <td class="text-end">{{ number_format($userTotal->gross_cost) }}</td>
-                                                <td class="text-end text-success">
-                                                    {{ number_format($userTotal->gross_cost - $userTotal->net_cost) }}
-                                                </td>
-                                                <td class="text-end">{{ number_format($userTotal->net_cost) }}</td>
-                                            </tr>
-
-                                            {{-- TASK --}}
-                                            @foreach($tasks[$phong->id][$user->id] ?? [] as $task)
-                                                <tr class="text-secondary">
-                                                    <td class="ps-7">{{ $task->Post->name }}</td>
-                                                    <td class="text-end">
-                                                        {{ number_format($task->days * $task->expected_costs) }}
-                                                    </td>
-                                                    <td class="text-end text-success">
-                                                        {{ number_format(
-                                                            ($task->days * $task->expected_costs)
-                                                            - ($task->days * $task->expected_costs * (1 - $task->rate / 100))
-                                                        ) }}
-                                                    </td>
-                                                    <td class="text-end">
-                                                        {{ number_format(
-                                                            $task->days * $task->expected_costs * (1 - $task->rate / 100)
-                                                        ) }}
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        @endif
-                                    @endforeach
-
-
-                                @endforeach
-                            @endforeach
-                        @endforeach
-                        </tbody>
-                    </table>
-                </div>
-
+                @include('account.partials.task_view')
             </div>
         </div>
     </div>
@@ -121,6 +30,55 @@
 @endsection
 
 
-@section('script')
+@section('js')
+<script>
+function toggleGroup(key){
+    const rows = document.querySelectorAll(
+        `[data-group="${key}"], [data-subgroup="${key}"], [data-leaf="${key}"]`
+    );
+    rows.forEach(r => r.style.display = (r.style.display === 'none' ? '' : 'none'));
+}
+</script>
+
+<script>
+  const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+  document.addEventListener('change', async (e) => {
+    if (!e.target.classList.contains('js-paid-toggle')) return;
+
+    const checkbox = e.target;
+    const taskId = checkbox.dataset.id;
+    const paid = checkbox.checked ? 1 : 0;
+
+    // lock tạm để tránh double click
+    checkbox.disabled = true;
+
+    try {
+      const res = await fetch(`/tasks/${taskId}/paid`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': csrf,
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ paid })
+      });
+
+      if (!res.ok) throw new Error('Request failed');
+      const data = await res.json();
+
+      // cập nhật paid_at nhỏ nhỏ
+      const paidAtEl = document.querySelector(`.js-paid-at-${taskId}`);
+      if (paidAtEl) paidAtEl.textContent = data.paid_at ?? '';
+
+    } catch (err) {
+      // rollback UI nếu lỗi
+      checkbox.checked = !checkbox.checked;
+      alert('Không cập nhật được trạng thái đóng tiền. Vui lòng thử lại.');
+    } finally {
+      checkbox.disabled = false;
+    }
+  });
+</script>
 
 @endsection

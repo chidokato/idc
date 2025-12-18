@@ -4,6 +4,7 @@
     <!-- seo -->
     <base href="{{asset('')}}">
     <title>@yield('title')</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
     <meta name="description" content="@yield('description')"/>
     <meta name="keywords" itemprop="keywords" content="@yield('keywords')" />

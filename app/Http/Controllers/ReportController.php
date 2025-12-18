@@ -12,6 +12,8 @@ use App\Models\Department;
 use App\Models\User;
 use Carbon\Carbon;
 use App\Helpers\TreeHelper;
+use App\Helpers\TreeHelperLv2Only;
+use Illuminate\Support\Facades\Auth;
 
 
 class ReportController extends HomeController
@@ -165,67 +167,140 @@ class ReportController extends HomeController
         return response()->json(['success' => true]);
     }
 
-    public function payment($id)
+    public function payment(Request $request, $id)
     {
-        // CTY (LV1)
-        $ctys = Department::where('parent', 0)
-            ->with('children.children')
+        $user = Auth::user();
+
+        $reports = Report::orderByDesc('id')->get();
+        $selectedReportId = (int) $request->input('report_id', optional($reports->first())->id);
+
+        $departments = Department::orderBy('name')->get();
+
+        // dropdown đang là LV1+LV2 => id có thể là lv1 hoặc lv2
+        $selectedDeptId = (int) $request->input('department_id', $user->department_lv2);
+
+        // build options (dùng hàm của bạn)
+        $departmentOptions = TreeHelperLv2Only::buildOptions($departments, $selectedDeptId);
+
+        // ===== xác định danh sách LV2 cần lọc =====
+        $selectedDept = $departments->firstWhere('id', $selectedDeptId);
+
+        $lv2Ids = [];
+        if ($selectedDept) {
+            if ((int)$selectedDept->parent === 0) {
+                // chọn LV1 => lấy toàn bộ LV2 con
+                $lv2Ids = $departments->where('parent', $selectedDeptId)->pluck('id')->map(fn($x)=>(int)$x)->all();
+            } else {
+                // chọn LV2
+                $lv2Ids = [$selectedDeptId];
+            }
+        } else {
+            // fallback: sàn của user
+            $lv2Ids = [(int)$user->department_lv2];
+        }
+
+        // ===== lấy users + tasks theo report =====
+        $users = User::query()
+            ->whereIn('department_lv2', $lv2Ids)
+            ->orderBy('department_lv2')
+            ->orderBy('department_id')
+            ->with([
+                'tasks' => function ($q) use ($selectedReportId) {
+                    $q->where('approved', 1)
+                      ->when($selectedReportId, fn($qq) => $qq->where('report_id', $selectedReportId))
+                      ->with(['department', 'Post', 'Channel', 'Report']);
+                }
+            ])
             ->get();
 
-        /**
-         * Tổng task theo PHÒNG
-         */
-        $taskByDepartment = DB::table('tasks')->where('report_id', $id)
-            ->where('approved', 1)
-            ->select(
-                'department_id',
-                DB::raw('SUM(days * expected_costs) as gross_cost'),
-                DB::raw('SUM(days * expected_costs * (1 - rate/100)) as net_cost')
-            )
-            ->groupBy('department_id')
-            ->get()
-            ->keyBy('department_id');
+        // ===== build cây + tổng: LV1 -> LV2 -> ROOM -> USER -> TASK =====
+        $tree = [];
+        $grandGross = 0;
+        $grandNet   = 0;
 
-        /**
-         * Tổng task theo USER
-         */
-        $taskByUser = DB::table('tasks')->where('report_id', $id)
-            ->where('approved', 1)
-            ->select(
-                'user_id',
-                DB::raw('SUM(days * expected_costs) as gross_cost'),
-                DB::raw('SUM(days * expected_costs * (1 - rate/100)) as net_cost')
-            )
-            ->groupBy('user_id')
-            ->get()
-            ->keyBy('user_id');
+        foreach ($users as $u) {
+            foreach ($u->tasks as $t) {
 
-        /**
-         * TASK theo PHÒNG → USER
-         */
-        $tasks = Task::where('report_id', $id)
-            ->where('approved', 1)
-            ->with('user') // ✅ OK
-            ->get()
-            ->groupBy(['department_id', 'user_id']);
+                $lv2Id = (int)$u->department_lv2;
+                $lv2   = $departments->firstWhere('id', $lv2Id);
+                $lv1Id = (int)($lv2?->parent ?? 0);
+                $lv1   = $departments->firstWhere('id', $lv1Id);
 
-        /**
-         * USER theo PHÒNG
-         */
-        $usersByDepartment = User::whereIn('id', $taskByUser->keys())
-            ->get()
-            ->groupBy('department_id');
+                $lv1Name = $lv1?->name ?? ('Cty #' . $lv1Id);
+                $lv2Name = $lv2?->name ?? ('Sàn #' . $lv2Id);
 
-        return view('account.report.payment', compact(
-            'ctys',
-            'taskByDepartment',
-            'taskByUser',
-            'tasks',
-            'usersByDepartment'
+                $roomId   = (int)($t->department_id ?? 0);
+                $roomName = $t->department?->name
+                    ?? $departments->firstWhere('id', $roomId)?->name
+                    ?? ('Phòng #' . $roomId);
+
+                // init lv1
+                if (!isset($tree[$lv1Id])) {
+                    $tree[$lv1Id] = ['id'=>$lv1Id,'name'=>$lv1Name,'gross'=>0,'net'=>0,'lv2s'=>[]];
+                }
+
+                // init lv2
+                if (!isset($tree[$lv1Id]['lv2s'][$lv2Id])) {
+                    $tree[$lv1Id]['lv2s'][$lv2Id] = ['id'=>$lv2Id,'name'=>$lv2Name,'gross'=>0,'net'=>0,'rooms'=>[]];
+                }
+
+                // init room
+                if (!isset($tree[$lv1Id]['lv2s'][$lv2Id]['rooms'][$roomId])) {
+                    $tree[$lv1Id]['lv2s'][$lv2Id]['rooms'][$roomId] = ['id'=>$roomId,'name'=>$roomName,'gross'=>0,'net'=>0,'users'=>[]];
+                }
+
+                // init user node
+                if (!isset($tree[$lv1Id]['lv2s'][$lv2Id]['rooms'][$roomId]['users'][$u->id])) {
+                    $tree[$lv1Id]['lv2s'][$lv2Id]['rooms'][$roomId]['users'][$u->id] = [
+                        'id'=>$u->id,
+                        'employee_code'=>$u->employee_code,
+                        'yourname'=>$u->yourname,
+                        'gross'=>0,'net'=>0,
+                        'tasks'=>[]
+                    ];
+                }
+
+                // push task + totals
+                $tree[$lv1Id]['lv2s'][$lv2Id]['rooms'][$roomId]['users'][$u->id]['tasks'][] = $t;
+
+                $tree[$lv1Id]['lv2s'][$lv2Id]['rooms'][$roomId]['users'][$u->id]['gross'] += (int)$t->gross_cost;
+                $tree[$lv1Id]['lv2s'][$lv2Id]['rooms'][$roomId]['users'][$u->id]['net']   += (int)$t->net_cost;
+
+                $tree[$lv1Id]['lv2s'][$lv2Id]['rooms'][$roomId]['gross'] += (int)$t->gross_cost;
+                $tree[$lv1Id]['lv2s'][$lv2Id]['rooms'][$roomId]['net']   += (int)$t->net_cost;
+
+                $tree[$lv1Id]['lv2s'][$lv2Id]['gross'] += (int)$t->gross_cost;
+                $tree[$lv1Id]['lv2s'][$lv2Id]['net']   += (int)$t->net_cost;
+
+                $tree[$lv1Id]['gross'] += (int)$t->gross_cost;
+                $tree[$lv1Id]['net']   += (int)$t->net_cost;
+
+                $grandGross += (int)$t->gross_cost;
+                $grandNet   += (int)$t->net_cost;
+            }
+        }
+
+        $tree = collect($tree)->map(function ($lv1) {
+            $lv1['lv2s'] = collect($lv1['lv2s'])->map(function ($lv2) {
+                $lv2['rooms'] = collect($lv2['rooms'])->map(function ($room) {
+                    $room['users'] = collect($room['users']);
+                    return $room;
+                });
+                return $lv2;
+            });
+            return $lv1;
+        });
+
+        return view('account.tasks', compact(
+            'user',
+            'reports',
+            'selectedReportId',
+            'departmentOptions',
+            'tree',
+            'grandGross',
+            'grandNet'
         ));
     }
-
-
 
 
 }

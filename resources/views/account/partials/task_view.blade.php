@@ -1,26 +1,4 @@
-@extends('layout.index')
-
-@section('title') Công Ty Cổ Phần Bất Động Sản Indochine @endsection
-@section('description') Công Ty Cổ Phần Bất Động Sản Indochine là công ty thành viên của Đất Xanh Miền Bắc - UY TÍN số 1 thị trường BĐS Việt Nam @endsection
-@section('robots') index, follow @endsection
-@section('url'){{asset('')}}@endsection
-
-@section('css')
-<link href="assets/css/widget.css" rel="stylesheet">
-<link href="assets/css/news.css" rel="stylesheet">
-<link href="assets/css/account.css" rel="stylesheet">
-@endsection
-
-@section('content')
-@include('account.layout.menu')
-<section class="card-grid news-sec">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-2 d-none d-lg-block">
-                @include('account.layout.sitebar')
-            </div>
-            <div class="col-lg-10">
-                <form method="GET" action="{{ url()->current() }}">
+<form method="GET" action="{{ url()->current() }}">
     <div class="text-uppercase title-cat flex gap1">
         <div>
             <select class="form-control" name="department_id" onchange="this.form.submit()">
@@ -53,8 +31,8 @@
                 <th class="text-end">Tổng tiền</th>
                 <th class="text-end">Hỗ trợ</th>
                 <th class="text-end">Tiền nộp</th>
-                <th>Đóng tiền</th>
                 <th>Ghi chú</th>
+                <!-- <th>Thời gian</th> -->
             </tr>
         </thead>
         <tbody>
@@ -125,20 +103,15 @@
                                 <td class="text-end">{{ $task->rate }}%</td>
                                 <td class="text-end">{{ number_format($task->net_cost,0,',','.') }}</td>
                                 <td class="text-center">
-                                    @if(auth()->check() && in_array(auth()->user()->rank, [1,2]))
-                                        <label class="switch">
-                                            <input type="checkbox"
-                                                   class="active-toggle"
-                                                   data-url="{{ route('tasks.updatePaid', $task->id) }}"
-                                                   {{ $task->paid ? 'checked' : '' }}>
-                                            <span class="slider round"></span>
-                                        </label>
-                                    @else
-                                        {{-- user thường chỉ xem --}}
-                                        <span class="badge {{ $task->paid ? 'bg-success' : 'bg-secondary' }}">
-                                            {{ $task->paid ? 'Đóng tiền' : 'Chưa đóng tiền' }}
-                                        </span>
-                                    @endif
+                                    <button
+  type="button"
+  class="btn btn-sm update-paid {{ $task->paid ? 'btn-success' : 'btn-secondary' }}"
+  data-url="{{ route('tasks.updatePaid', $task->id) }}"
+>
+  {{ $task->paid ? 'Đã thanh toán' : 'Chưa thanh toán' }}
+</button>
+
+
                                 </td>
                                 <td>{{ $task->content }}</td>
                             </tr>
@@ -152,61 +125,3 @@
 </div>
 
 
-
-            </div>
-        </div>
-    </div>
-</section>
-<!------------------- END CARD ------------------->
-
-@endsection
-
-
-@section('js')
-<script>
-function toggleGroup(key){
-    const rows = document.querySelectorAll(
-        `[data-group="${key}"], [data-subgroup="${key}"], [data-leaf="${key}"]`
-    );
-    rows.forEach(r => r.style.display = (r.style.display === 'none' ? '' : 'none'));
-}
-</script>
-
-
-<script>
-$(document).on('change', '.active-toggle', function () {
-    const checkbox = $(this);
-    const url = checkbox.data('url');
-
-    // trạng thái trước khi đổi (để revert nếu lỗi)
-    const oldChecked = !checkbox.prop('checked');
-
-    $.ajax({
-        url: url,
-        type: 'POST',
-        dataType: 'json',
-        data: {
-            _token: $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function (response) {
-            // đồng bộ lại theo server
-            checkbox.prop('checked', !!response.paid);
-
-            // thông báo giống style bạn muốn
-            showToast('success', response.message ?? "Đã thực hiện thành công");
-        },
-        error: function (xhr) {
-            // revert lại nếu lỗi
-            checkbox.prop('checked', oldChecked);
-
-            if (xhr.status === 419) {
-                showCenterError("Phiên đăng nhập hết hạn (CSRF). Vui lòng F5 trang rồi thử lại!");
-            } else {
-                showCenterError("Có lỗi xảy ra, vui lòng thử lại!");
-            }
-        }
-    });
-});
-</script>
-
-@endsection
