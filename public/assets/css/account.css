@@ -215,7 +215,7 @@ input:checked + .slider:before {
     transform: translateX(16px);
 }
 
-.table>:not(caption)>*>* { padding: .3rem .3rem !important;}
+.table>:not(caption)>*>* { padding: .3rem .3rem !important; font-size: .8rem}
 .switch {
     margin-top: 4px;
 }
