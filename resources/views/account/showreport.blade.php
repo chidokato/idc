@@ -61,9 +61,18 @@
 
                 </form>
 
+                @php
+                      $canBulkEdit = auth()->check() && in_array(auth()->user()->rank, [1,2]);
+                    @endphp
+
                 <table class="table table-hover">
                     <thead class="thead">
                         <tr >
+                            <th style="width:36px" class="text-center">
+                              @if($canBulkEdit)
+                                <input type="checkbox" id="check-all">
+                              @endif
+                            </th>
                             <th>Họ Tên</th>
                             <th>Sàn</th>
                             <th>Nhóm</th>
@@ -81,6 +90,78 @@
                         </tr>
                         
                     </thead>
+
+                    
+
+                    @if($canBulkEdit)
+                    <div class="d-flex gap-2 align-items-center mb-2">
+                        <button type="button" class="btn btn-primary btn-sm" id="btn-open-bulk-modal" disabled>
+                            Sửa hàng loạt (<span id="bulk-count">0</span>)
+                        </button>
+<!-- 
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-clear-selected" disabled>
+                            Bỏ chọn
+                        </button> -->
+                    </div>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="bulkEditModal" tabindex="-1" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title">Sửa hàng loạt</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+
+                          <div class="modal-body">
+
+                            {{-- Expected costs --}}
+                            <div class="border rounded p-2 mb-3">
+                              <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="apply_expected">
+                                <label class="form-check-label" for="apply_expected">Áp dụng Chi phí (expected_costs)</label>
+                              </div>
+                              <input type="text" class="form-control form-control-sm" id="bulk_expected" placeholder="VD: 1.500.000" disabled>
+                            </div>
+
+                            {{-- Rate --}}
+                            <div class="border rounded p-2 mb-3">
+                              <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="apply_rate">
+                                <label class="form-check-label" for="apply_rate">Áp dụng Hỗ trợ (rate)</label>
+                              </div>
+
+                              <select class="form-select form-select-sm" id="bulk_rate" disabled>
+                                @foreach(config('rates') as $value => $label)
+                                  <option value="{{ $value }}">{{ $label }}</option>
+                                @endforeach
+                              </select>
+                            </div>
+
+                            {{-- Approved --}}
+                            <div class="border rounded p-2">
+                              <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="apply_approved">
+                                <label class="form-check-label" for="apply_approved">Áp dụng Duyệt (approved)</label>
+                              </div>
+
+                              <select class="form-select form-select-sm" id="bulk_approved_action" disabled>
+                                <option value="approve">Duyệt</option>
+                                <option value="unapprove">Bỏ duyệt</option>
+                              </select>
+                            </div>
+
+                          </div>
+
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+                            <button type="button" class="btn btn-primary btn-sm" id="btn-bulk-save">Lưu</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    @endif
+
 
                     <tbody>
                         <tr>
@@ -106,6 +187,11 @@
                         @foreach($task as $val)
                         <?php $levels = $val->department?->hierarchy_levels ?? []; ?>
                         <tr class="padding16" id="row-{{ $val->id }}">
+                            <td class="text-center">
+  @if($canBulkEdit)
+    <input type="checkbox" class="row-check" value="{{ $val->id }}">
+  @endif
+</td>
                             <td>{{ $val->handler?->yourname ?? '---' }}</td>
                             <td>{{ $levels['level2'] ?? '-' }}</td>
                             <td>{{ $levels['level3'] ?? '-' }}</td>
@@ -170,11 +256,6 @@
                         @endforeach
                     </tbody>
                 </table>
-
-                <div class="mt-3">
-                </div>
-
-
             </div>
         </div>
     </div>
@@ -393,5 +474,160 @@ $(document).on('blur', '.expected-cost-input', function () {
 });
 </script>
 
+<script>
+$(function () {
+    const canBulkEdit = @json($canBulkEdit);
+
+    function formatVn(n){
+        n = parseInt(n || 0, 10);
+        return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    function parseVnMoney(str){
+        if(!str) return 0;
+        return parseInt(String(str).replace(/[^\d]/g,''), 10) || 0;
+    }
+
+    function selectedIds(){
+        return $('.row-check:checked').map(function(){ return $(this).val(); }).get();
+    }
+
+    function refreshBulkButtons(){
+        const count = selectedIds().length;
+        $('#bulk-count').text(count);
+        $('#btn-open-bulk-modal').prop('disabled', count === 0);
+        $('#btn-clear-selected').prop('disabled', count === 0);
+    }
+
+    if(!canBulkEdit) return;
+
+    // CSRF header
+    $.ajaxSetup({
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}
+    });
+
+    // select all
+    $(document).on('change', '#check-all', function(){
+        $('.row-check').prop('checked', this.checked);
+        refreshBulkButtons();
+    });
+
+    // select single
+    $(document).on('change', '.row-check', function(){
+        const all = $('.row-check').length;
+        const checked = $('.row-check:checked').length;
+        $('#check-all').prop('checked', all > 0 && checked === all);
+        refreshBulkButtons();
+    });
+
+    // clear
+    $('#btn-clear-selected').on('click', function(){
+        $('.row-check').prop('checked', false);
+        $('#check-all').prop('checked', false);
+        refreshBulkButtons();
+    });
+
+    // modal enable/disable fields
+    $('#apply_expected').on('change', function(){ $('#bulk_expected').prop('disabled', !this.checked); });
+    $('#apply_rate').on('change', function(){ $('#bulk_rate').prop('disabled', !this.checked); });
+    $('#apply_approved').on('change', function(){ $('#bulk_approved_action').prop('disabled', !this.checked); });
+
+    // open modal
+    $('#btn-open-bulk-modal').on('click', function(){
+        // reset modal state
+        $('#apply_expected, #apply_rate, #apply_approved').prop('checked', false);
+        $('#bulk_expected').val('').prop('disabled', true);
+        $('#bulk_rate').prop('disabled', true);
+        $('#bulk_approved_action').prop('disabled', true);
+
+        const modalEl = document.getElementById('bulkEditModal');
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    });
+
+    // save bulk
+    $('#btn-bulk-save').on('click', function(){
+        const ids = selectedIds();
+        if(ids.length === 0){
+            showCenterError("Bạn chưa chọn dòng nào!");
+            return;
+        }
+
+        const payload = {
+            ids: ids,
+            apply_expected: $('#apply_expected').is(':checked') ? 1 : 0,
+            expected_costs: parseVnMoney($('#bulk_expected').val()),
+
+            apply_rate: $('#apply_rate').is(':checked') ? 1 : 0,
+            rate: $('#bulk_rate').val(),
+
+            apply_approved: $('#apply_approved').is(':checked') ? 1 : 0,
+            approved_action: $('#bulk_approved_action').val(),
+        };
+
+        // ít nhất phải tick 1 mục áp dụng
+        if(!payload.apply_expected && !payload.apply_rate && !payload.apply_approved){
+            showCenterError("Hãy chọn ít nhất 1 mục để áp dụng!");
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('account.tasks.bulkUpdate') }}",
+            method: "POST",
+            data: payload,
+            success: function(res){
+                showToast('success', res.message ?? "Đã thực hiện thành công");
+
+                // Update UI từng row
+                (res.rows || []).forEach(function(r){
+                    const row = $('#row-' + r.id);
+
+                    // expected_costs input
+                    if(payload.apply_expected){
+                        row.find('.expected-cost-input').val(formatVn(r.expected_costs));
+                        row.find('.total-cost-text').text(formatVn(r.total_costs));
+                        // cập nhật tooltip ghi chú nhân ngày nếu bạn muốn:
+                        row.find('.total-cost-cell .note')
+                          .attr('title', formatVn(r.expected_costs) + 'đ * ' + row.find('.total-cost-cell').data('days') + ' ngày');
+                    }
+
+                    // rate select
+                    if(payload.apply_rate){
+                        row.find('.rate-select').val(r.rate);
+                    }
+
+                    // approved switch + badge
+                    if(payload.apply_approved){
+                        row.find('.active-toggle').prop('checked', r.approved == 1);
+                        const badgeCell = row.find('td').last(); // cột badge đang là td cuối
+                        if(r.approved == 1){
+                            badgeCell.html('<span class="badge bg-success">Đã duyệt</span>');
+                        } else {
+                            badgeCell.html('<span class="badge bg-warning">Chờ duyệt</span>');
+                        }
+                    }
+                });
+
+                // đóng modal
+                bootstrap.Modal.getInstance(document.getElementById('bulkEditModal')).hide();
+
+                // bỏ chọn sau khi lưu
+                $('#btn-clear-selected').click();
+            },
+            error: function(xhr){
+                if(xhr.status === 403){
+                    showCenterError("Bạn không có quyền thực hiện thao tác này!");
+                    return;
+                }
+                let msg = "Có lỗi xảy ra, vui lòng thử lại!";
+                if(xhr.responseJSON && xhr.responseJSON.message) msg = xhr.responseJSON.message;
+                showCenterError(msg);
+            }
+        });
+    });
+
+    refreshBulkButtons();
+});
+</script>
 
 @endsection

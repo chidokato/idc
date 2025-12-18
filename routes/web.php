@@ -180,6 +180,7 @@ Route::middleware(['user'])->group(function () {
         Route::post('task/update-kpi', [TaskController::class, 'updateKpi'])->name('task.updateKpi');
         Route::post('task/update-expected-cost', [TaskController::class, 'updateExpectedCost'])->name('task.updateExpectedCost');
         Route::post('tasks/{id}/update-paid', [TaskController::class, 'updatePaid'])->name('tasks.updatePaid');
+        Route::post('tasks/bulk-update', [TaskController::class, 'bulkUpdateTasks'])->name('account.tasks.bulkUpdate');
 
         // report
         Route::resource('report',ReportController::class);

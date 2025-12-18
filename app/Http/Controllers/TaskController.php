@@ -9,6 +9,7 @@ use App\Models\Department;
 use App\Models\Report;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\TreeHelperLv2Only;
+use Illuminate\Support\Facades\DB;
 
 class TaskController extends Controller
 {
@@ -285,4 +286,62 @@ class TaskController extends Controller
         ]);
     }
 
+
+    public function bulkUpdateTasks(Request $request)
+    {
+        $rateKeys = array_keys(config('rates', []));
+
+        $data = $request->validate([
+            'ids' => ['required','array','min:1'],
+            'ids.*' => ['integer','distinct','exists:tasks,id'],
+
+            'apply_expected' => ['nullable','boolean'],
+            'expected_costs' => ['nullable','integer','min:0','required_if:apply_expected,1'],
+
+            'apply_rate' => ['nullable','boolean'],
+            'rate' => ['nullable', 'required_if:apply_rate,1', 'in:'.implode(',', $rateKeys)],
+
+            'apply_approved' => ['nullable','boolean'],
+            'approved_action' => ['nullable','required_if:apply_approved,1','in:approve,unapprove'],
+        ]);
+
+        $ids = $data['ids'];
+
+        $updatedRows = [];
+
+        DB::transaction(function () use ($data, $ids, &$updatedRows) {
+            $tasks = Task::whereIn('id', $ids)->get();
+
+            foreach ($tasks as $t) {
+                if (!empty($data['apply_expected'])) {
+                    $t->expected_costs = (int)$data['expected_costs'];
+                    // nếu bạn muốn đồng bộ total_costs luôn:
+                    $t->total_costs = (int)$t->days * (int)$t->expected_costs;
+                }
+
+                if (!empty($data['apply_rate'])) {
+                    $t->rate = $data['rate'];
+                }
+
+                if (!empty($data['apply_approved'])) {
+                    $t->approved = ($data['approved_action'] === 'approve') ? 1 : 0;
+                }
+
+                $t->save();
+
+                $updatedRows[] = [
+                    'id' => $t->id,
+                    'expected_costs' => (int)$t->expected_costs,
+                    'rate' => (string)$t->rate,
+                    'approved' => (int)$t->approved,
+                    'total_costs' => (int)($t->total_costs ?? ($t->days * $t->expected_costs)),
+                ];
+            }
+        });
+
+        return response()->json([
+            'message' => 'Đã cập nhật hàng loạt thành công!',
+            'rows' => $updatedRows,
+        ]);
+    }
 }
