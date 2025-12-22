@@ -44,7 +44,7 @@
           </li>
 
           <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/task" title="Welcome page" data-placement="left">
+            <a class="js-nav-tooltip-link nav-link " href="account/task/user" title="Welcome page" data-placement="left">
                <i class="tio-layers-outlined nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Quản lý Marketing</span>
             </a>

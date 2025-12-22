@@ -15,6 +15,16 @@ use Illuminate\Validation\ValidationException;
 
 class TaskController extends Controller
 {
+    public function show()
+    {
+        $user = Auth::user();
+        $tasks = Task::where('department_lv2', $user->department_lv2)->get();
+        return view('account.task.taskuser', compact(
+            'user',
+            'tasks',
+        ));
+    }
+
     public function index(Request $request)
     {
         $user = Auth::user();
