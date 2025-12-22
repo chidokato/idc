@@ -36,67 +36,51 @@
   <div class="card">
   <!-- Header -->
   <div class="card-header">
-  <div class="row justify-content-between align-items-center flex-grow-1">
-  <div class="col-sm-6 col-md-4 mb-3 mb-sm-0">
-  <form>
-  <!-- Search -->
-  <div class="input-group input-group-merge input-group-flush">
-  <div class="input-group-prepend">
-  <div class="input-group-text">
-  <i class="tio-search"></i>
-  </div>
-  </div>
-  <input id="datatableSearch" type="search" class="form-control" placeholder="Search users" aria-label="Search users">
-  </div>
-  <!-- End Search -->
-  </form>
-  </div>
-  <div class="col-sm-6">
-  <div class="d-sm-flex justify-content-sm-end align-items-sm-center">
-  <!-- Datatable Info -->
-  <div id="datatableCounterInfo" class="mr-2 mb-2 mb-sm-0" style="display: none;">
-  <div class="d-flex align-items-center">
-  <span class="font-size-sm mr-3">
-  <span id="datatableCounter">0</span>
-  Selected
-  </span>
-  <a class="btn btn-sm btn-outline-danger" href="javascript:;">
-  <i class="tio-delete-outlined"></i> Delete
-  </a>
-  </div>
-  </div>
-  <!-- End Datatable Info -->
-  </div>
-  </div>
-  </div>
+    <div class="row justify-content-between align-items-center flex-grow-1">
+      <div class="col-sm-6 col-md-4 mb-3 mb-sm-0">
+        <form>
+          <!-- Search -->
+          <div class="input-group input-group-merge input-group-flush">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+              <i class="tio-search"></i>
+              </div>
+            </div>
+            <input id="quickSearch" type="search" class="form-control"
+       placeholder="Tìm kiếm nhanh" aria-label="Search">
+          </div>
+          <!-- End Search -->
+        </form>
+      </div>
+    </div>
   <!-- End Row -->
   </div>
   <!-- End Header -->
   <!-- Table -->
   <div class="table-responsive datatable-custom">
-  <table class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
-  <thead class="thead-light">
-  <tr>
-    <th class="table-column-pr-0">
-    <div class="custom-control custom-checkbox">
-    <input id="datatableCheckAll" type="checkbox" class="custom-control-input">
-    <label class="custom-control-label" for="datatableCheckAll"></label>
-    </div>
-    </th>
-    <th>Mã NV</th>
-    <th>Họ & Tên</th>
-    <th>Phòng / nhóm</th>
-    <th>Dự án</th>
-    <th>Kênh</th>
-    <th>Tổng tiền</th>
-    <th>Hỗ trợ</th>
-    <th>Tiền nộp</th>
-    <th>Đóng tiền</th>
-    <th>Ghi chú</th>
-  </tr>
-  </thead>
+  <table id="taskTable" class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
+    <thead class="thead-light">
+      <tr>
+        <th class="table-column-pr-0">
+        <div class="custom-control custom-checkbox">
+        <input id="datatableCheckAll" type="checkbox" class="custom-control-input">
+        <label class="custom-control-label" for="datatableCheckAll"></label>
+        </div>
+        </th>
+        <th>Mã NV</th>
+        <th>Họ & Tên</th>
+        <th>Phòng / nhóm</th>
+        <th>Dự án</th>
+        <th>Kênh</th>
+        <th>Tổng tiền</th>
+        <th>Hỗ trợ</th>
+        <th>Tiền nộp</th>
+        <th>Đóng tiền</th>
+        <th>Ghi chú</th>
+      </tr>
+    </thead>
   <tbody>
-@foreach($tasks as $task)
+  @foreach($tasks as $task)
   <tr>
     <td class="table-column-pr-0">
       <div class="custom-control custom-checkbox">
@@ -154,5 +138,57 @@
 
 
 @section('js')
+<script>
+  (function () {
+    const input = document.getElementById('quickSearch');
+    const table = document.getElementById('taskTable');
+    if (!input || !table) return;
+
+    const tbody = table.tBodies[0];
+    const noResultRow = document.getElementById('noResultRow');
+
+    // Lấy tất cả row TR (trừ noResultRow)
+    const rows = Array.from(tbody.querySelectorAll('tr'))
+      .filter(tr => tr.id !== 'noResultRow');
+
+    function normalize(text) {
+      return (text || '')
+        .toString()
+        .toLowerCase()
+        .normalize('NFD')                 // bỏ dấu tiếng Việt
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function filterRows() {
+      const q = normalize(input.value);
+      let visibleCount = 0;
+
+      rows.forEach(tr => {
+        // textContent lấy toàn bộ text trong dòng (mã NV, họ tên, phòng, dự án, ghi chú...)
+        const rowText = normalize(tr.textContent);
+        const match = rowText.includes(q);
+
+        tr.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+      });
+
+      if (noResultRow) {
+        noResultRow.style.display = (visibleCount === 0) ? '' : 'none';
+      }
+    }
+
+    // debounce để gõ mượt
+    let t = null;
+    input.addEventListener('input', function () {
+      clearTimeout(t);
+      t = setTimeout(filterRows, 150);
+    });
+
+    // lọc ngay lần đầu (nếu input có sẵn)
+    filterRows();
+  })();
+</script>
 
 @endsection
