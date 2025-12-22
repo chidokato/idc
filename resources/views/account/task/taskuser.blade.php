@@ -38,14 +38,22 @@
 
   <div class="col-sm-3 col-md-3 mb-3 mb-sm-0">
     <select name="report_id" id="filterReport" class="form-control">
-      <option value="">-- Chọn thời gian --</option>
-      @foreach($reports as $report)
-        <option value="{{ $report->id }}" {{ (int)($reportId ?? 0) === (int)$report->id ? 'selected' : '' }}>
-          {{ $report->name }}
-        </option>
-      @endforeach
-</select>
+        <option value="">-- Chọn thời gian --</option>
+        @foreach($reports as $report)
+          <option value="{{ $report->id }}" {{ (int)($reportId ?? 0) === (int)$report->id ? 'selected' : '' }}>
+            {{ $report->name }}
+          </option>
+        @endforeach
+  </select>
   </div>
+
+  <!-- <div class="col-sm-3 col-md-3 mb-3 mb-sm-0">
+    <select name="report_id" id="filterReport" class="form-control">
+        <option value="">-- Duyệt ?? --</option>
+        
+  </select>
+  </div> -->
+
 </div>
   <!-- End Row -->
   </div>
@@ -53,11 +61,24 @@
   <!-- Table -->
   <div class="table-responsive datatable-custom">
     <table id="taskTable" class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
-      <thead class="thead-light"> <tr> <th class="table-column-pr-0"> <div class="custom-control custom-checkbox"> <input id="datatableCheckAll" type="checkbox" class="custom-control-input"> <label class="custom-control-label" for="datatableCheckAll"></label> </div> </th> <th>Mã NV</th> <th>Họ & Tên</th> <th>Phòng / nhóm</th> <th>Dự án</th> <th>Kênh</th> <th>Tổng tiền</th> <th>Hỗ trợ</th> <th>Tiền nộp</th> <th>Đóng tiền</th> <th>Ghi chú</th> </tr> </thead>
+      <thead class="thead-light"> <tr> <th class="table-column-pr-0"> <div class="custom-control custom-checkbox"> <input id="datatableCheckAll" type="checkbox" class="custom-control-input"> <label class="custom-control-label" for="datatableCheckAll"></label> </div> </th> <th>Mã NV</th> <th>Họ & Tên</th> <th>Phòng / nhóm</th> <th>Dự án</th> <th>Kênh</th> <th>Tổng tiền</th> <th>Hỗ trợ</th> <th>Tiền nộp</th> <th>Đóng tiền</th> <th>Ghi chú</th> </tr>
+
+        @if($tasks->count())
+          <tr class="font-weight-bold bg-light">
+            <td colspan="6" class="text-end">Tổng:</td>
+            <td class="text-end" id="sumTotalText">{{ number_format($sumTotal, 0, ',', '.') }}</td>
+            <td></td>
+            <td class="text-end" id="sumPaidText">{{ number_format($sumPaid, 0, ',', '.') }}</td>
+            <td colspan="2"></td>
+          </tr>
+        @endif
+        
+      </thead>
 
       <tbody id="taskTableBody">
-    @include('account.task.partials.task_rows', ['tasks' => $tasks])
-  </tbody>
+
+        @include('account.task.partials.task_rows', ['tasks' => $tasks])
+      </tbody>
     </table>
   </div>
   <!-- End Table -->
@@ -121,13 +142,22 @@
   })();
 </script>
 
-
 <script>
 $(function () {
   const $dept = $('#filterDepartment');
   const $report = $('#filterReport');
   const $tbody = $('#taskTableBody');
+
+  // nơi hiển thị tổng (nếu không có thì sẽ tự bỏ qua)
+  const $sumTotalText = $('#sumTotalText');
+  const $sumPaidText  = $('#sumPaidText');
+
   let xhr = null;
+
+  function formatVND(n) {
+    n = Number(n || 0);
+    return n.toLocaleString('vi-VN');
+  }
 
   function loadTasks() {
     const department_id = $dept.val();
@@ -141,8 +171,13 @@ $(function () {
       url: "{{ route('tasks.user') }}",
       type: "GET",
       data: { department_id, report_id },
+      dataType: "json",
       success: function (res) {
         $tbody.html(res.html || '');
+
+        // cập nhật tổng (nếu backend có trả về sumTotal/sumPaid)
+        if ($sumTotalText.length) $sumTotalText.text(formatVND(res.sumTotal));
+        if ($sumPaidText.length)  $sumPaidText.text(formatVND(res.sumPaid));
       },
       error: function (xhr) {
         if (xhr.statusText === 'abort') return;
@@ -155,6 +190,7 @@ $(function () {
   $report.on('change', loadTasks);
 });
 </script>
+
 
 
 

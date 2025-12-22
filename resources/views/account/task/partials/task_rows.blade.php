@@ -1,4 +1,16 @@
+
+
+
 @forelse($tasks as $task)
+@php
+    // dùng lại cách ép số giống controller (nhanh gọn ở đây)
+    $cost = (float) preg_replace('/[^\d\-]/', '', (string)($task->expected_costs ?? 0));
+    $days = (float) preg_replace('/[^0-9\.\-]/', '', str_replace(',', '.', (string)($task->days ?? 0)));
+    $rate = (float) preg_replace('/[^0-9\.\-]/', '', str_replace(',', '.', (string)($task->rate ?? 0)));
+
+    $rowTotal = $cost * $days;
+    $rowPaid  = $rowTotal * (1 - $rate/100);
+  @endphp
   <tr>
     <td class="table-column-pr-0">
       <div class="custom-control custom-checkbox">
@@ -39,3 +51,5 @@
     <td colspan="11" class="text-center text-muted py-4">Không có dữ liệu phù hợp</td>
   </tr>
 @endforelse
+
+

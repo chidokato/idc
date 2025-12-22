@@ -67,13 +67,26 @@ class TaskController extends Controller
 
         $tasks = $q->get();
 
+        // tính tổng
+        $sumTotal = 0;
+        $sumPaid  = 0;
+
+        foreach ($tasks as $task) {
+            $rowTotal = $task->expected_costs * $task->days;
+            $rowPaid  = $rowTotal * (1 - $task->rate / 100);
+
+            $sumTotal += $rowTotal;
+            $sumPaid  += $rowPaid;
+        }
+
         // ===== AJAX: chỉ trả tbody rows =====
         if ($request->ajax()) {
             $html = view('account.task.partials.task_rows', compact('tasks'))->render();
 
             return response()->json([
-                'html'  => $html,
-                'count' => $tasks->count(),
+              'html' => $html,
+              'sumTotal' => $sumTotal,
+              'sumPaid' => $sumPaid,
             ]);
         }
 
@@ -90,14 +103,35 @@ class TaskController extends Controller
             'name'
         );
 
+
         return view('account.task.taskuser', compact(
             'user',
             'tasks',
             'departmentOptions',
             'selectedDeptId',
             'reports',
-            'reportId'
+            'reportId',
+            'sumTotal',
+            'sumPaid'
         ));
+    }
+
+    private function moneyToFloat($v): float
+    {
+        $s = (string) ($v ?? '');
+        $s = preg_replace('/[^\d\-]/', '', $s); // chỉ giữ số và dấu -
+        return (float) ($s ?: 0);
+    }
+
+    /**
+     * Số thường (days, rate): cho phép "10,5" -> 10.5
+     */
+    private function numToFloat($v): float
+    {
+        $s = (string) ($v ?? '');
+        $s = str_replace(',', '.', $s);
+        $s = preg_replace('/[^0-9\.\-]/', '', $s);
+        return (float) ($s ?: 0);
     }
 
     /**
