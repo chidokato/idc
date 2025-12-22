@@ -4,8 +4,8 @@
       <div class="navbar-brand-wrapper justify-content-between">
         <!-- Logo -->
           <a class="navbar-brand" href="{{asset('')}}" aria-label="Front">
-            <img class="navbar-brand-logo" src="img/logo/logo.svg" alt="Logo">
-            <img class="navbar-brand-logo-mini" src="img/logo/logomini.svg" alt="Logo">
+            <img class="navbar-brand-logo" src="account/img/logo/logo.svg" alt="Logo">
+            <img class="navbar-brand-logo-mini" src="account/img/logo/logomini.svg" alt="Logo">
           </a>
         
         <!-- End Logo -->
@@ -22,7 +22,7 @@
         <ul class="navbar-nav navbar-nav-lg nav-tabs">
           <!-- Dashboards -->
           <li class="navbar-vertical-aside-has-menu show">
-            <a class="js-navbar-vertical-aside-menu-link nav-link active" href="main" title="Dashboards">
+            <a class="js-navbar-vertical-aside-menu-link nav-link active" href="account/main" title="Dashboards">
               <i class="tio-home-vs-1-outlined nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Trang chủ</span>
             </a>
@@ -37,23 +37,42 @@
           <!-- Pages -->
           
           <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="mkt-register" title="Welcome page" data-placement="left">
-              <i class="tio-visible-outlined nav-icon"></i>
+            <a class="js-nav-tooltip-link nav-link " href="account/mkt-register" title="Welcome page" data-placement="left">
+              <i class="tio-add-circle nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Đăng ký Marketing</span>
             </a>
           </li>
 
           <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="task" title="Welcome page" data-placement="left">
-              <i class="tio-visible-outlined nav-icon"></i>
+            <a class="js-nav-tooltip-link nav-link " href="account/task" title="Welcome page" data-placement="left">
+               <i class="tio-layers-outlined nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Quản lý Marketing</span>
             </a>
           </li>
 
           <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="report" title="Welcome page" data-placement="left">
-              <i class="tio-visible-outlined nav-icon"></i>
+            <a class="js-nav-tooltip-link nav-link " href="account/report" title="Welcome page" data-placement="left">
+              <i class="tio-dashboard nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Quản lý tổng</span>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <small class="nav-subtitle" title="Pages">Quản lý tiền</small>
+            <small class="tio-more-horizontal nav-subtitle-replacer"></small>
+          </li>
+
+          <li class="nav-item ">
+            <a class="js-nav-tooltip-link nav-link " href="account/wallet" title="Welcome page" data-placement="left">
+              <i class="tio-wallet nav-icon"></i>
+              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Ví tiền</span>
+            </a>
+          </li>
+
+          <li class="nav-item ">
+            <a class="js-nav-tooltip-link nav-link " href="account/wallet/deposit" title="Welcome page" data-placement="left">
+              <i class="tio-money nav-icon"></i>
+              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Nạp tiền</span>
             </a>
           </li>
 

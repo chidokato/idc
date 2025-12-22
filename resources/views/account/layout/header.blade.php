@@ -2,9 +2,9 @@
   <div class="navbar-nav-wrap">
     <div class="navbar-brand-wrapper">
       <!-- Logo -->
-      <a class="navbar-brand" href="index.html" aria-label="Front">
-        <img class="navbar-brand-logo" src="svg\logos\logo.svg" alt="Logo">
-        <img class="navbar-brand-logo-mini" src="svg\logos\logo-short.svg" alt="Logo">
+      <a class="navbar-brand" href="{{asset('')}}" aria-label="Front">
+        <img class="navbar-brand-logo" src="account/img/logo/logo.svg" alt="Logo">
+            <img class="navbar-brand-logo-mini" src="account/img/logo/logomini.svg" alt="Logo">
       </a>
       <!-- End Logo -->
     </div>
@@ -22,6 +22,74 @@
     <div class="navbar-nav-wrap-content-right">
       <!-- Navbar -->
       <ul class="navbar-nav align-items-center flex-row">
+              <li class="nav-item d-none d-sm-inline-block">
+          <!-- Apps -->
+          <div class="hs-unfold">
+            <a class="js-hs-unfold-invoker btn btn-icon btn-ghost-secondary rounded-circle" href="javascript:;" data-hs-unfold-options="{
+                 &quot;target&quot;: &quot;#appsDropdown&quot;,
+                 &quot;type&quot;: &quot;css-animation&quot;
+               }" data-hs-unfold-target="#appsDropdown" data-hs-unfold-invoker="">
+              <i class="tio-menu-vs-outlined"></i>
+            </a>
+
+            <div id="appsDropdown" class="hs-unfold-content dropdown-unfold dropdown-menu dropdown-menu-right navbar-dropdown-menu hs-unfold-content-initialized hs-unfold-css-animation animated hs-unfold-hidden" style="width: 25rem; animation-duration: 300ms;" data-hs-target-height="450.438" data-hs-unfold-content="" data-hs-unfold-content-animation-in="slideInUp" data-hs-unfold-content-animation-out="fadeOut">
+              <!-- Header -->
+              <div class="card-header">
+                <span class="card-title h4">Web apps &amp; services</span>
+              </div>
+              <!-- End Header -->
+
+              <!-- Body -->
+              <div class="card-body card-body-height">
+                <!-- Nav -->
+                <div class="nav nav-pills flex-column">
+                  <a class="nav-link" href="#">
+                    <div class="media align-items-center">
+                      <span class="mr-3">
+                        <img class="avatar avatar-xs avatar-4by3" src="assets\svg\brands\atlassian.svg" alt="Image Description">
+                      </span>
+                      <div class="media-body text-truncate">
+                        <span class="h5 mb-0">Atlassian</span>
+                        <span class="d-block font-size-sm text-body">Security and control across Cloud</span>
+                      </div>
+                    </div>
+                  </a>
+
+                  <a class="nav-link" href="#">
+                    <div class="media align-items-center">
+                      <span class="mr-3">
+                        <img class="avatar avatar-xs avatar-4by3" src="assets\svg\brands\slack.svg" alt="Image Description">
+                      </span>
+                      <div class="media-body text-truncate">
+                        <span class="h5 mb-0">Slack <span class="badge badge-primary badge-pill text-uppercase ml-1">Try</span></span>
+                        <span class="d-block font-size-sm text-body">Email collaboration software</span>
+                      </div>
+                    </div>
+                  </a>
+
+                  <a class="nav-link" href="#">
+                    <div class="media align-items-center">
+                      <span class="mr-3">
+                        <img class="avatar avatar-xs avatar-4by3" src="assets\svg\brands\google-webdev.svg" alt="Image Description">
+                      </span>
+                      <div class="media-body text-truncate">
+                        <span class="h5 mb-0">Google webdev</span>
+                        <span class="d-block font-size-sm text-body">Work involved in developing a website</span>
+                      </div>
+                    </div>
+                  </a>
+
+                  
+                </div>
+                <!-- End Nav -->
+              </div>
+              <!-- End Body -->
+
+            
+            </div>
+          </div>
+          <!-- End Apps -->
+        </li>
         <li class="nav-item">
           <!-- Account -->
           <div class="hs-unfold">

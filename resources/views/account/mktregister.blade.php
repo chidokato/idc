@@ -23,6 +23,7 @@
 
               <h1 class="page-header-title">Đăng ký marketing</h1>
             </div>
+
           </div>
           <!-- End Row -->
         </div>
@@ -118,6 +119,8 @@
                                                 <option value="1000000">1.000.000 đ</option>
                                                 <option value="500000">500.000 đ</option>
                                                 <option value="300000">300.000 đ</option>
+                                                <option value="1100">1.100 đ</option>
+                                                <option value="800">800 đ</option>
                                             </select>
                                         </td>
                                         <td><input class="form-control" type="text" name="content[]" placeholder="Hỗ trợ, chạy chung ..."></td>

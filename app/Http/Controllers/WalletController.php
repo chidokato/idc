@@ -49,7 +49,14 @@ class WalletController extends Controller
         $deposits = Deposit::where('user_id', auth()->id())
         ->latest()
         ->paginate(10);
-        return view('account.wallet.deposit', compact('deposits'));
+
+        $user = auth()->user();
+
+        $wallet = $user->wallet()->firstOrCreate([
+            'user_id' => $user->id
+        ]);
+
+        return view('account.wallet.deposit', compact('deposits', 'wallet', 'user'));
     }
 
 
