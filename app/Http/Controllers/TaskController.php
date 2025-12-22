@@ -10,19 +10,120 @@ use App\Models\Department;
 use App\Models\Report;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\TreeHelperLv2Only;
+use App\Helpers\TreeHelper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Schema;
 
 class TaskController extends Controller
 {
-    public function show()
+    public function show(Request $request, Task $task = null)
+    {
+        // nếu bạn không dùng show chi tiết task, cho nó chạy như trang danh sách
+        return $this->tasksuser($request);
+    }
+    
+
+    public function tasksuser(Request $request)
     {
         $user = Auth::user();
-        $tasks = Task::where('department_lv2', $user->department_lv2)->get();
+
+        // Load departments 1 lần để: (1) build options (2) lấy danh sách con cháu nhanh
+        $departments = Department::select('id', 'parent', 'name')
+            ->orderBy('name')
+            ->get();
+
+        // selected department: ưu tiên request, không có thì lấy department_lv2 của user
+        $selectedDeptId = (int) $request->input('department_id', $user->department_lv2 ?? 0);
+        if ($selectedDeptId <= 0) {
+            $selectedDeptId = (int) ($user->department_lv2 ?? 0);
+        }
+
+        // report filter (nếu có)
+        $reportId = (int) $request->input('report_id', 0);
+
+        // Lấy tất cả id con cháu + chính nó (KHÔNG N+1 query)
+        $deptIds = [];
+        if ($selectedDeptId > 0) {
+            $deptIds = $this->getChildIdsFromCollection($departments, $selectedDeptId);
+        }
+
+        // Query tasks theo department_id IN (...)
+        $q = Task::query()
+            ->with(['handler', 'department', 'Post', 'channel'])
+            ->orderByDesc('id');
+
+        if (!empty($deptIds)) {
+            $q->whereIn('department_id', $deptIds);
+        } else {
+            // nếu không xác định được phòng ban => trả rỗng
+            $q->whereRaw('1=0');
+        }
+
+        // nếu tasks có cột report_id thì mới lọc
+        if ($reportId > 0 && Schema::hasColumn('tasks', 'report_id')) {
+            $q->where('report_id', $reportId);
+        }
+
+        $tasks = $q->get();
+
+        // ===== AJAX: chỉ trả tbody rows =====
+        if ($request->ajax()) {
+            $html = view('account.task.partials.task_rows', compact('tasks'))->render();
+
+            return response()->json([
+                'html'  => $html,
+                'count' => $tasks->count(),
+            ]);
+        }
+
+        // ===== Render trang =====
+        $reports = Report::orderByDesc('id')->get();
+
+        $departmentOptions = TreeHelper::buildOptions(
+            $departments,
+            0,
+            '',
+            $selectedDeptId,
+            'id',
+            'parent',
+            'name'
+        );
+
         return view('account.task.taskuser', compact(
             'user',
             'tasks',
+            'departmentOptions',
+            'selectedDeptId',
+            'reports',
+            'reportId'
         ));
+    }
+
+    /**
+     * Lấy tất cả id con cháu + chính nó từ collection departments (không query thêm)
+     */
+    private function getChildIdsFromCollection($departments, int $rootId): array
+    {
+        $childrenMap = [];
+
+        foreach ($departments as $d) {
+            $p = (int) ($d->parent ?? 0);
+            $childrenMap[$p][] = (int) $d->id;
+        }
+
+        $ids = [$rootId];
+        $stack = [$rootId];
+
+        while (!empty($stack)) {
+            $cur = array_pop($stack);
+            foreach (($childrenMap[$cur] ?? []) as $childId) {
+                $ids[] = $childId;
+                $stack[] = $childId;
+            }
+        }
+
+        return array_values(array_unique($ids));
     }
 
     public function index(Request $request)

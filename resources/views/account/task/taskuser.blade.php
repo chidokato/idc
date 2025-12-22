@@ -9,7 +9,6 @@
 @section('body') @endsection
 
 @section('content')
-
 <div class="content container-fluid">
   <div class="page-header">
     <div class="row align-items-end">
@@ -20,115 +19,46 @@
             <li class="breadcrumb-item active" aria-current="page">Danh sách link đăng ký MKT</li>
           </ol>
         </nav>
-
         <h1 class="page-header-title">Danh sách link đăng ký MKT</h1>
       </div>
-
-      <!-- <div class="col-sm-auto">
-        <a class="btn btn-primary" href="users-add-user.html">
-          <i class="tio-user-add mr-1"></i> Add user
-        </a>
-      </div> -->
+      
     </div>
     <!-- End Row -->
   </div>
-
   <div class="card">
   <!-- Header -->
   <div class="card-header">
-    <div class="row justify-content-between align-items-center flex-grow-1">
-      <div class="col-sm-6 col-md-4 mb-3 mb-sm-0">
-        <form>
-          <!-- Search -->
-          <div class="input-group input-group-merge input-group-flush">
-            <div class="input-group-prepend">
-              <div class="input-group-text">
-              <i class="tio-search"></i>
-              </div>
-            </div>
-            <input id="quickSearch" type="search" class="form-control"
-       placeholder="Tìm kiếm nhanh" aria-label="Search">
-          </div>
-          <!-- End Search -->
-        </form>
-      </div>
-    </div>
+    <div class="row align-items-center flex-grow-1" id="filterBar">
+  <div class="col-sm-3 col-md-3 mb-3 mb-sm-0">
+    <select name="department_id" id="filterDepartment" class="form-control">
+      <option value="">-- Chọn phòng ban --</option>
+      {!! $departmentOptions !!}
+    </select>
+  </div>
+
+  <div class="col-sm-3 col-md-3 mb-3 mb-sm-0">
+    <select name="report_id" id="filterReport" class="form-control">
+      <option value="">-- Chọn thời gian --</option>
+      @foreach($reports as $report)
+        <option value="{{ $report->id }}" {{ (int)($reportId ?? 0) === (int)$report->id ? 'selected' : '' }}>
+          {{ $report->name }}
+        </option>
+      @endforeach
+</select>
+  </div>
+</div>
   <!-- End Row -->
   </div>
   <!-- End Header -->
   <!-- Table -->
   <div class="table-responsive datatable-custom">
-  <table id="taskTable" class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
-    <thead class="thead-light">
-      <tr>
-        <th class="table-column-pr-0">
-        <div class="custom-control custom-checkbox">
-        <input id="datatableCheckAll" type="checkbox" class="custom-control-input">
-        <label class="custom-control-label" for="datatableCheckAll"></label>
-        </div>
-        </th>
-        <th>Mã NV</th>
-        <th>Họ & Tên</th>
-        <th>Phòng / nhóm</th>
-        <th>Dự án</th>
-        <th>Kênh</th>
-        <th>Tổng tiền</th>
-        <th>Hỗ trợ</th>
-        <th>Tiền nộp</th>
-        <th>Đóng tiền</th>
-        <th>Ghi chú</th>
-      </tr>
-    </thead>
-  <tbody>
-  @foreach($tasks as $task)
-  <tr>
-    <td class="table-column-pr-0">
-      <div class="custom-control custom-checkbox">
-        <input id="datatableCheck{{ $task->id }}" type="checkbox" class="custom-control-input row-check" value="{{ $task->id }}">
-        <label class="custom-control-label" for="datatableCheck{{ $task->id }}"></label>
-      </div>
-    </td>
+    <table id="taskTable" class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
+      <thead class="thead-light"> <tr> <th class="table-column-pr-0"> <div class="custom-control custom-checkbox"> <input id="datatableCheckAll" type="checkbox" class="custom-control-input"> <label class="custom-control-label" for="datatableCheckAll"></label> </div> </th> <th>Mã NV</th> <th>Họ & Tên</th> <th>Phòng / nhóm</th> <th>Dự án</th> <th>Kênh</th> <th>Tổng tiền</th> <th>Hỗ trợ</th> <th>Tiền nộp</th> <th>Đóng tiền</th> <th>Ghi chú</th> </tr> </thead>
 
-    <td>{{ $task->handler?->employee_code }}</td>
-
-    <td>{{ $task->handler?->yourname }}</td>
-
-    <td>
-      {{ $task->department?->name }}
-    </td>
-
-    <td>{{ $task->Post?->name }}</td>
-
-    <td>{{ $task->channel?->name ?? $task->channel ?? '' }}</td>
-
-    <td class="text-end">
-      {{ number_format((float)($task->expected_costs * $task->days), 0, ',', '.') }}
-    </td>
-
-    <td class="text-end">
-     {{ $task->rate }}%
-    </td>
-
-    <td class="text-end">
-      {{ number_format((float)( ($task->expected_costs * $task->days) * (1-$task->rate/100)  ), 0, ',', '.') }}
-    </td>
-
-    {{-- Đóng tiền (trạng thái) --}}
-    <td>
-      @if(($task->paid ?? 0) == 1)
-        <span class="badge badge-soft-success">Đã đóng</span>
-      @else
-        <span class="badge badge-soft-warning">Chưa đóng</span>
-      @endif
-    </td>
-
-    {{-- Ghi chú --}}
-    <td>{{ $task->note ?? '' }}</td>
-  </tr>
-@endforeach
-</tbody>
-
-  </table>
+      <tbody id="taskTableBody">
+    @include('account.task.partials.task_rows', ['tasks' => $tasks])
+  </tbody>
+    </table>
   </div>
   <!-- End Table -->
   </div>
@@ -190,5 +120,42 @@
     filterRows();
   })();
 </script>
+
+
+<script>
+$(function () {
+  const $dept = $('#filterDepartment');
+  const $report = $('#filterReport');
+  const $tbody = $('#taskTableBody');
+  let xhr = null;
+
+  function loadTasks() {
+    const department_id = $dept.val();
+    const report_id = $report.val();
+
+    if (xhr) xhr.abort();
+
+    $tbody.html(`<tr><td colspan="11" class="text-center py-4 text-muted">Đang tải...</td></tr>`);
+
+    xhr = $.ajax({
+      url: "{{ route('tasks.user') }}",
+      type: "GET",
+      data: { department_id, report_id },
+      success: function (res) {
+        $tbody.html(res.html || '');
+      },
+      error: function (xhr) {
+        if (xhr.statusText === 'abort') return;
+        $tbody.html(`<tr><td colspan="11" class="text-center py-4 text-danger">Có lỗi xảy ra!</td></tr>`);
+      }
+    });
+  }
+
+  $dept.on('change', loadTasks);
+  $report.on('change', loadTasks);
+});
+</script>
+
+
 
 @endsection

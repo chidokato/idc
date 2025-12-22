@@ -37,7 +37,6 @@
         <div class="card h-100">
         <div class="card-body">
         <h6 class="card-subtitle mb-2">Tổng tiền hiện có</h6>
-
         <div class="row align-items-center gx-2">
         <div class="col">
         <span class="js-counter display-4 text-dark" data-value="{{ number_format($wallet->balance) }}">{{ number_format($wallet->balance) }}</span>
@@ -109,8 +108,6 @@
           <!-- Header -->
           <div class="card-header">
                     <h5 class="card-header-title">Lịch sử</h5>
-
-                    
                   </div>
           <!-- End Header -->
 
