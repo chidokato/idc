@@ -51,7 +51,7 @@ class TaskController extends Controller
         // Query tasks theo department_id IN (...)
         $q = Task::query()
             ->with(['handler', 'department', 'Post', 'channel'])
-            ->orderByDesc('id');
+            ->orderByDesc('department_lv2');
 
         if (!empty($deptIds)) {
             $q->whereIn('department_id', $deptIds);
