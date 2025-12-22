@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 use App\Models\WalletTransaction;
 use App\Models\Deposit;
@@ -45,7 +46,10 @@ class WalletController extends Controller
 
     public function depositForm()
     {
-        return view('account.wallet.deposit');
+        $deposits = Deposit::where('user_id', auth()->id())
+        ->latest()
+        ->paginate(10);
+        return view('account.wallet.deposit', compact('deposits'));
     }
 
 
@@ -55,13 +59,30 @@ class WalletController extends Controller
             'amount' => 'required|numeric|min:10000',
             'bank_name' => 'required|string|max:255',
             'transaction_code' => 'required|string|max:255',
+            'proof_image'      => 'required|image|max:2048', // tối đa 2MB
         ]);
+
+        $user = Auth::user();
+
+        $imagePath = null;
+        if ($request->hasFile('proof_image')) {
+            $file = $request->file('proof_image');
+
+            $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+
+            $imagePath = $file->storeAs(
+                'deposits',
+                $filename,
+                'public'
+            );
+        }
 
         Deposit::create([
             'user_id' => auth()->id(),
             'amount' => $request->amount,
             'bank_name' => $request->bank_name,
             'transaction_code' => $request->transaction_code,
+            'proof_image'      => $imagePath,
             'status' => 'pending',
         ]);
 

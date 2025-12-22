@@ -5,10 +5,7 @@
 @section('robots') index, follow @endsection
 @section('url'){{asset('')}}@endsection
 
-
-
 @section('content')
-@include('account.layout.menu')
 <section class="card-grid news-sec">
     <div class="container">
         <div class="row">

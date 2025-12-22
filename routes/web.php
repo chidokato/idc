@@ -25,6 +25,8 @@ use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\ChannelController;
 use App\Http\Controllers\Admin\DuanController;
 
+use App\Http\Controllers\Admin\DepositController;
+
 use App\Http\Controllers\Admin\ProvinceController;
 use App\Http\Controllers\Admin\DistrictController;
 use App\Http\Controllers\Admin\WardController;
@@ -138,6 +140,9 @@ Route::prefix('admin')->group(function () {
         Route::post('duan/update-rate', [DuanController::class, 'updateRate'])->name('duan.updateRate');
         Route::post('duan/{id}/update-name', [DuanController::class, 'updateName'])->name('duan.updateName');
 
+        // deposits
+        Route::get('deposits', [DepositController::class, 'index'])->name('admin.deposits.index');
+        Route::post('deposits/{deposit}/update-status', [DepositController::class, 'updateStatus'])->name('admin.deposits.updateStatus');
         
     });
 
@@ -179,8 +184,9 @@ Route::middleware(['user'])->group(function () {
         Route::post('tasks/update-rate', [TaskController::class, 'updateRate'])->name('tasks.updateRate');
         Route::post('task/update-kpi', [TaskController::class, 'updateKpi'])->name('task.updateKpi');
         Route::post('task/update-expected-cost', [TaskController::class, 'updateExpectedCost'])->name('task.updateExpectedCost');
-        Route::post('tasks/{id}/update-paid', [TaskController::class, 'updatePaid'])->name('tasks.updatePaid');
+        // Route::post('tasks/{id}/update-paid', [TaskController::class, 'updatePaid'])->name('tasks.updatePaid');
         Route::post('tasks/bulk-update', [TaskController::class, 'bulkUpdateTasks'])->name('account.tasks.bulkUpdate');
+        Route::post('tasks/{task}/update-paid', [TaskController::class, 'updatePaid'])->name('tasks.updatePaid');
 
         // report
         Route::resource('report',ReportController::class);

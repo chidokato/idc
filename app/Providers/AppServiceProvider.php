@@ -28,12 +28,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Paginator::useBootstrap();
+        // Nếu bạn dùng BS4 thì đổi thành:
+        // Paginator::useBootstrapFour();
+
         View::composer('*', function ($view) {
-            $setting = Setting::find('1');
+            $setting = Setting::find(1); // có thể dùng số luôn
             $menu = Menu::orderBy('view', 'asc')->get();
-            view()->share( [
-                'setting'=>$setting,
-                'menu'=>$menu,
+
+            view()->share([
+                'setting' => $setting,
+                'menu'    => $menu,
             ]);
         });
     }

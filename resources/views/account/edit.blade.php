@@ -1,89 +1,424 @@
-@extends('layout.index')
+@extends('account.layout.index')
 
 @section('title') Công Ty Cổ Phần Bất Động Sản Indochine @endsection
-@section('description') Công Ty Cổ Phần Bất Động Sản Indochine là công ty thành viên của Đất Xanh Miền Bắc - UY TÍN số 1 thị trường BĐS Việt Nam @endsection
-@section('robots') index, follow @endsection
-@section('url'){{asset('')}}@endsection
 
 @section('css')
-<link href="assets/css/widget.css" rel="stylesheet">
-<link href="assets/css/news.css" rel="stylesheet">
-<link href="assets/css/account.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
 @endsection
 
-@section('content')
-@include('account.layout.menu')
+@section('body') data-offset="80" data-hs-scrollspy-options='{"target": "#navbarSettings"}' @endsection
 
-<section class="card-grid news-sec">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-2 d-none d-lg-block">
-                @include('account.layout.sitebar')
+@section('content')
+
+<div class="content container-fluid">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="row align-items-end">
+            <div class="col-sm mb-2 mb-sm-0">
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-no-gutter">
+                  <li class="breadcrumb-item"><a class="breadcrumb-link" href="javascript:;">Account</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Settings</li>
+                </ol>
+              </nav>
+
+              <h1 class="page-header-title">Settings</h1>
             </div>
 
-            <div class="col-lg-10">
+            <div class="col-sm-auto">
+              <a class="btn btn-primary" href="profile.php">
+                <i class="tio-user mr-1"></i> My profile
+              </a>
+            </div>
+          </div>
+          <!-- End Row -->
+        </div>
+        <!-- End Page Header -->
+
+        <div class="row">
+          <div class="col-lg-3">
+            <!-- Navbar -->
+            <div class="navbar-vertical navbar-expand-lg mb-3 mb-lg-5">
+              <!-- Navbar Toggle -->
+              <button type="button" class="navbar-toggler btn btn-block btn-white mb-3" aria-label="Toggle navigation" aria-expanded="false" aria-controls="navbarVerticalNavMenu" data-toggle="collapse" data-target="#navbarVerticalNavMenu">
+                <span class="d-flex justify-content-between align-items-center">
+                  <span class="h5 mb-0">Nav menu</span>
+
+                  <span class="navbar-toggle-default">
+                    <i class="tio-menu-hamburger"></i>
+                  </span>
+
+                  <span class="navbar-toggle-toggled">
+                    <i class="tio-clear"></i>
+                  </span>
+                </span>
+              </button>
+              <!-- End Navbar Toggle -->
+
+              <div id="navbarVerticalNavMenu" class="collapse navbar-collapse">
+                <!-- Navbar Nav -->
+                <ul id="navbarSettings" class="js-sticky-block js-scrollspy navbar-nav navbar-nav-lg nav-tabs card card-navbar-nav" data-hs-sticky-block-options='{
+                       "parentSelector": "#navbarVerticalNavMenu",
+                       "breakpoint": "lg",
+                       "startPoint": "#navbarVerticalNavMenu",
+                       "endPoint": "#stickyBlockEndPoint",
+                       "stickyOffsetTop": 20
+                     }'>
+                  <li class="nav-item">
+                    <a class="nav-link active" href="#content">
+                      <i class="tio-user-outlined nav-icon"></i> Basic information
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#emailSection">
+                      <i class="tio-online nav-icon"></i> Email
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#passwordSection">
+                      <i class="tio-lock-outlined nav-icon"></i> Password
+                    </a>
+                  </li>
+                
+                  <li class="nav-item">
+                    <a class="nav-link" href="#deleteAccountSection">
+                      <i class="tio-delete-outlined nav-icon"></i> Delete account
+                    </a>
+                  </li>
+                </ul>
+                <!-- End Navbar Nav -->
+              </div>
+            </div>
+            <!-- End Navbar -->
+          </div>
+
+          <div class="col-lg-9">
+            <!-- Card -->
+            <div class="card mb-3 mb-lg-5">
+              <!-- Profile Cover -->
+              <div class="profile-cover">
+                <div class="profile-cover-img-wrapper">
+                  <img id="profileCoverImg" class="profile-cover-img" src="img\1920x400\img2.jpg" alt="Image Description">
+
+                  <!-- Custom File Cover -->
+                  <!-- <div class="profile-cover-content profile-cover-btn">
+                    <div class="custom-file-btn">
+                      <input type="file" class="js-file-attach custom-file-btn-input" id="profileCoverUplaoder" data-hs-file-attach-options='{
+                                "textTarget": "#profileCoverImg",
+                                "mode": "image",
+                                "targetAttr": "src",
+                                "allowTypes": [".png", ".jpeg", ".jpg"]
+                             }'>
+                      <label class="custom-file-btn-label btn btn-sm btn-white" for="profileCoverUplaoder">
+                        <i class="tio-add-photo mr-sm-1"></i>
+                        <span class="d-none d-sm-inline-block">Update your header</span>
+                      </label>
+                    </div>
+                  </div> -->
+                  <!-- End Custom File Cover -->
+                </div>
+              </div>
+              <!-- End Profile Cover -->
+
+              <!-- Avatar -->
+              <label class="avatar avatar-xxl avatar-circle avatar-border-lg avatar-uploader profile-cover-avatar" for="avatarUploader">
+                <img id="avatarImg" class="avatar-img" src="{{ Auth::user()->avatar }}" alt="Image Description">
+
+                <!-- <input type="file" class="js-file-attach avatar-uploader-input" id="avatarUploader" data-hs-file-attach-options='{
+                          "textTarget": "#avatarImg",
+                          "mode": "image",
+                          "targetAttr": "src",
+                          "allowTypes": [".png", ".jpeg", ".jpg"]
+                       }'>
+
+                <span class="avatar-uploader-trigger">
+                  <i class="tio-edit avatar-uploader-icon shadow-soft"></i>
+                </span> -->
+              </label>
+              <!-- End Avatar -->
+
+              <!-- Body -->
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-sm-5">
+                    <!-- <span class="d-block font-size-sm mb-2">Who can see your profile photo? <i class="tio-help-outlined" data-toggle="tooltip" data-placement="top" title="Your visibility setting only applies to your profile photo. Your header image is always visible to anyone."></i></span> -->
+
+                    <!-- Select -->
+                    <!-- <div class="select2-custom">
+                      <select class="js-select2-custom custom-select" size="1" style="opacity: 0;" data-hs-select2-options='{
+                                "minimumResultsForSearch": "Infinity"
+                              }'>
+                        <option value="privacy1" data-option-template='<span class="media"><i class="tio-earth-east tio-lg text-body mr-2" style="margin-top: .125rem;"></i><span class="media-body"><span class="d-block">Anyone</span><small class="select2-custom-hide">Visible to anyone who can view your content. Accessible by installed apps.</small></span></span>'>Anyone</option>
+                        <option value="privacy2" data-option-template='<span class="media"><i class="tio-lock-outlined tio-lg text-body mr-2" style="margin-top: .125rem;"></i><span class="media-body"><span class="d-block">Only you</span><small class="select2-custom-hide">Only visible to you.</small></span></span>'>Only you</option>
+                      </select>
+                     </div> -->
+                    <!-- End Select -->
+                   </div>
+                </div>
+                <!-- End Row -->
+              </div>
+              <!-- End Body -->
+            </div>
+            <!-- End Card -->
+
+            <!-- Card -->
+            <div class="card mb-3 mb-lg-5">
+              <div class="card-header">
+                <h2 class="card-title h4">Thông tin cá nhân</h2>
+              </div>
+
+              <!-- Body -->
+              <div class="card-body">
+                <p class="">Nhóm / Sàn chỉ thay đổi được 1 lần. Vui lòng kiểm tra kỹ trước khi cập nhật !!!</p>
+                <p class=""><i>Lỗi hoặc không thực hiện được xin liên hệ: 0977572947 (zalo)</i></p>
+                <!-- Form -->
                 <form action="{{ route('account.update') }}" method="POST">
                     @csrf
-                    <div class="row input-group">
-                        <div class="col-md-2"></div>
-                        <div class="col-md-5"><h3>Sửa thông tin cá nhân</h3></div>
-                    </div>
-                    <div class="row input-group">
-                        <div class="col-md-2"><label>Mã nhân viên <span class="required">(*)</span></label></div>
-                        <div class="col-md-5"><input required type="text" name="employee_code" class="form-control" value="{{ $user->employee_code }}" placeholder="VD: IDC0116"></div>
-                    </div>
-                    <div class="row input-group">
-                        <div class="col-md-2"><label>Họ tên <span class="required">(*)</span></label></div>
-                        <div class="col-md-5"><input required type="text" name="yourname" class="form-control" value="{{ $user->yourname }}" placeholder="Họ & Tên"></div>
-                    </div>
-                    <div class="row input-group">
-                        <div class="col-md-2"><label>Nhóm / Sàn <span class="required">(*)</span> </label></div>
-                        <div class="col-md-5">
-                            <select {{ $user->department_id? 'disabled':'' }} class="form-control" name="department_id" required>
-                                <option value="">---</option>
-                                {!! $departmentOptions !!}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row input-group">
-                        <div class="col-md-2"><label>Email <span class="required">(*)</span></label></div>
-                        <div class="col-md-5"><input readonly type="text" name="email" class="form-control" value="{{ $user->email }}" placeholder="Email"></div>
-                    </div>
-                    <div class="row input-group">
-                        <div class="col-md-2"><label>Số điện thoại</label></div>
-                        <div class="col-md-5"><input type="text" name="phone" class="form-control" value="{{ $user->phone }}" placeholder="Số điện thoại"></div>
-                    </div>
-                    <div class="row input-group">
-                        <div class="col-md-2"><label>Địa chỉ</label></div>
-                        <div class="col-md-5"><input type="text" class="form-control" name="address" value="{{ $user->address }}" placeholder="Địa chỉ"></div>
-                    </div>
-                    <div class="row input-group">
-                        <div class="col-md-2"></div>
-                        <div class="col-md-5">
-                            <button type="submit">Lưu thay đổi</button>
-                            <p class="required mt-2">Nhóm / Sàn chỉ thay đổi được 1 lần. Vui lòng kiểm tra kỹ trước khi cập nhật !!!</p>
-                            <p class="mt-2"><i>Lỗi hoặc không thực hiện được xin liên hệ: 0977572947 (zalo)</i></p>
-                        </div>
-                    </div>
-                    
-                </form>
+                  <!-- Form Group -->
+                  <div class="row form-group">
+                    <label for="firstNameLabel" class="col-sm-3 col-form-label input-label">Mã nhân viên</label>
 
+                    <div class="col-sm-9">
+                      <div class="input-group input-group-sm-down-break">
+                        <input required type="text" name="employee_code" class="form-control" value="{{ $user->employee_code }}" placeholder="VD: IDC0116">
+                      </div>
+                    </div>
+                  </div>
+                  <!-- End Form Group -->
+
+                  <!-- Form Group -->
+                  <div class="row form-group">
+                    <label for="firstNameLabel" class="col-sm-3 col-form-label input-label">Họ và Tên <i class="tio-help-outlined text-body ml-1" data-toggle="tooltip" data-placement="top" title="Displayed on public forums, such as Front."></i></label>
+
+                    <div class="col-sm-9">
+                      <div class="input-group input-group-sm-down-break">
+                        <input required type="text" name="yourname" class="form-control" value="{{ $user->yourname }}" placeholder="Họ & Tên">
+                      </div>
+                    </div>
+                  </div>
+                  <!-- End Form Group -->
+
+                  <!-- Form Group -->
+                  <div class="row form-group">
+                    <label for="phoneLabel" class="col-sm-3 col-form-label input-label">Số điện thoại</label>
+
+                    <div class="col-sm-9">
+                      <input type="text" name="phone" class="form-control" value="{{ $user->phone }}" placeholder="Số điện thoại">
+                    </div>
+                  </div>
+                  <!-- End Form Group -->
+
+                  <!-- Form Group -->
+                  <div class="row form-group">
+                    <label for="organizationLabel" class="col-sm-3 col-form-label input-label">Nhóm / Sàn</label>
+
+                    <div class="col-sm-9">
+                      <select {{ $user->department_id? 'disabled':'' }} class="form-control" name="department_id" required>
+                        <option value="">---</option>
+                        {!! $departmentOptions !!}
+                    </select>
+                    </div>
+                  </div>
+                  <!-- End Form Group -->
+
+                  <!-- Form Group -->
+                  <div class="row form-group">
+                    <label for="addressLine2Label" class="col-sm-3 col-form-label input-label"> Địa chỉ </label>
+
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" name="address" value="{{ $user->address }}" placeholder="Địa chỉ">
+                    </div>
+                  </div>
+                  <!-- End Form Group -->
+
+                  <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                  </div>
+                </form>
+                <!-- End Form -->
+              </div>
+              <!-- End Body -->
             </div>
+            <!-- End Card -->
+
+            <!-- Card -->
+            <div id="emailSection" class="card mb-3 mb-lg-5">
+              <div class="card-header">
+                <h3 class="card-title h4">Email</h3>
+              </div>
+
+              <!-- Body -->
+              <div class="card-body">
+                <p>Your current email address is <span class="font-weight-bold">{{ $user->email }}</span></p>
+
+                <!-- Form -->
+                  <!-- Form Group -->
+                  <div class="row form-group">
+                    <label for="newEmailLabel" class="col-sm-3 col-form-label input-label">New email address</label>
+
+                    <div class="col-sm-9">
+                      <input readonly type="text" name="email" class="form-control" value="{{ $user->email }}" placeholder="Email">
+                    </div>
+                  </div>
+                  <!-- End Form Group -->
+
+                  
+                <!-- End Form -->
+              </div>
+              <!-- End Body -->
+            </div>
+            <!-- End Card -->
+
+            <!-- Card -->
+            <div id="passwordSection" class="card mb-3 mb-lg-5">
+              <div class="card-header">
+                <h4 class="card-title">Change your password</h4>
+              </div>
+
+              <!-- Body -->
+              <div class="card-body">
+                <!-- Form -->
+                <form id="changePasswordForm">
+                  <!-- Form Group -->
+                  <div class="row form-group">
+                    <label for="currentPasswordLabel" class="col-sm-3 col-form-label input-label">Current password</label>
+
+                    <div class="col-sm-9">
+                      <input type="password" class="form-control" name="currentPassword" id="currentPasswordLabel" placeholder="Enter current password" aria-label="Enter current password">
+                    </div>
+                  </div>
+                  <!-- End Form Group -->
+
+                  <!-- Form Group -->
+                  <div class="row form-group">
+                    <label for="newPassword" class="col-sm-3 col-form-label input-label">New password</label>
+
+                    <div class="col-sm-9">
+                      <input type="password" class="js-pwstrength form-control" name="newPassword" id="newPassword" placeholder="Enter new password" aria-label="Enter new password" data-hs-pwstrength-options='{
+                               "ui": {
+                                 "container": "#changePasswordForm",
+                                 "viewports": {
+                                   "progress": "#passwordStrengthProgress",
+                                   "verdict": "#passwordStrengthVerdict"
+                                 }
+                               }
+                             }'>
+
+                      <p id="passwordStrengthVerdict" class="form-text mb-2">
+
+                      <div id="passwordStrengthProgress"></div>
+                    </div>
+                  </div>
+                  <!-- End Form Group -->
+
+                  <!-- Form Group -->
+                  <div class="row form-group">
+                    <label for="confirmNewPasswordLabel" class="col-sm-3 col-form-label input-label">Confirm new password</label>
+
+                    <div class="col-sm-9">
+                      <div class="mb-3">
+                        <input type="password" class="form-control" name="confirmNewPassword" id="confirmNewPasswordLabel" placeholder="Confirm your new password" aria-label="Confirm your new password">
+                      </div>
+
+                      <h5>Password requirements:</h5>
+
+                      <p class="font-size-sm mb-2">Ensure that these requirements are met:</p>
+
+                      <ul class="font-size-sm">
+                        <li>Minimum 8 characters long - the more, the better</li>
+                        <li>At least one lowercase character</li>
+                        <li>At least one uppercase character</li>
+                        <li>At least one number, symbol, or whitespace character</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <!-- End Form Group -->
+
+                  <!-- <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                  </div> -->
+                </form>
+                <!-- End Form -->
+              </div>
+              <!-- End Body -->
+            </div>
+            <!-- End Card -->
+
             
+
+
+            <!-- Card -->
+            <div id="deleteAccountSection" class="card mb-3 mb-lg-5">
+              <div class="card-header">
+                <h4 class="card-title">Delete your account</h4>
+              </div>
+
+              <!-- Body -->
+              <div class="card-body">
+                <p class="card-text">When you delete your account, you lose access to Front account services, and we permanently delete your personal data. You can cancel the deletion for 14 days.</p>
+
+                <div class="form-group">
+                  <!-- Custom Checkbox -->
+                  <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="deleteAccountCheckbox">
+                    <label class="custom-control-label" for="deleteAccountCheckbox">Confirm that I want to delete my account.</label>
+                  </div>
+                  <!-- End Custom Checkbox -->
+                </div>
+
+                <div class="d-flex justify-content-end">
+
+                  <!-- <button type="submit" class="btn btn-danger">Delete</button> -->
+                </div>
+              </div>
+              <!-- End Body -->
+            </div>
+            <!-- End Card -->
+
+            <!-- Sticky Block End Point -->
+            <div id="stickyBlockEndPoint"></div>
+          </div>
         </div>
-    </div>
-</section>
-<!------------------- END CARD ------------------->
+        <!-- End Row -->
+      </div>
+      <!-- End Content -->
 
 @endsection
 
 
 @section('js')
+
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     $(document).ready(function() {
         $('.select2').select2();
     });
 </script>
+
+<script>
+      $(document).on('ready', function () {
+        // INITIALIZATION OF STICKY BLOCKS
+        // =======================================================
+        $('.js-sticky-block').each(function () {
+          var stickyBlock = new HSStickyBlock($(this), {
+            targetSelector: $('#header').hasClass('navbar-fixed') ? '#header' : null
+          }).init();
+        });
+        // INITIALIZATION OF SCROLL NAV
+        // =======================================================
+        var scrollspy = new HSScrollspy($('body'), {
+          // !SETTING "resolve" PARAMETER AND RETURNING "resolve('completed')" IS REQUIRED
+          beforeScroll: function(resolve) {
+            if (window.innerWidth < 992) {
+              $('#navbarVerticalNavMenu').collapse('hide').on('hidden.bs.collapse', function () {
+                return resolve('completed');
+              });
+            } else {
+              return resolve('completed');
+            }
+          }
+        }).init();
+      });
+    </script>
+
 @endsection

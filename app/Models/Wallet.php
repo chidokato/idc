@@ -12,6 +12,12 @@ class Wallet extends Model
     protected $fillable = [
         'user_id',
         'balance',
+        'held_balance'
+    ];
+
+    protected $casts = [
+        'balance' => 'decimal:2',
+        'held_balance' => 'decimal:2',
     ];
 
     /* ================== RELATIONSHIP ================== */

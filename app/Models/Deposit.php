@@ -17,6 +17,7 @@ class Deposit extends Model
         'status',
         'approved_by',
         'approved_at',
+        'proof_image'
     ];
 
     protected $casts = [
@@ -40,5 +41,10 @@ class Deposit extends Model
     public function isPending(): bool
     {
         return $this->status === 'pending';
+    }
+
+    public function histories()
+    {
+        return $this->hasMany(DepositHistory::class);
     }
 }

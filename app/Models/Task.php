@@ -26,6 +26,21 @@ class Task extends Model
         'cost_type',
         'content',
         'approved',
+         // NEW
+        'price_expected',
+        'price_final',
+        'hold_transaction_id',
+        'capture_transaction_id',
+        'status',
+    ];
+
+    protected $casts = [
+        'expected_costs' => 'decimal:2',
+        'actual_costs'   => 'decimal:2',
+        'rate'           => 'decimal:2',
+        'days'           => 'integer',
+        'price_expected' => 'decimal:2',
+        'price_final'    => 'decimal:2',
     ];
 
     public function User()

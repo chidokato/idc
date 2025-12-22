@@ -27,12 +27,12 @@
 
                 {{-- Số dư --}}
                 <div class="alert alert-success">
-                    <strong>Số dư hiện tại:</strong>
-                    {{ number_format($wallet->balance) }} đ
+                    <strong>Số tiền của bạn:</strong>{{ number_format($wallet->balance) }} đ | 
+                    <strong>Số tiền tạm giữ:</strong>{{ number_format($wallet->held_balance) }} đ
                 </div>
 
                 {{-- Bộ lọc --}}
-                <form method="GET" class="row g-2 mb-3">
+                <!-- <form method="GET" class="row g-2 mb-3">
                     <div class="col-md-3">
                         <select name="type" class="form-control">
                             <option value="">-- Tất cả giao dịch --</option>
@@ -58,7 +58,7 @@
                     <div class="col-md-3">
                         <button class="btn btn-primary w-100">Lọc</button>
                     </div>
-                </form>
+                </form> -->
 
                 {{-- Bảng sao kê --}}
                 <table class="table table-bordered table-hover">
@@ -76,17 +76,52 @@
                             <tr>
                                 <td>{{ $item->id }}</td>
                                 <td>{{ $item->created_at->format('d/m/Y H:i') }}</td>
-                                <td>
-                                    @if($item->type === 'deposit')
-                                        <span class="badge bg-success">Nạp tiền</span>
-                                    @else
-                                        <span class="badge bg-danger">Trừ tiền</span>
-                                    @endif
-                                </td>
-                                <td class="{{ $item->type=='deposit' ? 'text-success' : 'text-danger' }}">
-                                    {{ $item->type=='deposit' ? '+' : '-' }}
-                                    {{ number_format($item->amount) }} đ
-                                </td>
+                                @php
+    // Map type => [label, badgeClass, sign, textClass]
+    $typeMap = [
+        'deposit'  => ['Nạp tiền',        'bg-success', '+', 'text-success'],
+        'withdraw' => ['Trừ tiền',        'bg-danger',  '-', 'text-danger'],
+        'rollback' => ['Hoàn/rollback',   'bg-warning', '+', 'text-warning'],
+
+        // NEW
+        'hold'     => ['Giữ tiền (Hold)', 'bg-info',    '-', 'text-info'],
+        'release'  => ['Nhả giữ (Release)','bg-secondary','+','text-secondary'],
+        'capture'  => ['Nghiệm thu (Trừ)', 'bg-primary','-', 'text-primary'],
+        'refund'   => ['Hoàn tiền',        'bg-warning','+','text-warning'],
+    ];
+
+    $t = $typeMap[$item->type] ?? ['Khác', 'bg-dark', '', 'text-dark'];
+@endphp
+
+<td>
+    <span class="badge {{ $t[1] }}">{{ $t[0] }}</span>
+</td>
+
+<td class="{{ $t[3] }}">
+    {{ $t[2] }}
+    {{ number_format($item->amount) }} đ
+</td>
+
+                               @php
+    $amountUi = [
+        'deposit'  => ['text-success', '+'],
+        'withdraw' => ['text-danger',  '-'],
+        'rollback' => ['text-warning', '+'],
+
+        // NEW
+        'hold'     => ['text-info',    '-'], // giữ tiền: giảm available
+        'release'  => ['text-secondary','+'],// nhả giữ: tăng available
+        'capture'  => ['text-primary', '-'], // nghiệm thu: trừ thật từ held
+        'refund'   => ['text-warning', '+'], // hoàn tiền
+    ];
+
+    [$cls, $sign] = $amountUi[$item->type] ?? ['text-dark', ''];
+@endphp
+
+<td class="{{ $cls }}">
+    {{ $sign }} {{ number_format($item->amount) }} đ
+</td>
+
                                 <td>{{ $item->description }}</td>
                             </tr>
                         @empty

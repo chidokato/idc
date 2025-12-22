@@ -10,7 +10,7 @@
 hr{ margin:1.3rem 0 }
 .widget.affix {top:64px}
 .widget-list {background: #f5f5f5;border: 1px solid rgb(0 0 0 / 6%);border-radius: 0.25rem;padding: 1.2rem 1rem;font-size: 14px;}
-.widget-list h4, .scrollspy > a {font-size: 17px;-webkit-text-stroke-width: .4px;/* padding-bottom: 12px; */margin-bottom: 8px;  color:var(--main-color)}
+.widget-list h4, .scrollspy > a {font-size: 17px;/* padding-bottom: 12px; */margin-bottom: 8px;  color:var(--main-color)}
 .widget-list h4 span, .scrollspy > a span {position: relative;display: inline-block;padding-bottom: 5px;}
 /*.widget-list h4 span:before, .scrollspy > a span:before {position: absolute;content: '';height: 1px;left: 0;width: 100%;background-color: var(--sub-color);bottom: 0px;}*/
 .widget-list ul li {display:block}

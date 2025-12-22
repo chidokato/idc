@@ -59,7 +59,6 @@
 
       gtag('config', 'G-8R10SSS97Z');
     </script>
-
     @yield('css')
     
     {!! $setting->header !!}

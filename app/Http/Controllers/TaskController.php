@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Task;
+use App\Services\WalletService;
 use App\Models\User;
 use App\Models\Department;
 use App\Models\Report;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\TreeHelperLv2Only;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class TaskController extends Controller
 {
@@ -51,6 +53,7 @@ class TaskController extends Controller
             ->orderBy('department_lv2')
             ->orderBy('department_id')
             ->with([
+                'wallet:id,user_id,balance,held_balance', // ✅ thêm dòng này
                 'tasks' => function ($q) use ($selectedReportId) {
                     $q->where('approved', 1)
                       ->when($selectedReportId, fn($qq) => $qq->where('report_id', $selectedReportId))
@@ -58,6 +61,7 @@ class TaskController extends Controller
                 }
             ])
             ->get();
+
 
         // ===== build cây + tổng: LV1 -> LV2 -> ROOM -> USER -> TASK =====
         $tree = [];
@@ -98,31 +102,45 @@ class TaskController extends Controller
                 // init user node
                 if (!isset($tree[$lv1Id]['lv2s'][$lv2Id]['rooms'][$roomId]['users'][$u->id])) {
                     $tree[$lv1Id]['lv2s'][$lv2Id]['rooms'][$roomId]['users'][$u->id] = [
-                        'id'=>$u->id,
-                        'employee_code'=>$u->employee_code,
-                        'yourname'=>$u->yourname,
-                        'gross'=>0,'net'=>0,
-                        'tasks'=>[]
+                        'id' => $u->id,
+                        'employee_code' => $u->employee_code,
+                        'yourname' => $u->yourname,
+                        'gross' => 0,
+                        'net' => 0,
+                        'tasks' => [],
+
+                        'wallet' => [
+                            'balance' => (float) optional($u->wallet)->balance ?? 0,
+                            'held_balance' => (float) optional($u->wallet)->held_balance ?? 0,
+                        ],
                     ];
                 }
 
-                // push task + totals
+                $gross = (int) round($t->gross_cost, 0);
+                $net   = (int) round($t->net_cost, 0);
+
+                // push task
                 $tree[$lv1Id]['lv2s'][$lv2Id]['rooms'][$roomId]['users'][$u->id]['tasks'][] = $t;
 
-                $tree[$lv1Id]['lv2s'][$lv2Id]['rooms'][$roomId]['users'][$u->id]['gross'] += (int)$t->gross_cost;
-                $tree[$lv1Id]['lv2s'][$lv2Id]['rooms'][$roomId]['users'][$u->id]['net']   += (int)$t->net_cost;
+                // USER subtotal
+                $tree[$lv1Id]['lv2s'][$lv2Id]['rooms'][$roomId]['users'][$u->id]['gross'] += $gross;
+                $tree[$lv1Id]['lv2s'][$lv2Id]['rooms'][$roomId]['users'][$u->id]['net']   += $net;
 
-                $tree[$lv1Id]['lv2s'][$lv2Id]['rooms'][$roomId]['gross'] += (int)$t->gross_cost;
-                $tree[$lv1Id]['lv2s'][$lv2Id]['rooms'][$roomId]['net']   += (int)$t->net_cost;
+                // ROOM subtotal
+                $tree[$lv1Id]['lv2s'][$lv2Id]['rooms'][$roomId]['gross'] += $gross;
+                $tree[$lv1Id]['lv2s'][$lv2Id]['rooms'][$roomId]['net']   += $net;
 
-                $tree[$lv1Id]['lv2s'][$lv2Id]['gross'] += (int)$t->gross_cost;
-                $tree[$lv1Id]['lv2s'][$lv2Id]['net']   += (int)$t->net_cost;
+                // LV2 subtotal
+                $tree[$lv1Id]['lv2s'][$lv2Id]['gross'] += $gross;
+                $tree[$lv1Id]['lv2s'][$lv2Id]['net']   += $net;
 
-                $tree[$lv1Id]['gross'] += (int)$t->gross_cost;
-                $tree[$lv1Id]['net']   += (int)$t->net_cost;
+                // LV1 subtotal
+                $tree[$lv1Id]['gross'] += $gross;
+                $tree[$lv1Id]['net']   += $net;
 
-                $grandGross += (int)$t->gross_cost;
-                $grandNet   += (int)$t->net_cost;
+                // grand total
+                $grandGross += $gross;
+                $grandNet   += $net;
             }
         }
 
@@ -262,29 +280,36 @@ class TaskController extends Controller
 
     }
 
-
-    public function updatePaid(Request $request, $id)
+    public function updatePaid(Request $request, Task $task, WalletService $walletService)
     {
-        $user = auth()->user();
+        abort_unless(auth()->check() && in_array(auth()->user()->rank, [1,2]), 403);
 
-        if (!$user || !in_array($user->rank, [1, 2])) {
+        $paid = (int)$request->input('paid', 0);
+
+        try {
+            if ($paid === 1) {
+                $walletService->holdTask($task);
+                $task->paid = 1;
+                $task->save();
+
+                return response()->json(['status' => true, 'message' => 'Đã giữ tiền (HOLD) thành công.']);
+            } else {
+                $walletService->releaseTask($task, 'admin_toggle_off');
+
+                return response()->json(['status' => true, 'message' => 'Đã nhả giữ tiền (RELEASE) thành công.']);
+            }
+        } catch (ValidationException $e) {
+            $first = collect($e->errors())->flatten()->first() ?? 'Dữ liệu không hợp lệ.';
             return response()->json([
-                'success' => false,
-                'message' => 'Bạn không có quyền thực hiện thao tác này.'
-            ], 403);
+                'status' => false,
+                'message' => $first,
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Throwable $e) {
+            return response()->json(['status' => false, 'message' => $e->getMessage()], 422);
         }
-
-        $task = Task::findOrFail($id);
-
-        $task->paid = !$task->paid;
-        $task->save();
-
-        return response()->json([
-            'success' => true,
-            'paid' => (bool) $task->paid,
-            'message' => $task->paid ? 'Chuyển sang trạng thái: Đã thanh toán' : 'Chuyển sang trạng thái: Chưa thanh toán',
-        ]);
     }
+
 
 
     public function bulkUpdateTasks(Request $request)

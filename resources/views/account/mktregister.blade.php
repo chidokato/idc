@@ -1,34 +1,51 @@
-@extends('layout.index')
+@extends('account.layout.index')
 
 @section('title') Công Ty Cổ Phần Bất Động Sản Indochine @endsection
-@section('description') Công Ty Cổ Phần Bất Động Sản Indochine là công ty thành viên của Đất Xanh Miền Bắc - UY TÍN số 1 thị trường BĐS Việt Nam @endsection
-@section('robots') index, follow @endsection
-@section('url'){{asset('')}}@endsection
 
 @section('css')
-<link href="assets/css/widget.css" rel="stylesheet">
-<link href="assets/css/news.css" rel="stylesheet">
-<link href="assets/css/account.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
 @endsection
 
+@section('body')  @endsection
+
 @section('content')
-@include('account.layout.menu')
-<section class="card-grid news-sec">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-2 d-none d-lg-block">
-                @include('account.layout.sitebar')
+
+<div class="content container-fluid">
+  <div class="page-header">
+          <div class="row align-items-center">
+            <div class="col-sm mb-2 mb-sm-0">
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-no-gutter">
+                  <li class="breadcrumb-item"><a class="breadcrumb-link" href="main">Account</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Đăng ký marketing</li>
+                </ol>
+              </nav>
+
+              <h1 class="page-header-title">Đăng ký marketing</h1>
             </div>
-                <div class="col-lg-10 ">
-                    <div class="widget-list">
-                    
-                    <form action="{{ route('account.tasksstore') }}" method="POST">
+          </div>
+          <!-- End Row -->
+        </div>
+
+
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card mb-3 mb-lg-5">
+              <!-- Header -->
+              <div class="card-header">
+                <h4 class="card-header-title">Thêm link marketing</h4>
+              </div>
+              <!-- End Header -->
+              <!-- Body -->
+              <div class="card-body">
+                
+
+                <form action="{{ route('account.tasksstore') }}" method="POST">
                         @csrf
                         <input type="hidden" name="" value="">
-                        <div class="table-responsive-mobile">
-                            <table class="table" id="myTable">
-                                <thead>
+                        <div class="table-responsive">
+                            <table class="table table-borderless table-thead-bordered table-nowrap table-text-center table-align-middle card-table" id="myTable">
+                                <thead class="thead-light">
                                     <tr>
                                         <th></th>
                                         @if(Auth::user()->rank < 3)
@@ -44,9 +61,9 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td class="flex">
-                                            <button type="button" class="form-control del">xóa</button>
-                                            <button type="button" class="form-control dupple">Nhân</button>
+                                        <td class="btn-group">
+                                            <button type="button" class="form-control btn-danger del">Xóa</button>
+                                            <button type="button" class="form-control btn-success dupple">Nhân</button>
                                         </td>
                                         @if(Auth::user()->rank < 3)
                                         <td>
@@ -118,13 +135,25 @@
                             </table>
                         </div>
                         <div class="mt-3">
-                            <p><button type="submit" class="">Gửi đăng ký MARKETING</button></p>
+                            <p><button type="submit" class="btn btn-sm btn-primary">Gửi đăng ký MARKETING</button></p>
                             <p>Nếu không đăng ký được, thiếu dự án, thiếu trường nhập dữ liệu. Liên hệ ngay <a href="https://zalo.me/0977572947" target="_blank"><strong>Nguyễn Tuấn</strong></a> để được hỗ trợ kỹ thuật</p>
                         </div>
                     </form>
-                    </div>
-                    <hr>
-                    @foreach($reports as $report)
+
+                
+              </div>
+              <!-- Body -->
+
+
+            </div>
+
+            <div class="card mb-3 mb-lg-5">
+              <!-- Header -->
+              
+              <!-- End Header -->
+              <!-- Body -->
+              <div class="card-body">
+                  @foreach($reports as $report)
                     @if($report->Task->isEmpty())
                     <p>Kỳ này bạn chưa đăng ký dự án nào</p>
                     @else
@@ -141,7 +170,9 @@
                             
                             <p class="required"><i>- Chú ý: Cổng đăng ký chi phí marketing sẽ <strong>TỰ ĐỘNG ĐÓNG</strong> vào <strong>00h00 ngày {{ \Carbon\Carbon::parse($report->time_start)->format('d/m/Y') }}</strong>. Có thể gửi nhiều lần trước khi cổng đăng ký đóng lại.</i></p>
                             <div>
-                                <h3>{{$report->name}} ({{ \Carbon\Carbon::parse($report->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($report->time_end)->format('d/m/Y') }})</h3>
+                              <div class="card-header">
+                <h4 class="card-header-title">{{$report->name}} ({{ \Carbon\Carbon::parse($report->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($report->time_end)->format('d/m/Y') }})</h4>
+              </div>
                                 <div class="table-responsive-mobile">
                                 <table class="table">
                                     <tr>
@@ -262,18 +293,17 @@
                     </div>
                     @endif
                     @endforeach
-                    
-                </div>
+              </div>
             </div>
-        </div>
     </div>
-</section>
-<!------------------- END CARD ------------------->
+  </div>
+</div>
 
 @endsection
 
 
 @section('js')
+
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
@@ -452,8 +482,6 @@ $(document).on('change', '.channel_id', function () {
 
 
 </script>
-
-
 
 
 @endsection

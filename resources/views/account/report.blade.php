@@ -1,59 +1,65 @@
-@extends('layout.index')
+@extends('account.layout.index')
 
 @section('title') Công Ty Cổ Phần Bất Động Sản Indochine @endsection
-@section('description') Công Ty Cổ Phần Bất Động Sản Indochine là công ty thành viên của Đất Xanh Miền Bắc - UY TÍN số 1 thị trường BĐS Việt Nam @endsection
-@section('robots') index, follow @endsection
-@section('url'){{asset('')}}@endsection
 
+@section('css')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+@endsection
 
+@section('body') @endsection
 
 @section('content')
-@include('account.layout.menu')
 
-<style>
-    #report-form td{ border:none !important }
-</style>
+<div class="content container-fluid">
 
-<section class="card-grid news-sec">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-2 d-none d-lg-block">
-                @include('account.layout.sitebar')
+    <div class="page-header">
+          <div class="row align-items-end">
+            <div class="col-sm mb-2 mb-sm-0">
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-no-gutter">
+                  <li class="breadcrumb-item"><a class="breadcrumb-link" href="main">Account</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Quản lý tổng</li>
+                </ol>
+              </nav>
+
+              <h1 class="page-header-title">Quản lý tổng</h1>
             </div>
+           
+          </div>
+          <!-- End Row -->
+        </div>
 
-            <div class="col-lg-10 ">
-                <form id="report-form">
-                    @csrf
-                    <input type="hidden" name="id" id="report_id">
-                    <div class="widget-list mb-3">
-                        <table class="table">
-                            <tr>
-                                <td><input class="form-control" name="name" type="text" placeholder="Tên"></td>
-                                <td><input class="form-control" name="date" id="date-range" type="text" placeholder="Thời gian"></td>
-                                <td>
-                                    <button type="submit" class="btn btn-primary">Lưu lại</button>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </form>
 
-                <div id="load_report" class="widget-list"></div>
 
-            </div>
+    <div class="row">
+       
+        <div class="col-lg-10 ">
+            <form id="report-form">
+                @csrf
+                <input type="hidden" name="id" id="report_id">
+                <div class="widget-list mb-3">
+                    <table class="table">
+                        <tr>
+                            <td><input class="form-control" name="name" type="text" placeholder="Tên"></td>
+                            <td><input class="form-control" name="date" id="date-range" type="text" placeholder="Thời gian"></td>
+                            <td>
+                                <button type="submit" class="btn btn-primary">Lưu lại</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </form>
+
+            <div id="load_report" class="widget-list"></div>
+
         </div>
     </div>
-</section>
+</div>
 <!------------------- END CARD ------------------->
 
 @endsection
 
-@section('css')
-<link href="assets/css/widget.css" rel="stylesheet">
-<link href="assets/css/account.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
-@endsection
 @section('js')
 <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
@@ -210,6 +216,4 @@ $(document).ready(function () {
     });
 
 </script>
-
-
 @endsection
