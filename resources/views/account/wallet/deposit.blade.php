@@ -16,17 +16,14 @@
             <div class="col-sm mb-2 mb-sm-0">
                 <nav aria-label="breadcrumb">
                 <ol class="breadcrumb breadcrumb-no-gutter">
-                <li class="breadcrumb-item"><a class="breadcrumb-link" href="account">Account</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Ví tiền</li>
+                <li class="breadcrumb-item"><a class="breadcrumb-link" href="account/main">Account</a></li>
+                <li class="breadcrumb-item"><a class="breadcrumb-link" href="account/wallet">Ví tiền</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Nạp tiền</li>
                 </ol>
                 </nav>
-                <h1 class="page-header-title">Ví tiền</h1>
+                <h1 class="page-header-title">Nạp tiền</h1>
             </div>
-            <div class="col-sm-auto">
-                <a class="btn btn-primary" href="wallet/deposit">
-                    <i class="tio-money mr-1"></i> Nạp tiền
-                </a>
-            </div>
+            
         </div>
     <!-- End Row -->
     </div>
@@ -105,78 +102,119 @@
         </div>
     </div>
 
-    <div class="card">
-          <!-- Header -->
-          <div class="card-header">
-            <div class="row justify-content-between align-items-center flex-grow-1">
-              <div class="col-sm-6 col-md-4 mb-3 mb-sm-0">
-                <form>
-                  <!-- Search -->
-                  <div class="input-group input-group-merge input-group-flush">
-                    <div class="input-group-prepend">
-                      <div class="input-group-text">
-                        <i class="tio-search"></i>
-                      </div>
-                    </div>
-                    <input id="datatableSearch" type="search" class="form-control" placeholder="Search users" aria-label="Search users">
-                  </div>
-                  <!-- End Search -->
-                </form>
-              </div>
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="card mb-3">
+            <div class="card-header">
+              <h2 class="card-header-title h5">Nạp tiền</h2>
 
-              <div class="col-sm-6">
-                <div class="d-sm-flex justify-content-sm-end align-items-sm-center">
-                  <!-- Datatable Info -->
-                  <div id="datatableCounterInfo" class="mr-2 mb-2 mb-sm-0" style="display: none;">
-                    <div class="d-flex align-items-center">
-                      <span class="font-size-sm mr-3">
-                        <span id="datatableCounter">0</span>
-                        Selected
-                      </span>
-                      <a class="btn btn-sm btn-outline-danger" href="javascript:;">
-                        <i class="tio-delete-outlined"></i> Delete
-                      </a>
-                    </div>
-                  </div>
-                  <!-- End Datatable Info -->
-
-                  
-                </div>
-              </div>
             </div>
-            <!-- End Row -->
+            <div class="card-body">
+              @if(session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+
+              <form method="POST"
+                action="{{ route('wallet.deposit.submit') }}"
+                enctype="multipart/form-data">
+              @csrf
+
+              <div class="mb-3">
+                  <label>Số tiền đã chuyển</label>
+                  <input type="number"
+                         name="amount"
+                         class="form-control"
+                         min="10000"
+                         required>
+              </div>
+
+              <div class="mb-3">
+                  <label>Ảnh chứng minh chuyển khoản</label>
+                  <input type="file"
+                         name="proof_image"
+                         class="form-control"
+                         accept="image/*"
+                         required>
+              </div>
+
+              <button class="btn btn-primary w-100">
+                  Gửi yêu cầu nạp tiền
+              </button>
+          </form>
+            </div>
+
           </div>
-          <!-- End Header -->
 
-          <!-- Table -->
-          <div class="table-responsive datatable-custom">
-            <table class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
-              <thead class="thead-light">
-                <tr>
-                  <th class="table-column-pr-0">
-                    <div class="custom-control custom-checkbox">
-                      <input id="datatableCheckAll" type="checkbox" class="custom-control-input">
-                      <label class="custom-control-label" for="datatableCheckAll"></label>
-                    </div>
-                  </th>
-                  <th>#</th>
-                            <th>Thời gian</th>
-                            <th>Loại</th>
-                            <th>Số tiền</th>
-                            <th></th>
-                            <th>Ghi chú</th>
-                </tr>
-              </thead>
-
+          <div class="card ">
+            <div class="card-header">
+              <h2 class="card-header-title h5">Lịch sử nạp tiền</h2>
+            </div>
+            <div class="card-body">
+              <table class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table dataTable no-footer">
+                <thead class="thead-light">
+                  <tr>
+                      <th>Ngày</th>
+                      <th>Số tiền</th>
+                      <th>Trạng thái</th>
+                  </tr>
+                </thead>
                 <tbody>
-                    
-
-               
-              </tbody>
-            </table>
+                  @foreach($deposits as $d)
+                        <tr>
+                            <td>{{ $d->created_at }}</td>
+                            <td>{{ number_format($d->amount) }} đ</td>
+                            <td>
+                                @if($d->status=='pending')
+                                    ⏳ Chờ duyệt
+                                @elseif($d->status=='approved')
+                                    ✅ Đã duyệt
+                                @else
+                                    ❌ Từ chối
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                </tbody>
+              </table>
+              {{ $deposits->links() }}
+            </div>
           </div>
-          <!-- End Table -->
+
         </div>
+        <div class="col-lg-4  ">
+          <div class="card">
+            
+          
+          <div class="card-header">
+              <h2 class="card-header-title h5">Thông tin chuyển khoản</h2>
+            </div>
+            <div class="card-body">
+              
+            
+          <ul class="list-unstyled list-unstyled-py-3 text-dark mb-3">
+            <li class="pt-2 pb-0">
+              <small class="card-subtitle">Số tài khoản</small>
+            </li>
+            <li>
+              Tên người thụ hưởng: Nguyễn Văn Tuấn
+            </li>
+            <li>
+              Ngân hàng: VP bank
+            </li>
+            <li>
+              Số tài khoản: 118808223
+            </li>
+            <li>
+              Nội dung CK: {{ $user->email }}
+            </li>
+            <li class="pt-2 pb-0">
+              <small class="card-subtitle">QR</small>
+            </li>
+          </ul>
+          </div>
+        </div>
+      </div>
+      </div>
 </div>
 
 @endsection

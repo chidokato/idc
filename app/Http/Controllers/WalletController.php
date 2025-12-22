@@ -64,8 +64,6 @@ class WalletController extends Controller
     {
         $request->validate([
             'amount' => 'required|numeric|min:10000',
-            'bank_name' => 'required|string|max:255',
-            'transaction_code' => 'required|string|max:255',
             'proof_image'      => 'required|image|max:2048', // tối đa 2MB
         ]);
 
@@ -87,8 +85,6 @@ class WalletController extends Controller
         Deposit::create([
             'user_id' => auth()->id(),
             'amount' => $request->amount,
-            'bank_name' => $request->bank_name,
-            'transaction_code' => $request->transaction_code,
             'proof_image'      => $imagePath,
             'status' => 'pending',
         ]);

@@ -23,7 +23,7 @@
                 <h1 class="page-header-title">Ví tiền</h1>
             </div>
             <div class="col-sm-auto">
-                <a class="btn btn-primary" href="wallet/deposit">
+                <a class="btn btn-primary" href="account/wallet/deposit">
                     <i class="tio-money mr-1"></i> Nạp tiền
                 </a>
             </div>
@@ -108,44 +108,10 @@
     <div class="card">
           <!-- Header -->
           <div class="card-header">
-            <div class="row justify-content-between align-items-center flex-grow-1">
-              <div class="col-sm-6 col-md-4 mb-3 mb-sm-0">
-                <form>
-                  <!-- Search -->
-                  <div class="input-group input-group-merge input-group-flush">
-                    <div class="input-group-prepend">
-                      <div class="input-group-text">
-                        <i class="tio-search"></i>
-                      </div>
-                    </div>
-                    <input id="datatableSearch" type="search" class="form-control" placeholder="Search users" aria-label="Search users">
-                  </div>
-                  <!-- End Search -->
-                </form>
-              </div>
+                    <h5 class="card-header-title">Lịch sử</h5>
 
-              <div class="col-sm-6">
-                <div class="d-sm-flex justify-content-sm-end align-items-sm-center">
-                  <!-- Datatable Info -->
-                  <div id="datatableCounterInfo" class="mr-2 mb-2 mb-sm-0" style="display: none;">
-                    <div class="d-flex align-items-center">
-                      <span class="font-size-sm mr-3">
-                        <span id="datatableCounter">0</span>
-                        Selected
-                      </span>
-                      <a class="btn btn-sm btn-outline-danger" href="javascript:;">
-                        <i class="tio-delete-outlined"></i> Delete
-                      </a>
-                    </div>
+                    
                   </div>
-                  <!-- End Datatable Info -->
-
-                  
-                </div>
-              </div>
-            </div>
-            <!-- End Row -->
-          </div>
           <!-- End Header -->
 
           <!-- Table -->
