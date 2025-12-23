@@ -3,7 +3,7 @@
 @section('title') Công Ty Cổ Phần Bất Động Sản Indochine @endsection
 
 @section('css')
-
+<link rel="stylesheet" href="account/css/custom.css">
 @endsection
 
 @section('body') @endsection
@@ -63,7 +63,7 @@
     <table id="taskTable" class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
       <thead class="thead-light"> 
         <tr> 
-          <td></td>
+          <th></th>
           <th>Mã NV</th>
           <th>Họ & Tên</th> 
           <th>Phòng / nhóm</th> 
@@ -74,6 +74,7 @@
           <th>Tiền nộp</th> 
           <th>Đóng tiền</th> 
           <th>Ghi chú</th> 
+
         </tr>
         @if($tasks->count())
         <tr class="font-weight-bold bg-light">

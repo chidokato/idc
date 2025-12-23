@@ -4,7 +4,6 @@
     $cost = (float) preg_replace('/[^\d\-]/', '', (string)($task->expected_costs ?? 0));
     $days = (float) preg_replace('/[^0-9\.\-]/', '', str_replace(',', '.', (string)($task->days ?? 0)));
     $rate = (float) preg_replace('/[^0-9\.\-]/', '', str_replace(',', '.', (string)($task->rate ?? 0)));
-
     $rowTotal = $cost * $days;
     $rowPaid  = $rowTotal * (1 - $rate/100);
   @endphp
@@ -15,7 +14,7 @@
       @else
           <span class="badge bg-warning">Chờ duyệt</span>
       @endif
-  </td>
+    </td>
     <td>{{ $task->handler?->employee_code }}</td>
     <td>{{ $task->handler?->yourname }}</td>
     <td>{{ $task->department?->name }}</td>
