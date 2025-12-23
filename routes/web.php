@@ -204,6 +204,12 @@ Route::middleware(['user'])->group(function () {
         Route::get('wallet/deposit', [WalletController::class, 'depositForm'])->name('wallet.deposit.form');
         Route::post('wallet/deposit', [WalletController::class, 'depositSubmit'])->name('wallet.deposit.submit');
         Route::get('wallet/deposits', [WalletController::class, 'myDeposits'])->name('wallet.deposits');
+        Route::get('wallet/transfer', [WalletController::class, 'bulkTransferForm'])->name('wallet.bulk.form');
+        Route::post('wallet/transfer', [WalletController::class, 'bulkTransferSubmit'])->name('wallet.bulk.submit');
+        Route::post('/wallet/transactions/{id}/recall', [WalletController::class, 'recallTransfer'])->name('wallet.transactions.recall')->middleware('auth');
+    
+    
+
 
         
     });

@@ -23,6 +23,9 @@
                 <h1 class="page-header-title">Ví tiền</h1>
             </div>
             <div class="col-sm-auto">
+                <a class="btn btn-primary" href="account/wallet/transfer">
+                    <i class="tio-swap-horizontal mr-1"></i> Chuyển tiền
+                </a>
                 <a class="btn btn-primary" href="account/wallet/deposit">
                     <i class="tio-money mr-1"></i> Nạp tiền
                 </a>
@@ -187,15 +190,30 @@
                         {{ $sign }} {{ number_format($item->amount) }} đ
                     </td>
 
-                        <td>{{ $item->description }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="text-center text-muted">
-                            Chưa có giao dịch
+                        <td>{{ $item->description }}
+                          @if($item->type === 'withdraw' && $item->ref_type === 'BulkTransfer' && !empty($meta['to_user_id']))
+                            <form method="POST" action="{{ route('wallet.transactions.recall', $item->id) }}"
+                                  class="d-inline"
+                                  onsubmit="return confirm('Bạn chắc chắn muốn THU HỒI giao dịch này? (Chỉ thu hồi được nếu người nhận còn đủ số dư khả dụng)');">
+                              @csrf
+                              <button type="submit" class="btn btn-sm btn-outline-danger ml-2">
+                                Thu hồi
+                              </button>
+                            </form>
+                          @endif
                         </td>
+                        @php
+                          $meta = $item->meta ? json_decode($item->meta, true) : [];
+                        @endphp
+
                     </tr>
-                @endforelse
+                    @empty
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">
+                                Chưa có giao dịch
+                            </td>
+                        </tr>
+                    @endforelse
 
                
               </tbody>
