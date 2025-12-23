@@ -1,6 +1,3 @@
-
-
-
 @forelse($tasks as $task)
 @php
     // dùng lại cách ép số giống controller (nhanh gọn ở đây)
@@ -12,14 +9,13 @@
     $rowPaid  = $rowTotal * (1 - $rate/100);
   @endphp
   <tr>
-    <td class="table-column-pr-0">
-      <div class="custom-control custom-checkbox">
-        <input id="datatableCheck{{ $task->id }}" type="checkbox"
-               class="custom-control-input row-check" value="{{ $task->id }}">
-        <label class="custom-control-label" for="datatableCheck{{ $task->id }}"></label>
-      </div>
-    </td>
-
+    <td>
+      @if($task->approved)
+          <span class="badge bg-success">Đã duyệt</span>
+      @else
+          <span class="badge bg-warning">Chờ duyệt</span>
+      @endif
+  </td>
     <td>{{ $task->handler?->employee_code }}</td>
     <td>{{ $task->handler?->yourname }}</td>
     <td>{{ $task->department?->name }}</td>
@@ -44,7 +40,7 @@
       @endif
     </td>
 
-    <td>{{ $task->note ?? '' }}</td>
+    <td>{{ $task->content ?? '' }}</td>
   </tr>
 @empty
   <tr>

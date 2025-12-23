@@ -61,22 +61,31 @@
   <!-- Table -->
   <div class="table-responsive datatable-custom">
     <table id="taskTable" class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
-      <thead class="thead-light"> <tr> <th class="table-column-pr-0"> <div class="custom-control custom-checkbox"> <input id="datatableCheckAll" type="checkbox" class="custom-control-input"> <label class="custom-control-label" for="datatableCheckAll"></label> </div> </th> <th>Mã NV</th> <th>Họ & Tên</th> <th>Phòng / nhóm</th> <th>Dự án</th> <th>Kênh</th> <th>Tổng tiền</th> <th>Hỗ trợ</th> <th>Tiền nộp</th> <th>Đóng tiền</th> <th>Ghi chú</th> </tr>
-
+      <thead class="thead-light"> 
+        <tr> 
+          <td></td>
+          <th>Mã NV</th>
+          <th>Họ & Tên</th> 
+          <th>Phòng / nhóm</th> 
+          <th>Dự án</th> 
+          <th>Kênh</th> 
+          <th>Tổng tiền</th> 
+          <th>Hỗ trợ</th> 
+          <th>Tiền nộp</th> 
+          <th>Đóng tiền</th> 
+          <th>Ghi chú</th> 
+        </tr>
         @if($tasks->count())
-          <tr class="font-weight-bold bg-light">
-            <td colspan="6" class="text-end">Tổng:</td>
-            <td class="text-end" id="sumTotalText">{{ number_format($sumTotal, 0, ',', '.') }}</td>
-            <td></td>
-            <td class="text-end" id="sumPaidText">{{ number_format($sumPaid, 0, ',', '.') }}</td>
-            <td colspan="2"></td>
-          </tr>
+        <tr class="font-weight-bold bg-light">
+          <td colspan="6" class="text-end">Tổng:</td>
+          <td class="text-end" id="sumTotalText">{{ number_format($sumTotal, 0, ',', '.') }}</td>
+          <td></td>
+          <td class="text-end" id="sumPaidText">{{ number_format($sumPaid, 0, ',', '.') }}</td>
+          <td colspan="2"></td>
+        </tr>
         @endif
-        
       </thead>
-
       <tbody id="taskTableBody">
-
         @include('account.task.partials.task_rows', ['tasks' => $tasks])
       </tbody>
     </table>
