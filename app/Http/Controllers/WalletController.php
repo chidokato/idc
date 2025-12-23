@@ -250,19 +250,18 @@ class WalletController extends Controller
 
                 $toWallets = Wallet::whereIn('user_id', $toUserIds)->lockForUpdate()->get()->keyBy('user_id');
 
-                // Trừ tiền người gửi
-                $fromBefore = $fromWallet->balance;
-                $fromAfterCents = $fromBalanceCents - $totalCents;
-                $fromAfter = $this->centsToDecimalString($fromAfterCents);
+                // ====== NGƯỜI GỬI: trừ theo từng người + ghi lịch sử chi tiết ======
+                $fromStartCents = $this->toCents($fromWallet->balance);
 
-                $fromWallet->balance = $fromAfter;
-                $fromWallet->save();
+                // Check đủ tiền theo tổng
+                if ($fromStartCents < $totalCents) {
+                    throw new \RuntimeException('Số dư không đủ để chuyển tiền hàng loạt.');
+                }
 
-                // Log withdraw cho người gửi
-                $fromBeforeCents = $this->toCents($fromWallet->balance);
-                $runningCents = $fromBeforeCents;
+                $runningCents = $fromStartCents;
 
-                // Tên người nhận để ghi lịch sử đẹp hơn (optional)
+                // Tên người nhận để ghi lịch sử đẹp hơn
+                $toUserIds = array_keys($transfers);
                 $toUsers = \App\Models\User::select('id','yourname')
                     ->whereIn('id', $toUserIds)->get()->keyBy('id');
 
@@ -272,7 +271,6 @@ class WalletController extends Controller
                     $beforeCents = $runningCents;
                     $afterCents  = $runningCents - (int)$amtCents;
 
-                    // ✅ tạo 1 dòng lịch sử cho người gửi: “Chuyển cho ai, bao nhiêu”
                     WalletTransaction::create([
                         'wallet_id' => $fromWallet->id,
                         'ref_type' => 'BulkTransfer',
@@ -287,7 +285,7 @@ class WalletController extends Controller
                         'idempotency_key' => $idempotencyKey.'-out-'.$toUserId,
                         'meta' => json_encode([
                             'batch_key' => $idempotencyKey,
-                            'from_user_id' => $user->id,
+                            'from_user_id' => (int)$user->id,
                             'to_user_id' => (int)$toUserId,
                             'to_name' => $toName,
                             'amount' => $this->centsToDecimalString((int)$amtCents),
@@ -297,6 +295,11 @@ class WalletController extends Controller
 
                     $runningCents = $afterCents;
                 }
+
+                // Save số dư người gửi 1 lần
+                $fromWallet->balance = $this->centsToDecimalString($runningCents);
+                $fromWallet->save();
+
 
                 // ✅ update số dư người gửi 1 lần (khỏi save nhiều lần)
                 $fromWallet->balance = $this->centsToDecimalString($runningCents);

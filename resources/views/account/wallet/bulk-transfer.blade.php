@@ -102,6 +102,13 @@
       <div class="card-header">
         <h4 class="card-header-title">Chuyển tiền</h4>
       </div>
+      @if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+  @endif
+
+  @if($errors->has('error'))
+    <div class="alert alert-danger">{{ $errors->first('error') }}</div>
+  @endif
       <div class="card-body">
         
       <form method="POST" action="{{ route('wallet.bulk.submit') }}">

@@ -126,16 +126,23 @@
                     </div>
                   </th>
                   <th>#</th>
-                            <th>Thời gian</th>
-                            <th>Loại</th>
-                            <th>Số tiền</th>
-                            <th></th>
-                            <th>Ghi chú</th>
+                <th>Thời gian</th>
+                <th>Loại</th>
+                <th>Số tiền</th>
+                <th></th>
+                <th>Thu hồi</th>
+                
+                <th>Ghi chú</th>
                 </tr>
               </thead>
 
                 <tbody>
                     @forelse($transactions as $item)
+
+                    @php
+                          $meta = $item->meta ? json_decode($item->meta, true) : [];
+                        @endphp
+
                     <tr>
                     <td class="table-column-pr-0">
                         <div class="custom-control custom-checkbox">
@@ -189,9 +196,8 @@
                     <td class="{{ $cls }}">
                         {{ $sign }} {{ number_format($item->amount) }} đ
                     </td>
-
-                        <td>{{ $item->description }}
-                          @if($item->type === 'withdraw' && $item->ref_type === 'BulkTransfer' && !empty($meta['to_user_id']))
+                    <td>
+                        @if($item->type === 'withdraw' && $item->ref_type === 'BulkTransfer' && !empty($meta['to_user_id']))
                             <form method="POST" action="{{ route('wallet.transactions.recall', $item->id) }}"
                                   class="d-inline"
                                   onsubmit="return confirm('Bạn chắc chắn muốn THU HỒI giao dịch này? (Chỉ thu hồi được nếu người nhận còn đủ số dư khả dụng)');">
@@ -201,10 +207,13 @@
                               </button>
                             </form>
                           @endif
+                    </td>
+
+                        <td>{{ $item->description }}
+                          
                         </td>
-                        @php
-                          $meta = $item->meta ? json_decode($item->meta, true) : [];
-                        @endphp
+
+                        
 
                     </tr>
                     @empty
