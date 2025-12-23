@@ -110,7 +110,7 @@
 
                 <!-- Bar Chart -->
                 <div class="chartjs-custom">
-                  <canvas id="updatingData" style="height: 10rem;"></canvas>
+                  <canvas id="updatingData" style="height: 30rem;"></canvas>
                   <script>
                   document.addEventListener('DOMContentLoaded', function () {
                     const labels       = @json($chartLabels, JSON_UNESCAPED_UNICODE);
@@ -159,7 +159,7 @@
                               max: yMax,
 
                               // ✅ hạ thấp khoảng cách giữa các ô (dày hơn)
-                              stepSize: 1000000,
+                              stepSize: 5000000,
                               maxTicksLimit: 60,
 
                               fontSize: 12,
