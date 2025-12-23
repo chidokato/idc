@@ -121,7 +121,7 @@
           <select name="recipient_ids[]" id="recipient_ids" class="form-control" multiple size="10">
             @foreach($users as $u)
               <option value="{{ $u->id }}" @if(collect(old('recipient_ids',[]))->contains($u->id)) selected @endif>
-                {{ $u->employee_code }} | {{ $u->yourname }} | ({{ $u->email }})
+                {{ $u->email }} | {{ $u->employee_code }} | {{ $u->yourname }}
               </option>
             @endforeach
           </select>
