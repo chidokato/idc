@@ -12,7 +12,7 @@
       @if($task->approved)
           <span class="badge bg-success">Đã duyệt</span>
       @else
-          <span class="badge bg-warning">Chờ duyệt</span>
+          <span class="badge bg-warning">Không duyệt</span>
       @endif
     </td>
     <td>{{ $task->handler?->employee_code }}</td>

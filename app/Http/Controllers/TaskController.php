@@ -47,6 +47,7 @@ class TaskController extends Controller
         if ($selectedDeptId > 0) {
             $deptIds = $this->getChildIdsFromCollection($departments, $selectedDeptId);
         }
+        $approved = $request->input('approved', null); // '1' | '0' | null
 
         // Query tasks theo department_id IN (...)
         $q = Task::query()
@@ -63,6 +64,11 @@ class TaskController extends Controller
         // nếu tasks có cột report_id thì mới lọc
         if ($reportId > 0 && Schema::hasColumn('tasks', 'report_id')) {
             $q->where('report_id', $reportId);
+        }
+        
+        // lọc approved nếu có chọn
+        if ($approved !== null && $approved !== '') {
+            $q->where('approved', (int) $approved);
         }
 
         $tasks = $q->get();

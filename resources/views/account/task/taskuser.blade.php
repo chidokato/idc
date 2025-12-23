@@ -29,33 +29,31 @@
   <!-- Header -->
   <div class="card-header">
     <div class="row align-items-center flex-grow-1" id="filterBar">
-  <div class="col-sm-3 col-md-3 mb-3 mb-sm-0">
-    <select name="department_id" id="filterDepartment" class="form-control">
-      <option value="">-- Chọn phòng ban --</option>
-      {!! $departmentOptions !!}
-    </select>
-  </div>
-
-  <div class="col-sm-3 col-md-3 mb-3 mb-sm-0">
-    <select name="report_id" id="filterReport" class="form-control">
-        <option value="">-- Chọn thời gian --</option>
-        @foreach($reports as $report)
-          <option value="{{ $report->id }}" {{ (int)($reportId ?? 0) === (int)$report->id ? 'selected' : '' }}>
-            {{ $report->name }}
-          </option>
-        @endforeach
-  </select>
-  </div>
-
-  <!-- <div class="col-sm-3 col-md-3 mb-3 mb-sm-0">
-    <select name="report_id" id="filterReport" class="form-control">
-        <option value="">-- Duyệt ?? --</option>
-        
-  </select>
-  </div> -->
-
-</div>
-  <!-- End Row -->
+      <div class="col-sm-3 col-md-3 mb-3 mb-sm-0">
+        <select name="department_id" id="filterDepartment" class="form-control">
+          <option value="">-- Chọn phòng ban --</option>
+          {!! $departmentOptions !!}
+        </select>
+      </div>
+      <div class="col-sm-3 col-md-3 mb-3 mb-sm-0">
+        <select name="report_id" id="filterReport" class="form-control">
+          <option value="">-- Chọn thời gian --</option>
+          @foreach($reports as $report)
+            <option value="{{ $report->id }}" {{ (int)($reportId ?? 0) === (int)$report->id ? 'selected' : '' }}>
+              {{ $report->name }}
+            </option>
+          @endforeach
+        </select>
+      </div>
+      <div class="col-sm-3 col-md-3 mb-3 mb-sm-0">
+        <select name="approved" id="filterApproved" class="form-control">
+          <option value="">-- Duyệt ?? --</option>
+          <option value="1">Đã duyệt</option>
+          <option value="0">Không duyệt</option>
+        </select>
+      </div>
+    </div>
+    <!-- End Row -->
   </div>
   <!-- End Header -->
   <!-- Table -->
@@ -74,7 +72,6 @@
           <th>Tiền nộp</th> 
           <th>Đóng tiền</th> 
           <th>Ghi chú</th> 
-
         </tr>
         @if($tasks->count())
         <tr class="font-weight-bold bg-light">
@@ -156,11 +153,13 @@
 $(function () {
   const $dept = $('#filterDepartment');
   const $report = $('#filterReport');
+  const $approved = $('#filterApproved');
   const $tbody = $('#taskTableBody');
 
   // nơi hiển thị tổng (nếu không có thì sẽ tự bỏ qua)
   const $sumTotalText = $('#sumTotalText');
   const $sumPaidText  = $('#sumPaidText');
+
 
   let xhr = null;
 
@@ -172,6 +171,7 @@ $(function () {
   function loadTasks() {
     const department_id = $dept.val();
     const report_id = $report.val();
+    const approved = $approved.val();
 
     if (xhr) xhr.abort();
 
@@ -180,7 +180,7 @@ $(function () {
     xhr = $.ajax({
       url: "{{ route('tasks.user') }}",
       type: "GET",
-      data: { department_id, report_id },
+      data: { department_id, report_id, approved  },
       dataType: "json",
       success: function (res) {
         $tbody.html(res.html || '');
@@ -198,6 +198,7 @@ $(function () {
 
   $dept.on('change', loadTasks);
   $report.on('change', loadTasks);
+  $approved.on('change', loadTasks);
 });
 </script>
 
