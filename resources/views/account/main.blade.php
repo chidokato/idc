@@ -105,73 +105,111 @@
                     </div>
                   </div> -->
 
-                  <div class="col-sm-auto align-self-sm-end">
-                    <!-- Legend Indicators -->
-                    <div class="row font-size-sm">
-                      <div class="col-auto">
-                        <span class="legend-indicator bg-primary"></span> Chi phí thực tế
-                      </div>
-                      <div class="col-auto">
-                        <span class="legend-indicator"></span> Chi phí dự kiến
-                      </div>
-                    </div>
-                    <!-- End Legend Indicators -->
-                  </div>
                 </div>
                 <!-- End Row -->
 
                 <!-- Bar Chart -->
                 <div class="chartjs-custom">
-  <canvas id="updatingData" style="height: 20rem;"
-    data-hs-chartjs-options='{
-      "type": "bar",
-      "data": {
-        "labels": {!! json_encode($chartLabels, JSON_UNESCAPED_UNICODE) !!},
-        "datasets": [{
-          "label": "Chi phí dự kiến",
-          "data": {!! json_encode($dataExpected) !!},
-          "backgroundColor": "#377dff",
-          "hoverBackgroundColor": "#377dff",
-          "borderColor": "#377dff"
-        },{
-          "label": "Chi phí thực tế",
-          "data": {!! json_encode($dataActual) !!},
-          "backgroundColor": "#e7eaf3",
-          "hoverBackgroundColor": "#e7eaf3",
-          "borderColor": "#e7eaf3"
-        }]
-      },
-      "options": {
-        "scales": {
-          "yAxes": [{
-            "gridLines": { "color": "#e7eaf3", "drawBorder": false, "zeroLineColor": "#e7eaf3" },
-            "ticks": {
-              "beginAtZero": true,
-              "fontSize": 12,
-              "fontColor": "#97a4af",
-              "fontFamily": "Open Sans, sans-serif",
-              "padding": 10
-            }
-          }],
-          "xAxes": [{
-            "gridLines": { "display": false, "drawBorder": false },
-            "ticks": {
-              "fontSize": 12,
-              "fontColor": "#97a4af",
-              "fontFamily": "Open Sans, sans-serif",
-              "padding": 5
-            },
-            "categoryPercentage": 0.6,
-            "barPercentage": 0.9,
-            "maxBarThickness": 14
-          }]
-        },
-        "tooltips": { "hasIndicator": true, "mode": "index", "intersect": false },
-        "hover": { "mode": "nearest", "intersect": true }
-      }
-    }'>
-  </canvas>
-</div>
+                  <canvas id="updatingData" style="height: 10rem;"></canvas>
+                  <script>
+                  document.addEventListener('DOMContentLoaded', function () {
+                    const labels       = @json($chartLabels, JSON_UNESCAPED_UNICODE);
+                    const dataExpected = @json($dataExpected);
+                    const dataActual   = @json($dataActual);
+
+                    const canvas = document.getElementById('updatingData');
+                    if (!canvas || typeof Chart === 'undefined') return;
+
+                    // Tính trần Y để cột không chạm nóc (chừa 20%)
+                    const maxVal = Math.max(...dataExpected, ...dataActual, 0);
+                    const yMax   = Math.ceil(maxVal * 1.2);
+
+                    const ctx = canvas.getContext('2d');
+
+                    new Chart(ctx, {
+                      type: 'bar',
+                      data: {
+                        labels: labels,
+                        datasets: [
+                          {
+                            label: 'Chi phí dự kiến',
+                            data: dataExpected,
+                            backgroundColor: '#377dff',
+                            hoverBackgroundColor: '#377dff',
+                            borderColor: '#377dff'
+                          },
+                          {
+                            label: 'Chi phí thực tế',
+                            data: dataActual,
+                            backgroundColor: '#e7eaf3',
+                            hoverBackgroundColor: '#e7eaf3',
+                            borderColor: '#e7eaf3'
+                          }
+                        ]
+                      },
+                      options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+
+                        scales: {
+                          yAxes: [{
+                            gridLines: { color: '#e7eaf3', drawBorder: false, zeroLineColor: '#e7eaf3' },
+                            ticks: {
+                              beginAtZero: true,
+                              max: yMax,
+
+                              // ✅ hạ thấp khoảng cách giữa các ô (dày hơn)
+                              stepSize: 1000000,
+                              maxTicksLimit: 60,
+
+                              fontSize: 12,
+                              fontColor: '#97a4af',
+                              fontFamily: 'Open Sans, sans-serif',
+                              padding: 10,
+                              callback: function(value) {
+                                return Number(value).toLocaleString('vi-VN');
+                              }
+                            }
+                          }],
+                          xAxes: [{
+                            gridLines: { display: false, drawBorder: false },
+                            ticks: {
+                              fontSize: 12,
+                              fontColor: '#97a4af',
+                              fontFamily: 'Open Sans, sans-serif',
+                              padding: 5,
+
+                              // (tuỳ chọn) cắt ngắn tên dự án nếu quá dài
+                              callback: function(value) {
+                                const s = String(value ?? '');
+                                return s.length > 18 ? (s.slice(0, 18) + '…') : s;
+                              }
+                            },
+                            categoryPercentage: 0.6,
+                            barPercentage: 0.9,
+                            maxBarThickness: 14
+                          }]
+                        },
+
+                        tooltips: {
+                          mode: 'index',
+                          intersect: false,
+                          callbacks: {
+                            label: function(tooltipItem, data) {
+                              const label = data.datasets[tooltipItem.datasetIndex].label || '';
+                              const val = tooltipItem.yLabel || 0; // ChartJS v2
+                              return label + ': ' + Number(val).toLocaleString('vi-VN');
+                            }
+                          }
+                        },
+
+                        hover: { mode: 'nearest', intersect: true }
+                      }
+                    });
+                  });
+                  </script>
+    
+                </div>
 
 
                 <!-- End Bar Chart -->
@@ -192,5 +230,5 @@
 
 
 @section('js')
-
+<!-- <script src="account/js/chartjs.js"></script> -->
 @endsection
