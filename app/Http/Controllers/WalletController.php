@@ -141,7 +141,7 @@ class WalletController extends Controller
         $users = User::select('id', 'yourname', 'email', 'employee_code')
             ->where('id', '!=', $user->id)
             ->where('department_lv2', $user->department_lv2)
-            ->orderBy('yourname')
+            ->orderBy('email')
             ->limit(500)
             ->get();
 
