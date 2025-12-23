@@ -189,8 +189,6 @@ Route::middleware(['user'])->group(function () {
         Route::post('tasks/{task}/update-paid', [TaskController::class, 'updatePaid'])->name('tasks.updatePaid');
         Route::get('tasks/user', [TaskController::class, 'tasksuser'])->name('tasks.user');
 
-
-
         // report
         Route::resource('report',ReportController::class);
         Route::post('/account/report-store', [ReportController::class, 'store'])->name('account.report.store');

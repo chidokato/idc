@@ -29,13 +29,13 @@
   <!-- Header -->
   <div class="card-header">
     <div class="row align-items-center flex-grow-1" id="filterBar">
-      <div class="col-sm-3 col-md-3 mb-3 mb-sm-0">
+      <div class="col-sm-3 col-md-3 mb-sm-0">
         <select name="department_id" id="filterDepartment" class="form-control">
           <option value="">-- Chọn phòng ban --</option>
           {!! $departmentOptions !!}
         </select>
       </div>
-      <div class="col-sm-3 col-md-3 mb-3 mb-sm-0">
+      <div class="col-sm-3 col-md-3 mb-sm-0">
         <select name="report_id" id="filterReport" class="form-control">
           <option value="">-- Chọn thời gian --</option>
           @foreach($reports as $report)
@@ -45,7 +45,7 @@
           @endforeach
         </select>
       </div>
-      <div class="col-sm-3 col-md-3 mb-3 mb-sm-0">
+      <div class="col-sm-2 col-md-2 mb-sm-0">
         <select name="approved" id="filterApproved" class="form-control">
           <option value="">-- Duyệt ?? --</option>
           <option value="1">Đã duyệt</option>

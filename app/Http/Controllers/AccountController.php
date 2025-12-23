@@ -20,21 +20,51 @@ use App\Models\Report;
 
 class AccountController extends HomeController
 {
+    public function index()
+    {
+        $user = User::findOrFail(Auth::id());
+
+        // Tổng expected_costs + actual_costs theo dự án (post_id)
+        // expected_costs, actual_costs đang varchar => làm sạch '.' ',' và CAST DECIMAL để SUM
+        $projects = Task::query()
+            ->selectRaw("
+                post_id,
+                SUM(
+                    CAST(
+                        REPLACE(REPLACE(COALESCE(expected_costs,'0'), '.', ''), ',', '')
+                    AS DECIMAL(15,2))
+                ) AS total_expected,
+                SUM(
+                    CAST(
+                        REPLACE(REPLACE(COALESCE(actual_costs,'0'), '.', ''), ',', '')
+                    AS DECIMAL(15,2))
+                ) AS total_actual
+            ")
+            ->whereNotNull('post_id')
+            ->where('post_id', '!=', '')
+            ->groupBy('post_id')
+            ->orderByDesc('total_expected')
+            ->limit(15) // tuỳ bạn, để chart không quá dài
+            ->get();
+
+        $chartLabels = $projects->pluck('post_id')->values()->all();
+        $dataExpected = $projects->pluck('total_expected')->map(fn($v) => (float)$v)->values()->all();
+        $dataActual   = $projects->pluck('total_actual')->map(fn($v) => (float)$v)->values()->all();
+
+        return view('account.main', compact(
+            'user',
+            'projects',
+            'chartLabels',
+            'dataExpected',
+            'dataActual'
+        ));
+    }
+
     public function dangnhap()
     {
         return view('account.login');
     }
 
-    public function index()
-    {
-        $user = User::find(Auth::User()->id);
-
-        return view('account.main', compact(
-            'user',
-            
-        ));
-
-    }
 
     public function edit()
     {
