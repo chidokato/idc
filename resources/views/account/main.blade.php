@@ -117,7 +117,6 @@
                     }'>
                   </canvas>
                 </div>
-
                 <!-- End Bar Chart -->
               </div>
               <!-- End Body -->
@@ -136,5 +135,63 @@
 
 
 @section('js')
-<!-- <script src="account/js/chartjs.js"></script> -->
+
+<script>
+(function () {
+  function fmtVND(v) {
+    const n = Number(v) || 0;
+    return n.toLocaleString('vi-VN') + ' ₫';
+  }
+
+  // Chart.js v2
+  if (window.Chart && Chart.pluginService) {
+    Chart.pluginService.register({
+      beforeInit: function(chart) {
+        // Y ticks
+        if (chart.options?.scales?.yAxes) {
+          chart.options.scales.yAxes.forEach(ax => {
+            ax.ticks = ax.ticks || {};
+            ax.ticks.callback = function(value){ return fmtVND(value); };
+          });
+        }
+
+        // Tooltip
+        chart.options.tooltips = chart.options.tooltips || {};
+        chart.options.tooltips.callbacks = chart.options.tooltips.callbacks || {};
+        chart.options.tooltips.callbacks.label = function(tooltipItem, data) {
+          const label = (data.datasets[tooltipItem.datasetIndex]?.label || '');
+          return label + ': ' + fmtVND(tooltipItem.yLabel);
+        };
+      }
+    });
+    return;
+  }
+
+  // Chart.js v3+
+  if (window.Chart && Chart.register) {
+    Chart.register({
+      id: 'vndFormatter',
+      beforeInit(chart) {
+        // Y ticks (v3)
+        const y = chart.options?.scales?.y;
+        if (y?.ticks) {
+          y.ticks.callback = (value) => fmtVND(value);
+        }
+
+        // Tooltip (v3)
+        const tt = chart.options?.plugins?.tooltip;
+        if (tt) {
+          tt.callbacks = tt.callbacks || {};
+          tt.callbacks.label = (ctx) => {
+            const label = ctx.dataset?.label || '';
+            return label + ': ' + fmtVND(ctx.parsed.y);
+          };
+        }
+      }
+    });
+  }
+})();
+</script>
+
+
 @endsection
