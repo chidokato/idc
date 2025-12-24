@@ -98,7 +98,7 @@
               <!-- Profile Cover -->
               <div class="profile-cover">
                 <div class="profile-cover-img-wrapper">
-                  <img id="profileCoverImg" class="profile-cover-img" src="img\1920x400\img2.jpg" alt="Image Description">
+                  <img id="profileCoverImg" class="profile-cover-img" src="account/img\1920x400\img2.jpg" alt="Image Description">
 
                   <!-- Custom File Cover -->
                   <!-- <div class="profile-cover-content profile-cover-btn">
