@@ -121,11 +121,23 @@
 
               <div class="mb-3">
                   <label>Số tiền đã chuyển</label>
-                  <input type="number"
-                         name="amount"
+                  <!-- input gốc: hiển thị trực tiếp VND -->
+                  <input type="text"
+                         id="amount"
                          class="form-control"
-                         min="10000"
+                         inputmode="numeric"
+                         autocomplete="off"
+                         placeholder="0 ₫"
                          required>
+
+                  <!-- input hidden: giá trị số thật để submit -->
+                  <input type="hidden" id="amount_raw" name="amount">
+
+                  <div class="invalid-feedback">
+                    Số tiền phải ≥ 10.000 và là bội số của 10.000
+                  </div>
+
+
               </div>
 
               <div class="mb-3">
@@ -221,5 +233,62 @@
 
 
 @section('js')
+<script>
+  const displayEl = document.getElementById('amount');       // input gốc (hiển thị)
+  const rawEl     = document.getElementById('amount_raw');   // input hidden (submit)
+
+  const STEP = 10000;
+  const MIN  = 10000;
+
+  function onlyDigits(str) {
+    return (str || '').replace(/\D+/g, '');
+  }
+
+  function formatVND(n) {
+    const val = Number(n) || 0;
+    return val.toLocaleString('vi-VN');
+  }
+
+  function setValidity(isOk, msg = '') {
+    displayEl.setCustomValidity(isOk ? '' : msg);
+    displayEl.classList.toggle('is-invalid', !isOk);
+    displayEl.classList.toggle('is-valid', isOk && displayEl.value.trim() !== '');
+  }
+
+  function renderFromDigits(digits) {
+    if (!digits) {
+      displayEl.value = '';
+      rawEl.value = '';
+      setValidity(false, 'Vui lòng nhập số tiền');
+      return;
+    }
+
+    const n = Number(digits);
+    rawEl.value = String(n);           // giá trị thật để submit
+    displayEl.value = formatVND(n);    // hiển thị trực tiếp trên input gốc
+
+    const ok = (n >= MIN) && (n % STEP === 0);
+    setValidity(ok, ok ? '' : 'Số tiền phải ≥ 10.000 và là bội số của 10.000');
+  }
+
+  // Khi gõ: luôn format ngay trong input gốc
+  displayEl.addEventListener('input', () => {
+    const digits = onlyDigits(displayEl.value);
+    renderFromDigits(digits);
+  });
+
+  // Khi rời khỏi ô: tự làm tròn về bội số 50.000 gần nhất (nếu muốn)
+  displayEl.addEventListener('blur', () => {
+    const digits = onlyDigits(displayEl.value);
+    if (!digits) return;
+
+    let n = Number(digits);
+    n = Math.round(n / STEP) * STEP;   // làm tròn về bội số 50k gần nhất
+    renderFromDigits(String(n));
+  });
+
+  // Init trạng thái
+  setValidity(false, 'Vui lòng nhập số tiền');
+</script>
 
 @endsection
