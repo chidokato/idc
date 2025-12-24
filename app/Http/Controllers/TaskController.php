@@ -40,6 +40,8 @@ class TaskController extends Controller
             $selectedDeptId = (int) ($user->department_lv2 ?? 0);
         }
 
+        $keyword = trim((string) $request->input('yourname', ''));
+
         // report filter (nếu có)
         $reportId = (int) $request->input('report_id', 0);
 
@@ -54,6 +56,14 @@ class TaskController extends Controller
         $q = Task::query()
             ->with(['handler', 'department', 'Post', 'channel'])
             ->orderByDesc('department_lv2');
+
+        if ($keyword !== '') {
+            $q->whereHas('handler', function ($qq) use ($keyword) {
+                $qq->where('yourname', 'like', "%{$keyword}%")
+                   ->orWhere('email', 'like', "%{$keyword}%")
+                   ->orWhere('employee_code', 'like', "%{$keyword}%");
+            });
+        }
 
         if (!empty($deptIds)) {
             $q->whereIn('department_id', $deptIds);

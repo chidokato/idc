@@ -29,6 +29,11 @@
   <!-- Header -->
   <div class="card-header">
     <div class="row align-items-center flex-grow-1" id="filterBar">
+      <div class="col-sm-2 col-md-2 mb-sm-0">
+  <input type="text" name="yourname" id="filterName" class="form-control" placeholder="Tìm theo tên / mã NV / email...">
+</div>
+
+
       <div class="col-sm-3 col-md-3 mb-sm-0">
         <select name="department_id" id="filterDepartment" class="form-control">
           <option value="">-- Chọn phòng ban --</option>
@@ -155,12 +160,11 @@ $(function () {
   const $dept = $('#filterDepartment');
   const $report = $('#filterReport');
   const $approved = $('#filterApproved');
+  const $name = $('#filterName');
   const $tbody = $('#taskTableBody');
 
-  // nơi hiển thị tổng (nếu không có thì sẽ tự bỏ qua)
   const $sumTotalText = $('#sumTotalText');
   const $sumPaidText  = $('#sumPaidText');
-
 
   let xhr = null;
 
@@ -173,6 +177,7 @@ $(function () {
     const department_id = $dept.val();
     const report_id = $report.val();
     const approved = $approved.val();
+    const yourname = $name.val(); // NEW
 
     if (xhr) xhr.abort();
 
@@ -181,12 +186,11 @@ $(function () {
     xhr = $.ajax({
       url: "{{ route('tasks.user') }}",
       type: "GET",
-      data: { department_id, report_id, approved  },
+      data: { department_id, report_id, approved, yourname }, // NEW
       dataType: "json",
       success: function (res) {
         $tbody.html(res.html || '');
 
-        // cập nhật tổng (nếu backend có trả về sumTotal/sumPaid)
         if ($sumTotalText.length) $sumTotalText.text(formatVND(res.sumTotal));
         if ($sumPaidText.length)  $sumPaidText.text(formatVND(res.sumPaid));
       },
@@ -200,8 +204,16 @@ $(function () {
   $dept.on('change', loadTasks);
   $report.on('change', loadTasks);
   $approved.on('change', loadTasks);
+
+  // NEW: debounce khi gõ tên
+  let t = null;
+  $name.on('input', function () {
+    clearTimeout(t);
+    t = setTimeout(loadTasks, 250);
+  });
 });
 </script>
+
 
 
 <script>

@@ -129,15 +129,12 @@
                          autocomplete="off"
                          placeholder="0 ₫"
                          required>
-
                   <!-- input hidden: giá trị số thật để submit -->
                   <input type="hidden" id="amount_raw" name="amount">
 
                   <div class="invalid-feedback">
                     Số tiền phải ≥ 10.000 và là bội số của 10.000
                   </div>
-
-
               </div>
 
               <div class="mb-3">

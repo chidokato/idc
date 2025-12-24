@@ -137,9 +137,22 @@
 
         <div id="same_amount_box" class="mb-3">
           <label class="form-label">Số tiền (VND)</label>
-          <input type="number" name="amount" class="form-control" min="1000" value="{{ old('amount') }}">
+
+          <!-- input hiển thị -->
+          <input type="text"
+                 id="amount_display"
+                 class="form-control"
+                 inputmode="numeric"
+                 autocomplete="off"
+                 placeholder="0 ₫"
+                 value="{{ old('amount') ? number_format(old('amount'),0,',','.') . ' ₫' : '' }}">
+
+          <!-- giá trị số thật để submit -->
+          <input type="hidden" id="amount_raw" name="amount" value="{{ old('amount') }}">
+
           @error('amount') <div class="text-danger mt-1">{{ $message }}</div> @enderror
         </div>
+
 
         <div id="custom_amount_box" class="mb-3" style="display:none;">
           <label class="form-label">Số tiền theo từng người</label>
@@ -157,8 +170,6 @@
         </button>
       </form>
       </div>
-      
-
       
 
     </div>
@@ -183,29 +194,110 @@
   @endforeach
 
   const oldAmounts = @json(old('amounts', []));
+  const oldSameAmount = @json(old('amount'));
+
+  const MIN = 10000;
+  const STEP = 0; // <-- nếu muốn bắt buộc bội số 50.000 thì đổi thành 50000
+
+  function onlyDigits(str){ return (str || '').replace(/\D+/g, ''); }
+  function formatVND(n){ return (Number(n)||0).toLocaleString('vi-VN'); }
+
+  function validateAmount(n){
+    if(!n || n < MIN) return false;
+    if(STEP && (n % STEP !== 0)) return false;
+    return true;
+  }
+
+  // ====== SAME AMOUNT ======
+  const sameDisplay = document.getElementById('amount_display');
+  const sameRaw = document.getElementById('amount_raw');
+
+  function syncSame(){
+    const digits = onlyDigits(sameDisplay.value);
+    if(!digits){
+      sameDisplay.value = '';
+      sameRaw.value = '';
+      sameDisplay.classList.remove('is-valid');
+      sameDisplay.classList.add('is-invalid');
+      return;
+    }
+    const n = Number(digits);
+    sameRaw.value = String(n);
+    sameDisplay.value = formatVND(n);
+
+    const ok = validateAmount(n);
+    sameDisplay.classList.toggle('is-invalid', !ok);
+    sameDisplay.classList.toggle('is-valid', ok);
+    sameDisplay.setCustomValidity(ok ? '' : 'invalid');
+  }
+
+  if(sameDisplay){
+    // init old value
+    if(oldSameAmount){
+      sameRaw.value = oldSameAmount;
+      sameDisplay.value = formatVND(oldSameAmount);
+    }
+    sameDisplay.addEventListener('input', syncSame);
+    sameDisplay.addEventListener('blur', syncSame);
+    syncSame();
+  }
 
   function selectedIds(){
     return Array.from(recipientsEl.selectedOptions).map(o => parseInt(o.value,10));
   }
 
+  // ====== CUSTOM AMOUNT LIST ======
   function renderCustom(){
     listBox.innerHTML = '';
     const ids = selectedIds();
     if(!ids.length) return;
 
     ids.forEach(id => {
+      const oldVal = (oldAmounts && oldAmounts[id] !== undefined) ? oldAmounts[id] : '';
+
       const row = document.createElement('div');
       row.className = 'd-flex align-items-center mb-2';
       row.innerHTML = `
         <div style="flex:1;padding-right:10px;"><strong>${userMap[id] || ('User ' + id)}</strong></div>
         <div style="width:220px;">
-          <input type="number" class="form-control" min="1000" name="amounts[${id}]" placeholder="Số tiền">
+          <input type="text"
+                 class="form-control amount-vnd"
+                 inputmode="numeric"
+                 autocomplete="off"
+                 placeholder="0 ₫"
+                 value="${oldVal ? (Number(oldVal).toLocaleString('vi-VN') + ' ₫') : ''}">
+          <input type="hidden" name="amounts[${id}]" value="${oldVal}">
+          <div class="invalid-feedback">Tối thiểu ${MIN.toLocaleString('vi-VN')} ₫${STEP ? ' và là bội số ' + STEP.toLocaleString('vi-VN') : ''}</div>
         </div>
       `;
       listBox.appendChild(row);
 
-      const inp = row.querySelector(`input[name="amounts[${id}]"]`);
-      if(oldAmounts && oldAmounts[id] !== undefined) inp.value = oldAmounts[id];
+      const displayInp = row.querySelector('.amount-vnd');
+      const rawInp = row.querySelector(`input[type="hidden"][name="amounts[${id}]"]`);
+
+      const syncRow = () => {
+        const digits = onlyDigits(displayInp.value);
+        if(!digits){
+          displayInp.value = '';
+          rawInp.value = '';
+          displayInp.classList.add('is-invalid');
+          displayInp.classList.remove('is-valid');
+          displayInp.setCustomValidity('invalid');
+          return;
+        }
+        const n = Number(digits);
+        rawInp.value = String(n);
+        displayInp.value = formatVND(n);
+
+        const ok = validateAmount(n);
+        displayInp.classList.toggle('is-invalid', !ok);
+        displayInp.classList.toggle('is-valid', ok);
+        displayInp.setCustomValidity(ok ? '' : 'invalid');
+      };
+
+      displayInp.addEventListener('input', syncRow);
+      displayInp.addEventListener('blur', syncRow);
+      syncRow();
     });
   }
 
@@ -226,4 +318,5 @@
   toggle();
 })();
 </script>
+
 @endsection
