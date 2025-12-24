@@ -22,7 +22,7 @@
         <ul class="navbar-nav navbar-nav-lg nav-tabs">
           <!-- Dashboards -->
           <li class="navbar-vertical-aside-has-menu show">
-            <a class="js-navbar-vertical-aside-menu-link nav-link active" href="account/main" title="Dashboards">
+            <a class="js-navbar-vertical-aside-menu-link nav-link active" href="account/main" title="Trang chủ">
               <i class="tio-home-vs-1-outlined nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Trang chủ</span>
             </a>
@@ -37,21 +37,21 @@
           <!-- Pages -->
           
           <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/mkt-register" title="Welcome page" data-placement="left">
+            <a class="js-nav-tooltip-link nav-link " href="account/mkt-register" title="Đăng ký Marketing" data-placement="left">
               <i class="tio-add-circle nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Đăng ký Marketing</span>
             </a>
           </li>
 
           <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="{{ route('tasks.user') }}" title="Welcome page" data-placement="left">
+            <a class="js-nav-tooltip-link nav-link " href="{{ route('tasks.user') }}" title="Quản lý Marketing" data-placement="left">
                <i class="tio-layers-outlined nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Quản lý Marketing</span>
             </a>
           </li>
           @if(auth()->check() && in_array((int)auth()->user()->rank, [1], true))
           <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/report" title="Welcome page" data-placement="left">
+            <a class="js-nav-tooltip-link nav-link " href="account/report" title="Quản lý tổng" data-placement="left">
               <i class="tio-dashboard nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Quản lý tổng</span>
             </a>
@@ -64,56 +64,19 @@
           </li>
 
           <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/wallet" title="Welcome page" data-placement="left">
+            <a class="js-nav-tooltip-link nav-link " href="account/wallet" title="Ví tiền" data-placement="left">
               <i class="tio-wallet nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Ví tiền</span>
             </a>
           </li>
-
+          @if(auth()->check() && in_array((int)auth()->user()->rank, [1,2], true))
           <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/wallet/deposit" title="Welcome page" data-placement="left">
+            <a class="js-nav-tooltip-link nav-link " href="account/wallet/deposit" title="Nạp tiền" data-placement="left">
               <i class="tio-money nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Nạp tiền</span>
             </a>
           </li>
-
-          <!-- Help -->
-          <li class="navbar-vertical-aside-has-menu nav-footer-item ">
-            <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle " href="javascript:;" title="Help">
-              <i class="tio-home-vs-1-outlined nav-icon"></i>
-              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Help</span>
-            </a>
-
-            <ul class="js-navbar-vertical-aside-submenu nav nav-sub">
-              <li class="nav-item">
-                <a class="nav-link" href="#" title="Resources &amp; tutorials">
-                  <i class="tio-book-outlined dropdown-item-icon"></i> Resources &amp; tutorials
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#" title="Keyboard shortcuts">
-                  <i class="tio-command-key dropdown-item-icon"></i> Keyboard shortcuts
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#" title="Connect other apps">
-                  <i class="tio-alt dropdown-item-icon"></i> Connect other apps
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#" title="What's new?">
-                  <i class="tio-gift dropdown-item-icon"></i> What's new?
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#" title="Contact support">
-                  <i class="tio-chat-outlined dropdown-item-icon"></i> Contact support
-                </a>
-              </li>
-            </ul>
-          </li>
-          <!-- End Help -->
-
+          @endif
           
         </ul>
       </div>
