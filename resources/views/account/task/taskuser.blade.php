@@ -240,20 +240,34 @@ document.addEventListener('change', function (e) {
     body: JSON.stringify({ paid })
   })
   .then(async (res) => {
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok || data.status === false) throw new Error(data.message || 'Có lỗi xảy ra');
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data.status === false) throw new Error(data.message || 'Có lỗi xảy ra');
 
-    showToast('success', data.message || 'Thành công');
+  showToast('success', data.message || 'Thành công');
 
-    // update badge trong cùng dòng (nếu có)
-    const tr = el.closest('tr');
-    const badgeCell = tr?.querySelector('.hold-badge');
-    if (badgeCell) {
-      badgeCell.innerHTML = paid
-        ? `<span class="badge badge-soft-success">Đã đóng</span>`
-        : `<span class="badge badge-soft-warning">Chưa đóng</span>`;
+  // update badge trong cùng dòng (nếu có)
+  const tr = el.closest('tr');
+  const badgeCell = tr?.querySelector('.hold-badge');
+  if (badgeCell) {
+    badgeCell.innerHTML = paid
+      ? `<span class="badge badge-soft-success">Đã đóng</span>`
+      : `<span class="badge badge-soft-warning">Chưa đóng</span>`;
+  }
+
+  // ✅ update số dư trên menu
+  if (data.wallet && typeof data.wallet.balance !== 'undefined') {
+    const menuBalanceEl = document.getElementById('menuBalance');
+    if (menuBalanceEl) {
+      const num = Number(data.wallet.balance || 0);
+      menuBalanceEl.textContent = num.toLocaleString('vi-VN');
     }
-  })
+
+    // (tuỳ chọn) nếu có hiển thị held:
+    const menuHeldEl = document.getElementById('menuHeld');
+    if (menuHeldEl) menuHeldEl.textContent = Number(data.wallet.held_balance||0).toLocaleString('vi-VN');
+  }
+})
+
   .catch(err => {
     el.checked = oldState;
     showCenterError(err.message || 'Có lỗi xảy ra, vui lòng thử lại!');

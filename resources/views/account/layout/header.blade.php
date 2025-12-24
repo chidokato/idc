@@ -23,10 +23,13 @@
       <!-- Navbar -->
       <ul class="navbar-nav align-items-center flex-row">
         <li class="mr-3">
-          <div class="view-balance">
-            {{ number_format(Auth::user()->wallet?->balance) }} vnđ
-          </div>
-        </li>
+  <div class="view-balance">
+    <span id="menuBalance">{{ number_format(Auth::user()->wallet?->balance ?? 0, 0, ',', '.') }}</span> vnđ | 
+    <span id="menuHeld">{{ number_format(Auth::user()->wallet?->held_balance ?? 0, 0, ',', '.') }}</span> vnđ giữ
+
+  </div>
+</li>
+
         <li class="nav-item">
           <!-- Account -->
           <div class="hs-unfold">

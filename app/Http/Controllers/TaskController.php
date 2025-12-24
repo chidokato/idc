@@ -7,6 +7,7 @@ use App\Models\Task;
 use App\Services\WalletService;
 use App\Models\User;
 use App\Models\Department;
+use App\Models\Wallet;
 use App\Models\Report;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\TreeHelperLv2Only;
@@ -448,6 +449,8 @@ public function updatePaid(Request $request, Task $task, WalletService $walletSe
     $taskUserId = (int) ($task->user ?? 0);
     $isMine = ($taskUserId === $meId);
 
+    
+
     // Rank 1: full
     if ($rank === 1) {
         // ok
@@ -477,10 +480,31 @@ public function updatePaid(Request $request, Task $task, WalletService $walletSe
     try {
         if ($paid === 1) {
             $walletService->holdTask($task);
-            return response()->json(['status' => true, 'message' => 'Đã giữ tiền (HOLD) thành công.']);
+            // sô tiền trong ví
+            $wallet = Wallet::where('user_id', $meId)->first();
+
+            return response()->json([
+                'status' => true, 
+                'message' => 'Đã giữ tiền (HOLD) thành công.',
+                'wallet' => [
+                      'balance' => (string)($wallet->balance ?? '0.00'),
+                      'held_balance' => (string)($wallet->held_balance ?? '0.00'),
+                      'total' => (string)bcadd((string)($wallet->balance ?? '0.00'), (string)($wallet->held_balance ?? '0.00'), 2),
+                  ]
+            ]);
         } else {
             $walletService->releaseTask($task, 'admin_toggle_off');
-            return response()->json(['status' => true, 'message' => 'Đã nhả giữ tiền (RELEASE) thành công.']);
+            // sô tiền trong ví
+            $wallet = Wallet::where('user_id', $meId)->first();
+            return response()->json([
+                'status' => true, 
+                'message' => 'Đã nhả giữ tiền (RELEASE) thành công.',
+                'wallet' => [
+                      'balance' => (string)($wallet->balance ?? '0.00'),
+                      'held_balance' => (string)($wallet->held_balance ?? '0.00'),
+                      'total' => (string)bcadd((string)($wallet->balance ?? '0.00'), (string)($wallet->held_balance ?? '0.00'), 2),
+                  ]
+            ]);
         }
     } catch (ValidationException $e) {
         $first = collect($e->errors())->flatten()->first() ?? 'Dữ liệu không hợp lệ.';
