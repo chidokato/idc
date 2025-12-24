@@ -49,13 +49,14 @@
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Quản lý Marketing</span>
             </a>
           </li>
-
+          @if(auth()->check() && in_array((int)auth()->user()->rank, [1], true))
           <li class="nav-item ">
             <a class="js-nav-tooltip-link nav-link " href="account/report" title="Welcome page" data-placement="left">
               <i class="tio-dashboard nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Quản lý tổng</span>
             </a>
           </li>
+          @endif
 
           <li class="nav-item">
             <small class="nav-subtitle" title="Pages">Quản lý tiền</small>

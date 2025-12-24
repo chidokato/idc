@@ -52,39 +52,9 @@ class AccountController extends HomeController
         $dataExpected = $projects->pluck('total_expected')->map(fn($v) => (float)$v)->values()->all();
         $dataActual   = $projects->pluck('total_actual')->map(fn($v) => (float)$v)->values()->all();
 
-        // biểu đồ theo sàn/phòng (LV2)
-        $projects_2 = Task::query()
-            ->leftJoin('departments', function ($join) {
-                // tasks.department_lv2 là varchar, departments.id là int => cast id sang char để join chuẩn
-                $join->on('tasks.department_lv2', '=', \DB::raw('CAST(departments.id AS CHAR)'));
-            })
-            ->selectRaw("
-                tasks.department_lv2,
-                COALESCE(departments.name, tasks.department_lv2) AS department_name,
-
-                SUM(
-                    CAST(REPLACE(REPLACE(COALESCE(tasks.expected_costs,'0'), '.', ''), ',', '') AS DECIMAL(15,2))
-                ) AS total_expected,
-
-                SUM(
-                    CAST(REPLACE(REPLACE(COALESCE(tasks.actual_costs,'0'), '.', ''), ',', '') AS DECIMAL(15,2))
-                ) AS total_actual
-            ")
-            ->whereNotNull('tasks.department_lv2')
-            ->where('tasks.department_lv2', '!=', '')
-            ->groupBy('tasks.department_lv2', 'department_name')
-            ->orderByDesc('total_expected')
-            ->limit(15)
-            ->get();
-
-        $chartLabels_2  = $projects_2->pluck('department_name')->values()->all();
-        $dataExpected_2 = $projects_2->pluck('total_expected')->map(fn($v) => (float)$v)->values()->all();
-        $dataActual_2   = $projects_2->pluck('total_actual')->map(fn($v) => (float)$v)->values()->all();
-
         return view('account.main', compact(
             'user',
             'chartLabels', 'dataExpected', 'dataActual',
-            'chartLabels_2', 'dataExpected_2', 'dataActual_2',
         ));
     }
 

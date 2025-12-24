@@ -203,6 +203,45 @@ $(function () {
 </script>
 
 
+<script> // đóng tiền
+document.addEventListener('change', function (e) {
+  const el = e.target;
+  if (!el.classList.contains('active-toggle')) return;
+
+  const url = el.dataset.url;
+  const paid = el.checked ? 1 : 0;     // paid=1 => HOLD, paid=0 => RELEASE
+  const oldState = !el.checked;        // rollback UI khi lỗi
+
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify({ paid })
+  })
+  .then(async (res) => {
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.status === false) throw new Error(data.message || 'Có lỗi xảy ra');
+
+    showToast('success', data.message || 'Thành công');
+
+    // update badge trong cùng dòng (nếu có)
+    const tr = el.closest('tr');
+    const badgeCell = tr?.querySelector('.hold-badge');
+    if (badgeCell) {
+      badgeCell.innerHTML = paid
+        ? `<span class="badge badge-soft-success">Đã đóng</span>`
+        : `<span class="badge badge-soft-warning">Chưa đóng</span>`;
+    }
+  })
+  .catch(err => {
+    el.checked = oldState;
+    showCenterError(err.message || 'Có lỗi xảy ra, vui lòng thử lại!');
+  });
+});
+</script>
 
 
 @endsection

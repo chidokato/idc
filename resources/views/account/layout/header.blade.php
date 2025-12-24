@@ -22,7 +22,11 @@
     <div class="navbar-nav-wrap-content-right">
       <!-- Navbar -->
       <ul class="navbar-nav align-items-center flex-row">
-              
+        <li class="mr-3">
+          <div class="view-balance">
+            {{ number_format(Auth::user()->wallet?->balance) }} vnđ
+          </div>
+        </li>
         <li class="nav-item">
           <!-- Account -->
           <div class="hs-unfold">

@@ -140,8 +140,11 @@
                     @forelse($transactions as $item)
 
                     @php
-                          $meta = $item->meta ? json_decode($item->meta, true) : [];
-                        @endphp
+                      $meta = $item->meta ?? [];
+                      if (is_string($meta)) {
+                          $meta = json_decode($meta, true) ?: [];
+                      }
+                    @endphp
 
                     <tr>
                     <td class="table-column-pr-0">

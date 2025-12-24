@@ -13,12 +13,47 @@ use Exception;
 class WalletService
 {
     // =========================
+    // Normalize số (tránh "1.000.000", "1,5")
+    // =========================
+    private function normalizeNumber($v): string
+    {
+        $s = (string)($v ?? '0');
+        $s = trim($s);
+        $s = str_replace([' ', "\u{00A0}"], '', $s);
+        $s = str_replace(',', '.', $s);
+        $s = preg_replace('/[^0-9\.\-]/', '', $s);
+        if ($s === '' || $s === '-' || $s === '.' || $s === '-.') return '0';
+        return $s;
+    }
+
+    // =========================
     // Helpers bc math (tránh float)
     // =========================
     private function bc_add($a, $b, $scale = 2) { return bcadd((string)$a, (string)$b, $scale); }
     private function bc_sub($a, $b, $scale = 2) { return bcsub((string)$a, (string)$b, $scale); }
     private function bc_mul($a, $b, $scale = 2) { return bcmul((string)$a, (string)$b, $scale); }
     private function bc_div($a, $b, $scale = 4) { return bcdiv((string)$a, (string)$b, $scale); }
+
+    /**
+     * Xác định user nào là người bị trừ tiền/giữ tiền.
+     * - Ưu tiên handler_id (vì bạn hiển thị $task->handler)
+     * - Fallback user_id
+     */
+    private function resolveWalletUserId(Task $task): int
+    {
+        // ✅ CHỈ LẤY THEO CỘT user TRONG BẢNG tasks
+        // yêu cầu: tasks.user phải là ID (int/bigint). Nếu đang là string tên user thì phải đổi DB.
+        $uid = $task->user;
+
+        if (empty($uid) || !is_numeric($uid)) {
+            throw ValidationException::withMessages([
+                'task' => 'Cột user của task không hợp lệ (phải là ID user).'
+            ]);
+        }
+
+        return (int) $uid;
+    }
+
 
     /**
      * Trừ trực tiếp vào balance (available). (Giữ lại chức năng cũ)
@@ -28,10 +63,7 @@ class WalletService
         DB::transaction(function () use ($user, $amount, $description) {
 
             $wallet = $user->wallet()->lockForUpdate()->first();
-
-            if (!$wallet) {
-                throw new Exception('User chưa có ví');
-            }
+            if (!$wallet) throw new Exception('User chưa có ví');
 
             $amount = bcadd((string)$amount, '0', 2);
 
@@ -39,25 +71,21 @@ class WalletService
                 throw new Exception('Số dư không đủ');
             }
 
-            // Nếu bạn đang có method withdraw() ở Wallet model thì dùng:
-            // $wallet->withdraw($amount, $description);
-
-            // Nếu chưa có withdraw() hoặc muốn chắc chắn:
             $balanceBefore = (string)$wallet->balance;
-            $heldBefore = (string)($wallet->held_balance ?? '0.00');
+            $heldBefore    = (string)($wallet->held_balance ?? '0.00');
 
             $wallet->balance = $this->bc_sub($wallet->balance, $amount, 2);
             $wallet->save();
 
             WalletTransaction::create([
-                'wallet_id' => $wallet->id,
-                'type' => 'withdraw',
-                'amount' => $amount,
-                'description' => $description,
-                'balance_before' => $balanceBefore,
-                'balance_after' => (string)$wallet->balance,
-                'held_before' => $heldBefore,
-                'held_after' => (string)($wallet->held_balance ?? '0.00'),
+                'wallet_id'       => $wallet->id,
+                'type'            => 'withdraw',
+                'amount'          => $amount,
+                'description'     => $description,
+                'balance_before'  => $balanceBefore,
+                'balance_after'   => (string)$wallet->balance,
+                'held_before'     => $heldBefore,
+                'held_after'      => (string)($wallet->held_balance ?? '0.00'),
             ]);
         });
     }
@@ -68,13 +96,13 @@ class WalletService
      */
     public function calcExpectedAmount(Task $task): string
     {
-        $days = (string)($task->days ?? 0);
-        $expected = (string)($task->expected_costs ?? 0);
-        $rate = (string)($task->rate ?? 0);
+        $days     = $this->normalizeNumber($task->days ?? 0);
+        $expected = $this->normalizeNumber($task->expected_costs ?? 0);
+        $rate     = $this->normalizeNumber($task->rate ?? 0);
 
-        $gross = $this->bc_mul($days, $expected, 2);
+        $gross    = $this->bc_mul($days, $expected, 2);
         $discount = $this->bc_sub('1', $this->bc_div($rate, '100', 4), 4);
-        $net = $this->bc_mul($gross, $discount, 2);
+        $net      = $this->bc_mul($gross, $discount, 2);
 
         if (bccomp($net, '0', 2) < 0) return '0.00';
         return $net;
@@ -87,6 +115,7 @@ class WalletService
     {
         return DB::transaction(function () use ($task, $amount) {
 
+            // lock task trước
             $task = Task::whereKey($task->id)->lockForUpdate()->firstOrFail();
 
             // Idempotent: nếu đã hold thì trả transaction hold gần nhất
@@ -99,11 +128,20 @@ class WalletService
                 if ($existing) return $existing;
             }
 
+            // lock wallet đúng user
+            $walletUserId = $this->resolveWalletUserId($task);
+
             /** @var Wallet|null $wallet */
-            $wallet = Wallet::where('user_id', $task->user_id)->lockForUpdate()->first();
-            if (!$wallet) {
-                throw new Exception('User chưa có ví');
-            }
+            $wallet = Wallet::where('user_id', $walletUserId)->lockForUpdate()->first();
+            if (!$wallet) throw new Exception('User chưa có ví');
+
+            // log sau khi đã có $wallet (tránh undefined variable)
+            \Log::info('HOLD TARGET', [
+                'task_id'         => $task->id,
+                'task_user_id'    => $task->user_id,
+                'task_handler_id' => $task->handler_id ?? null,
+                'wallet_user_id'  => $wallet->user_id,
+            ]);
 
             $holdAmount = $amount ?? $this->calcExpectedAmount($task);
             $holdAmount = bcadd((string)$holdAmount, '0', 2);
@@ -112,6 +150,7 @@ class WalletService
                 throw ValidationException::withMessages(['amount' => 'Số tiền hold không hợp lệ.']);
             }
 
+            // check tiền khả dụng
             if (bccomp((string)$wallet->balance, $holdAmount, 2) < 0) {
                 throw ValidationException::withMessages(['balance' => 'Số dư không đủ để đăng ký dịch vụ.']);
             }
@@ -125,35 +164,38 @@ class WalletService
             if ($dup) return $dup;
 
             $balanceBefore = (string)$wallet->balance;
-            $heldBefore = (string)($wallet->held_balance ?? '0.00');
+            $heldBefore    = (string)($wallet->held_balance ?? '0.00');
 
-            $wallet->balance = $this->bc_sub($wallet->balance, $holdAmount, 2);
+            // move balance -> held
+            $wallet->balance      = $this->bc_sub($wallet->balance, $holdAmount, 2);
             $wallet->held_balance = $this->bc_add($wallet->held_balance ?? '0.00', $holdAmount, 2);
             $wallet->save();
 
             $tx = WalletTransaction::create([
-                'wallet_id' => $wallet->id,
-                'type' => 'hold',
-                'amount' => $holdAmount,
-                'description' => "Hold tiền cho task #{$task->id}",
-                'ref_type' => 'task',
-                'ref_id' => $task->id,
-                'idempotency_key' => $idempotencyKey,
-                'meta' => [
-                    'days' => $task->days,
-                    'expected_costs' => (string)$task->expected_costs,
-                    'rate' => (string)$task->rate,
+                'wallet_id'        => $wallet->id,
+                'type'             => 'hold',
+                'amount'           => $holdAmount,
+                'description'      => "Hold tiền cho task #{$task->id}",
+                'ref_type'         => 'task',
+                'ref_id'           => $task->id,
+                'idempotency_key'  => $idempotencyKey,
+                'meta'             => [
+                    'days'           => $task->days,
+                    'expected_costs'  => (string)$task->expected_costs,
+                    'rate'           => (string)$task->rate,
+                    'wallet_user_id' => $wallet->user_id,
                 ],
-                'balance_before' => $balanceBefore,
-                'balance_after' => (string)$wallet->balance,
-                'held_before' => $heldBefore,
-                'held_after' => (string)$wallet->held_balance,
+                'balance_before'   => $balanceBefore,
+                'balance_after'    => (string)$wallet->balance,
+                'held_before'      => $heldBefore,
+                'held_after'       => (string)$wallet->held_balance,
             ]);
 
-            // Update task fields (nếu bạn đã migrate các cột này)
-            $task->price_expected = $holdAmount;
-            $task->hold_transaction_id = $tx->id;
-            $task->status = 'held';
+            // update task
+            $task->price_expected       = $holdAmount;
+            $task->hold_transaction_id  = $tx->id;
+            $task->status               = 'held';
+            $task->paid                 = 1; // ✅ đồng bộ paid = 1 khi hold
             $task->save();
 
             return $tx;
@@ -161,7 +203,7 @@ class WalletService
     }
 
     /**
-     * RELEASE hold (hủy/từ chối): held_balance giảm, balance tăng
+     * RELEASE hold: held_balance giảm, balance tăng
      */
     public function releaseTask(Task $task, string $reason = 'release'): WalletTransaction
     {
@@ -177,13 +219,14 @@ class WalletService
                 throw ValidationException::withMessages(['task' => 'Task đã nghiệm thu, không thể release.']);
             }
 
-            $wallet = Wallet::where('user_id', $task->user_id)->lockForUpdate()->firstOrFail();
+            $walletUserId = $this->resolveWalletUserId($task);
+            $wallet = Wallet::where('user_id', $walletUserId)->lockForUpdate()->firstOrFail();
 
             $amount = bcadd((string)$task->price_expected, '0', 2);
 
             $cycle = (int)($task->hold_cycle ?? 1);
             $idempotencyKey = "task:{$task->id}:release:{$cycle}";
-            
+
             $dup = WalletTransaction::where('wallet_id', $wallet->id)
                 ->where('idempotency_key', $idempotencyKey)
                 ->first();
@@ -194,38 +237,35 @@ class WalletService
             }
 
             $balanceBefore = (string)$wallet->balance;
-            $heldBefore = (string)$wallet->held_balance;
+            $heldBefore    = (string)$wallet->held_balance;
 
+            // move held -> balance
             $wallet->held_balance = $this->bc_sub($wallet->held_balance, $amount, 2);
-            $wallet->balance = $this->bc_add($wallet->balance, $amount, 2);
+            $wallet->balance      = $this->bc_add($wallet->balance, $amount, 2);
             $wallet->save();
 
             $tx = WalletTransaction::create([
-                'wallet_id' => $wallet->id,
-                'type' => 'release',
-                'amount' => $amount,
-                'description' => "Release tiền task #{$task->id} ({$reason})",
-                'ref_type' => 'task',
-                'ref_id' => $task->id,
-                'idempotency_key' => $idempotencyKey,
-                'meta' => ['reason' => $reason],
-                'balance_before' => $balanceBefore,
-                'balance_after' => (string)$wallet->balance,
-                'held_before' => $heldBefore,
-                'held_after' => (string)$wallet->held_balance,
+                'wallet_id'        => $wallet->id,
+                'type'             => 'release',
+                'amount'           => $amount,
+                'description'      => "Release tiền task #{$task->id} ({$reason})",
+                'ref_type'         => 'task',
+                'ref_id'           => $task->id,
+                'idempotency_key'  => $idempotencyKey,
+                'meta'             => ['reason' => $reason, 'wallet_user_id' => $wallet->user_id],
+                'balance_before'   => $balanceBefore,
+                'balance_after'    => (string)$wallet->balance,
+                'held_before'      => $heldBefore,
+                'held_after'       => (string)$wallet->held_balance,
             ]);
 
-            $task->status = 'canceled';
-            $task->save();
-
-            // reset để có thể hold lại lần sau (chu kỳ mới)
-            $task->paid = 0; // nếu bạn có cột paid
+            // reset task để hold lại được
+            $task->paid                = 0;
             $task->hold_transaction_id = null;
-            $task->price_expected = 0;
-            $task->status = 'registered'; // hoặc 'released'
-            $task->hold_cycle = (int)($task->hold_cycle ?? 1) + 1;
+            $task->price_expected      = '0.00';
+            $task->status              = 'registered';
+            $task->hold_cycle          = (int)($task->hold_cycle ?? 1) + 1;
             $task->save();
-
 
             return $tx;
         });
@@ -233,9 +273,6 @@ class WalletService
 
     /**
      * CAPTURE khi nghiệm thu: trừ từ held_balance
-     * - mặc định final = price_expected
-     * - nếu final < expected: tự release phần dư về balance
-     * - nếu final > expected: báo lỗi (bạn có thể làm hold thêm sau)
      */
     public function captureTask(Task $task, ?string $finalAmount = null): WalletTransaction
     {
@@ -258,10 +295,11 @@ class WalletService
                 throw ValidationException::withMessages(['task' => 'Task đã capture trước đó.']);
             }
 
-            $wallet = Wallet::where('user_id', $task->user_id)->lockForUpdate()->firstOrFail();
+            $walletUserId = $this->resolveWalletUserId($task);
+            $wallet = Wallet::where('user_id', $walletUserId)->lockForUpdate()->firstOrFail();
 
             $expected = bcadd((string)$task->price_expected, '0', 2);
-            $final = bcadd((string)($finalAmount ?? $expected), '0', 2);
+            $final    = bcadd((string)($finalAmount ?? $expected), '0', 2);
 
             if (bccomp($final, $expected, 2) > 0) {
                 throw ValidationException::withMessages([
@@ -280,24 +318,24 @@ class WalletService
             }
 
             $balanceBefore = (string)$wallet->balance;
-            $heldBefore = (string)$wallet->held_balance;
+            $heldBefore    = (string)$wallet->held_balance;
 
             $wallet->held_balance = $this->bc_sub($wallet->held_balance, $final, 2);
             $wallet->save();
 
             $tx = WalletTransaction::create([
-                'wallet_id' => $wallet->id,
-                'type' => 'capture',
-                'amount' => $final,
-                'description' => "Capture nghiệm thu task #{$task->id}",
-                'ref_type' => 'task',
-                'ref_id' => $task->id,
+                'wallet_id'       => $wallet->id,
+                'type'            => 'capture',
+                'amount'          => $final,
+                'description'     => "Capture nghiệm thu task #{$task->id}",
+                'ref_type'        => 'task',
+                'ref_id'          => $task->id,
                 'idempotency_key' => $idempotencyKey,
-                'meta' => ['expected' => $expected, 'final' => $final],
-                'balance_before' => $balanceBefore,
-                'balance_after' => (string)$wallet->balance,
-                'held_before' => $heldBefore,
-                'held_after' => (string)$wallet->held_balance,
+                'meta'            => ['expected' => $expected, 'final' => $final, 'wallet_user_id' => $wallet->user_id],
+                'balance_before'  => $balanceBefore,
+                'balance_after'   => (string)$wallet->balance,
+                'held_before'     => $heldBefore,
+                'held_after'      => (string)$wallet->held_balance,
             ]);
 
             // release phần dư nếu final < expected
@@ -315,32 +353,32 @@ class WalletService
 
                 if (!$dup2) {
                     $balanceB = (string)$wallet->balance;
-                    $heldB = (string)$wallet->held_balance;
+                    $heldB    = (string)$wallet->held_balance;
 
                     $wallet->held_balance = $this->bc_sub($wallet->held_balance, $diff, 2);
-                    $wallet->balance = $this->bc_add($wallet->balance, $diff, 2);
+                    $wallet->balance      = $this->bc_add($wallet->balance, $diff, 2);
                     $wallet->save();
 
                     WalletTransaction::create([
-                        'wallet_id' => $wallet->id,
-                        'type' => 'release',
-                        'amount' => $diff,
-                        'description' => "Release phần dư task #{$task->id}",
-                        'ref_type' => 'task',
-                        'ref_id' => $task->id,
+                        'wallet_id'       => $wallet->id,
+                        'type'            => 'release',
+                        'amount'          => $diff,
+                        'description'     => "Release phần dư task #{$task->id}",
+                        'ref_type'        => 'task',
+                        'ref_id'          => $task->id,
                         'idempotency_key' => $idk,
-                        'meta' => ['reason' => 'diff_after_capture'],
-                        'balance_before' => $balanceB,
-                        'balance_after' => (string)$wallet->balance,
-                        'held_before' => $heldB,
-                        'held_after' => (string)$wallet->held_balance,
+                        'meta'            => ['reason' => 'diff_after_capture', 'wallet_user_id' => $wallet->user_id],
+                        'balance_before'  => $balanceB,
+                        'balance_after'   => (string)$wallet->balance,
+                        'held_before'     => $heldB,
+                        'held_after'      => (string)$wallet->held_balance,
                     ]);
                 }
             }
 
-            $task->price_final = $final;
+            $task->price_final            = $final;
             $task->capture_transaction_id = $tx->id;
-            $task->status = 'accepted';
+            $task->status                 = 'accepted';
             $task->save();
 
             return $tx;

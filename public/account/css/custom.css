@@ -1,2 +1,4 @@
 .table-lg td, .table-lg th{ padding:.7rem !important }
 .table tr:hover{ background:#f9fafc }
+
+.view-balance{ font-size:1.2rem; font-weight:bold; border:#ddd 1px solid; border-radius:30px; padding:3px 20px }

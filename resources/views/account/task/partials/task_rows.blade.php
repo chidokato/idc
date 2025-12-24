@@ -31,7 +31,27 @@
       {{ number_format((float)(($task->expected_costs * $task->days) * (1 - $task->rate/100)), 0, ',', '.') }}
     </td>
 
-    <td>
+   
+
+    <td class="text-center">
+      @if(auth()->check() && in_array((int)auth()->user()->rank, [1,2,3], true))
+        @php $switchId = 'holdSwitch'.$task->id; @endphp
+      <label class="toggle-switch toggle-switch-sm switch" for="{{ $switchId }}">
+        <input type="checkbox" class="toggle-switch-input active-toggle" id="{{ $switchId }}" data-url="{{ route('tasks.updatePaid', $task->id) }}" {{ (int)($task->paid ?? 0) === 1 ? 'checked' : '' }}>
+        <span class="toggle-switch-label slider round">
+          <span class="toggle-switch-indicator"></span>
+        </span>
+      </label>
+      @else
+        <span class="badge {{ (int)($task->paid ?? 0) ? 'bg-info' : 'bg-secondary' }}">
+          {{ (int)($task->paid ?? 0) ? 'Đang giữ (HOLD)' : 'Chưa giữ' }}
+        </span>
+      @endif
+    </td>
+
+
+
+    <td class="hold-badge">
       @if(($task->paid ?? 0) == 1)
         <span class="badge badge-soft-success">Đã đóng</span>
       @else

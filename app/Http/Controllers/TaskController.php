@@ -432,35 +432,42 @@ class TaskController extends Controller
     }
 
     public function updatePaid(Request $request, Task $task, WalletService $walletService)
-    {
-        abort_unless(auth()->check() && in_array(auth()->user()->rank, [1,2]), 403);
+{
+    abort_unless(auth()->check() && in_array((int)auth()->user()->rank, [1,2,3], true), 403);
 
-        $paid = (int)$request->input('paid', 0);
+    $paid = (int) $request->input('paid', 0);
 
-        try {
-            if ($paid === 1) {
-                $walletService->holdTask($task);
-                $task->paid = 1;
-                $task->save();
+    try {
+        if ($paid === 1) {
+            $walletService->holdTask($task);
 
-                return response()->json(['status' => true, 'message' => 'Đã giữ tiền (HOLD) thành công.']);
-            } else {
-                $walletService->releaseTask($task, 'admin_toggle_off');
-
-                return response()->json(['status' => true, 'message' => 'Đã nhả giữ tiền (RELEASE) thành công.']);
-            }
-        } catch (ValidationException $e) {
-            $first = collect($e->errors())->flatten()->first() ?? 'Dữ liệu không hợp lệ.';
             return response()->json([
-                'status' => false,
-                'message' => $first,
-                'errors' => $e->errors(),
-            ], 422);
-        } catch (\Throwable $e) {
-            return response()->json(['status' => false, 'message' => $e->getMessage()], 422);
+                'status' => true,
+                'message' => 'Đã giữ tiền (HOLD) thành công.'
+            ]);
         }
-    }
 
+        $walletService->releaseTask($task, 'admin_toggle_off');
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Đã nhả giữ tiền (RELEASE) thành công.'
+        ]);
+
+    } catch (ValidationException $e) {
+        $first = collect($e->errors())->flatten()->first() ?? 'Dữ liệu không hợp lệ.';
+        return response()->json([
+            'status' => false,
+            'message' => $first,
+            'errors' => $e->errors(),
+        ], 422);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'status' => false,
+            'message' => $e->getMessage(),
+        ], 422);
+    }
+}
 
 
     public function bulkUpdateTasks(Request $request)
