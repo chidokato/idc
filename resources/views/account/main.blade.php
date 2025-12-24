@@ -21,57 +21,6 @@
           </div>
         </div>
         <!-- End Page Header -->
-
-        <!-- Stats -->
-        <div class="row gx-2 gx-lg-3">
-          <div class="col-sm-4 col-lg-2 mb-lg-4">
-            <!-- Card -->
-            <a class="card card-hover-shadow h-80" href="#">
-              <div class="card-body">
-                <h6 class="card-subtitle">Tổng tiền thực tế</h6>
-                <div class="row align-items-center gx-2 mb-1">
-                  <div class="col-6">
-                    <span class="card-title h2">100</span>
-                  </div>
-                </div>
-              </div>
-            </a>
-            <!-- End Card -->
-          </div>
-
-          <div class="col-sm-4 col-lg-2 mb-lg-4">
-            <!-- Card -->
-            <a class="card card-hover-shadow h-80" href="#">
-              <div class="card-body">
-                <h6 class="card-subtitle">Tổng số dự án</h6>
-                <div class="row align-items-center gx-2 mb-1">
-                  <div class="col-6">
-                    <span class="card-title h2">100</span>
-                  </div>
-                </div>
-              </div>
-            </a>
-            <!-- End Card -->
-          </div>
-
-          <div class="col-sm-4 col-lg-2 mb-lg-4">
-            <!-- Card -->
-            <a class="card card-hover-shadow h-80" href="#">
-              <div class="card-body">
-                <h6 class="card-subtitle">Tổng số người dùng</h6>
-                <div class="row align-items-center gx-2 mb-1">
-                  <div class="col-6">
-                    <span class="card-title h2">100</span>
-                  </div>
-                </div>
-              </div>
-            </a>
-            <!-- End Card -->
-          </div>
-
-        </div>
-          
-
         <div class="row gx-2 gx-lg-3">
           <div class="col-lg-12 mb-3 mb-lg-12">
             <!-- Card -->

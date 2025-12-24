@@ -22,6 +22,8 @@
 <!-- CSS Front Template -->
 <link rel="stylesheet" href="account/css/theme.min.css?v=1.0">
 
+<link rel="stylesheet" href="account/css/custom.css">
+
 @yield('css')
 
 </head>

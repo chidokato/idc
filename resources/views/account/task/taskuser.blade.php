@@ -3,7 +3,7 @@
 @section('title') Công Ty Cổ Phần Bất Động Sản Indochine @endsection
 
 @section('css')
-<link rel="stylesheet" href="account/css/custom.css">
+
 @endsection
 
 @section('body') @endsection
@@ -210,70 +210,88 @@ document.addEventListener('change', function (e) {
   if (!el.classList.contains('active-toggle')) return;
 
   const url = el.dataset.url;
-  const paid = el.checked ? 1 : 0;
-  const oldState = !el.checked;
+  const paid = el.checked ? 1 : 0;              // 1 = HOLD, 0 = RELEASE
+  const oldState = !el.checked;                 // rollback UI nếu hủy/lỗi
 
   const rank = parseInt(el.dataset.rank || '0', 10);
   const isMine = parseInt(el.dataset.mine || '0', 10) === 1;
   const sameDept = parseInt(el.dataset.samedept || '0', 10) === 1;
 
-  // ===== RULE UI =====
+  // ===== RULE UI (theo yêu cầu bạn đã chốt) =====
   // rank2: chỉ HOLD nếu cùng department_id, không RELEASE
   if (rank === 2) {
-    if (paid === 0) { el.checked = true; showCenterError('Rank 2 không được hủy giữ tiền (RELEASE).'); return; }
-    if (!sameDept)  { el.checked = false; showCenterError('Rank 2 chỉ được giữ tiền cho tác vụ cùng phòng ban (department).'); return; }
+    if (paid === 0) { el.checked = true; showCenterError('Bạn không được hủy giữ tiền (RELEASE).'); return; }
+    if (!sameDept)  { el.checked = false; showCenterError('Bạn chỉ được giữ tiền cho tác vụ cùng phòng ban (department).'); return; }
   }
-
   // rank3: chỉ HOLD task của mình, không RELEASE
   if (rank === 3) {
-    if (paid === 0) { el.checked = true; showCenterError('Rank 3 không được hủy giữ tiền (RELEASE).'); return; }
-    if (!isMine)    { el.checked = false; showCenterError('Rank 3 chỉ được giữ tiền (HOLD) tác vụ của mình.'); return; }
+    if (paid === 0) { el.checked = true; showCenterError('Bạn không được hủy giữ tiền (RELEASE).'); return; }
+    if (!isMine)    { el.checked = false; showCenterError('Bạn chỉ được giữ tiền (HOLD) tác vụ của mình.'); return; }
   }
 
-  fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-      'Accept': 'application/json',
-    },
-    body: JSON.stringify({ paid })
-  })
-  .then(async (res) => {
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok || data.status === false) throw new Error(data.message || 'Có lỗi xảy ra');
+  // ===== Confirm trước khi gọi API =====
+  const confirmTitle = paid ? 'Xác nhận đóng tiền (HOLD)?' : 'Xác nhận nhả giữ (RELEASE)?';
+  const confirmText  = paid
+    ? 'Bạn có chắc muốn đóng tiền cho tác vụ này không?'
+    : 'Bạn có chắc muốn nhả giữ tiền cho tác vụ này không?';
 
-  showToast('success', data.message || 'Thành công');
-
-  // update badge trong cùng dòng (nếu có)
-  const tr = el.closest('tr');
-  const badgeCell = tr?.querySelector('.hold-badge');
-  if (badgeCell) {
-    badgeCell.innerHTML = paid
-      ? `<span class="badge badge-soft-success">Đã đóng</span>`
-      : `<span class="badge badge-soft-warning">Chưa đóng</span>`;
-  }
-
-  // ✅ update số dư trên menu
-  if (data.wallet && typeof data.wallet.balance !== 'undefined') {
-    const menuBalanceEl = document.getElementById('menuBalance');
-    if (menuBalanceEl) {
-      const num = Number(data.wallet.balance || 0);
-      menuBalanceEl.textContent = num.toLocaleString('vi-VN');
+  Swal.fire({
+    icon: 'question',
+    title: confirmTitle,
+    text: confirmText,
+    showCancelButton: true,
+    confirmButtonText: paid ? 'Giữ tiền' : 'Nhả giữ',
+    cancelButtonText: 'Hủy',
+    reverseButtons: true
+  }).then((result) => {
+    if (!result.isConfirmed) {
+      el.checked = oldState; // người dùng bấm Hủy -> rollback UI
+      return;
     }
 
-    // (tuỳ chọn) nếu có hiển thị held:
-    const menuHeldEl = document.getElementById('menuHeld');
-    if (menuHeldEl) menuHeldEl.textContent = Number(data.wallet.held_balance||0).toLocaleString('vi-VN');
-  }
-})
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ paid })
+    })
+    .then(async (res) => {
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.status === false) throw new Error(data.message || 'Có lỗi xảy ra');
 
-  .catch(err => {
-    el.checked = oldState;
-    showCenterError(err.message || 'Có lỗi xảy ra, vui lòng thử lại!');
+      showToast('success', data.message || 'Thành công');
+
+      // update badge trong cùng dòng (nếu có)
+      const tr = el.closest('tr');
+      const badgeCell = tr?.querySelector('.hold-badge');
+      if (badgeCell) {
+        badgeCell.innerHTML = paid
+          ? `<span class="badge badge-soft-success">Đã đóng</span>`
+          : `<span class="badge badge-soft-warning">Chưa đóng</span>`;
+      }
+
+      // update số dư menu (nếu backend trả về data.wallet.balance)
+      if (data.wallet && typeof data.wallet.balance !== 'undefined') {
+        const menuBalanceEl = document.getElementById('menuBalance');
+        if (menuBalanceEl) {
+          menuBalanceEl.textContent = Number(data.wallet.balance || 0).toLocaleString('vi-VN');
+        }
+        const menuHeldEl = document.getElementById('menuHeld');
+    if (menuHeldEl) menuHeldEl.textContent = Number(data.wallet.held_balance||0).toLocaleString('vi-VN');
+      }
+
+    })
+    .catch(err => {
+      el.checked = oldState; // rollback khi lỗi
+      showCenterError(err.message || 'Có lỗi xảy ra, vui lòng thử lại!');
+    });
   });
 });
 </script>
+
 
 
 
