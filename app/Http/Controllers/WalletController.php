@@ -40,7 +40,7 @@ class WalletController extends Controller
 
         $transactions = $query
             ->orderByDesc('id')
-            ->paginate(10)
+            ->paginate(50)
             ->withQueryString();
 
         return view('account.wallet.index', compact('wallet', 'transactions'));

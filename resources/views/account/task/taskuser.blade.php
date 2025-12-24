@@ -72,6 +72,7 @@
           <th>Tiền nộp</th> 
           <th>Đóng tiền</th> 
           <th>Ghi chú</th> 
+          <th></th>
         </tr>
         @if($tasks->count())
         <tr class="font-weight-bold bg-light">
@@ -79,7 +80,7 @@
           <td class="text-end" id="sumTotalText">{{ number_format($sumTotal, 0, ',', '.') }}</td>
           <td></td>
           <td class="text-end" id="sumPaidText">{{ number_format($sumPaid, 0, ',', '.') }}</td>
-          <td colspan="2"></td>
+          <td colspan="3"></td>
         </tr>
         @endif
       </thead>
@@ -203,14 +204,31 @@ $(function () {
 </script>
 
 
-<script> // đóng tiền
+<script>
 document.addEventListener('change', function (e) {
   const el = e.target;
   if (!el.classList.contains('active-toggle')) return;
 
   const url = el.dataset.url;
-  const paid = el.checked ? 1 : 0;     // paid=1 => HOLD, paid=0 => RELEASE
-  const oldState = !el.checked;        // rollback UI khi lỗi
+  const paid = el.checked ? 1 : 0;
+  const oldState = !el.checked;
+
+  const rank = parseInt(el.dataset.rank || '0', 10);
+  const isMine = parseInt(el.dataset.mine || '0', 10) === 1;
+  const sameDept = parseInt(el.dataset.samedept || '0', 10) === 1;
+
+  // ===== RULE UI =====
+  // rank2: chỉ HOLD nếu cùng department_id, không RELEASE
+  if (rank === 2) {
+    if (paid === 0) { el.checked = true; showCenterError('Rank 2 không được hủy giữ tiền (RELEASE).'); return; }
+    if (!sameDept)  { el.checked = false; showCenterError('Rank 2 chỉ được giữ tiền cho tác vụ cùng phòng ban (department).'); return; }
+  }
+
+  // rank3: chỉ HOLD task của mình, không RELEASE
+  if (rank === 3) {
+    if (paid === 0) { el.checked = true; showCenterError('Rank 3 không được hủy giữ tiền (RELEASE).'); return; }
+    if (!isMine)    { el.checked = false; showCenterError('Rank 3 chỉ được giữ tiền (HOLD) tác vụ của mình.'); return; }
+  }
 
   fetch(url, {
     method: 'POST',
@@ -242,6 +260,7 @@ document.addEventListener('change', function (e) {
   });
 });
 </script>
+
 
 
 @endsection

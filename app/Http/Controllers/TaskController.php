@@ -431,43 +431,65 @@ class TaskController extends Controller
 
     }
 
-    public function updatePaid(Request $request, Task $task, WalletService $walletService)
+public function updatePaid(Request $request, Task $task, WalletService $walletService)
 {
-    abort_unless(auth()->check() && in_array((int)auth()->user()->rank, [1,2,3], true), 403);
+    abort_unless(auth()->check(), 403);
 
+    $rank = (int) auth()->user()->rank;
+    $meId = (int) auth()->id();
     $paid = (int) $request->input('paid', 0);
+
+    // LV3 = department_id
+    $myDept   = (int) (auth()->user()->department_id ?? 0);
+    $taskDept = (int) ($task->department_id ?? 0);
+    $sameDept = ($myDept !== 0 && $taskDept !== 0 && $myDept === $taskDept);
+
+    // cột user trong task (ID user sử dụng task)
+    $taskUserId = (int) ($task->user ?? 0);
+    $isMine = ($taskUserId === $meId);
+
+    // Rank 1: full
+    if ($rank === 1) {
+        // ok
+    }
+    // Rank 2: chỉ HOLD nếu cùng department_id, không RELEASE
+    else if ($rank === 2) {
+        if ($paid === 0) {
+            return response()->json(['status' => false, 'message' => 'Rank 2 không được hủy giữ tiền.'], 403);
+        }
+        if (!$sameDept) {
+            return response()->json(['status' => false, 'message' => 'Rank 2 chỉ được giữ tiền cho tác vụ cùng phòng ban (department).'], 403);
+        }
+    }
+    // Rank 3: chỉ HOLD task của mình, không RELEASE
+    else if ($rank === 3) {
+        if ($paid === 0) {
+            return response()->json(['status' => false, 'message' => 'Rank 3 không được hủy giữ tiền.'], 403);
+        }
+        if (!$isMine) {
+            return response()->json(['status' => false, 'message' => 'Bạn chỉ được giữ tiền cho tác vụ của mình.'], 403);
+        }
+    }
+    else {
+        return response()->json(['status' => false, 'message' => 'Bạn không có quyền thao tác.'], 403);
+    }
 
     try {
         if ($paid === 1) {
             $walletService->holdTask($task);
-
-            return response()->json([
-                'status' => true,
-                'message' => 'Đã giữ tiền (HOLD) thành công.'
-            ]);
+            return response()->json(['status' => true, 'message' => 'Đã giữ tiền (HOLD) thành công.']);
+        } else {
+            $walletService->releaseTask($task, 'admin_toggle_off');
+            return response()->json(['status' => true, 'message' => 'Đã nhả giữ tiền (RELEASE) thành công.']);
         }
-
-        $walletService->releaseTask($task, 'admin_toggle_off');
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Đã nhả giữ tiền (RELEASE) thành công.'
-        ]);
-
     } catch (ValidationException $e) {
         $first = collect($e->errors())->flatten()->first() ?? 'Dữ liệu không hợp lệ.';
-        return response()->json([
-            'status' => false,
-            'message' => $first,
-            'errors' => $e->errors(),
-        ], 422);
+        return response()->json(['status' => false, 'message' => $first, 'errors' => $e->errors()], 422);
     } catch (\Throwable $e) {
-        return response()->json([
-            'status' => false,
-            'message' => $e->getMessage(),
-        ], 422);
+        return response()->json(['status' => false, 'message' => $e->getMessage()], 422);
     }
 }
+
 
 
     public function bulkUpdateTasks(Request $request)

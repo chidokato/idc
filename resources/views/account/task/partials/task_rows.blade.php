@@ -33,21 +33,62 @@
 
    
 
-    <td class="text-center">
-      @if(auth()->check() && in_array((int)auth()->user()->rank, [1,2,3], true))
-        @php $switchId = 'holdSwitch'.$task->id; @endphp
-      <label class="toggle-switch toggle-switch-sm switch" for="{{ $switchId }}">
-        <input type="checkbox" class="toggle-switch-input active-toggle" id="{{ $switchId }}" data-url="{{ route('tasks.updatePaid', $task->id) }}" {{ (int)($task->paid ?? 0) === 1 ? 'checked' : '' }}>
-        <span class="toggle-switch-label slider round">
-          <span class="toggle-switch-indicator"></span>
-        </span>
-      </label>
-      @else
-        <span class="badge {{ (int)($task->paid ?? 0) ? 'bg-info' : 'bg-secondary' }}">
-          {{ (int)($task->paid ?? 0) ? 'Đang giữ (HOLD)' : 'Chưa giữ' }}
-        </span>
-      @endif
-    </td>
+ <td class="text-center">
+  @php
+    $rank = (int)(auth()->user()->rank ?? 0);
+    $meId = (int)(auth()->id() ?? 0);
+
+    // cột user trong task (ID user sử dụng task)
+    $taskUserId = (int)($task->user ?? 0);
+
+    // LV3 = department_id
+    $myDept   = (int)(auth()->user()->department_id ?? 0);
+    $taskDept = (int)($task->department_id ?? 0);
+    $sameDept = ($myDept !== 0 && $taskDept !== 0 && $myDept === $taskDept);
+
+    $isMine = ($taskUserId === $meId);
+    $isHeld = ((int)($task->paid ?? 0) === 1);
+
+    $switchId = 'holdSwitch'.$task->id;
+
+    // quyền HOLD
+    $canHold =
+        ($rank === 1) ||
+        ($rank === 2 && $sameDept) ||
+        ($rank === 3 && $isMine);
+
+    // quyền RELEASE: chỉ rank 1
+    $canRelease = ($rank === 1);
+
+    // disable khi:
+    // - không có quyền hold
+    // - hoặc đang held mà không có quyền release (rank2/rank3)
+    $disabled = (!$canHold) || ($isHeld && !$canRelease);
+  @endphp
+
+  @if(auth()->check() && in_array($rank, [1,2,3], true))
+    <label class="toggle-switch toggle-switch-sm switch" for="{{ $switchId }}">
+      <input type="checkbox"
+             class="toggle-switch-input active-toggle"
+             id="{{ $switchId }}"
+             data-url="{{ route('tasks.updatePaid', $task->id) }}"
+             data-rank="{{ $rank }}"
+             data-mine="{{ $isMine ? 1 : 0 }}"
+             data-samedept="{{ $sameDept ? 1 : 0 }}"
+             {{ $isHeld ? 'checked' : '' }}
+             {{ $disabled ? 'disabled' : '' }}>
+      <span class="toggle-switch-label slider round">
+        <span class="toggle-switch-indicator"></span>
+      </span>
+    </label>
+  @else
+    <span class="badge {{ $isHeld ? 'bg-info' : 'bg-secondary' }}">
+      {{ $isHeld ? 'Đang giữ (HOLD)' : 'Chưa giữ' }}
+    </span>
+  @endif
+  </td>
+
+
 
 
 
