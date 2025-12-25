@@ -85,7 +85,7 @@
           <li class="nav-item ">
             <a class="js-nav-tooltip-link nav-link " href="account/opened" title="Ví tiền" data-placement="left">
               <i class="tio-book-opened nav-icon"></i>
-              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Hướng dẫn sử dụng tool</span>
+              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Hướng dẫn sử dụng</span>
             </a>
           </li>
         </ul>
