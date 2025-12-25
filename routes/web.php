@@ -170,6 +170,7 @@ Route::get('dangnhap', [AccountController::class, 'dangnhap'])->name('dangnhap')
 Route::middleware(['user'])->group(function () {
     Route::prefix('account')->group(function () {
         Route::get('main', [AccountController::class, 'index'])->name('account.main');
+        Route::get('opened', [AccountController::class, 'opened'])->name('account.opened');
         Route::get('edit', [AccountController::class, 'edit'])->name('account.edit');
         Route::post('update', [AccountController::class, 'update'])->name('account.update');
         // mkt
@@ -206,9 +207,6 @@ Route::middleware(['user'])->group(function () {
         Route::post('wallet/transfer', [WalletController::class, 'bulkTransferSubmit'])->name('wallet.bulk.submit');
         Route::post('/wallet/transactions/{id}/recall', [WalletController::class, 'recallTransfer'])->name('wallet.transactions.recall')->middleware('auth');
     
-    
-
-
         
     });
 });

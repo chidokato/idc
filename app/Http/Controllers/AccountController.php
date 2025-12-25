@@ -258,5 +258,12 @@ class AccountController extends HomeController
         ]);
     }
 
+    public function opened()
+    {
+        $user = User::find(Auth::id());
+        
+        return view('account.opened', compact('user'));
+    }
+
 
 }

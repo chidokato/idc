@@ -197,30 +197,36 @@
           <div class="card-header">
               <h2 class="card-header-title h5">Thông tin chuyển khoản</h2>
             </div>
+
             <div class="card-body">
-              
-            
-          <ul class="list-unstyled list-unstyled-py-3 text-dark mb-3">
-            <li class="pt-2 pb-0">
-              <small class="card-subtitle">Số tài khoản</small>
-            </li>
-            <li>
-              Tên người thụ hưởng: Nguyễn Văn Tuấn
-            </li>
-            <li>
-              Ngân hàng: VP bank
-            </li>
-            <li>
-              Số tài khoản: 118808223
-            </li>
-            <li>
-              Nội dung CK: {{ $user->email }}
-            </li>
-            <li class="pt-2 pb-0">
-              <small class="card-subtitle">QR</small>
-            </li>
-          </ul>
-          </div>
+                <div class="row align-items-center mb-3">
+                  <span class="col-6">Số tài khoản:</span>
+                  <h4 class="col-6 text-right text-dark mb-0">265608981</h4>
+                </div>
+                <!-- End Row -->
+
+                <div class="row align-items-center mb-3">
+                  <span class="col-6">Tên người thụ hưởng:</span>
+                  <h4 class="col-6 text-right text-dark mb-0">PHAN THỊ HẰNG</h4>
+                </div>
+                <!-- End Row -->
+
+
+                <div class="row align-items-center mb-3">  
+                  <span class="col-6">Ngân hàng:</span>
+                  <h4 class="col-6 text-right text-dark mb-0">VP bank</h4>
+                </div>
+                <!-- End Row -->
+
+
+                <div class="row align-items-center mb-3">
+                  <span class="col-6">Nội dung CK:</span>
+                  <h3 class="col-6 text-right text-dark mb-0">{{ $user->yourname }}</h3>
+                </div>
+                <!-- End Row -->
+                <hr class="my-4">
+                  <img class="w-100" src="account/img/qr/hangphan.jpg">
+              </div>
         </div>
       </div>
       </div>

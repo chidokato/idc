@@ -55,7 +55,7 @@
 <script src="account/js/demo.js"></script>
 
 
-<main id="content" role="main" class="main pointer-event">
+<main id="content" role="main" class="main pointer-event bg-light">
 
 
 @yield('content')

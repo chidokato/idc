@@ -77,7 +77,17 @@
             </a>
           </li>
           @endif
-          
+
+          <li class="nav-item">
+            <small class="nav-subtitle" title="Pages">Hướng dẫn</small>
+            <small class="tio-more-horizontal nav-subtitle-replacer"></small>
+          </li>
+          <li class="nav-item ">
+            <a class="js-nav-tooltip-link nav-link " href="account/opened" title="Ví tiền" data-placement="left">
+              <i class="tio-book-opened nav-icon"></i>
+              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Hướng dẫn sử dụng tool</span>
+            </a>
+          </li>
         </ul>
       </div>
       <!-- End Content -->

@@ -252,8 +252,8 @@ document.addEventListener('change', function (e) {
     title: confirmTitle,
     text: confirmText,
     showCancelButton: true,
-    confirmButtonText: paid ? 'Giữ tiền' : 'Nhả giữ',
-    cancelButtonText: 'Hủy',
+    confirmButtonText: paid ? 'Đóng tiền' : 'Nhả giữ',
+    cancelButtonText: 'Không',
     reverseButtons: true
   }).then((result) => {
     if (!result.isConfirmed) {
