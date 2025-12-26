@@ -161,7 +161,7 @@
         <p>Kỳ này bạn chưa đăng ký dự án nào</p>
         @else
         <?php
-            $tasks_all = $report->Task()->whereIn('department_id', $groupIds)->get();
+            $tasks_all = $report->Task()->whereIn('department_id', $groupIds)->where('user', '!=', Auth::id())->get();
             $tasks = $report->Task()->where('user', Auth::id())->get();
         ?>
         <div class="card-body">
