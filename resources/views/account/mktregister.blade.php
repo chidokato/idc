@@ -164,7 +164,7 @@
             $tasks_all = $report->Task()->where('department_lv2', Auth::user()->department_lv2)->where('user', '!=', Auth::id())->get();
             $tasks = $report->Task()->where('user', Auth::id())->get();
         ?>
-        <div class="card-body">
+        <div class="">
             <!-- Table -->
             <div class="table-responsive">
                 <table class="table table-borderless table-thead-bordered card-table">
