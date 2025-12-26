@@ -41,7 +41,6 @@
       </div>
       <div class="col-sm-3 col-md-3 mb-sm-0">
         <select name="report_id" id="filterReport" class="form-control">
-          <option value="">-- Chọn thời gian --</option>
           @foreach($reports as $report)
             <option value="{{ $report->id }}" {{ (int)($reportId ?? 0) === (int)$report->id ? 'selected' : '' }}>
               {{ $report->name }}
