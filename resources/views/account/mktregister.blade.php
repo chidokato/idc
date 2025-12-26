@@ -11,294 +11,216 @@
 @section('content')
 
 <div class="content container-fluid">
-<div class="page-header">
-    <div class="row align-items-center">
-    <div class="col-sm mb-2 mb-sm-0">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb breadcrumb-no-gutter">
-          <li class="breadcrumb-item"><a class="breadcrumb-link" href="account/main">Account</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Đăng ký marketing</li>
-        </ol>
-      </nav>
-
-      <h1 class="page-header-title">Đăng ký marketing</h1>
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-sm mb-2 mb-sm-0">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-no-gutter">
+                        <li class="breadcrumb-item"><a class="breadcrumb-link" href="account/main">Account</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Đăng ký marketing</li>
+                    </ol>
+                </nav>
+                <h1 class="page-header-title">Đăng ký marketing</h1>
+            </div>
+        </div>
     </div>
 
-    </div>
-    <!-- End Row -->
-</div>
 
-
-  <div class="row">
-    <div class="col-lg-12">
-      <div class="card mb-3 mb-lg-5">
-              <!-- Header -->
-              <div class="card-header">
-                <h4 class="card-header-title">Thêm link marketing</h4>
-              </div>
-              <!-- End Header -->
-              <!-- Body -->
-                <form action="{{ route('account.tasksstore') }}" method="POST">
-                @csrf
-                <input type="hidden" name="" value="">
-                <div class="table-responsive">
-                    <table class="table table-borderless table-thead-bordered table-nowrap table-text-center table-align-middle card-table custon-table" id="myTable">
-                        <thead class="thead-light">
-                            <tr>
-                                <th></th>
-                                @if(Auth::user()->rank < 3)
-                                <th>Nhân viên</th>
-                                @endif
-                                <th>Dự án <span class="required">(*)</span></th>
-                                <th>Hỗ trợ</th>
-                                <th>Kênh <span class="required">(*)</span></th>
-                                <th>Ngân sách/ngày <span class="required">(*)</span></th>
-                                <th>Ghi chú</th>
-                                <th>Thời gian chạy</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="btn-group" role="group">
-                                      <a class="btn btn-sm btn-white dupple">
-                                        <i class="tio-copy"></i> Nhân
-                                      </a>
-                                      <a class="btn btn-sm btn-white del">
-                                        <i class="tio-delete-outlined"></i>
-                                      </a>
-                                    </div>
-                                  </td>
-                                @if(Auth::user()->rank < 3)
-                                <td>
-                                    <select name="user_id[]" required class="form-control user-select">
-                                        <option value="">---</option>
-                                        @foreach($users as $val)
-                                        <option <?php if(Auth::user()->id == $val->id){ echo "selected"; } ?> value="{{ $val->id }}" data-department="{{ $val->department_id }}">
-                                            {{ $val->yourname }}
-                                        </option>
-                                        @endforeach
-                                    </select>
-                                    <input type="hidden" name="department_id[]" class="department-id" value="{{ Auth::user()->department_id }}">
-                                </td>
-                                @else
-                                <input type="hidden" name="user_id[]" class="department-id" value="{{ Auth::user()->id }}">
+    <div class="card mb-3 mb-lg-5">
+          <!-- Header -->
+        <div class="card-header">
+            <h4 class="card-header-title">Thêm link marketing</h4>
+        </div>
+          <!-- End Header -->
+          <!-- Body -->
+        <form action="{{ route('account.tasksstore') }}" method="POST">
+            @csrf
+            <input type="hidden" name="" value="">
+            <div class="table-responsive">
+                <table class="table table-borderless table-thead-bordered table-nowrap table-text-center table-align-middle card-table custon-table" id="myTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th></th>
+                            @if(Auth::user()->rank < 3)
+                            <th>Nhân viên</th>
+                            @endif
+                            <th>Dự án <span class="required">(*)</span></th>
+                            <th>Hỗ trợ</th>
+                            <th>Kênh <span class="required">(*)</span></th>
+                            <th>Ngân sách/ngày <span class="required">(*)</span></th>
+                            <th>Ghi chú</th>
+                            <th>Thời gian chạy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="btn-group" role="group">
+                                  <a class="btn btn-sm btn-white dupple">
+                                    <i class="tio-copy"></i> Nhân
+                                  </a>
+                                  <a class="btn btn-sm btn-white del">
+                                    <i class="tio-delete-outlined"></i>
+                                  </a>
+                                </div>
+                              </td>
+                            @if(Auth::user()->rank < 3)
+                            <td>
+                                <select name="user_id[]" required class="form-control user-select">
+                                    <option value="">---</option>
+                                    @foreach($users as $val)
+                                    <option <?php if(Auth::user()->id == $val->id){ echo "selected"; } ?> value="{{ $val->id }}" data-department="{{ $val->department_id }}">
+                                        {{ $val->yourname }}
+                                    </option>
+                                    @endforeach
+                                </select>
                                 <input type="hidden" name="department_id[]" class="department-id" value="{{ Auth::user()->department_id }}">
-                                @endif
-                                <td>
-                                    <select name="post_id[]" required class="form-control post-select">
-                                        <option value="">---</option>
-                                        @foreach($posts as $val)
-                                        <option value="{{ $val->id }}" data-rate="{{ $val->rate }}">
-                                            {{ $val->name }}
+                            </td>
+                            @else
+                            <input type="hidden" name="user_id[]" class="department-id" value="{{ Auth::user()->id }}">
+                            <input type="hidden" name="department_id[]" class="department-id" value="{{ Auth::user()->department_id }}">
+                            @endif
+                            <td>
+                                <select name="post_id[]" required class="form-control post-select">
+                                    <option value="">---</option>
+                                    @foreach($posts as $val)
+                                    <option value="{{ $val->id }}" data-rate="{{ $val->rate }}">
+                                        {{ $val->name }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </td>
+
+                            <td>
+                                <select name="rate[]" required class="form-control rate-select">
+                                    <option value="">-</option>
+                                    @foreach(config('datas.rates') as $key => $label)
+                                        <option value="{{ $key }}">
+                                            {{ $label }}
                                         </option>
-                                        @endforeach
-                                    </select>
-                                </td>
+                                    @endforeach
+                                </select>
+                            </td>
 
-                                <td>
-                                    <select name="rate[]" required class="form-control rate-select">
-                                        <option value="">-</option>
-                                        @foreach(config('datas.rates') as $key => $label)
-                                            <option value="{{ $key }}">
-                                                {{ $label }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </td>
-
-                                <td>
-                                    <select name="channel_id[]" required  class="form-control channel_id">
-                                        <option value="">---</option>
-                                        @foreach($channels as $val)
-                                        <option value="{{$val->id}}">{{$val->name}}</option>
-                                        @endforeach
-                                    </select>
-                                    <input type="hidden" name="days[]" class="days" value="">
-                                </td>
-                                <td>
-                                    <select name="expected_costs[]" required class="form-control">
-                                        <option value="">---</option>
-                                        @foreach(config('datas.costs') as $key => $label)
-                                            <option value="{{ $key }}">
-                                                {{ $label }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                                <td><input class="form-control" type="text" name="content[]" placeholder="Hỗ trợ, chạy chung ..."></td>
-                                <td>
-                                    <select name="report_id[]" class="form-control report_id" required>
-                                        @foreach($reports as $val)
-                                        <option value="{{ $val->id }}" data-days="{{ $val->days }}">{{ $val->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    
-                                </td>
+                            <td>
+                                <select name="channel_id[]" required  class="form-control channel_id">
+                                    <option value="">---</option>
+                                    @foreach($channels as $val)
+                                    <option value="{{$val->id}}">{{$val->name}}</option>
+                                    @endforeach
+                                </select>
+                                <input type="hidden" name="days[]" class="days" value="">
+                            </td>
+                            <td>
+                                <select name="expected_costs[]" required class="form-control">
+                                    <option value="">---</option>
+                                    @foreach(config('datas.costs') as $key => $label)
+                                        <option value="{{ $key }}">
+                                            {{ $label }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td><input class="form-control" type="text" name="content[]" placeholder="Hỗ trợ, chạy chung ..."></td>
+                            <td>
+                                <select name="report_id[]" class="form-control report_id" required>
+                                    @foreach($reports as $val)
+                                    <option value="{{ $val->id }}" data-days="{{ $val->days }}">{{ $val->name }}</option>
+                                    @endforeach
+                                </select>
                                 
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="card-footer">
-                    <p><button type="submit" class="btn btn-sm btn-primary">Gửi đăng ký MARKETING</button></p>
-                    <p>Nếu không đăng ký được, thiếu dự án, thiếu trường nhập dữ liệu. Liên hệ ngay <a href="https://zalo.me/0977572947" target="_blank"><strong>Nguyễn Tuấn</strong></a> để được hỗ trợ kỹ thuật</p>
-                </div>
-            </form>
-
-                
-            </div>
-
-            <div class="card mb-3 mb-lg-5">
-              <!-- Header -->
-              
-              <!-- End Header -->
-              <!-- Body -->
-              <div class="card-body">
-                  @foreach($reports as $report)
-                    @if($report->Task->isEmpty())
-                    <p>Kỳ này bạn chưa đăng ký dự án nào</p>
-                    @else
-                    <?php
-                        $tasks_all = $report->Task()->whereIn('department_id', $groupIds)->get();
-                        $tasks = $report->Task()->where('user', Auth::id())->get();
-                        $total_expected = 0;   // tổng tiền gốc
-                        $total_pay = 0;        // tổng tiền phải nộp
-                    ?>
-                    <div class="row">
-                        <div class="col-lg-9 widget mb-3">
-                            <div class="widget-list">
-                                
+                            </td>
                             
-                            <p class="required"><i>- Chú ý: Cổng đăng ký chi phí marketing sẽ <strong>TỰ ĐỘNG ĐÓNG</strong> vào <strong>00h00 ngày {{ \Carbon\Carbon::parse($report->time_start)->format('d/m/Y') }}</strong>. Có thể gửi nhiều lần trước khi cổng đăng ký đóng lại.</i></p>
-                            <div>
-                              <div class="card-header">
-                <h4 class="card-header-title">{{$report->name}} ({{ \Carbon\Carbon::parse($report->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($report->time_end)->format('d/m/Y') }})</h4>
-              </div>
-                                <div class="table-responsive-mobile">
-                                <table class="table">
-                                    <tr>
-                                        <th></th>
-                                        <th>Dự án</th>
-                                        <th>Hỗ trợ</th>
-                                        <th>Kênh</th>
-                                        <th>Ngân sách</th>
-                                        <th>Tổng tiền</th>
-                                        <th>Tiền phải nộp</th>
-                                        <th>Ghi chú</th>
-                                        <th></th>
-                                    </tr>
-                                    @foreach($tasks as $val)
-                                    <tr class="padding16" id="row-{{ $val->id }}">
-                                        <td>
-                                            @if($val->approved)
-                                                <span class="badge bg-success">Đã duyệt</span>
-                                            @else
-                                                <span class="badge bg-warning">Chờ duyệt</span>
-                                            @endif
-                                        </td>
-                                        <td>{{$val->Post?->name}}</td>
-                                        <td>{{$val->rate}}%</td>
-                                        <td>{{$val->Channel?->name}}</td>
-                                        <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td>
-                                        <td>{{ number_format(($val->days * $val->expected_costs), 0, ',', '.') }} đ</td>
-                                        <td>{{ number_format(($val->days * $val->expected_costs * (1 - $val->rate/100)), 0, ',', '.') }} đ</td>
-                                        <td class="ghichu" title="{{ $val->content }}">
-                                            <span class="tooltip-wrapper">
-                                                <span class="text-truncate-set-1 text-truncate-set">
-                                                    {{ $val->content }}
-                                                </span>
-                                                <span class="tooltip">
-                                                    {{ $val->content }}
-                                                </span>
-                                            </span>
-                                        </td>
-                                        
-                                        <td>
-                                            <form action="{{ route('account.tasks.delete', $val) }}" method="POST">
-                                                @csrf
-                                                <button type="submit" class="del-db btn btn-danger p-1" data-id="{{ $val->id }}">Xóa</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                    <?php
-                                        $expected = $report->days * $val->expected_costs;
-                                        $pay = $val->days * $val->expected_costs * (1 - ($val->rate ?? 0) / 100);
-
-                                        $total_expected += $expected;
-                                        $total_pay += $pay;
-                                    ?>
-                                    @endforeach
-                                </table>
-                            </div>
-                            </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 widget">
-                            <div id="stats-box">
-                                @include('account.partials.stats')
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col-lg-12 widget ">
-                            <div class="widget-list">
-                                <h3>Danh sách tác vụ: {{ Auth::user()->Department->Parent->name }}</h3>
-                                <div class="table-responsive-mobile">
-                                <table class="table">
-                                    <tr>
-                                        <th>Nhân viên</th>
-                                        <th>Phòng/Nhóm</th>
-                                        <th>Dự án</th>
-                                        <th>Hỗ trợ</th>
-                                        <th>Kênh</th>
-                                        <th>Ngân sách</th>
-                                        <th>Tổng tiền</th>
-                                        <th>Tiền phải nộp</th>
-                                        <th>Ghi chú</th>
-                                        <th></th>
-                                    </tr>
-                                    @foreach($tasks_all as $val)
-                                    <tr class="padding16" id="row-{{ $val->id }}">
-                                        <td>{{$val->handler?->yourname ?? '-'}}</td>
-                                        <td>{{ $val->Department->name }}</td>
-                                        <td>{{$val->Post?->name}}</td>
-                                        <td>{{$val->rate}}%</td>
-                                        <td>{{$val->Channel?->name}}</td>
-                                        <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td>
-                                        <td>{{ number_format(($val->days * $val->expected_costs), 0, ',', '.') }} đ</td>
-                                        <td>{{ number_format(($val->days * $val->expected_costs * (1 - $val->rate/100)), 0, ',', '.') }} đ</td>
-                                        <td class="ghichu" title="{{ $val->content }}">
-                                            <span class="tooltip-wrapper">
-                                                <span class="text-truncate-set-1 text-truncate-set">
-                                                    {{ $val->content }}
-                                                </span>
-                                                <span class="tooltip">
-                                                    {{ $val->content }}
-                                                </span>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            @if($val->approved)
-                                                <span class="badge bg-success">Đã duyệt</span>
-                                            @else
-                                                <span class="badge bg-warning">Chờ duyệt</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </table>
-                            </div>
-                            </div>
-                        </div>
-                        
-                    </div>
-                    @endif
-                    @endforeach
-              </div>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+            <div class="card-footer">
+                <p><button type="submit" class="btn btn-sm btn-primary">Gửi đăng ký MARKETING</button></p>
+                <p>Nếu không đăng ký được, thiếu dự án, thiếu trường nhập dữ liệu. Liên hệ ngay <a href="https://zalo.me/0977572947" target="_blank"><strong>Nguyễn Tuấn</strong></a> để được hỗ trợ kỹ thuật</p>
+            </div>
+        </form>
     </div>
-  </div>
+
+    <div class="card">
+        <div class="card-header" data-select2-id="8">
+            <div class="row align-items-center flex-grow-1" data-select2-id="7">
+                <div class="col-sm mb-2 mb-sm-0">
+                    <h4 class="card-header-title">Danh sách link đăng ký marketing của phòng/sàn <i class="tio-help-outlined text-body ml-1" data-toggle="tooltip" data-placement="top" title="" data-original-title="Net sales (gross sales minus discounts and returns) plus taxes and shipping. Includes orders from all sales channels."></i></h4>
+                </div>
+                <!-- <div class="col-sm-auto" data-select2-id="6">
+                    <select class="custom-select-sm form-control">
+                        <option value="" data-select2-id="3">Online store</option>
+                        <option value="in-store" data-select2-id="4">In-store</option>
+                    </select>
+                </div> -->
+            </div>
+        </div>
+        @foreach($reports as $report)
+        @if($report->Task->isEmpty())
+        <p>Kỳ này bạn chưa đăng ký dự án nào</p>
+        @else
+        <?php
+            $tasks_all = $report->Task()->whereIn('department_id', $groupIds)->get();
+            $tasks = $report->Task()->where('user', Auth::id())->get();
+            $total_expected = 0;   // tổng tiền gốc
+            $total_pay = 0;        // tổng tiền phải nộp
+        ?>
+        <div class="card-body">
+            <!-- Table -->
+            <div class="table-responsive">
+                <table class="table table-borderless table-thead-bordered card-table">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Nhân viên</th>
+                            <th>Phòng/Nhóm</th>
+                            <th>Dự án</th>
+                            <th>Hỗ trợ</th>
+                            <th>Kênh</th>
+                            <th>Ngân sách</th>
+                            <th>Tổng tiền</th>
+                            <th>Tiền phải nộp</th>
+                            <th>Ghi chú</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($tasks_all as $val)
+                        <tr class="padding16" id="row-{{ $val->id }}">
+                            <td>{{$val->handler?->yourname ?? '-'}}</td>
+                            <td>{{ $val->Department->name }}</td>
+                            <td>{{$val->Post?->name}}</td>
+                            <td>{{$val->rate}}%</td>
+                            <td>{{$val->Channel?->name}}</td>
+                            <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td>
+                            <td>{{ number_format(($val->days * $val->expected_costs), 0, ',', '.') }} đ</td>
+                            <td>{{ number_format(($val->days * $val->expected_costs * (1 - $val->rate/100)), 0, ',', '.') }} đ</td>
+                            <td class="ghichu" title="{{ $val->content }}">
+                                <span class="tooltip-wrapper">
+                                    <span class="text-truncate-set-1 text-truncate-set">
+                                        {{ $val->content }}
+                                    </span>
+                                    <span class="tooltip">
+                                        {{ $val->content }}
+                                    </span>
+                                </span>
+                            </td>
+                            <td>
+                                @if($val->approved)
+                                    <span class="badge bg-success">Đã duyệt</span>
+                                @else
+                                    <span class="badge bg-warning">Chờ duyệt</span>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
+        @endforeach
+    </div>
 </div>
 
 @endsection

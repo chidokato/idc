@@ -6,3 +6,5 @@
 .custon-table tr>td{padding: .6rem .2rem; }
 .custon-table tr>td:first-child{ padding-left:1rem }
 .custon-table tr>td:last-child{ padding-right:1rem }
+
+.space-between{justify-content: space-between; }
