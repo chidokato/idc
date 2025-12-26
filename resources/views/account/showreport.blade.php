@@ -129,7 +129,7 @@
                               </div>
 
                               <select class="form-select form-select-sm" id="bulk_rate" disabled>
-                                @foreach(config('rates') as $value => $label)
+                                @foreach(config('datas.rates') as $value => $label)
                                   <option value="{{ $value }}">{{ $label }}</option>
                                 @endforeach
                               </select>
@@ -185,10 +185,10 @@
                         <?php $levels = $val->department?->hierarchy_levels ?? []; ?>
                         <tr class="padding16" id="row-{{ $val->id }}">
                             <td class="text-center">
-  @if($canBulkEdit)
-    <input type="checkbox" class="row-check" value="{{ $val->id }}">
-  @endif
-</td>
+                              @if($canBulkEdit)
+                                <input type="checkbox" class="row-check" value="{{ $val->id }}">
+                              @endif
+                            </td>
                             <td>{{ $val->handler?->yourname ?? '---' }}</td>
                             <td>{{ $levels['level2'] ?? '-' }}</td>
                             <td>{{ $levels['level3'] ?? '-' }}</td>
@@ -212,7 +212,7 @@
 
                             <td>
                                 <select name="rate" class="rate-select form-select form-select-sm" data-id="{{ $val->id }}">
-                                    @foreach(config('rates') as $value => $label)
+                                    @foreach(config('datas.rates') as $value => $label)
                                         <option value="{{ $value }}" {{ $val->rate == $value ? 'selected' : '' }}>
                                             {{ $label }}
                                         </option>

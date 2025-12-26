@@ -96,7 +96,7 @@
                                         <td>
                                             <select name="rate[]" required class="form-control rate-select">
                                                 <option value="">-</option>
-                                                @foreach(config('rates') as $key => $label)
+                                                @foreach(config('datas.rates') as $key => $label)
                                                     <option value="{{ $key }}">
                                                         {{ $label }}
                                                     </option>
@@ -116,11 +116,11 @@
                                         <td>
                                             <select name="expected_costs[]" required class="form-control">
                                                 <option value="">---</option>
-                                                <option value="1000000">1.000.000 đ</option>
-                                                <option value="500000">500.000 đ</option>
-                                                <option value="300000">300.000 đ</option>
-                                                <option value="1100">1.100 đ</option>
-                                                <option value="800">800 đ</option>
+                                                @foreach(config('datas.costs') as $key => $label)
+                                                    <option value="{{ $key }}">
+                                                        {{ $label }}
+                                                    </option>
+                                                @endforeach
                                             </select>
                                         </td>
                                         <td><input class="form-control" type="text" name="content[]" placeholder="Hỗ trợ, chạy chung ..."></td>
