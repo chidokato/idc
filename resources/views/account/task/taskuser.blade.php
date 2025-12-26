@@ -30,9 +30,8 @@
   <div class="card-header">
     <div class="row align-items-center flex-grow-1" id="filterBar">
       <div class="col-sm-2 col-md-2 mb-sm-0">
-  <input type="text" name="yourname" id="filterName" class="form-control" placeholder="Tìm theo tên / mã NV / email...">
-</div>
-
+        <input type="text" name="yourname" id="filterName" class="form-control" placeholder="Tìm theo tên / mã NV / email...">
+      </div>
 
       <div class="col-sm-3 col-md-3 mb-sm-0">
         <select name="department_id" id="filterDepartment" class="form-control">

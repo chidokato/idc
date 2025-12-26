@@ -29,6 +29,8 @@ class TaskController extends Controller
     {
         $user = Auth::user();
 
+        $max_id = Report::max('id');
+
         // Load departments 1 lần để: (1) build options (2) lấy danh sách con cháu nhanh
         $departments = Department::select('id', 'parent', 'name')
             ->orderBy('name')
@@ -43,7 +45,7 @@ class TaskController extends Controller
         $keyword = trim((string) $request->input('yourname', ''));
 
         // report filter (nếu có)
-        $reportId = (int) $request->input('report_id', 0);
+        $reportId = (int) $request->input('report_id', $max_id);
 
         // Lấy tất cả id con cháu + chính nó (KHÔNG N+1 query)
         $deptIds = [];
@@ -109,7 +111,6 @@ class TaskController extends Controller
 
         // ===== Render trang =====
         $reports = Report::orderByDesc('id')->get();
-
         $departmentOptions = TreeHelper::buildOptions(
             $departments,
             0,
