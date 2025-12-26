@@ -43,7 +43,7 @@
         <select name="report_id" id="filterReport" class="form-control">
           @foreach($reports as $report)
             <option value="{{ $report->id }}" {{ (int)($reportId ?? 0) === (int)$report->id ? 'selected' : '' }}>
-              {{ $report->name }}
+              {{ $report->name }} ({{ \Carbon\Carbon::parse($report->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($report->time_end)->format('d/m/Y') }})
             </option>
           @endforeach
         </select>
