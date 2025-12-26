@@ -56,7 +56,7 @@
                         <tr>
                             <td>
                                 <div class="btn-group" role="group">
-                                  <a class="btn btn-sm btn-white dupple">
+                                  <a class="btn btn-sm btn-primary dupple">
                                     <i class="tio-copy"></i> Nhân
                                   </a>
                                   <a class="btn btn-sm btn-white del">
@@ -136,7 +136,7 @@
                 </table>
             </div>
             <div class="card-footer">
-                <p><button type="submit" class="btn btn-sm btn-primary">Gửi đăng ký MARKETING</button></p>
+                <p><button type="submit" class="btn btn-sm btn-success">Gửi đăng ký MARKETING</button></p>
                 <p>Nếu không đăng ký được, thiếu dự án, thiếu trường nhập dữ liệu. Liên hệ ngay <a href="https://zalo.me/0977572947" target="_blank"><strong>Nguyễn Tuấn</strong></a> để được hỗ trợ kỹ thuật</p>
             </div>
         </form>
