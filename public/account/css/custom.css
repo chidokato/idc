@@ -8,3 +8,5 @@
 .custon-table tr>td:last-child{ padding-right:1rem }
 
 .space-between{justify-content: space-between; }
+
+.button-none{ padding:0; border:none; background:none }

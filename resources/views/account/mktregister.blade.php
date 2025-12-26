@@ -163,8 +163,6 @@
         <?php
             $tasks_all = $report->Task()->whereIn('department_id', $groupIds)->get();
             $tasks = $report->Task()->where('user', Auth::id())->get();
-            $total_expected = 0;   // tổng tiền gốc
-            $total_pay = 0;        // tổng tiền phải nộp
         ?>
         <div class="card-body">
             <!-- Table -->
@@ -182,9 +180,45 @@
                             <th>Tiền phải nộp</th>
                             <th>Ghi chú</th>
                             <th></th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
+                        @foreach($tasks as $val)
+                        <tr class="padding16" id="row-{{ $val->id }}">
+                            <td>{{$val->handler?->yourname ?? '-'}}</td>
+                            <td>{{ $val->Department->name }}</td>
+                            <td>{{$val->Post?->name}}</td>
+                            <td>{{$val->rate}}%</td>
+                            <td>{{$val->Channel?->name}}</td>
+                            <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td>
+                            <td>{{ number_format(($val->days * $val->expected_costs), 0, ',', '.') }} đ</td>
+                            <td>{{ number_format(($val->days * $val->expected_costs * (1 - $val->rate/100)), 0, ',', '.') }} đ</td>
+                            <td class="ghichu" title="{{ $val->content }}">
+                                <span class="tooltip-wrapper">
+                                    <span class="text-truncate-set-1 text-truncate-set">
+                                        {{ $val->content }}
+                                    </span>
+                                    <span class="tooltip">
+                                        {{ $val->content }}
+                                    </span>
+                                </span>
+                            </td>
+                            <td>
+                                @if($val->approved)
+                                    <span class="badge bg-success">Đã duyệt</span>
+                                @else
+                                    <span class="badge bg-warning">Chờ duyệt</span>
+                                @endif
+                            </td>
+                            <td>
+                                <form action="{{ route('account.tasks.delete', $val) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="button-none btn-white del-db" data-id="{{ $val->id }}"> <i class="tio-delete-outlined"></i> Xóa</button>
+                                </form>
+                            </td>
+                        </tr>
+                        @endforeach
                         @foreach($tasks_all as $val)
                         <tr class="padding16" id="row-{{ $val->id }}">
                             <td>{{$val->handler?->yourname ?? '-'}}</td>
@@ -212,6 +246,7 @@
                                     <span class="badge bg-warning">Chờ duyệt</span>
                                 @endif
                             </td>
+                            <td></td>
                         </tr>
                         @endforeach
                     </tbody>
