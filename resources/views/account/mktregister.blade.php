@@ -161,7 +161,7 @@
         <p>Kỳ này bạn chưa đăng ký dự án nào</p>
         @else
         <?php
-            $tasks_all = $report->Task()->whereIn('department_id', $groupIds)->where('user', '!=', Auth::id())->get();
+            $tasks_all = $report->Task()->where('department_lv2', Auth::user()->department_lv2)->where('user', '!=', Auth::id())->get();
             $tasks = $report->Task()->where('user', Auth::id())->get();
         ?>
         <div class="card-body">
@@ -212,11 +212,19 @@
                                 @endif
                             </td>
                             <td>
-                                <form action="{{ route('account.tasks.delete', $val) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="button-none btn-white del-db" data-id="{{ $val->id }}"> <i class="tio-delete-outlined"></i> Xóa</button>
+                                <form action="{{ route('account.tasks.delete', $val->id) }}" method="POST" class="delete-form">
+                                  @csrf
+                                  <button
+                                    type="submit"
+                                    class="button-none btn-white del-db"
+                                    data-id="{{ $val->id }}"
+                                    data-approved="{{ (int)$val->approved }}"
+                                    data-paid="{{ (int)$val->paid }}"
+                                  >
+                                    <i class="tio-delete-outlined"></i> Xóa
+                                  </button>
                                 </form>
-                            </td>
+                              </td>
                         </tr>
                         @endforeach
                         @foreach($tasks_all as $val)
@@ -348,61 +356,62 @@
 
 </script>
 
-
 <script>
 $(document).on('click', '.del-db', function (e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    let id = $(this).data('id');
-    let row = $("#row-" + id);
+  const btn = $(this);
+  const id = btn.data('id');
+  const approved = parseInt(btn.data('approved')) === 1;
+  const paid = parseInt(btn.data('paid')) === 1; // paid=1 => đã hold tiền (theo bạn nói)
 
-    let approved = row.find('td:nth-child(5) span').hasClass('bg-success'); 
+  if (approved) {
+    Swal.fire('Không thể xóa!', 'Tác vụ đã được duyệt, không thể xóa.', 'warning');
+    return;
+  }
 
-    if (approved) {
-        Swal.fire('Không thể xóa!', 'Tác vụ đã được duyệt, không thể xóa.', 'warning');
-        return;
-    }
+  if (paid) {
+    Swal.fire('Không thể xóa!', 'Tác vụ đã đóng tiền, không thể xóa.', 'warning');
+    return;
+  }
 
-    let url = "{{ url('account/tasks/delete') }}/" + id;
+  const row = $("#row-" + id);
+  const form = btn.closest('form');
+  const url = form.attr('action');
 
-    Swal.fire({
-        title: 'Bạn có chắc muốn xóa?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Có',
-        cancelButtonText: 'Không'
-    }).then((result) => {
-        if (result.isConfirmed) {
+  Swal.fire({
+    title: 'Bạn có chắc muốn xóa?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Có',
+    cancelButtonText: 'Không'
+  }).then((result) => {
+    if (!result.isConfirmed) return;
 
-            $.ajax({
-                url: url,
-                type: "POST",
-                data: { _token: "{{ csrf_token() }}" },
-                success: function(res) {
-                    if (res.status) {
-
-                        row.fadeOut(300, function() {
-                            $(this).remove();
-
-                            // Cập nhật giao diện số liệu
-                            $("#tongduan").text(res.stats.total_project + " dự án");
-                            $("#tongtien").text(res.stats.total_expected + " đ");
-                            $("#tongphainop").text(res.stats.total_pay + " đ");
-                        });
-
-                    } else {
-                        Swal.fire('Lỗi!', res.message, 'error');
-                    }
-                },
-                error: function() {
-                    Swal.fire('Lỗi!', 'Không thể kết nối server.', 'error');
-                }
-            });
-
+    $.ajax({
+      url: url,
+      type: "POST",
+      data: form.serialize(), // gửi _token luôn
+      success: function(res) {
+        if (res.status) {
+          row.fadeOut(300, function() {
+            $(this).remove();
+            $("#tongduan").text(res.stats.total_project + " dự án");
+            $("#tongtien").text(res.stats.total_expected + " đ");
+            $("#tongphainop").text(res.stats.total_pay + " đ");
+          });
+        } else {
+          Swal.fire('Lỗi!', res.message ?? 'Xóa thất bại', 'error');
         }
+      },
+      error: function() {
+        Swal.fire('Lỗi!', 'Không thể kết nối server.', 'error');
+      }
     });
+  });
 });
 </script>
+
 
 
 <script> 
