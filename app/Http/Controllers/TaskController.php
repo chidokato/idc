@@ -57,7 +57,7 @@ class TaskController extends Controller
         // Query tasks theo department_id IN (...)
         $q = Task::query()
             ->with(['handler', 'department', 'Post', 'channel'])
-            ->orderBy('department_id', 'desc');
+            ->orderBy('department_id', 'asc');
 
         if ($keyword !== '') {
             $q->whereHas('handler', function ($qq) use ($keyword) {
