@@ -50,10 +50,20 @@
             </a>
           </li>
           @if(auth()->check() && in_array((int)auth()->user()->rank, [1], true))
+          <li class="nav-item">
+            <small class="nav-subtitle" title="Pages">Quản lý</small>
+            <small class="tio-more-horizontal nav-subtitle-replacer"></small>
+          </li>
           <li class="nav-item ">
             <a class="js-nav-tooltip-link nav-link " href="account/report" title="Quản lý tổng" data-placement="left">
               <i class="tio-dashboard nav-icon"></i>
-              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Quản lý tổng</span>
+              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Duyệt Marketing</span>
+            </a>
+          </li>
+          <li class="nav-item ">
+            <a class="js-nav-tooltip-link nav-link " href="account/report" title="Quản lý tổng" data-placement="left">
+              <i class="tio-dashboard nav-icon"></i>
+              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Duyệt đóng tiền</span>
             </a>
           </li>
           @endif

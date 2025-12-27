@@ -192,11 +192,13 @@ Route::middleware(['user'])->group(function () {
 
         // report
         Route::resource('report',ReportController::class);
-        Route::post('/account/report-store', [ReportController::class, 'store'])->name('account.report.store');
-        Route::post('/account/report-update', [ReportController::class, 'update'])->name('account.report.update');
-        Route::post('/account/report-delete', [ReportController::class, 'delete'])->name('account.report.delete');
-        Route::get('/account/load-report', [ReportController::class, 'loadReport'])->name('account.loadReport');
-        Route::post('/account/report-active', [ReportController::class, 'active'])->name('account.report.active');
+        Route::post('report-store', [ReportController::class, 'store'])->name('account.report.store');
+        Route::post('report-update', [ReportController::class, 'update'])->name('account.report.update');
+        Route::post('report-delete', [ReportController::class, 'delete'])->name('account.report.delete');
+        Route::get('load-report', [ReportController::class, 'loadReport'])->name('account.loadReport');
+        Route::post('report-active', [ReportController::class, 'active'])->name('account.report.active');
+        Route::post('report/{report}/recalc-expected', [ReportController::class, 'recalcExpected'])->name('account.reports.recalcExpected');
+        Route::post('report/{report}/recalc-actual', [ReportController::class, 'recalcActual'])->name('account.reports.recalcActual');
 
         // wallet
         Route::get('wallet', [WalletController::class, 'index'])->name('wallet.index');

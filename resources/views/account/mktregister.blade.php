@@ -146,7 +146,7 @@
         <div class="card-header" data-select2-id="8">
             <div class="row align-items-center flex-grow-1" data-select2-id="7">
                 <div class="col-sm mb-2 mb-sm-0">
-                    <h4 class="card-header-title">Danh sách link đăng ký marketing của phòng/sàn <i class="tio-help-outlined text-body ml-1" data-toggle="tooltip" data-placement="top" title="" data-original-title="Net sales (gross sales minus discounts and returns) plus taxes and shipping. Includes orders from all sales channels."></i></h4>
+                    <h4 class="card-header-title">Danh sách link đăng ký marketing của phòng/sàn</h4>
                 </div>
                 <!-- <div class="col-sm-auto" data-select2-id="6">
                     <select class="custom-select-sm form-control">

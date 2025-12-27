@@ -88,10 +88,6 @@
   @endif
   </td>
 
-
-
-
-
     <td class="hold-badge">
       @if(($task->paid ?? 0) == 1)
         <span class="badge badge-soft-success">Đã đóng</span>
@@ -100,7 +96,11 @@
       @endif
     </td>
 
-    <td>{{ $task->content ?? '' }}</td>
+    <td class="d-flex">
+      <div class="note" data-toggle="tooltip" data-placement="top" title="" data-original-title="{{ $task->content ?? '' }}">
+        {{ $task->content ?? '' }}
+      </div>
+    </td>
   </tr>
 @empty
   <tr>

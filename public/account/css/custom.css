@@ -10,3 +10,10 @@
 .space-between{justify-content: space-between; }
 
 .button-none{ padding:0; border:none; background:none }
+
+.note{
+	width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

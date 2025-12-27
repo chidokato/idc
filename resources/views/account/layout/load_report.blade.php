@@ -1,41 +1,60 @@
-<div class="table-responsive-mobile">
-    
-<table class="table">
-    <thead>
-        <tr>
-             <th>Đóng/mở</th>
-             <th>Khu vực cho: GĐ / admin / MKT</th>
-            <th>Tên</th>
-            <th>Thời gian</th>
-            <th>Số ngày</th>
-           
-        </tr>
-    </thead>
-    <tbody>
-        @foreach($reports as $r)
-        <tr data-id="{{ $r->id }}">
-            <td>
-                <label class="switch">
-                    <input type="checkbox" class="active-toggle" data-id="{{ $r->id }}" {{ $r->active ? 'checked' : '' }}>
-                    <span class="slider round"></span>
-                </label>
+<div class="table-responsive">
+    <table class="table table-thead-bordered table-nowrap table-align-middle card-table no-footer">
+        <thead class="thead-light">
+            <tr>
+                 
+                <th></th>
+                <th>Thời gian</th>
+                <th>Tổng tiền</th>
+                <th>Thực tế</th>
+                <th>Số ngày</th>
+                <th>Đóng/mở</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($reports as $r)
+            <tr data-id="{{ $r->id }}">
+                <td>
+                    <a class="btn btn-sm btn-success" href="account/report/{{ $r->id }}">Duyệt MKT</a>
+                </td>
+                <td><strong> <span class="r-date">{{ \Carbon\Carbon::parse($r->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($r->time_end)->format('d/m/Y') }}</span></strong> <br> <small class="r-name">{{ $r->name }}</small> </td>
+                <td class="js-expected-cell">
+                  <a href="javascript:void(0)" class="js-refresh-expected" data-id="{{ $r->id }}" title="Cập nhật tổng dự kiến">
+                    <i class="tio-refresh"></i>
+                  </a>
+                  <span class="js-expected-text">{{ number_format((int)$r->expected_costs, 0, ',', '.') }}</span>
+                </td>
 
-            </td>
-            <td>
-                <a href="account/report/{{ $r->id }}"><button class="btn-info btn">Duyệt MKT</button></a>
-                <a href="account/report/{{ $r->id }}"><button class="btn-info btn">Chi phí thực tế</button></a>
-                <a href="account/report/{{ $r->id }}"><button class="btn-info btn">Tất cả</button></a>
-            </td>
-            <td class="r-name"><strong>{{ $r->name }}</strong></td>
-            <td class="r-date">{{ \Carbon\Carbon::parse($r->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($r->time_end)->format('d/m/Y') }}</td>
-            <td>{{ $r->days }}</td>
-            
-            <td>
-                <button class="edit btn btn-warning">Sửa</button>
-                <button class="del btn btn-danger" data-id="{{ $r->id }}">Xóa</button>
-            </td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
+                <td class="js-actual-cell">
+                  <a href="javascript:void(0)" class="js-refresh-actual" data-id="{{ $r->id }}" title="Cập nhật tổng thực tế">
+                    <i class="tio-refresh"></i>
+                  </a>
+                  <span class="js-actual-text">{{ number_format((int)$r->actual_costs, 0, ',', '.') }}</span>
+                </td>
+                <td>{{ $r->days }}</td>
+                <td>
+                    <label class="toggle-switch toggle-switch-sm" for="checkbox{{ $r->id }}">
+                        <input type="checkbox" class="toggle-switch-input active-toggle" id="checkbox{{ $r->id }}" data-id="{{ $r->id }}" {{ $r->active ? 'checked' : '' }}>
+                        <span class="toggle-switch-label">
+                            <span class="toggle-switch-indicator"></span>
+                        </span>
+                    </label>
+                </td>
+                <td>
+                    <div class="btn-group" role="group">
+                      <a class="btn btn-sm btn-white edit">
+                        <i class="tio-edit"></i> Edit
+                      </a>
+                      <a class="btn btn-sm btn-white del" data-id="{{ $r->id }}">
+                        <i class="tio-delete"></i>
+                      </a>
+                    </div>
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
 </div>
+
+

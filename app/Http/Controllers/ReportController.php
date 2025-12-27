@@ -24,6 +24,52 @@ class ReportController extends HomeController
         return view('account.report', compact('reports'));
     }
 
+    private function onlyDigitsToInt($value): int
+    {
+        $n = preg_replace('/[^\d]/', '', (string)$value);
+        return $n === '' ? 0 : (int)$n;
+    }
+
+    public function recalcExpected(Request $request, Report $report)
+    {
+        $tasks = Task::where('report_id', $report->id)->get(['expected_costs']);
+
+        $sum = 0;
+        foreach ($tasks as $t) {
+            $sum += $this->onlyDigitsToInt($t->expected_costs);
+        }
+
+        $report->expected_costs = $sum;
+        $report->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Đã cập nhật tổng tiền dự kiến',
+            'total' => $sum,
+            'total_format' => number_format($sum, 0, ',', '.'),
+        ]);
+    }
+
+    public function recalcActual(Request $request, Report $report)
+    {
+        $tasks = Task::where('report_id', $report->id)->get(['actual_costs']);
+
+        $sum = 0;
+        foreach ($tasks as $t) {
+            $sum += $this->onlyDigitsToInt($t->actual_costs);
+        }
+
+        $report->actual_costs = $sum;
+        $report->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Đã cập nhật tổng tiền thực tế',
+            'total' => $sum,
+            'total_format' => number_format($sum, 0, ',', '.'),
+        ]);
+    }
+
     public function store(Request $request)
     {
         $request->validate([

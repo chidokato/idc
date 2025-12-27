@@ -3,7 +3,7 @@
 @section('title') Công Ty Cổ Phần Bất Động Sản Indochine @endsection
 
 @section('css')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
 @endsection
 
 @section('body') @endsection
@@ -11,56 +11,55 @@
 @section('content')
 
 <div class="content container-fluid">
-
     <div class="page-header">
-          <div class="row align-items-end">
+        <div class="row align-items-center">
             <div class="col-sm mb-2 mb-sm-0">
-              <nav aria-label="breadcrumb">
-                <ol class="breadcrumb breadcrumb-no-gutter">
-                  <li class="breadcrumb-item"><a class="breadcrumb-link" href="main">Account</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">Quản lý tổng</li>
-                </ol>
-              </nav>
-
-              <h1 class="page-header-title">Quản lý tổng</h1>
+                <h1 class="page-header-title">Trang chủ</h1>
             </div>
-           
-          </div>
-          <!-- End Row -->
         </div>
-
-
-
-    <div class="row">
-       
-        <div class="col-lg-10 ">
-            <form id="report-form">
-                @csrf
-                <input type="hidden" name="id" id="report_id">
-                <div class="widget-list mb-3">
+    </div>
+    <div class="row gx-2 gx-lg-3">
+        <div class="col-lg-9 mb-3 mb-lg-9">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-header-title">Danh sách</h5>
+                </div>
+                <div id="load_report" class="widget-list"></div>
+            </div>
+        </div>
+        <div class="col-lg-3 mb-3 mb-lg-3">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-header-title">Thêm / sửa</h5>
+                </div>
+                <form id="report-form">
+                    @csrf
+                    <input type="hidden" name="id" id="report_id">
                     <table class="table">
                         <tr>
                             <td><input class="form-control" name="name" type="text" placeholder="Tên"></td>
+                        </tr>
+                        <tr>
                             <td><input class="form-control" name="date" id="date-range" type="text" placeholder="Thời gian"></td>
+                        </tr>
+                        <tr>
                             <td>
                                 <button type="submit" class="btn btn-primary">Lưu lại</button>
                             </td>
                         </tr>
                     </table>
-                </div>
-            </form>
-
-            <div id="load_report" class="widget-list"></div>
-
+                </form>
+            </div>
         </div>
     </div>
 </div>
-<!------------------- END CARD ------------------->
 
 @endsection
 
 
 @section('js')
+
+
 <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <script>
@@ -216,4 +215,87 @@ $(document).ready(function () {
     });
 
 </script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  function showToast(type, message) {
+    Swal.fire({
+      toast: true,
+      position: 'bottom-start',
+      icon: type,
+      title: message,
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true
+    });
+  }
+
+  $.ajaxSetup({
+    headers: {
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    }
+  });
+
+  function setLoading($icon, loading) {
+    if (loading) {
+      $icon.addClass('tio-loading').css('pointer-events', 'none'); // nếu theme hỗ trợ class loading
+    } else {
+      $icon.removeClass('tio-loading').css('pointer-events', '');
+    }
+  }
+
+  $(document).on('click', '.js-refresh-expected', function () {
+    const reportId = $(this).data('id');
+    const $row = $(this).closest('tr');
+    const $icon = $(this).find('i');
+
+    setLoading($icon, true);
+
+    $.post(`account/report/${reportId}/recalc-expected`)
+      .done(function (res) {
+        if (res.status) {
+          $row.find('.js-expected-text').text(res.total_format);
+          showToast('success', res.message || 'Thành công');
+        } else {
+          showToast('warning', res.message || 'Không thể cập nhật');
+        }
+      })
+      .fail(function (xhr) {
+        const msg = xhr?.responseJSON?.message || 'Có lỗi xảy ra, vui lòng thử lại!';
+        showToast('error', msg);
+      })
+      .always(function () {
+        setLoading($icon, false);
+      });
+  });
+
+  $(document).on('click', '.js-refresh-actual', function () {
+    const reportId = $(this).data('id');
+    const $row = $(this).closest('tr');
+    const $icon = $(this).find('i');
+
+    setLoading($icon, true);
+
+    $.post(`account/report/${reportId}/recalc-actual`)
+      .done(function (res) {
+        if (res.status) {
+          $row.find('.js-actual-text').text(res.total_format);
+          showToast('success', res.message || 'Thành công');
+        } else {
+          showToast('warning', res.message || 'Không thể cập nhật');
+        }
+      })
+      .fail(function (xhr) {
+        const msg = xhr?.responseJSON?.message || 'Có lỗi xảy ra, vui lòng thử lại!';
+        showToast('error', msg);
+      })
+      .always(function () {
+        setLoading($icon, false);
+      });
+  });
+</script>
+
+
+
 @endsection
