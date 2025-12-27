@@ -37,9 +37,9 @@ class TaskController extends Controller
             ->get();
 
         // selected department: ưu tiên request, không có thì lấy department_lv2 của user
-        $selectedDeptId = (int) $request->input('department_id', $user->department_lv2 ?? 0);
+        $selectedDeptId = (int) $request->input('department_id', $user->department_id ?? 0);
         if ($selectedDeptId <= 0) {
-            $selectedDeptId = (int) ($user->department_lv2 ?? 0);
+            $selectedDeptId = (int) ($user->department_id ?? 0);
         }
 
         $keyword = trim((string) $request->input('yourname', ''));
