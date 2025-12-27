@@ -56,7 +56,7 @@ class ReportController extends HomeController
 
         $sum = 0;
         foreach ($tasks as $t) {
-            $sum += $this->onlyDigitsToInt($t->actual_costs);
+            $sum += $this->onlyDigitsToInt($t->actual_costs  * $t->days);
         }
 
         $report->actual_costs = $sum;

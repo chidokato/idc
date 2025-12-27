@@ -20,17 +20,19 @@
                 </td>
                 <td><strong> <span class="r-date">{{ \Carbon\Carbon::parse($r->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($r->time_end)->format('d/m/Y') }}</span></strong> <br> <small class="r-name">{{ $r->name }}</small> </td>
                 <td class="js-expected-cell">
+                  
+                  <span class="js-expected-text">{{ number_format((int)$r->expected_costs, 0, ',', '.') }}</span>
                   <a href="javascript:void(0)" class="js-refresh-expected" data-id="{{ $r->id }}" title="Cập nhật tổng dự kiến">
                     <i class="tio-refresh"></i>
                   </a>
-                  <span class="js-expected-text">{{ number_format((int)$r->expected_costs, 0, ',', '.') }}</span>
                 </td>
 
                 <td class="js-actual-cell">
+                  
+                  <span class="js-actual-text">{{ number_format((int)$r->actual_costs, 0, ',', '.') }}</span>
                   <a href="javascript:void(0)" class="js-refresh-actual" data-id="{{ $r->id }}" title="Cập nhật tổng thực tế">
                     <i class="tio-refresh"></i>
                   </a>
-                  <span class="js-actual-text">{{ number_format((int)$r->actual_costs, 0, ',', '.') }}</span>
                 </td>
                 <td>{{ $r->days }}</td>
                 <td>
