@@ -5,7 +5,7 @@
                  
                 <th></th>
                 <th>Thời gian</th>
-                <th>Tổng tiền</th>
+                <th>Tổng tiền (duyệt)</th>
                 <th>Thực tế</th>
                 <th>Số ngày</th>
                 <th>Đóng/mở</th>

@@ -32,11 +32,11 @@ class ReportController extends HomeController
 
     public function recalcExpected(Request $request, Report $report)
     {
-        $tasks = Task::where('report_id', $report->id)->get(['expected_costs']);
+        $tasks = Task::where('approved',1)->where('report_id', $report->id)->get(['expected_costs', 'days']);
 
         $sum = 0;
         foreach ($tasks as $t) {
-            $sum += $this->onlyDigitsToInt($t->expected_costs);
+            $sum += $this->onlyDigitsToInt($t->expected_costs * $t->days);
         }
 
         $report->expected_costs = $sum;
