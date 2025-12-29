@@ -41,22 +41,34 @@ class LoginController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-        $this->validate($request, [
-            'email' => 'required|email:filter',
-            'password' => 'required'
-        ]);
+{
+    $this->validate($request, [
+        'email' => 'required|email:filter',
+        'password' => 'required'
+    ]);
 
-        if (Auth::attempt([
-                'email' => $request->input('email'),
-                'password' => $request->input('password'),
-                // 'permission' => '1'
-            ], $request->input('remember'))) {
-            return redirect()->route('admin');
+    $remember = $request->boolean('remember');
+
+    if (Auth::attempt([
+        'email' => $request->input('email'),
+        'password' => $request->input('password'),
+    ], $remember)) {
+
+        $permission = (int) Auth::user()->permission;
+
+        // permission < 6 => vào admin
+        if ($permission < 6) {
+            return redirect()->route('admin'); // đổi route theo dashboard admin của bạn
         }
-        Session::flash('error', 'Email hoặc Password không đúng');
-        return redirect()->back();
+
+        // permission = 6 => ra trang người dùng
+        return redirect()->route('account.main'); // đổi route theo trang user của bạn
     }
+
+    Session::flash('error', 'Email hoặc Password không đúng');
+    return redirect()->back()->withInput($request->only('email', 'remember'));
+}
+
 
     public function register(Request $request)
     {

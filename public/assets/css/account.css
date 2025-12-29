@@ -1,6 +1,5 @@
 .container{ max-width:100% !important }
-.account{ min-height:60vh }
-.account button.login{ margin:auto; margin-top:20% }
+.account{ min-height:60vh; background-color:#f9fafc; }
 
 .row-btn{ display:flex;         flex-direction: column;  }
 .row-btn button{ border:1px solid #f5f5f5; padding:10px 0px; font-weight:bold; background-color:#f5f5f5;     margin-bottom: 1rem; }
@@ -515,9 +514,12 @@ input:checked + .slider:before {
 }
 
 
-
-
-
+.box-login{ width:500px; padding:2rem; background:#fff; margin:0 auto; border-radius:20px; margin-top:4rem; margin-bottom: 3REM}
+.box-login h1{ font-size:1.2rem; text-align:center; margin-bottom:2rem; font-weight:bold; }
+.box-login .goole button { margin:auto; width:100%; border-radius:10px !important;     justify-content: center;}
+.box-login hr{ margin:2rem 0 }
+.box-login .form-login input{ margin-bottom:1.5rem }
+.box-login label{ padding-bottom:.5rem }
 
 @media (max-width: 1860px) {
   .users>div{ width:100%; overflow: hidden; }

@@ -24,8 +24,8 @@
       <ul class="navbar-nav align-items-center flex-row">
         <li class="mr-3">
         <div class="view-balance">
-          <span id="menuBalance">{{ number_format(Auth::user()->wallet?->balance ?? 0, 0, ',', '.') }}</span> đ | 
-          <span id="menuHeld">{{ number_format(Auth::user()->wallet?->held_balance ?? 0, 0, ',', '.') }}</span> đ
+          <span id="menuBalance">{{ number_format(Auth::user()->wallet?->balance ?? 0, 0, ',', '.') }}</span>đ
+          <!-- <span id="menuHeld">{{ number_format(Auth::user()->wallet?->held_balance ?? 0, 0, ',', '.') }}</span> đ -->
 
         </div>
       </li>
