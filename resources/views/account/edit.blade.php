@@ -4,6 +4,8 @@
 
 @section('css')
 
+<link href="admin_asset/select2/css/select2.min.css" rel="stylesheet">
+
 @endsection
 
 @section('body') data-offset="80" data-hs-scrollspy-options='{"target": "#navbarSettings"}' @endsection
@@ -213,7 +215,7 @@
                     <label for="organizationLabel" class="col-sm-3 col-form-label input-label">Nhóm / Sàn</label>
 
                     <div class="col-sm-9">
-                      <select {{ $user->department_id? 'disabled':'' }} class="form-control" name="department_id" required>
+                      <select class="select2" {{ $user->department_id? 'disabled':'' }} class="form-control" name="department_id" required>
                         <option value="">---</option>
                         {!! $departmentOptions !!}
                     </select>
@@ -388,11 +390,12 @@
 
 @section('js')
 
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script>
-    $(document).ready(function() {
-        $('.select2').select2();
-    });
+<!-- select2 multiple JavaScript -->
+<script src="admin_asset/select2/js/select2.min.js"></script>
+<script src="admin_asset/select2/js/select2-searchInputPlaceholder.js"></script>
+<script type="text/javascript">
+    // $(document).ready(function() { $('.select2').select2({ placeholder: '...'}); });
+    $(document).ready(function() { $('.select2').select2({ searchInputPlaceholder: '...' }); });
 </script>
 
 <script>
