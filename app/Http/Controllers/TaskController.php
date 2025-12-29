@@ -390,21 +390,21 @@ class TaskController extends Controller
     // }
 
     public function updateRate(Request $request)
-    {
-        $request->validate([
-            'id'   => 'required|exists:tasks,id',
-            'rate' => 'required|numeric|min:0|max:100'
-        ]);
+{
+    $request->validate([
+        'id'   => 'required|exists:tasks,id',
+        'rate' => 'required|integer|min:0|max:100',
+    ]);
 
-        $task = Task::find($request->id);
-        $task->rate = $request->rate;
-        $task->save();
+    $task = Task::findOrFail($request->id);
+    $task->rate = (int) $request->rate;
+    $task->save();
 
-        return response()->json([
-            'success' => true,
-            'rate' => $task->rate
-        ]);
-    }
+    return response()->json([
+        'success' => true,
+        'rate' => (int) $task->rate
+    ]);
+}
 
 
     public function updateKpi(Request $request)

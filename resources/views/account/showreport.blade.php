@@ -211,14 +211,24 @@
                             </td>
 
                             <td>
-                                <select name="rate" class="rate-select form-select form-select-sm" data-id="{{ $val->id }}">
-                                    @foreach(config('datas.rates') as $value => $label)
-                                        <option value="{{ $value }}" {{ $val->rate == $value ? 'selected' : '' }}>
-                                            {{ $label }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </td>
+  <div class="input-group input-group-sm" style="max-width:70px;">
+    <input
+      type="text"
+      class="form-control rate-input"
+      data-id="{{ $val->id }}"
+      value="{{ (int) $val->rate }}"
+      min="0"
+      max="100"
+      step="1"
+      inputmode="numeric"
+      pattern="[0-9]*"
+      placeholder="0-100"
+    >
+    <span class="input-group-text">%</span>
+  </div>
+</td>
+
+
 
                             <!-- <td>{{ number_format($val->support_money ?? 0, 0, ',', '.') }} đ</td> -->
                             <td class="ghichu" title="{{ $val->content }}">
@@ -362,31 +372,52 @@ $(document).on('click', '.del-db', function (e) {
 </script>
 
 <script>
-$(document).on('change', '.rate-select', function () {
-    let rate = $(this).val();
-    let taskId = $(this).data('id');
+function sendRateUpdate(taskId, rate, $el){
+  $.ajax({
+    url: "{{ route('tasks.updateRate') }}",
+    method: "POST",
+    data: {
+      _token: "{{ csrf_token() }}",
+      id: taskId,
+      rate: rate
+    },
+    success: function (res) {
+      if (res.success) {
+        showToast('success', 'Đã cập nhật rate ' + res.rate + '%');
+        $el.val(res.rate); // luôn là int
+      } else {
+        showToast('warning', 'Cập nhật rate không thành công');
+      }
+    },
+    error: function (xhr) {
+      if (xhr.status === 422 && xhr.responseJSON?.errors?.rate?.[0]) {
+        showToast('warning', xhr.responseJSON.errors.rate[0]);
+      } else {
+        showToast('error', 'Lỗi khi cập nhật rate');
+      }
+    }
+  });
+}
 
-    $.ajax({
-        url: "{{ route('tasks.updateRate') }}",
-        method: "POST",
-        data: {
-            _token: "{{ csrf_token() }}",
-            id: taskId,
-            rate: rate
-        },
-        success: function (res) {
-            if (res.success) {
-                showToast('success', 'Đã cập nhật rate ' + rate + '%');
-            } else {
-                showToast('warning', 'Cập nhật rate không thành công');
-            }
-        },
-        error: function () {
-            showToast('error', 'Lỗi khi cập nhật rate');
-        }
-    });
+// chặn nhập dấu . , + e (một số trình duyệt cho nhập)
+$(document).on('keydown', '.rate-input', function(e){
+  if (['.', ',', 'e', 'E', '+', '-'].includes(e.key)) e.preventDefault();
+  if (e.key === 'Enter') { e.preventDefault(); $(this).blur(); }
+});
+
+$(document).on('blur', '.rate-input', function () {
+  const $el = $(this);
+  const taskId = $el.data('id');
+
+  let rate = parseInt($el.val(), 10);
+  if (isNaN(rate)) rate = 0;
+  rate = Math.max(0, Math.min(100, rate));
+
+  sendRateUpdate(taskId, rate, $el);
 });
 </script>
+
+
 
 <script>
 $(document).on('change', '.task-kpi', function () {
