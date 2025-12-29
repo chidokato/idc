@@ -3,9 +3,7 @@
 @section('title') Công Ty Cổ Phần Bất Động Sản Indochine @endsection
 
 @section('css')
-
 <link href="admin_asset/select2/css/select2.min.css" rel="stylesheet">
-
 @endsection
 
 @section('body') data-offset="80" data-hs-scrollspy-options='{"target": "#navbarSettings"}' @endsection
