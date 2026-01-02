@@ -28,7 +28,7 @@
 
 </head>
 
-<body class="footer-offset @yield('body') ">
+<body class=" @yield('body') ">
 
 
 <!-- JS Preview mode only -->

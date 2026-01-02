@@ -1,4 +1,4 @@
-.table-lg td, .table-lg th{ padding:.7rem !important }
+.table-lg td, .table-lg th{ padding:.5rem !important }
 .table tr:hover{ background:#f9fafc }
 
 .view-balance{ font-size:1.2rem; font-weight:bold; border:#ddd 1px solid; border-radius:30px; padding:3px 20px }
@@ -30,3 +30,26 @@
 }
 .select2-container--default .select2-selection--single .select2-selection__arrow {
     height: 40px !important; }
+.select2-container--open .select2-dropdown--below{ margin-top:0 }
+.select2-container--default .select2-results__option{ padding:.5rem .2rem }
+.select2-dropdown { border: 1px solid #e7eaf3 !important;}
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+    padding-left: .5rem !important;
+}
+
+.cell-actions{ 
+  position: relative; /* quan trọng: làm "anchor" cho absolute */
+}
+
+.edit-button{
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 10;
+  display: none;
+}
+
+.mg-0{ margin:0 !important }
+
+.table tr:hover .edit-button{ display:block; }

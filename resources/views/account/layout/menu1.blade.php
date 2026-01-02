@@ -1,4 +1,4 @@
-<aside class="js-navbar-vertical-aside navbar navbar-vertical-aside navbar-vertical navbar-vertical-fixed navbar-expand-xl navbar-bordered  ">
+<aside class="js-navbar-vertical-aside navbar navbar-vertical-aside navbar-vertical navbar-vertical-fixed navbar-expand-xl navbar-bordered default navbar-vertical-aside-initialized ">
   <div class="navbar-vertical-container">
     <div class="navbar-brand d-flex justify-content-center">
       <!-- Logo -->

@@ -17,7 +17,6 @@
             <div class="col-sm mb-2 mb-sm-0">
               <h1 class="page-header-title">Trang chủ</h1>
             </div>
-
           </div>
         </div>
         <!-- End Page Header -->

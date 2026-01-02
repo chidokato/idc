@@ -119,12 +119,7 @@ class ReportController extends HomeController
         $days = Carbon::parse($report->time_start)->diffInDays(Carbon::parse($report->time_end)) + 1;
 
         // Base query
-        $query = Task::with([
-            'User.department.parent.parent', // giữ nguyên quan hệ cũ
-            'Post',
-            'Channel'
-        ])
-        ->where('report_id', $id);
+        $query = Task::where('report_id', $id);
        
         if ($request->department_id) {
             $departmentIds = Department::getChildIds($request->department_id);

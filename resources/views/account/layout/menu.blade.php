@@ -1,4 +1,5 @@
-<div id="sidebarMain" class="d-none"><aside class="js-navbar-vertical-aside navbar navbar-vertical-aside navbar-vertical navbar-vertical-fixed navbar-expand-xl navbar-bordered  ">
+<div id="sidebarMain" class="d-none">
+  <aside class="js-navbar-vertical-aside navbar navbar-vertical-aside navbar-vertical navbar-vertical-fixed navbar-expand-xl navbar-bordered default navbar-vertical-aside-initialized ">
   <div class="navbar-vertical-container">
     <div class="navbar-vertical-footer-offset">
       <div class="navbar-brand-wrapper justify-content-between">
@@ -79,14 +80,12 @@
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Ví tiền</span>
             </a>
           </li>
-          @if(auth()->check() && in_array((int)auth()->user()->rank, [1,2], true))
           <li class="nav-item ">
             <a class="js-nav-tooltip-link nav-link " href="account/wallet/deposit" title="Nạp tiền" data-placement="left">
               <i class="tio-money nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Nạp tiền</span>
             </a>
           </li>
-          @endif
 
           <li class="nav-item">
             <small class="nav-subtitle" title="Pages">Hướng dẫn</small>

@@ -72,6 +72,11 @@ class Task extends Model
         return $this->belongsTo(Department::class, 'department_id');
     }
 
+    public function Department_lv2()
+    {
+        return $this->belongsTo(Department::class, 'department_lv2');
+    }
+
 
     public function getGrossCostAttribute()
     {

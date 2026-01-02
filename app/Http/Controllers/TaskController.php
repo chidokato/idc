@@ -52,7 +52,8 @@ class TaskController extends Controller
         if ($selectedDeptId > 0) {
             $deptIds = $this->getChildIdsFromCollection($departments, $selectedDeptId);
         }
-        $approved = $request->input('approved', null); // '1' | '0' | null
+
+        $approved = $request->input('approved', 1); // '1' | '0' | null
 
         // Query tasks theo department_id IN (...)
         $q = Task::query()
@@ -584,4 +585,40 @@ public function updatePaid(Request $request, Task $task, WalletService $walletSe
             'rows' => $updatedRows,
         ]);
     }
+
+
+    public function updateall(Request $request, Task $task)
+    {
+        $data = $request->validate([
+            // 'expected_costs' => ['nullable', 'integer', 'min:0'],
+            // 'days'           => ['nullable', 'integer', 'min:0'],
+            'rate'           => ['nullable', 'integer', 'min:0', 'max:100'],
+            // 'kpi'            => ['nullable', 'string', 'max:255'],
+            // 'content'        => ['nullable', 'string'],
+        ]);
+
+        $rate = (int) $request->input('rate', $task->rate);
+
+        $task->update([
+            // 'days'           => $data['days'] ?? $task->days,
+            'rate'           => $rate,
+        ]);
+
+        return response()->json([
+            'ok' => true,
+            'task' => [
+                'id' => $task->id,
+                // 'expected_costs' => $task->expected_costs,
+                // 'days' => $task->days,
+                'rate' => $task->rate,
+                // 'kpi' => $task->kpi,
+                // 'content' => $task->content,
+                // 'approved' => (bool)$task->approved,
+                // 'total_costs' => $task->total_costs,
+            ]
+        ]);
+    }
+
+
+
 }

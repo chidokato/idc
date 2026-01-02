@@ -1,74 +1,94 @@
-@extends('layout.index')
+@extends('account.layout.index')
 
 @section('title') Công Ty Cổ Phần Bất Động Sản Indochine @endsection
-@section('description') Công Ty Cổ Phần Bất Động Sản Indochine là công ty thành viên của Đất Xanh Miền Bắc - UY TÍN số 1 thị trường BĐS Việt Nam @endsection
-@section('robots') index, follow @endsection
-@section('url'){{asset('')}}@endsection
+
+@section('css')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+@endsection
+
+@section('body')  @endsection
 
 @section('content')
-<section class="card-grid news-sec">
-    <div class="container">
+<section class="content container-fluid">
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-sm mb-2 mb-sm-0">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-no-gutter">
+                        <li class="breadcrumb-item"><a class="breadcrumb-link" href="account/main">Account</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Duyệt marketing</li>
+                    </ol>
+                </nav>
+                <h1 class="page-header-title">{{ $report->name }} ({{ \Carbon\Carbon::parse($report->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($report->time_end)->format('d/m/Y') }})</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+      <form method="GET">
+      <div class="card-header"> 
+          <div class="row align-items-center flex-grow-1">
+            <div class="col-sm-2 col-md-2 mb-sm-0">
+                <select name="department_id" class="form-control select2">
+                    <option value="">-- Sàn / Nhóm --</option>
+                    {!! $departmentOptions !!}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="post_id" class="form-control select2">
+                    <option value="">-- Dự án --</option>
+                    @foreach($posts as $p)
+                        <option value="{{ $p->id }}" {{ request('post_id') == $p->id ? 'selected' : '' }}>
+                            {{ $p->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <select name="channel_id" class="form-control select2">
+                    <option value="">-- Kênh --</option>
+                    {!! $channelsOptions !!}
+                </select>
+            </div>
+            <div class="col-md-1">
+                <select name="approved" class="form-control select2">
+                    <option value="" {{ request()->filled('approved') ? '' : 'selected' }}>
+                        -- Duyệt ?? --
+                    </option>
+                    <option value="1" {{ request('approved') === '1' ? 'selected' : '' }}>
+                        Đã duyệt
+                    </option>
+                    <option value="0" {{ request('approved') === '0' ? 'selected' : '' }}>
+                        Chưa duyệt
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button class="btn button-search form-control btn-success">Lọc</button>
+            </div>
+          </div>
+        
+        </div>
+        </form>
         <div class="row">
             <div class="col-lg-12">
-                <h3 class="mb-4 flex space-between"><button type="button" onclick="window.location.href='{{route('report.index')}}'" class="btn btn-primary">Trở về trang trước</button> {{ $report->name }} ({{ \Carbon\Carbon::parse($report->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($report->time_end)->format('d/m/Y') }}) </h3>
-                <hr>
-                <form method="GET" class="row g-2 mb-3">
-                    <div class="col-md-2">
-                        <select name="department_id" class="form-control select2">
-                            <option value="">-- Sàn / Nhóm --</option>
-                            {!! $departmentOptions !!}
-                        </select>
-                    </div>
-
-                    <div class="col-md-2">
-                        <select name="post_id" class="form-control select2">
-                            <option value="">-- Dự án --</option>
-                            @foreach($posts as $p)
-                                <option value="{{ $p->id }}" {{ request('post_id') == $p->id ? 'selected' : '' }}>
-                                    {{ $p->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="col-md-2">
-                        <select name="channel_id" class="form-control select2">
-                            <option value="">-- Kênh --</option>
-                            {!! $channelsOptions !!}
-                        </select>
-                    </div>
-                    <div class="col-md-1">
-                        <select name="approved" class="form-control select2">
-                            <option value="" {{ request()->filled('approved') ? '' : 'selected' }}>
-                                -- Duyệt ?? --
-                            </option>
-                            <option value="1" {{ request('approved') === '1' ? 'selected' : '' }}>
-                                Đã duyệt
-                            </option>
-                            <option value="0" {{ request('approved') === '0' ? 'selected' : '' }}>
-                                Chưa duyệt
-                            </option>
-                        </select>
-                    </div>
-
-
-                    <div class="col-md-2">
-                        <button class="btn button-search form-control bg-success">Lọc</button>
-                    </div>
-
-                </form>
-
                 @php
-                      $canBulkEdit = auth()->check() && in_array(auth()->user()->rank, [1,2]);
-                    @endphp
-
-                <table class="table table-hover">
-                    <thead class="thead">
+                  $canBulkEdit = auth()->check() && in_array(auth()->user()->rank, [1,2]);
+                @endphp
+            <div class="table-responsive">
+                
+            
+                <table class="table table-hover table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table dataTable no-footer">
+                    <thead class="thead-light">
                         <tr >
                             <th style="width:36px" class="text-center">
-                              @if($canBulkEdit)
-                                <input type="checkbox" id="check-all">
-                              @endif
+                                @if($canBulkEdit)
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="check-all">
+                                    <label class="custom-control-label" for="check-all"></label>
+                                </div>
+                                @endif
                             </th>
                             <th>Họ Tên</th>
                             <th>Sàn</th>
@@ -85,33 +105,29 @@
                             <th>Duyệt</th>
                             <th></th>
                         </tr>
-                        
                     </thead>
-
-                    
-
                     @if($canBulkEdit)
                     <div class="d-flex gap-2 align-items-center mb-2">
                         <button type="button" class="btn btn-primary btn-sm" id="btn-open-bulk-modal" disabled>
                             Sửa hàng loạt (<span id="bulk-count">0</span>)
                         </button>
-<!-- 
-                        <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-clear-selected" disabled>
-                            Bỏ chọn
-                        </button> -->
                     </div>
 
                     <!-- Modal -->
-                    <div class="modal fade" id="bulkEditModal" tabindex="-1" aria-hidden="true">
-                      <div class="modal-dialog">
+                  <div class="modal fade" id="bulkEditModal" tabindex="-1" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered" role="document">
                         <div class="modal-content">
+                          <!-- Header -->
                           <div class="modal-header">
-                            <h5 class="modal-title">Sửa hàng loạt</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <h4 id="editUserModalTitle" class="modal-title">Sửa hàng loạt</h4>
+
+                            <button type="button" class="btn btn-icon btn-sm btn-ghost-secondary" data-dismiss="modal" aria-label="Close">
+                              <i class="tio-clear tio-lg"></i>
+                            </button>
                           </div>
+                          <!-- End Header -->
 
                           <div class="modal-body">
-
                             {{-- Expected costs --}}
                             <div class="border rounded p-2 mb-3">
                               <div class="form-check mb-2">
@@ -168,6 +184,7 @@
                             <td></td>
                             <td></td>
                             <td></td>
+                            <td></td>
                             <td class="text-end">{{ number_format($tongTien, 0, ',', '.') }}</td>
                             <td></td>
                             <td></td>
@@ -175,62 +192,45 @@
                             <td></td>
                             <td></td>   
                         </tr>
-                        <?php
-                            $task = $task->sortBy([
-                                fn($a, $b) => strcmp($a->department?->hierarchy_levels['level2'] ?? '', $b->department?->hierarchy_levels['level2'] ?? ''),
-                                fn($a, $b) => strcmp($a->department?->hierarchy_levels['level3'] ?? '', $b->department?->hierarchy_levels['level3'] ?? ''),
-                            ]);
-                        ?>
+                        
                         @foreach($task as $val)
-                        <?php $levels = $val->department?->hierarchy_levels ?? []; ?>
                         <tr class="padding16" id="row-{{ $val->id }}">
                             <td class="text-center">
-                              @if($canBulkEdit)
-                                <input type="checkbox" class="row-check" value="{{ $val->id }}">
-                              @endif
+                                @if($canBulkEdit)
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input row-check" id="canBulkEdit{{ $val->id }}" value="{{ $val->id }}">
+                                    <label class="custom-control-label" for="canBulkEdit{{ $val->id }}"></label>
+                                </div>
+                                @endif
                             </td>
                             <td>{{ $val->handler?->yourname ?? '---' }}</td>
-                            <td>{{ $levels['level2'] ?? '-' }}</td>
-                            <td>{{ $levels['level3'] ?? '-' }}</td>
-                            <td>{{ $val->Post?->name }}</td>
+                            <td>{{ $val->Department_lv2?->name }}</td>
+                            <td>{{ $val->department?->name }}</td>
+                            <td class="duan" data-duan="{{ $val->Post?->id }}">{{ $val->Post?->name }} </td>
                             <td class="text-center">{{ $val->Channel?->name }}</td>
-                            <td class="text-end"><input type="text" style="width: 80px" class="form-control form-select-sm expected-cost-input" value="{{ number_format($val->expected_costs, 0, ',', '.') }}" data-id="{{ $val->id }}">
+                            <td class="text-end"><input type="text" style="width: 100px" class="form-control form-select-sm expected-cost-input" value="{{ number_format($val->expected_costs, 0, ',', '.') }}" data-id="{{ $val->id }}">
                             </td>
-                            <!-- <td>{{ $val->days }}</td> -->
-                            <td class="text-end total-cost-cell"
-                                data-days="{{ $val->days }}"
-                                data-rate="{{ $val->rate }}"
-                            >
-                                <span class="total-cost-text">
+                            <td class="text-end total-cost-cell" data-days="{{ $val->days }}" data-rate="{{ $val->rate }}" >
+                                <span class="total-cost-text" title="{{ number_format($val->expected_costs, 0, ',', '.') }}đ * {{ $val->days }} ngày">
                                     {{ number_format($val->total_costs ?? $val->days * $val->expected_costs, 0, ',', '.') }}
                                 </span>
-                                <span
-                                    title="{{ number_format($val->expected_costs, 0, ',', '.') }}đ * {{ $val->days }} ngày"
-                                    class="note"
-                                >?</span>
                             </td>
-
                             <td>
-  <div class="input-group input-group-sm" style="max-width:70px;">
-    <input
-      type="text"
-      class="form-control rate-input"
-      data-id="{{ $val->id }}"
-      value="{{ (int) $val->rate }}"
-      min="0"
-      max="100"
-      step="1"
-      inputmode="numeric"
-      pattern="[0-9]*"
-      placeholder="0-100"
-    >
-    <span class="input-group-text">%</span>
-  </div>
-</td>
-
-
-
-                            <!-- <td>{{ number_format($val->support_money ?? 0, 0, ',', '.') }} đ</td> -->
+                              <div class="input-group input-group-sm" style="max-width:50px;">
+                                <input
+                                  type="text"
+                                  class="form-control rate-input"
+                                  data-id="{{ $val->id }}"
+                                  value="{{ (int) $val->rate }}"
+                                  min="0"
+                                  max="100"
+                                  step="1"
+                                  inputmode="numeric"
+                                  pattern="[0-9]*"
+                                  placeholder="0-100"
+                                >
+                              </div>
+                            </td>
                             <td class="ghichu" title="{{ $val->content }}">
                                 <span class="tooltip-wrapper">
                                     <span class="text-truncate-set-1 text-truncate-set">
@@ -241,49 +241,110 @@
                                     </span>
                                 </span>
                             </td>
-
                             <td>
                                 <input type="text" class="task-kpi form-control form-select-sm" value="{{ $val->kpi ?? '' }}" data-id="{{ $val->id }}" placeholder="..." >
                             </td>
-                            <!-- <td>
-                                <form action="{{ route('account.tasks.delete', $val) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="del-db btn btn-danger p-1" data-id="{{ $val->id }}">Xóa</button>
-                                </form>
-                            </td> -->
                             <td>
-                                <label class="switch">
-                                    <input type="checkbox" class="active-toggle" data-id="{{ $val->id }}" {{ $val->approved ? 'checked' : '' }}>
-                                    <span class="slider round"></span>
+                                <label class="row toggle-switch-sm switch mg-0" for="avail111{{ $val->id }}">
+                                  <span class="col-4 col-sm-3">
+                                    <input type="checkbox" class="toggle-switch-input active-toggle" id="avail111{{ $val->id }}" data-id="{{ $val->id }}" {{ $val->approved ? 'checked' : '' }}>
+                                    <span class="toggle-switch-label ml-auto">
+                                      <span class="toggle-switch-indicator"></span>
+                                    </span>
+                                  </span>
                                 </label>
                             </td>
-                            <td> @if($val->approved) <span class="badge bg-success">Đã duyệt</span> @else <span class="badge bg-warning">Chờ duyệt</span> @endif </td>
-                            
+                            <td class="cell-actions">
+                                @if($val->approved) <span class="badge btn-success">Đã duyệt</span> @else <span class="badge btn-warning">Chờ duyệt</span> @endif 
+                                <div class="edit-button">
+                                  <a class="btn btn-sm btn-white btn-edit-task"
+                                       href="javascript:;"
+                                       data-id="{{ $val->id }}"
+                                       data-toggle="modal"
+                                       data-target="#invoiceReceiptModal">
+                                      <i class="tio-edit"></i>
+                                    </a>
+                                </div>
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>
-                </table>
+                </table></div>
             </div>
         </div>
     </div>
 </section>
 <!------------------- END CARD ------------------->
 
+<div class="modal fade" id="invoiceReceiptModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+        <!-- Header -->
+          <div class="modal-header">
+            <h4 id="editUserModalTitle" class="modal-title">Sửa chi tiết</h4>
+
+            <button type="button" class="btn btn-icon btn-sm btn-ghost-secondary" data-dismiss="modal" aria-label="Close">
+              <i class="tio-clear tio-lg"></i>
+            </button>
+          </div>
+          <!-- End Header -->
+      <div class="modal-body">
+        <input type="hidden" id="modal_task_id">
+
+        <!-- <div class="form-group">
+          <label>Expected costs</label>
+          <input type="text" class="form-control" id="modal_expected_costs">
+        </div>
+
+        <div class="form-group">
+          <label>Days</label>
+          <input type="number" class="form-control" id="modal_days">
+        </div> -->
+
+        <div class="form-group">
+          <label>Dự án</label>
+          <input type="text" class="form-control" id="duan" >
+        </div>
+
+        <div class="form-group">
+          <label>Rate (%)</label>
+          <input type="number" class="form-control" id="modal_rate" min="0" max="100">
+        </div>
+
+        <!-- <div class="form-group">
+          <label>KPI</label>
+          <input type="text" class="form-control" id="modal_kpi">
+        </div>
+
+        <div class="form-group">
+          <label>Content</label>
+          <textarea class="form-control" id="modal_content" rows="3"></textarea>
+        </div> -->
+
+        <div class="d-flex justify-content-end">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+          <button type="button" class="btn btn-primary ml-2" id="btnSaveTaskModal">Lưu</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
 @endsection
 
-@section('css')
-<link href="assets/css/widget.css" rel="stylesheet">
-<link href="assets/css/account.css" rel="stylesheet">
-<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" /> -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-@endsection
 @section('js')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     $(document).ready(function() {
         $('.select2').select2();
     });
-$(document).ready(function() {
+</script>
+
+<script>
+    $(document).ready(function() {
     $('.active-toggle').on('change', function() {
         let checkbox = $(this);
         let taskId = checkbox.data('id');
@@ -300,9 +361,9 @@ $(document).ready(function() {
                 if(res.success) {
                     let badge = checkbox.closest('tr').find('td:last span');
                     if(res.approved) {
-                        badge.removeClass('bg-warning').addClass('bg-success').text('Đã duyệt');
+                        badge.removeClass('btn-warning').addClass('btn-success').text('Đã duyệt');
                     } else {
-                        badge.removeClass('bg-success').addClass('bg-warning').text('Chờ duyệt');
+                        badge.removeClass('btn-success').addClass('btn-warning').text('Chờ duyệt');
                     }
                 }
             },
@@ -314,9 +375,7 @@ $(document).ready(function() {
         });
     });
 });
-</script>
 
-<script>
 $(document).on('click', '.del-db', function (e) {
     e.preventDefault();
 
@@ -369,9 +428,7 @@ $(document).on('click', '.del-db', function (e) {
         }
     });
 });
-</script>
 
-<script>
 function sendRateUpdate(taskId, rate, $el){
   $.ajax({
     url: "{{ route('tasks.updateRate') }}",
@@ -415,11 +472,9 @@ $(document).on('blur', '.rate-input', function () {
 
   sendRateUpdate(taskId, rate, $el);
 });
-</script>
 
 
 
-<script>
 $(document).on('change', '.task-kpi', function () {
     let input = $(this);
     let kpi = input.val();
@@ -444,9 +499,7 @@ $(document).on('change', '.task-kpi', function () {
         }
     });
 });
-</script>
 
-<script>
 $(document).on('blur', '.expected-cost-input', function () {
     let input = $(this);
     let taskId = input.data('id');
@@ -500,9 +553,7 @@ $(document).on('blur', '.expected-cost-input', function () {
         }
     });
 });
-</script>
 
-<script>
 $(function () {
     const canBulkEdit = @json($canBulkEdit);
 
@@ -629,9 +680,9 @@ $(function () {
                         row.find('.active-toggle').prop('checked', r.approved == 1);
                         const badgeCell = row.find('td').last(); // cột badge đang là td cuối
                         if(r.approved == 1){
-                            badgeCell.html('<span class="badge bg-success">Đã duyệt</span>');
+                            badgeCell.html('<span class="badge btn-success">Đã duyệt</span>');
                         } else {
-                            badgeCell.html('<span class="badge bg-warning">Chờ duyệt</span>');
+                            badgeCell.html('<span class="badge btn-warning">Chờ duyệt</span>');
                         }
                     }
                 });
@@ -656,6 +707,130 @@ $(function () {
 
     refreshBulkButtons();
 });
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  // 1) Ép thu nhỏ menu trái khi vào trang report
+  document.body.classList.add('navbar-vertical-aside-mini-mode');
+
+  // (tuỳ theme) lưu trạng thái để refresh vẫn giữ mini
+  try {
+    localStorage.setItem('hs-navbar-vertical-aside-mini-mode', 'true');
+    localStorage.setItem('hs-navbar-vertical-aside-mini-mode-status', 'true');
+  } catch (e) {}
+
+  // 2) Logic tooltip: chỉ cho show tooltip khi đang mini mode
+  $(document).off('show.bs.tooltip', '.js-nav-tooltip-link'); // tránh bind trùng
+  $(document).on('show.bs.tooltip', '.js-nav-tooltip-link', function (e) {
+    if (!$('body').hasClass('navbar-vertical-aside-mini-mode')) {
+      return false;
+    }
+  });
+
+  // (tuỳ chọn) bật tooltip nếu theme chưa init
+  $('[data-toggle="tooltip"], [data-bs-toggle="tooltip"]').tooltip?.();
+});
+
+</script>
+
+<script>
+    function toNumber(str) {
+      if (!str) return 0;
+      return parseInt(String(str).replace(/\./g, '').replace(/,/g, ''), 10) || 0;
+    }
+    function formatVn(n) {
+      return (n || 0).toLocaleString('vi-VN');
+    }
+
+    $(document).on('click', '.btn-edit-task', function () {
+      const id = $(this).data('id');
+      const $row = $('#row-' + id);
+
+      // lấy từ input trong row
+      const expected = $row.find('.expected-cost-input').val(); // ví dụ "1.000.000"
+      const rate = $row.find('.rate-input').val();
+      const kpi = $row.find('.task-kpi').val();
+
+      // lấy từ data-attribute trong cell total-cost (bạn có sẵn)
+      const days = $row.find('.total-cost-cell').data('days');
+
+      const duan = $row.find('.duan').data('duan'); // lấy id dự án
+
+      // content đang nằm trong td.ghichu (bạn có title)
+      const content = $row.find('td.ghichu').attr('title') || $row.find('td.ghichu').text().trim();
+
+      // đổ vào modal
+      $('#duan').val(duan);
+      $('#modal_task_id').val(id);
+      $('#modal_expected_costs').val(expected);
+      $('#modal_days').val(days);
+      $('#modal_rate').val(rate);
+      $('#modal_kpi').val(kpi);
+      $('#modal_content').val(content);
+    });
+
+</script>
+
+<script>
+$('#btnSaveTaskModal').on('click', function () {
+  const id = $('#modal_task_id').val();
+
+  // const expectedNum = toNumber($('#modal_expected_costs').val());
+  const days = parseInt($('#modal_days').val(), 10) || 0;
+  const rate = parseInt($('#modal_rate').val(), 10) || 0;
+  // const kpi = $('#modal_kpi').val() || '';
+  // const content = $('#modal_content').val() || '';
+
+  $.ajax({
+    url: 'account/tasks/' + id,
+    method: 'PUT',
+    headers: {
+      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    },
+    data: {
+      // expected_costs: expectedNum,
+      // days: days,
+      rate: rate,
+      // kpi: kpi,
+      // content: content
+    },
+    success: function (res) {
+      if (!res?.ok) {
+        alert('Lưu thất bại');
+        return;
+      }
+
+      // Update lại UI theo dữ liệu server trả về (an toàn nhất)
+      const t = res.task;
+      const $row = $('#row-' + t.id);
+
+      // $row.find('.expected-cost-input').val(formatVn(t.expected_costs));
+      $row.find('.rate-input').val(parseInt(t.rate, 10) || 0);
+      // $row.find('.task-kpi').val(t.kpi ?? '');
+
+      // $row.find('td.ghichu').attr('title', t.content ?? '');
+      // $row.find('td.ghichu .text-truncate-set').text(t.content ?? '');
+      // $row.find('td.ghichu .tooltip').text(t.content ?? '');
+
+      // $row.find('.total-cost-cell').data('days', t.days).attr('data-days', t.days);
+      // $row.find('.total-cost-text')
+      //   .text(formatVn(t.total_costs))
+      //   .attr('title', `${formatVn(t.expected_costs)}đ * ${t.days} ngày`);
+
+      $('#invoiceReceiptModal').modal('hide');
+    },
+    error: function (xhr) {
+      // Laravel validation errors
+      if (xhr.status === 422) {
+        const errors = xhr.responseJSON?.errors || {};
+        alert(Object.values(errors).flat().join('\n'));
+        return;
+      }
+      alert('Có lỗi khi lưu, vui lòng thử lại.');
+    }
+  });
+});
+
 </script>
 
 @endsection
