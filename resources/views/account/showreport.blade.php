@@ -243,7 +243,7 @@
                                 </span>
                             </td>
                             <td>
-                                <input type="text" class="task-kpi form-control form-select-sm" value="{{ $val->kpi ?? '' }}" data-id="{{ $val->id }}" placeholder="..." >
+                                <input type="text" @if($val->paid ==1) disabled @endif class="task-kpi form-control form-select-sm" value="{{ $val->kpi ?? '' }}" data-id="{{ $val->id }}" placeholder="..." >
                             </td>
                             <td>
                                 <label class="row toggle-switch-sm switch mg-0" for="avail111{{ $val->id }}">

@@ -133,7 +133,7 @@
                   <input type="hidden" id="amount_raw" name="amount">
 
                   <div class="invalid-feedback">
-                    Số tiền phải ≥ 10.000 và là bội số của 10.000
+                    Số tiền phải ≥ 1.000 và là bội số của 1.000
                   </div>
               </div>
 
@@ -240,8 +240,8 @@
   const displayEl = document.getElementById('amount');       // input gốc (hiển thị)
   const rawEl     = document.getElementById('amount_raw');   // input hidden (submit)
 
-  const STEP = 10000;
-  const MIN  = 10000;
+  const STEP = 1000;
+  const MIN  = 1000;
 
   function onlyDigits(str) {
     return (str || '').replace(/\D+/g, '');
