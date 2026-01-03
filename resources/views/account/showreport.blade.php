@@ -194,6 +194,7 @@
                         </tr>
                         
                         @foreach($task as $val)
+
                         <tr class="padding16" id="row-{{ $val->id }}">
                             <td class="text-center">
                                 @if($canBulkEdit)
@@ -208,7 +209,7 @@
                             <td>{{ $val->department?->name }}</td>
                             <td class="duan" data-duan="{{ $val->Post?->id }}">{{ $val->Post?->name }} </td>
                             <td class="text-center">{{ $val->Channel?->name }}</td>
-                            <td class="text-end"><input type="text" style="width: 100px" class="form-control form-select-sm expected-cost-input" value="{{ number_format($val->expected_costs, 0, ',', '.') }}" data-id="{{ $val->id }}">
+                            <td class="text-end"><input @if($val->paid ==1) disabled @endif type="text" style="width: 100px" class="form-control form-select-sm expected-cost-input" value="{{ number_format($val->expected_costs, 0, ',', '.') }}" data-id="{{ $val->id }}">
                             </td>
                             <td class="text-end total-cost-cell" data-days="{{ $val->days }}" data-rate="{{ $val->rate }}" >
                                 <span class="total-cost-text" title="{{ number_format($val->expected_costs, 0, ',', '.') }}đ * {{ $val->days }} ngày">
@@ -217,7 +218,7 @@
                             </td>
                             <td>
                               <div class="input-group input-group-sm" style="max-width:50px;">
-                                <input
+                                <input  @if($val->paid ==1) disabled @endif
                                   type="text"
                                   class="form-control rate-input"
                                   data-id="{{ $val->id }}"
@@ -256,6 +257,7 @@
                             </td>
                             <td class="cell-actions">
                                 @if($val->approved) <span class="badge btn-success">Đã duyệt</span> @else <span class="badge btn-warning">Chờ duyệt</span> @endif 
+                                @if($val->paid !=1 )
                                 <div class="edit-button">
                                   <a class="btn btn-sm btn-white btn-edit-task"
                                        href="javascript:;"
@@ -265,6 +267,7 @@
                                       <i class="tio-edit"></i>
                                     </a>
                                 </div>
+                                @endif
                             </td>
                         </tr>
                         @endforeach
@@ -833,7 +836,7 @@ $('#btnSaveTaskModal').on('click', function () {
           .attr('data-duan', t.post_id)
           .text(t.post_name || '');
       }
-      
+
 
       $('#invoiceReceiptModal').modal('hide');
     },
