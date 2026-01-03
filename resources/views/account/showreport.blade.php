@@ -303,7 +303,14 @@
 
         <div class="form-group">
           <label>Dự án</label>
-          <input type="text" class="form-control" id="duan" >
+          <select id="duan" class="form-control select2">
+              @foreach($posts as $p)
+                <option value="{{ $p->id }}" {{ request('post_id') == $p->id ? 'selected' : '' }}>
+                    {{ $p->name }}
+                </option>
+            @endforeach
+          </select>
+          <!-- <input type="text" class="form-control" id="duan" > -->
         </div>
 
         <div class="form-group">
@@ -762,11 +769,12 @@ document.addEventListener('DOMContentLoaded', function () {
       // đổ vào modal
       $('#duan').val(duan);
       $('#modal_task_id').val(id);
-      $('#modal_expected_costs').val(expected);
-      $('#modal_days').val(days);
+      // $('#modal_expected_costs').val(expected);
+      // $('#modal_days').val(days);
       $('#modal_rate').val(rate);
-      $('#modal_kpi').val(kpi);
-      $('#modal_content').val(content);
+      // $('#modal_kpi').val(kpi);
+      // $('#modal_content').val(content);
+      $('#duan').val(duan).trigger('change'); 
     });
 
 </script>
@@ -776,10 +784,11 @@ $('#btnSaveTaskModal').on('click', function () {
   const id = $('#modal_task_id').val();
 
   // const expectedNum = toNumber($('#modal_expected_costs').val());
-  const days = parseInt($('#modal_days').val(), 10) || 0;
+  // const days = parseInt($('#modal_days').val(), 10) || 0;
   const rate = parseInt($('#modal_rate').val(), 10) || 0;
   // const kpi = $('#modal_kpi').val() || '';
   // const content = $('#modal_content').val() || '';
+  const post_id = parseInt($('#duan').val(), 10) || null;
 
   $.ajax({
     url: 'account/tasks/' + id,
@@ -791,6 +800,7 @@ $('#btnSaveTaskModal').on('click', function () {
       // expected_costs: expectedNum,
       // days: days,
       rate: rate,
+      post_id: post_id
       // kpi: kpi,
       // content: content
     },
@@ -816,6 +826,14 @@ $('#btnSaveTaskModal').on('click', function () {
       // $row.find('.total-cost-text')
       //   .text(formatVn(t.total_costs))
       //   .attr('title', `${formatVn(t.expected_costs)}đ * ${t.days} ngày`);
+
+      if (t.post_id) {
+        $row.find('.duan')
+          .data('duan', t.post_id)
+          .attr('data-duan', t.post_id)
+          .text(t.post_name || '');
+      }
+      
 
       $('#invoiceReceiptModal').modal('hide');
     },
