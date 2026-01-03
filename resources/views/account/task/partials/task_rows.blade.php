@@ -9,7 +9,7 @@
   @endphp
   <tr>
     <td>
-      @if($task->approved)
+      @if($task->approved == 1)
           <span class="badge btn-success">Đã duyệt</span>
       @else
           <span class="badge btn-warning">Không duyệt</span>

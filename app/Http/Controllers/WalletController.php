@@ -65,8 +65,8 @@ class WalletController extends Controller
     public function depositSubmit(Request $request)
     {
         $request->validate([
-            'amount' => 'required|numeric|min:10000',
-            'proof_image'      => 'required|image|max:2048', // tối đa 2MB
+            'amount' => 'required|numeric|min:1000',
+            'proof_image'      => 'required|image|max:20480', // tối đa 20MB
         ]);
 
         $user = Auth::user();
