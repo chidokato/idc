@@ -56,13 +56,29 @@
                     </div>
 
                     <div class="col-lg-2 d-flex gap-2">
-                      <input
-                      type="text"
-                      name="range"
-                      class="js-daterangepicker form-control"
-                      placeholder="Chọn khoảng thời gian"
-                      value="{{ request('range') }}"
-                    >
+                     <!-- <input
+  type="text"
+  name="range"
+  class="js-daterangepicker form-control"
+  placeholder="Chọn khoảng thời gian"
+  value="{{ request('range') }}"
+  data-range="{{ request('range') }}"
+> -->
+
+<input
+  type="text"
+  name="range"
+  class="js-daterangepicker-clear form-control daterangepicker-custom-input"
+  placeholder="Select dates"
+  value="{{ request('range') ?? '' }}"
+  data-hs-daterangepicker-options='{
+    "autoUpdateInput": false,
+    "locale": { "cancelLabel": "Clear" }
+  }'
+>
+
+
+
                     </div>
 
                     <div class="col-lg-3 d-flex gap-2">
@@ -225,11 +241,22 @@
 <script src="daterangepicker/daterangepicker.js"></script>
 
 <script>
-  $(function () {
-    $.HSCore.components.HSDaterangepicker.init($('.js-daterangepicker'));
-    $(document).on('cancel.daterangepicker', '.js-daterangepicker', function () { this.value = ''; });
+  $(document).on('ready', function () {
+    $.HSCore.components.HSDaterangepicker.init($('.js-daterangepicker-clear'));
+
+    $('.js-daterangepicker-clear').on('apply.daterangepicker', function(ev, picker) {
+      $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+    });
+
+    $('.js-daterangepicker-clear').on('cancel.daterangepicker', function(ev, picker) {
+      $(this).val('');
+    });
   });
 </script>
+
+
+
+
 
 
 
