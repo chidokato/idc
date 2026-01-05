@@ -228,43 +228,12 @@
 <script src="daterangepicker/daterangepicker.js"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  const input = document.querySelector('.js-daterangepicker');
-  if (!input || typeof $ === 'undefined' || !$.fn.daterangepicker || typeof moment === 'undefined') return;
-
-  // Giá trị hiện tại trên input (từ request('range'))
-  const rangeVal = (input.value || '').trim(); // "DD/MM/YYYY - DD/MM/YYYY"
-
-  // Parse range nếu có
-  let start = null, end = null;
-  const m = rangeVal.match(/^(\d{2}\/\d{2}\/\d{4})\s*-\s*(\d{2}\/\d{2}\/\d{4})$/);
-  if (m) {
-    start = moment(m[1], 'DD/MM/YYYY');
-    end   = moment(m[2], 'DD/MM/YYYY');
-  }
-
-  $(input).daterangepicker({
-    autoUpdateInput: true,     // ✅ tự update value của input
-    autoApply: true,           // ✅ chọn xong tự apply (khỏi bấm Áp dụng)
-    locale: {
-      format: 'DD/MM/YYYY',
-      applyLabel: 'Áp dụng',
-      cancelLabel: 'Hủy'
-    },
-    ...(start && end ? { startDate: start, endDate: end } : {})
+  $(function () {
+    $.HSCore.components.HSDaterangepicker.init($('.js-daterangepicker'));
+    $(document).on('cancel.daterangepicker', '.js-daterangepicker', function () { this.value = ''; });
   });
-
-  // Đảm bảo format hiển thị chuẩn (kể cả khi daterangepicker tự set)
-  $(input).on('apply.daterangepicker', function (ev, picker) {
-    this.value = picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY');
-  });
-
-  // Bấm hủy thì clear input
-  $(input).on('cancel.daterangepicker', function () {
-    this.value = '';
-  });
-});
 </script>
+
 
 
 
