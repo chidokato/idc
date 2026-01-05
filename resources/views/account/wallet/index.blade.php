@@ -22,7 +22,6 @@
                 </nav>
                 <h1 class="page-header-title">Ví tiền</h1>
             </div>
-            @if(auth()->check() && in_array((int)auth()->user()->rank, [1,2], true))
             <div class="col-sm-auto">
                 <a class="btn btn-primary" href="account/wallet/transfer">
                     <i class="tio-swap-horizontal mr-1"></i> Chuyển tiền
@@ -31,7 +30,6 @@
                     <i class="tio-money mr-1"></i> Nạp tiền
                 </a>
             </div>
-            @endif
         </div>
     <!-- End Row -->
     </div>
