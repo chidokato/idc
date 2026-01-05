@@ -93,6 +93,13 @@
             </a>
           </li>
 
+          <li class="nav-item ">
+            <a class="js-nav-tooltip-link nav-link " href="account/wallet/transfer" title="Nạp tiền" data-placement="left">
+              <i class="tio-money nav-icon"></i>
+              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Chuyển tiền</span>
+            </a>
+          </li>
+
           <li class="nav-item">
             <small class="nav-subtitle" title="Pages">Hướng dẫn</small>
             <small class="tio-more-horizontal nav-subtitle-replacer"></small>
