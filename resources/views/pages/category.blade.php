@@ -19,7 +19,7 @@
                 <div class="col-lg-4">
                     <div class="input-group search-input">
                         <span class="input-group-text border100"><i class="icon-search"></i></span>
-                        <input value="{{ request()->key ?? '' }}" name="key" type="text" class="form-control" placeholder="Nhập địa chỉ, dự án">
+                        <input value="{{ request()->key ?? '' }}" name="key" type="text" class="form-control" placeholder="Nhập tên dự án">
                     </div>
                     <button type="submit" class="btn btn-circle">Tìm kiếm</button>
                 </div>
@@ -36,24 +36,40 @@
                 <div class="widget widget-list widget-hightlight mb-3">
                     <h4><span>Loại hình</span></h4>
                     @foreach($cats as $val)
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="categories[]" value="{{$val->id}}" id="flexCheck{{$val->id}}" {{ in_array($val->id, request()->input('categories', [])) ? 'checked' : '' }}>
-                            <label class="form-check-label aa22" for="flexCheck{{$val->id}}">
-                                <span>{{$val->name}}</span> <span>({{ count($val->Post) }})</span>
-                            </label>
-                        </div>
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          name="categories[]"
+                          value="{{ $val->id }}"
+                          id="flexCheckCat{{ $val->id }}"
+                          {{ in_array($val->id, request()->input('categories', [])) ? 'checked' : '' }}
+                        >
+                        <label class="form-check-label aa22" for="flexCheckCat{{ $val->id }}">
+                          <span>{{ $val->name }}</span>
+                          <span>({{ count($val->Post) }})</span>
+                        </label>
+                      </div>
                     @endforeach
                     <hr>
                     <h4><span>Tình thành</span></h4>
                     @foreach($provinces as $val)
-                        @if(count($val->Post) > 0)
+                      @if(count($val->Post) > 0)
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="provinces[]" value="{{$val->id}}" id="flexCheck{{$val->id}}">
-                            <label class="form-check-label aa22" for="flexCheck{{$val->id}}">
-                                <span>{{$val->name}}</span> <span>({{ count($val->Post) }})</span>
-                            </label>
+                          <input
+                            class="form-check-input"
+                            type="checkbox"
+                            name="provinces[]"
+                            value="{{ $val->id }}"
+                            id="flexCheckProvince{{ $val->id }}"
+                            {{ in_array($val->id, request()->input('provinces', [])) ? 'checked' : '' }}
+                          >
+                          <label class="form-check-label aa22" for="flexCheckProvince{{ $val->id }}">
+                            <span>{{ $val->name }}</span>
+                            <span>({{ count($val->Post) }})</span>
+                          </label>
                         </div>
-                        @endif
+                      @endif
                     @endforeach
                 </div>
             </div>
@@ -115,5 +131,13 @@
 
 
 @section('js')
+
+<script>
+document.addEventListener('change', function (e) {
+  if (e.target.matches('input[name="categories[]"], input[name="provinces[]"]')) {
+    e.target.closest('form').submit();
+  }
+});
+</script>
 
 @endsection
