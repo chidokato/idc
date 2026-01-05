@@ -42,7 +42,7 @@ public function index(Request $request)
     });
 }
 
-    $deposits = $query->paginate(15)->withQueryString();
+    $deposits = $query->paginate(30)->withQueryString();
 
     // ✅ Build options đệ quy tại controller
     $departments = Department::orderBy('name')->get(['id', 'name', 'parent']);
