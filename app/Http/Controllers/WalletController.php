@@ -45,7 +45,7 @@ class WalletController extends Controller
             });
         }
 
-        $wallets = $query->paginate(15)->withQueryString();
+        $wallets = $query->paginate(50)->withQueryString();
 
         // Build options department đệ quy tại controller
         $departments = Department::orderBy('name')->get(['id', 'name', 'parent']);
@@ -199,9 +199,9 @@ class WalletController extends Controller
         $user = auth()->user();
 
         // Nếu bạn muốn chỉ rank 1,2 dùng:
-        if (!in_array((int)$user->rank, [1,2], true)) {
-            abort(403, 'Bạn không có quyền sử dụng chức năng này.');
-        }
+        // if (!in_array((int)$user->rank, [1,2], true)) {
+        //     abort(403, 'Bạn không có quyền sử dụng chức năng này.');
+        // }
 
         $request->validate([
             'mode' => 'required|in:same,custom',

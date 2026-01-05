@@ -3,7 +3,7 @@
 @section('title') Công Ty Cổ Phần Bất Động Sản Indochine @endsection
 
 @section('css')
-
+<link rel="stylesheet" href="daterangepicker/daterangepicker.css">
 @endsection
 
 @section('body') @endsection
@@ -20,7 +20,7 @@
           </div>
         </div>
         <!-- End Page Header -->
-        <div class="row gx-2 gx-lg-3">
+        <div class="row gx-2 gx-lg-2">
           <div class="col-lg-12 mb-3 mb-lg-12">
             <!-- Card -->
             <div class="card h-100">
@@ -29,15 +29,16 @@
   <div class="card-header">
     <div class="row align-items-center flex-grow-1 g-2">
 
-      <div class="col-lg-3">
-        <input type="text"
-               name="yourname"
-               value="{{ request('yourname') }}"
-               class="form-control"
-               placeholder="Tìm theo tên...">
-      </div>
+      <div class="col-lg-2">
+  <input type="text"
+         name="yourname"
+         value="{{ request('yourname') }}"
+         class="form-control"
+         placeholder="Tìm theo tên...">
+</div>
 
-      <div class="col-lg-3">
+
+      <div class="col-lg-2">
             <select name="department_id" class="form-control">
       <option value="">-- Sàn/phòng/nhóm --</option>
       {!! $departmentOptions !!}
@@ -45,7 +46,7 @@
 
           </div>
 
-          <div class="col-lg-3">
+          <div class="col-lg-2">
             <select name="status" class="form-control">
               <option value="">-- Tất cả trạng thái --</option>
               <option value="pending"  {{ request('status')=='pending'  ? 'selected':'' }}>Chờ duyệt</option>
@@ -53,6 +54,19 @@
               <option value="rejected" {{ request('status')=='rejected' ? 'selected':'' }}>Từ chối</option>
             </select>
           </div>
+
+          <div class="col-lg-2 d-flex gap-2">
+            <input
+            type="text"
+            name="range"
+            class="js-daterangepicker form-control"
+            placeholder="Chọn khoảng thời gian"
+            value="{{ request('range') }}"
+          >
+          </div>
+
+
+
 
           <div class="col-lg-3 d-flex gap-2">
             <button class="btn btn-primary">Lọc</button>
@@ -209,6 +223,53 @@
 
 
 @section('js')
+
+<script src="daterangepicker/moment.min.js"></script>
+<script src="daterangepicker/daterangepicker.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const input = document.querySelector('.js-daterangepicker');
+  if (!input || typeof $ === 'undefined' || !$.fn.daterangepicker || typeof moment === 'undefined') return;
+
+  // Giá trị hiện tại trên input (từ request('range'))
+  const rangeVal = (input.value || '').trim(); // "DD/MM/YYYY - DD/MM/YYYY"
+
+  // Parse range nếu có
+  let start = null, end = null;
+  const m = rangeVal.match(/^(\d{2}\/\d{2}\/\d{4})\s*-\s*(\d{2}\/\d{2}\/\d{4})$/);
+  if (m) {
+    start = moment(m[1], 'DD/MM/YYYY');
+    end   = moment(m[2], 'DD/MM/YYYY');
+  }
+
+  $(input).daterangepicker({
+    autoUpdateInput: true,     // ✅ tự update value của input
+    autoApply: true,           // ✅ chọn xong tự apply (khỏi bấm Áp dụng)
+    locale: {
+      format: 'DD/MM/YYYY',
+      applyLabel: 'Áp dụng',
+      cancelLabel: 'Hủy'
+    },
+    ...(start && end ? { startDate: start, endDate: end } : {})
+  });
+
+  // Đảm bảo format hiển thị chuẩn (kể cả khi daterangepicker tự set)
+  $(input).on('apply.daterangepicker', function (ev, picker) {
+    this.value = picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY');
+  });
+
+  // Bấm hủy thì clear input
+  $(input).on('cancel.daterangepicker', function () {
+    this.value = '';
+  });
+});
+</script>
+
+
+
+
+
 
 <script>
 $(function () {
