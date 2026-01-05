@@ -95,6 +95,15 @@ class HomeController extends Controller
             $query->whereIn('category_id', $catIds);
         }
 
+       if ((int) $request->get('for_sale', 0) === 1) {
+    $query->where('for_sale', 1);
+}
+
+if ((int) $request->get('monopoly', 0) === 1) {
+    $query->where('monopoly', 1);
+}
+
+
         // lọc theo province
         if (!empty($provinceIds)) {
             $query->whereIn('province_id', $provinceIds);

@@ -11,6 +11,17 @@
 
 @section('content')
 <form action="{{ url()->current() }}" method="GET">
+
+    @if(request()->has('for_sale'))
+  <input type="hidden" name="for_sale" value="{{ request('for_sale') }}">
+@endif
+
+@if(request()->has('monopoly'))
+  <input type="hidden" name="monopoly" value="{{ request('monopoly') }}">
+@endif
+
+
+
 <section class="sec-fiter-search floating-label">
     <div class="container">
         <div data-bs-toggle="button" class="d-md-none"><button type="button" class="btn btn-circle btn-toggle"><span class="icon-search"></span></button></div>
@@ -81,10 +92,29 @@
                     </ol>
                 </nav>
                 <h1 class="text-uppercase title-cat">Các dự án bất động sản trên toàn quốc</h1>
-                <div class="option-cat">
-                    <div class="iteam"><a href="">Đang mở bán</a></div>
-                    <div class="iteam"><a href="">Indochine phân phối độc quyền</a></div>
-                </div>
+               <div class="option-cat">
+  <div class="iteam">
+    <a href="{{ request()->fullUrlWithQuery(['for_sale'=>null,'monopoly'=>null,'page'=>null]) }}"
+       class="{{ !request()->has('for_sale') && !request()->has('monopoly') ? 'active' : '' }}">
+      Tất cả
+    </a>
+  </div>
+
+  <div class="iteam">
+    <a href="{{ request()->fullUrlWithQuery(['for_sale'=>1,'page'=>null]) }}"
+       class="{{ request('for_sale') == 1 ? 'active' : '' }}">
+      Đang mở bán
+    </a>
+  </div>
+
+  <div class="iteam">
+    <a href="{{ request()->fullUrlWithQuery(['monopoly'=>1,'page'=>null]) }}"
+       class="{{ request('monopoly') == 1 ? 'active' : '' }}">
+      Indochine phân phối độc quyền
+    </a>
+  </div>
+</div>
+
                 <div class="sort-box">
                     <span>có <span class="text-main font-weight-semibold">{{ $posts->total() }}</span> sản phẩm</span>
                     <div class="sort-ct">
