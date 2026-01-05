@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Deposit;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
+use App\Models\Department;
+use App\Helpers\TreeHelper;
 use Illuminate\Support\Facades\DB;
 
 class DepositController extends Controller
@@ -13,19 +15,51 @@ class DepositController extends Controller
     /**
      * Danh sách nạp tiền
      */
-    public function index(Request $request)
-    {
-        $query = Deposit::with(['user', 'histories.admin'])
-            ->latest();
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
+public function index(Request $request)
+{
+    $query = Deposit::with(['user.department', 'histories.admin'])->latest();
 
-        $deposits = $query->paginate(15)->withQueryString();
-
-        return view('account.deposit.index', compact('deposits'));
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
     }
+
+    if ($request->filled('yourname')) {
+        $kw = trim($request->yourname);
+        $query->whereHas('user', function ($q) use ($kw) {
+            $q->where('yourname', 'like', "%{$kw}%");
+        });
+    }
+
+    if ($request->filled('department_id')) {
+    $rootId = (int) $request->department_id;
+
+    // lấy tất cả id con + cháu + chính nó
+    $ids = Department::getChildIds($rootId);
+
+    $query->whereHas('user', function ($q) use ($ids) {
+        $q->whereIn('department_id', $ids);
+    });
+}
+
+    $deposits = $query->paginate(15)->withQueryString();
+
+    // ✅ Build options đệ quy tại controller
+    $departments = Department::orderBy('name')->get(['id', 'name', 'parent']);
+    $departmentOptions = TreeHelper::buildOptions(
+        $departments,
+        0,
+        '',
+        $request->department_id, // selectedId
+        'id',
+        'parent',
+        'name'
+    );
+
+    return view('account.deposit.index', compact('deposits', 'departmentOptions'));
+}
+
+
 
     /**
      * Cập nhật trạng thái: duyệt / từ chối / rollback

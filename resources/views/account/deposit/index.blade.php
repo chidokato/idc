@@ -25,26 +25,44 @@
             <!-- Card -->
             <div class="card h-100">
               <!-- Header -->
-              <form method="GET" >
-              <div class="card-header">
-                <div class="row align-items-center flex-grow-1">
-                  <div class="col-lg-3">
-                      <select name="status" class="form-control">
-                          <option value="">-- Tất cả trạng thái --</option>
-                          <option value="pending" {{ request('status')=='pending'?'selected':'' }}>Chờ duyệt</option>
-                          <option value="approved" {{ request('status')=='approved'?'selected':'' }}>Đã duyệt</option>
-                          <option value="rejected" {{ request('status')=='rejected'?'selected':'' }}>Từ chối</option>
-                      </select>
-                  </div>
-                  <div class="col-lg-2">
-                      <button class="btn btn-primary">Lọc</button>
-                  </div>
-                </div>
-                  
-              
-              </div>
-              <!-- End Header -->
-              </form>
+              <form method="GET" action="{{ url()->current() }}">
+  <div class="card-header">
+    <div class="row align-items-center flex-grow-1 g-2">
+
+      <div class="col-lg-3">
+        <input type="text"
+               name="yourname"
+               value="{{ request('yourname') }}"
+               class="form-control"
+               placeholder="Tìm theo tên...">
+      </div>
+
+      <div class="col-lg-3">
+            <select name="department_id" class="form-control">
+      <option value="">-- Sàn/phòng/nhóm --</option>
+      {!! $departmentOptions !!}
+    </select>
+
+          </div>
+
+          <div class="col-lg-3">
+            <select name="status" class="form-control">
+              <option value="">-- Tất cả trạng thái --</option>
+              <option value="pending"  {{ request('status')=='pending'  ? 'selected':'' }}>Chờ duyệt</option>
+              <option value="approved" {{ request('status')=='approved' ? 'selected':'' }}>Đã duyệt</option>
+              <option value="rejected" {{ request('status')=='rejected' ? 'selected':'' }}>Từ chối</option>
+            </select>
+          </div>
+
+          <div class="col-lg-3 d-flex gap-2">
+            <button class="btn btn-primary">Lọc</button>
+            <a href="{{ url()->current() }}" class="btn btn-warning">Reset</a>
+          </div>
+
+        </div>
+      </div>
+    </form>
+
               <!-- Body -->
                 <!-- Bar Chart -->
                 <div class="table-responsive">
