@@ -192,40 +192,32 @@
         </div>
         <div class="col-lg-4  ">
           <div class="card">
-            
-          
           <div class="card-header">
               <h2 class="card-header-title h5">Thông tin chuyển khoản</h2>
             </div>
-
             <div class="card-body">
                 <div class="row align-items-center mb-3">
                   <span class="col-6">Số tài khoản:</span>
-                  <h4 class="col-6 text-right text-dark mb-0">265608981</h4>
+                  <h4 class="col-6 text-right text-dark mb-0">0977572947</h4>
                 </div>
                 <!-- End Row -->
-
                 <div class="row align-items-center mb-3">
                   <span class="col-6">Tên người thụ hưởng:</span>
-                  <h4 class="col-6 text-right text-dark mb-0">PHAN THỊ HẰNG</h4>
+                  <h4 class="col-6 text-right text-dark mb-0">NGUYỄN VĂN TUẤN</h4>
                 </div>
                 <!-- End Row -->
-
-
                 <div class="row align-items-center mb-3">  
                   <span class="col-6">Ngân hàng:</span>
                   <h4 class="col-6 text-right text-dark mb-0">VP bank</h4>
                 </div>
                 <!-- End Row -->
-
-
                 <div class="row align-items-center mb-3">
                   <span class="col-6">Nội dung CK:</span>
                   <h3 class="col-6 text-right text-dark mb-0">{{ $user->yourname }}</h3>
                 </div>
                 <!-- End Row -->
                 <hr class="my-4">
-                  <img class="w-100" src="account/img/qr/hangphan.jpg">
+                  <img class="w-100" src="account/img/qr/tuan.jpg">
               </div>
         </div>
       </div>
