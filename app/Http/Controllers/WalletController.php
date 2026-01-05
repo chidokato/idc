@@ -171,9 +171,9 @@ class WalletController extends Controller
         $user = auth()->user();
 
         // Nếu bạn muốn chỉ rank 1,2 dùng:
-        if (!in_array((int)$user->rank, [1,2], true)) {
-            abort(403, 'Bạn không có quyền sử dụng chức năng này.');
-        }
+        // if (!in_array((int)$user->rank, [1,2], true)) {
+        //     abort(403, 'Bạn không có quyền sử dụng chức năng này.');
+        // }
 
         $wallet = $user->wallet()->firstOrCreate(['user_id' => $user->id], [
             'balance' => 0,
