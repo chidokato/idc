@@ -65,7 +65,7 @@
                     <hr>
                     <h4><span>Tình thành</span></h4>
                     @foreach($provinces as $val)
-                      @if(count($val->Post) > 0)
+                      @if(count($val->Post) > 1)
                         <div class="form-check">
                           <input
                             class="form-check-input"
