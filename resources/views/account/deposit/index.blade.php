@@ -4,6 +4,9 @@
 
 @section('css')
 <link rel="stylesheet" href="daterangepicker/daterangepicker.css">
+
+
+
 @endsection
 
 @section('body') @endsection
@@ -26,74 +29,59 @@
             <div class="card h-100">
               <!-- Header -->
               <form method="GET" action="{{ url()->current() }}">
-  <div class="card-header">
-    <div class="row align-items-center flex-grow-1 g-2">
-
-      <div class="col-lg-2">
-  <input type="text"
-         name="yourname"
-         value="{{ request('yourname') }}"
-         class="form-control"
-         placeholder="Tìm theo tên...">
-</div>
-
-
-        <div class="col-lg-2">
-            <select name="department_id" class="form-control">
+              <div class="card-header">
+              <div class="row align-items-center flex-grow-1 g-2">
+              <div class="col-lg-2">
+              <input type="text"
+              name="yourname"
+              value="{{ request('yourname') }}"
+              class="form-control"
+              placeholder="Tìm theo tên...">
+              </div>
+              <div class="col-lg-2">
+              <select name="department_id" class="form-control">
               <option value="">-- Sàn/phòng/nhóm --</option>
               {!! $departmentOptions !!}
               </select>
+              </div>
+              <div class="col-lg-2">
+              <select name="status" class="form-control">
+              <option value="">-- Tất cả trạng thái --</option>
+              <option value="pending"  {{ request('status')=='pending'  ? 'selected':'' }}>Chờ duyệt</option>
+              <option value="approved" {{ request('status')=='approved' ? 'selected':'' }}>Đã duyệt</option>
+              <option value="rejected" {{ request('status')=='rejected' ? 'selected':'' }}>Từ chối</option>
+              </select>
+              </div>
 
-                    </div>
-
-                    <div class="col-lg-2">
-                      <select name="status" class="form-control">
-                        <option value="">-- Tất cả trạng thái --</option>
-                        <option value="pending"  {{ request('status')=='pending'  ? 'selected':'' }}>Chờ duyệt</option>
-                        <option value="approved" {{ request('status')=='approved' ? 'selected':'' }}>Đã duyệt</option>
-                        <option value="rejected" {{ request('status')=='rejected' ? 'selected':'' }}>Từ chối</option>
-                      </select>
-                    </div>
-
-                    <div class="col-lg-2 d-flex gap-2">
-                     <!-- <input
-  type="text"
-  name="range"
-  class="js-daterangepicker form-control"
-  placeholder="Chọn khoảng thời gian"
-  value="{{ request('range') }}"
-  data-range="{{ request('range') }}"
-> -->
-
-<input
-  type="text"
-  name="range"
-  class="js-daterangepicker-clear form-control daterangepicker-custom-input"
-  placeholder="Select dates"
-  value="{{ request('range') ?? '' }}"
-  data-hs-daterangepicker-options='{
-    "autoUpdateInput": false,
-    "locale": { "cancelLabel": "Clear" }
-  }'
->
-
-
-
-                    </div>
-
-                    <div class="col-lg-3 d-flex gap-2">
-                      <button class="btn btn-primary">Lọc</button>
-                      <a href="{{ url()->current() }}" class="btn btn-warning">Reset</a>
-                    </div>
-
-                  </div>
-                </div>
+              <div class="col-lg-2 d-flex gap-2">
+              <input
+              type="text"
+              name="range"
+              class="js-daterangepicker-clear form-control daterangepicker-custom-input"
+              placeholder="Select dates"
+              value="{{ request('range') ?? '' }}"
+              data-hs-daterangepicker-options='{
+              "autoUpdateInput": false,
+              "locale": { "cancelLabel": "Clear" }
+              }'
+              >
+              </div>
+              <div class="col-lg-3 d-flex gap-2">
+              <button class="btn btn-primary">Lọc</button>
+              <a href="{{ url()->current() }}" class="btn btn-warning">Reset</a>
+              </div>
+              </div>
+              <button type="button" class="btn btn-success btn-sm js-export-excel" data-table="#walletsTable" data-filename="wallets.xlsx"> Xuất Excel</button>
+              </div>
               </form>
 
+              <div class="d-flex gap-2 mb-2">
+
+</div>
               <!-- Body -->
                 <!-- Bar Chart -->
                 <div class="table-responsive">
-                  <table class="table table-lg table-thead-bordered table-nowrap table-align-middle card-table">
+                  <table id="walletsTable" class="table table-lg table-thead-bordered table-nowrap table-align-middle card-table">
                     <thead class="thead-light">
                     <tr>
                         <th>Mã NV</th>
@@ -113,7 +101,7 @@
                         <td>{{ $d->user->employee_code }}</td>
                         <td>{{ $d->user->yourname }}</td>
                         <td>{{ $d->user->department?->name }}</td>
-                        <td>{{ number_format($d->amount) }} đ</td>
+                        <td>{{ number_format($d->amount) }}</td>
                         <td>{{ $d->transaction_code }}
 
                             @if($d->proof_image)
@@ -236,6 +224,63 @@
 
 
 @section('js')
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<script>
+(function () {
+  function sanitizeCellText(td) {
+    // Nếu cell có input/select/textarea -> lấy value
+    const input = td.querySelector('input, select, textarea');
+    if (input) return (input.value ?? '').toString().trim();
+
+    // Nếu có data-export -> ưu tiên lấy
+    const v = td.getAttribute('data-export');
+    if (v !== null) return v.toString().trim();
+
+    // Text thường
+    return (td.innerText ?? '').toString().trim();
+  }
+
+  function buildCleanTable(originalTable) {
+    const clone = originalTable.cloneNode(true);
+
+    // Bỏ các cột/ô bạn không muốn export: gắn class "no-export"
+    clone.querySelectorAll('.no-export').forEach(el => el.remove());
+
+    // Bỏ button/icon không cần thiết
+    clone.querySelectorAll('button, a.btn, .btn, .tio-edit, .tio-delete, .dropdown, .avatar, img').forEach(el => el.remove());
+
+    // Convert input/select/textarea thành text
+    clone.querySelectorAll('td, th').forEach(cell => {
+      const val = sanitizeCellText(cell);
+      cell.innerHTML = '';
+      cell.textContent = val;
+    });
+
+    return clone;
+  }
+
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.js-export-excel');
+    if (!btn) return;
+
+    const selector = btn.getAttribute('data-table');
+    const filename = btn.getAttribute('data-filename') || 'export.xlsx';
+    if (!selector) return;
+
+    const table = document.querySelector(selector);
+    if (!table) return;
+
+    const cleanTable = buildCleanTable(table);
+
+    // Xuất workbook
+    const wb = XLSX.utils.table_to_book(cleanTable, { sheet: "Sheet1" });
+    XLSX.writeFile(wb, filename);
+  });
+})();
+</script>
+
 
 <script src="daterangepicker/moment.min.js"></script>
 <script src="daterangepicker/daterangepicker.js"></script>
