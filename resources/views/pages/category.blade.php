@@ -118,7 +118,7 @@
                 <div class="sort-box">
                     <span>có <span class="text-main font-weight-semibold">{{ $posts->total() }}</span> sản phẩm</span>
                     <div class="sort-ct">
-                        <div class="dropdown">
+                        <!-- <div class="dropdown">
                             <a class="btn ripple-effect dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
                                 <span>Sắp xếp theo: giá tăng dần <i class="icon-down ms-2"></i></span>
                             </a>
@@ -127,7 +127,7 @@
                             <li><a class="dropdown-item" href="#">Giá giảm dần</a></li>
                             <li><a class="dropdown-item" href="#">Mới nhất</a></li>
                             </ul>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 <div class="row" id="load-product">
