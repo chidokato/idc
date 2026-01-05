@@ -67,6 +67,12 @@
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Duyệt đóng tiền</span>
             </a>
           </li>
+          <li class="nav-item ">
+            <a class="js-nav-tooltip-link nav-link " href="account/wallets" title="Quản lý tổng" data-placement="left">
+              <i class="tio-dashboard nav-icon"></i>
+              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Quản lý ví tiền</span>
+            </a>
+          </li>
           @endif
 
           <li class="nav-item">

@@ -210,6 +210,8 @@ Route::middleware(['user'])->group(function () {
         Route::get('wallet/transfer', [WalletController::class, 'bulkTransferForm'])->name('wallet.bulk.form');
         Route::post('wallet/transfer', [WalletController::class, 'bulkTransferSubmit'])->name('wallet.bulk.submit');
         Route::post('/wallet/transactions/{id}/recall', [WalletController::class, 'recallTransfer'])->name('wallet.transactions.recall')->middleware('auth');
+
+        Route::get('wallets', [WalletController::class, 'wallets'])->name('account.wallets');
         
         // quản lý deposit
         Route::get('deposits', [DepositController::class, 'index'])->name('deposits.index');

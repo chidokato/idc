@@ -14,8 +14,51 @@ use App\Models\Deposit;
 use App\Models\User;
 use App\Models\Wallet;
 
+use App\Models\Department;
+use App\Helpers\TreeHelper;
+
 class WalletController extends Controller
 {
+    public function wallets(Request $request)
+    {
+        $query = Wallet::with(['user.department'])->latest();
+
+        // 1) Tìm theo mã/tên
+        if ($request->filled('key')) {
+            $key = trim($request->key);
+
+            $query->whereHas('user', function ($q) use ($key) {
+                $q->where('employee_code', 'like', "%{$key}%")
+                  ->orWhere('yourname', 'like', "%{$key}%");
+            });
+        }
+
+        // 2) Lọc theo nhóm/phòng (đệ quy cả con + cháu)
+        if ($request->filled('department_id')) {
+            $rootId = (int) $request->department_id;
+
+            // dùng hàm bạn đã có trong Department model
+            $ids = Department::getChildIds($rootId);
+
+            $query->whereHas('user', function ($q) use ($ids) {
+                $q->whereIn('department_id', $ids);
+            });
+        }
+
+        $wallets = $query->paginate(15)->withQueryString();
+
+        // Build options department đệ quy tại controller
+        $departments = Department::orderBy('name')->get(['id', 'name', 'parent']);
+        $departmentOptions = TreeHelper::buildOptions(
+            $departments,
+            0,
+            '',
+            $request->department_id
+        );
+
+        return view('account.wallet.wallets', compact('wallets', 'departmentOptions'));
+    }
+
     public function index(Request $request)
     {
         $user = auth()->user();
