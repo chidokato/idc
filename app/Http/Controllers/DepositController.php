@@ -47,17 +47,20 @@ public function index(Request $request)
     if ($request->filled('range')) {
         $range = trim($request->range);
 
-        // ví dụ: "05/01/2026 - 12/01/2026"
-        if (preg_match('/^(\d{2}\/\d{2}\/\d{4})\s*-\s*(\d{2}\/\d{2}\/\d{4})$/', $range, $m)) {
-            try {
-                $from = Carbon::createFromFormat('d/m/Y', $m[1])->startOfDay();
-                $to   = Carbon::createFromFormat('d/m/Y', $m[2])->endOfDay();
-                $query->whereBetween('created_at', [$from, $to]);
-            } catch (\Exception $e) {
-                // sai format thì bỏ qua filter (hoặc bạn có thể return lỗi)
-            }
+        if (preg_match('/^(\d{1,2}\/\d{1,2}\/\d{4})\s*-\s*(\d{1,2}\/\d{1,2}\/\d{4})$/', $range, $m)) {
+
+            $tz = config('app.timezone'); // vd: Asia/Ho_Chi_Minh
+
+            // input bạn đang nhận là m/d/Y (vì có kiểu 12/31/2025)
+            $from = Carbon::createFromFormat('m/d/Y', $m[1], $tz)->startOfDay()->utc();
+            $to   = Carbon::createFromFormat('m/d/Y', $m[2], $tz)->endOfDay()->utc();
+
+            $query->whereBetween('created_at', [$from, $to]);
         }
     }
+
+
+
 
     $deposits = $query->paginate(30)->withQueryString();
 

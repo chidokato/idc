@@ -38,44 +38,41 @@
 </div>
 
 
-      <div class="col-lg-2">
+        <div class="col-lg-2">
             <select name="department_id" class="form-control">
-      <option value="">-- Sàn/phòng/nhóm --</option>
-      {!! $departmentOptions !!}
-    </select>
+              <option value="">-- Sàn/phòng/nhóm --</option>
+              {!! $departmentOptions !!}
+              </select>
 
-          </div>
+                    </div>
 
-          <div class="col-lg-2">
-            <select name="status" class="form-control">
-              <option value="">-- Tất cả trạng thái --</option>
-              <option value="pending"  {{ request('status')=='pending'  ? 'selected':'' }}>Chờ duyệt</option>
-              <option value="approved" {{ request('status')=='approved' ? 'selected':'' }}>Đã duyệt</option>
-              <option value="rejected" {{ request('status')=='rejected' ? 'selected':'' }}>Từ chối</option>
-            </select>
-          </div>
+                    <div class="col-lg-2">
+                      <select name="status" class="form-control">
+                        <option value="">-- Tất cả trạng thái --</option>
+                        <option value="pending"  {{ request('status')=='pending'  ? 'selected':'' }}>Chờ duyệt</option>
+                        <option value="approved" {{ request('status')=='approved' ? 'selected':'' }}>Đã duyệt</option>
+                        <option value="rejected" {{ request('status')=='rejected' ? 'selected':'' }}>Từ chối</option>
+                      </select>
+                    </div>
 
-          <div class="col-lg-2 d-flex gap-2">
-            <input
-            type="text"
-            name="range"
-            class="js-daterangepicker form-control"
-            placeholder="Chọn khoảng thời gian"
-            value="{{ request('range') }}"
-          >
-          </div>
+                    <div class="col-lg-2 d-flex gap-2">
+                      <input
+                      type="text"
+                      name="range"
+                      class="js-daterangepicker form-control"
+                      placeholder="Chọn khoảng thời gian"
+                      value="{{ request('range') }}"
+                    >
+                    </div>
 
+                    <div class="col-lg-3 d-flex gap-2">
+                      <button class="btn btn-primary">Lọc</button>
+                      <a href="{{ url()->current() }}" class="btn btn-warning">Reset</a>
+                    </div>
 
-
-
-          <div class="col-lg-3 d-flex gap-2">
-            <button class="btn btn-primary">Lọc</button>
-            <a href="{{ url()->current() }}" class="btn btn-warning">Reset</a>
-          </div>
-
-        </div>
-      </div>
-    </form>
+                  </div>
+                </div>
+              </form>
 
               <!-- Body -->
                 <!-- Bar Chart -->
@@ -233,10 +230,6 @@
     $(document).on('cancel.daterangepicker', '.js-daterangepicker', function () { this.value = ''; });
   });
 </script>
-
-
-
-
 
 
 
