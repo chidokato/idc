@@ -29,9 +29,7 @@
     <li class="nav-item">
         <a class="nav-link" href="{{route('news.index')}}"><i class="fas fa-fw fa-chart-area"></i><span>Tin tức</span></a>
     </li>
-    <li class="nav-item">
-        <a class="nav-link" href="{{route('admin.deposits.index')}}"><i class="fas fa-fw fa-chart-area"></i><span>Nạp tiền</span></a>
-    </li>
+    
     <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#Internal"
             aria-expanded="true" aria-controls="Internal">

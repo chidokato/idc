@@ -62,7 +62,7 @@
             </a>
           </li>
           <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/report" title="Quản lý tổng" data-placement="left">
+            <a class="js-nav-tooltip-link nav-link " href="account/deposits" title="Quản lý tổng" data-placement="left">
               <i class="tio-dashboard nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Duyệt đóng tiền</span>
             </a>

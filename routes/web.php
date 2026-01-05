@@ -25,7 +25,7 @@ use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\ChannelController;
 use App\Http\Controllers\Admin\DuanController;
 
-use App\Http\Controllers\Admin\DepositController;
+
 
 use App\Http\Controllers\Admin\ProvinceController;
 use App\Http\Controllers\Admin\DistrictController;
@@ -42,6 +42,7 @@ use App\Http\Controllers\HomeSystemController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\WalletController;
+use App\Http\Controllers\DepositController;
 
 Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
      \UniSharp\LaravelFilemanager\Lfm::routes();
@@ -141,8 +142,8 @@ Route::prefix('admin')->group(function () {
         Route::post('duan/{id}/update-name', [DuanController::class, 'updateName'])->name('duan.updateName');
 
         // deposits
-        Route::get('deposits', [DepositController::class, 'index'])->name('admin.deposits.index');
-        Route::post('deposits/{deposit}/update-status', [DepositController::class, 'updateStatus'])->name('admin.deposits.updateStatus');
+        // Route::get('deposits', [DepositController::class, 'index'])->name('deposits.index');
+        // Route::post('deposits/{deposit}/update-status', [DepositController::class, 'updateStatus'])->name('admin.deposits.updateStatus');
         
     });
 
@@ -209,7 +210,10 @@ Route::middleware(['user'])->group(function () {
         Route::get('wallet/transfer', [WalletController::class, 'bulkTransferForm'])->name('wallet.bulk.form');
         Route::post('wallet/transfer', [WalletController::class, 'bulkTransferSubmit'])->name('wallet.bulk.submit');
         Route::post('/wallet/transactions/{id}/recall', [WalletController::class, 'recallTransfer'])->name('wallet.transactions.recall')->middleware('auth');
-    
+        
+        // quản lý deposit
+        Route::get('deposits', [DepositController::class, 'index'])->name('deposits.index');
+        Route::post('deposits/{deposit}/update-status', [DepositController::class, 'updateStatus'])->name('deposits.updateStatus');
         
     });
 });
