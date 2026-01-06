@@ -212,6 +212,8 @@ Route::middleware(['user'])->group(function () {
         Route::post('/wallet/transactions/{id}/recall', [WalletController::class, 'recallTransfer'])->name('wallet.transactions.recall')->middleware('auth');
 
         Route::get('wallets', [WalletController::class, 'wallets'])->name('account.wallets');
+        Route::get('wallets/{wallet}/histories', [WalletController::class, 'histories'])->name('wallets.histories');
+
         
         // quản lý deposit
         Route::get('deposits', [DepositController::class, 'index'])->name('deposits.index');

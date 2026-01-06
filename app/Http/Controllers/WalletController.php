@@ -523,4 +523,18 @@ class WalletController extends Controller
         }
     }
 
+
+  public function histories(\App\Models\Wallet $wallet)
+{
+    $transactions = $wallet->transactions()->latest()->limit(200)->get();
+
+    $html = view('account.wallet._history_rows', compact('transactions'))->render();
+
+    return response()->json([
+        'ok' => true,
+        'html' => $html,
+    ]);
+}
+
+
 }

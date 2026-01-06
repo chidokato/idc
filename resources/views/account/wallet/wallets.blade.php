@@ -62,9 +62,11 @@
                 <thead class="thead-light">
                   <tr>
                     <th>Mã NV</th>
+                    <th>Email</th>
                     <th>Họ tên</th>
                     <th>Phòng ban</th>
-                    <th class="text-end">Số dư</th>
+                    <th>Số dư</th>
+                    <th>Lịch sử</th>
                     <th>Cập nhật</th>
                   </tr>
                 </thead>
@@ -75,7 +77,19 @@
                       <td>{{ $w->user?->employee_code ?? '---' }}</td>
                       <td>{{ $w->user?->yourname ?? '---' }}</td>
                       <td>{{ $w->user?->department?->name ?? '---' }}</td>
-                      <td class="text-end">{{ number_format($w->balance ?? 0) }} đ</td>
+                      <td>{{ number_format($w->balance ?? 0) }} đ</td>
+                      <td>
+                        <a class="btn btn-xs btn-white mr-2 btn-wallet-history"
+   href="javascript:;"
+   data-wallet-id="{{ $w->id }}"
+   data-user-name="{{ $w->user?->yourname ?? '---' }}"
+   data-toggle="modal"
+   data-target="#editCardModal">
+  <i class="tio-edit mr-1"></i> Lịch sử
+</a>
+
+
+                      </td>
                       <td>{{ $w->updated_at }}</td>
                     </tr>
                   @empty
@@ -98,16 +112,92 @@
         </div>
         <!-- End Row -->
 
-        <!-- Card -->
+<!-- Card -->
 
-        
+      
       </div>
+
+
+<div class="modal fade" id="editCardModal" tabindex="-1" role="dialog" aria-labelledby="editCardModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+    <div class="modal-content">
+      <!-- Header -->
+      <div class="modal-header">
+        <h4 id="editCardModalTitle" class="modal-title">Lịch sử</h4>
+
+        <button type="button" class="btn btn-icon btn-sm btn-ghost-secondary" data-dismiss="modal" aria-label="Close">
+          <i class="tio-clear tio-lg"></i>
+        </button>
+      </div>
+      <!-- End Header -->
+
+      <!-- Body -->
+      <div class="modal-body">
+          <!-- Form Group -->
+        <table class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
+          <thead class="thead-light">
+            <tr>
+              <td>Thời gian</td>
+              <td>Loại</td>
+              <td>Số tiền</td>
+              <td>Ghi chú</td>
+            </tr>
+          </thead>
+          <tbody id="wallet-history-body">
+  <tr>
+    <td colspan="4" class="text-center text-muted">Đang tải...</td>
+  </tr>
+</tbody>
+
+        </table>
+          <!-- End Form Group -->
+      </div>
+      <!-- End Body -->
+    </div>
+  </div>
+</div>
 
 @endsection
 
 
 @section('js')
 
+
+<script>
+  $(document).on('click', '.btn-wallet-history', function () {
+    const walletId = $(this).data('wallet-id');
+    const userName = $(this).data('user-name') || '---';
+
+    $('#editCardModalTitle').text('Lịch sử ví - ' + userName);
+    $('#wallet-history-body').html(`<tr><td colspan="4" class="text-center text-muted">Đang tải...</td></tr>`);
+
+    // route() ra URL kiểu: /account/wallets/0/histories rồi replace 0 thành walletId
+    let url = @json(route('wallets.histories', ['wallet' => 0]));
+    url = url.replace('/0/', '/' + walletId + '/');
+
+    $.ajax({
+      url: url,
+      method: 'GET',
+      dataType: 'json',
+      success: function (res) {
+        if (!res || !res.ok) {
+          $('#wallet-history-body').html(`<tr><td colspan="4" class="text-center text-danger">Load thất bại</td></tr>`);
+          showToast?.('error', 'Không tải được lịch sử ví.');
+          return;
+        }
+        $('#wallet-history-body').html(res.html);
+      },
+      error: function (xhr) {
+        $('#wallet-history-body').html(`<tr><td colspan="4" class="text-center text-danger">Có lỗi xảy ra</td></tr>`);
+        showToast?.('error', 'Có lỗi khi tải lịch sử ví.');
+
+        // debug nhanh (mở console sẽ thấy)
+        console.log('Status:', xhr.status);
+        console.log('Response:', xhr.responseText);
+      }
+    });
+  });
+</script>
 
 
 

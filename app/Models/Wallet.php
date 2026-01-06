@@ -59,4 +59,10 @@ class Wallet extends Model
             'description' => $description,
         ]);
     }
+
+    public function histories()
+    {
+        return $this->hasMany(WalletHistory::class, 'wallet_id')->latest();
+    }
+
 }
