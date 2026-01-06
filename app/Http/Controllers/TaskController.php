@@ -438,7 +438,7 @@ class TaskController extends Controller
 
         return response()->json([
             'status' => true,
-            'expected_costs' => number_format($task->expected_costs, 0, ',', '.'),
+            'expected_costs' => number_format($task->expected_costs, 0, ',', ','),
             'raw_expected_costs' => $task->expected_costs,
         ]);
 

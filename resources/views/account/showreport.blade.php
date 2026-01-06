@@ -218,7 +218,7 @@
                             <td>{{ $val->department?->name }}</td>
                             <td class="duan" data-duan="{{ $val->Post?->id }}">{{ $val->Post?->name }} </td>
                             <td class="text-center">{{ $val->Channel?->name }}</td>
-                            <td class="text-end"><input @if($val->paid ==1) disabled @endif type="text" style="width: 100px" class="form-control form-select-sm expected-cost-input" value="{{ number_format($val->expected_costs, 0, ',', '.') }}" data-id="{{ $val->id }}">
+                            <td class="text-end"><input @if($val->paid ==1) disabled @endif type="text" style="width: 100px" class="form-control form-select-sm expected-cost-input" value="{{ number_format($val->expected_costs, 0, ',', ',') }}" data-id="{{ $val->id }}">
                             </td>
                             <td class="text-end total-cost-cell" data-days="{{ $val->days }}" data-rate="{{ $val->rate }}" >
                                 <span class="total-cost-text" title="{{ number_format($val->expected_costs, 0, ',', ',') }}đ * {{ $val->days }} ngày">
