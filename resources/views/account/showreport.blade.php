@@ -197,7 +197,7 @@
 
                         <tr class="padding16" id="row-{{ $val->id }}">
                             <td class="text-center">
-                                @if($canBulkEdit)
+                                @if($canBulkEdit && $val->paid != 1)
                                 <div class="custom-control custom-checkbox">
                                     <input type="checkbox" class="custom-control-input row-check" id="canBulkEdit{{ $val->id }}" value="{{ $val->id }}">
                                     <label class="custom-control-label" for="canBulkEdit{{ $val->id }}"></label>
@@ -248,7 +248,7 @@
                             <td>
                                 <label class="row toggle-switch-sm switch mg-0" for="avail111{{ $val->id }}">
                                   <span class="col-4 col-sm-3">
-                                    <input type="checkbox" class="toggle-switch-input active-toggle" id="avail111{{ $val->id }}" data-id="{{ $val->id }}" {{ $val->approved ? 'checked' : '' }}>
+                                    <input @if($val->paid ==1) disabled @endif type="checkbox" class="toggle-switch-input active-toggle" id="avail111{{ $val->id }}" data-id="{{ $val->id }}" {{ $val->approved ? 'checked' : '' }}>
                                     <span class="toggle-switch-label ml-auto">
                                       <span class="toggle-switch-indicator"></span>
                                     </span>
