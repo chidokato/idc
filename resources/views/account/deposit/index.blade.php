@@ -113,7 +113,7 @@
       Phan Thị Hằng
     </option>
     <option value="Nguyễn Văn Tuấn" {{ $d->bank_name === 'Nguyễn Văn Tuấn' ? 'selected' : '' }}>
-      Tuấn
+      Nguyễn Văn Tuấn
     </option>
   </select>
 </td>
