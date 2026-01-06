@@ -108,6 +108,7 @@
       class="form-control js-bank-name"
       data-id="{{ $d->id }}"
   >
+  <option value="">...</option>
     <option value="Phan Thị Hằng" {{ $d->bank_name === 'Phan Thị Hằng' ? 'selected' : '' }}>
       Phan Thị Hằng
     </option>
