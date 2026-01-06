@@ -254,6 +254,7 @@
                                     </span>
                                   </span>
                                 </label>
+                                <input type="hidden" class="date" value="{{ $val->created_at }}">
                             </td>
                             <td class="cell-actions">
                                 @if($val->approved) <span class="badge btn-success">Đã duyệt</span> @else <span class="badge btn-warning">Chờ duyệt</span> @endif 
@@ -270,6 +271,7 @@
                                 @endif
                             </td>
                         </tr>
+                        
                         @endforeach
                     </tbody>
                 </table></div>
@@ -284,7 +286,7 @@
     <div class="modal-content">
         <!-- Header -->
           <div class="modal-header">
-            <h4 id="editUserModalTitle" class="modal-title">Sửa chi tiết</h4>
+            <h4 id="editUserModalTitle" class="modal-title">Chi tiết</h4>
 
             <button type="button" class="btn btn-icon btn-sm btn-ghost-secondary" data-dismiss="modal" aria-label="Close">
               <i class="tio-clear tio-lg"></i>
@@ -319,6 +321,11 @@
         <div class="form-group">
           <label>Rate (%)</label>
           <input type="number" class="form-control" id="modal_rate" min="0" max="100">
+        </div>
+
+        <div class="form-group">
+          <label>Ngày tạo</label>
+          <input type="text" class="form-control" id="modal_date">
         </div>
 
         <!-- <div class="form-group">
@@ -761,6 +768,8 @@ document.addEventListener('DOMContentLoaded', function () {
       const rate = $row.find('.rate-input').val();
       const kpi = $row.find('.task-kpi').val();
 
+      const date = $row.find('.date').val();
+      // alert(date);
       // lấy từ data-attribute trong cell total-cost (bạn có sẵn)
       const days = $row.find('.total-cost-cell').data('days');
 
@@ -777,6 +786,7 @@ document.addEventListener('DOMContentLoaded', function () {
       $('#modal_rate').val(rate);
       // $('#modal_kpi').val(kpi);
       // $('#modal_content').val(content);
+      $('#modal_date').val(date);
       $('#duan').val(duan).trigger('change'); 
     });
 

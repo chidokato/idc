@@ -191,6 +191,8 @@ Route::middleware(['user'])->group(function () {
         Route::post('tasks/{task}/update-paid', [TaskController::class, 'updatePaid'])->name('tasks.updatePaid');
         Route::get('tasks/user', [TaskController::class, 'tasksuser'])->name('tasks.user');
         Route::put('tasks/{task}', [TaskController::class, 'updateall'])->name('tasks.update');
+        // chi phí thực tế actualcosts
+        Route::get('actualcosts', [TaskController::class, 'actualcosts'])->name('tasks.actualcosts');
 
         // report
         Route::resource('report',ReportController::class);
