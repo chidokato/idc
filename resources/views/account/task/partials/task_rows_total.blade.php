@@ -16,17 +16,7 @@
       @endif
     </td>
     <td>{{ $task->handler?->employee_code }}</td>
-      <td>
-        <a class="media align-items-center text-dark" >
-          <div class="avatar avatar-xs avatar-circle mr-2">
-            <img class="avatar-img" src="{{ $task->handler?->avatar }}" alt="Image Description">
-          </div>
-          <div class="media-body ">
-            <span class="text-hover-primary">{{ $task->handler?->yourname }}</span>
-          </div>
-        </a>
-      </td>
-
+    <td>{{ $task->handler?->yourname }}</td>
     <td>{{ $task->department?->name }}</td>
     <td>{{ $task->Post?->name }}</td>
     <td>{{ $task->channel?->name ?? $task->channel ?? '' }}</td>

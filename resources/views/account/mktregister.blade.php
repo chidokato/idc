@@ -194,15 +194,8 @@
                             <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td>
                             <td>{{ number_format(($val->days * $val->expected_costs), 0, ',', '.') }} đ</td>
                             <td>{{ number_format(($val->days * $val->expected_costs * (1 - $val->rate/100)), 0, ',', '.') }} đ</td>
-                            <td class="ghichu" title="{{ $val->content }}">
-                                <span class="tooltip-wrapper">
-                                    <span class="text-truncate-set-1 text-truncate-set">
-                                        {{ $val->content }}
-                                    </span>
-                                    <span class="tooltip">
-                                        {{ $val->content }}
-                                    </span>
-                                </span>
+                            <td>
+                                {{ $val->content }}
                             </td>
                             <td>
                                 @if($val->approved)
@@ -221,7 +214,7 @@
                                     data-approved="{{ (int)$val->approved }}"
                                     data-paid="{{ (int)$val->paid }}"
                                   >
-                                    <i class="tio-delete-outlined"></i> Xóa
+                                    <i class="tio-delete-outlined"></i>
                                   </button>
                                 </form>
                               </td>

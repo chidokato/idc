@@ -87,7 +87,7 @@
         @endif
       </thead>
       <tbody id="taskTableBody">
-        @include('account.task.partials.task_rows', ['tasks' => $tasks])
+        @include('account.task.partials.task_rows_total', ['tasks' => $tasks])
       </tbody>
     </table>
   </div>
@@ -99,6 +99,214 @@
 
 
 @section('js')
+<script>
+  (function () {
+    const input = document.getElementById('quickSearch');
+    const table = document.getElementById('taskTable');
+    if (!input || !table) return;
 
+    const tbody = table.tBodies[0];
+    const noResultRow = document.getElementById('noResultRow');
+
+    // Lấy tất cả row TR (trừ noResultRow)
+    const rows = Array.from(tbody.querySelectorAll('tr'))
+      .filter(tr => tr.id !== 'noResultRow');
+
+    function normalize(text) {
+      return (text || '')
+        .toString()
+        .toLowerCase()
+        .normalize('NFD')                 // bỏ dấu tiếng Việt
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function filterRows() {
+      const q = normalize(input.value);
+      let visibleCount = 0;
+
+      rows.forEach(tr => {
+        // textContent lấy toàn bộ text trong dòng (mã NV, họ tên, phòng, dự án, ghi chú...)
+        const rowText = normalize(tr.textContent);
+        const match = rowText.includes(q);
+
+        tr.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+      });
+
+      if (noResultRow) {
+        noResultRow.style.display = (visibleCount === 0) ? '' : 'none';
+      }
+    }
+
+    // debounce để gõ mượt
+    let t = null;
+    input.addEventListener('input', function () {
+      clearTimeout(t);
+      t = setTimeout(filterRows, 150);
+    });
+
+    // lọc ngay lần đầu (nếu input có sẵn)
+    filterRows();
+  })();
+</script>
+
+<script>
+$(function () {
+  const $dept = $('#filterDepartment');
+  const $report = $('#filterReport');
+  const $approved = $('#filterApproved');
+  const $name = $('#filterName');
+  const $tbody = $('#taskTableBody');
+
+  const $sumTotalText = $('#sumTotalText');
+  const $sumPaidText  = $('#sumPaidText');
+
+  let xhr = null;
+
+  function formatVND(n) {
+    n = Number(n || 0);
+    return n.toLocaleString('vi-VN');
+  }
+
+  function loadTasks() {
+    const department_id = $dept.val();
+    const report_id = $report.val();
+    const approved = $approved.val();
+    const yourname = $name.val(); // NEW
+
+    if (xhr) xhr.abort();
+
+    $tbody.html(`<tr><td colspan="11" class="text-center py-4 text-muted">Đang tải...</td></tr>`);
+
+    xhr = $.ajax({
+      url: "{{ route('tasks.user') }}",
+      type: "GET",
+      data: { department_id, report_id, approved, yourname }, // NEW
+      dataType: "json",
+      success: function (res) {
+        $tbody.html(res.html || '');
+
+        if ($sumTotalText.length) $sumTotalText.text(formatVND(res.sumTotal));
+        if ($sumPaidText.length)  $sumPaidText.text(formatVND(res.sumPaid));
+      },
+      error: function (xhr) {
+        if (xhr.statusText === 'abort') return;
+        $tbody.html(`<tr><td colspan="11" class="text-center py-4 text-danger">Có lỗi xảy ra!</td></tr>`);
+      }
+    });
+  }
+
+  $dept.on('change', loadTasks);
+  $report.on('change', loadTasks);
+  $approved.on('change', loadTasks);
+
+  // NEW: debounce khi gõ tên
+  let t = null;
+  $name.on('input', function () {
+    clearTimeout(t);
+    t = setTimeout(loadTasks, 250);
+  });
+});
+</script>
+
+
+
+<script>
+document.addEventListener('change', function (e) {
+  const el = e.target;
+  if (!el.classList.contains('active-toggle')) return;
+
+  const url = el.dataset.url;
+  const paid = el.checked ? 1 : 0;              // 1 = HOLD, 0 = RELEASE
+  const oldState = !el.checked;                 // rollback UI nếu hủy/lỗi
+
+  const rank = parseInt(el.dataset.rank || '0', 10);
+  const isMine = parseInt(el.dataset.mine || '0', 10) === 1;
+  const sameDept = parseInt(el.dataset.samedept || '0', 10) === 1;
+
+  // ===== RULE UI (theo yêu cầu bạn đã chốt) =====
+  // rank2: chỉ HOLD nếu cùng department_id, không RELEASE
+  if (rank === 2) {
+    if (paid === 0) { el.checked = true; showCenterError('Bạn không được hủy giữ tiền (RELEASE).'); return; }
+    if (!sameDept)  { el.checked = false; showCenterError('Bạn chỉ được giữ tiền cho tác vụ cùng phòng ban (department).'); return; }
+  }
+  // rank3: chỉ HOLD task của mình, không RELEASE
+  if (rank === 3) {
+    if (paid === 0) { el.checked = true; showCenterError('Bạn không được hủy giữ tiền (RELEASE).'); return; }
+    if (!isMine)    { el.checked = false; showCenterError('Bạn chỉ được giữ tiền (HOLD) tác vụ của mình.'); return; }
+  }
+
+  // ===== Confirm trước khi gọi API =====
+  const confirmTitle = paid ? 'Xác nhận đóng tiền (HOLD)?' : 'Xác nhận nhả giữ (RELEASE)?';
+  const confirmText  = paid
+    ? 'Bạn có chắc muốn đóng tiền cho tác vụ này không?'
+    : 'Bạn có chắc muốn nhả giữ tiền cho tác vụ này không?';
+
+  Swal.fire({
+    icon: 'question',
+    title: confirmTitle,
+    text: confirmText,
+    showCancelButton: true,
+    confirmButtonText: paid ? 'Đóng tiền' : 'Nhả giữ',
+    cancelButtonText: 'Không',
+    reverseButtons: true
+  }).then((result) => {
+    if (!result.isConfirmed) {
+      el.checked = oldState; // người dùng bấm Hủy -> rollback UI
+      return;
+    }
+
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ paid })
+    })
+    .then(async (res) => {
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.status === false) throw new Error(data.message || 'Có lỗi xảy ra');
+
+      showToast('success', data.message || 'Thành công');
+
+      // update badge trong cùng dòng (nếu có)
+      const tr = el.closest('tr');
+      const badgeCell = tr?.querySelector('.hold-badge');
+      if (badgeCell) {
+        badgeCell.innerHTML = paid
+          ? `<span class="badge badge-soft-success">Đã đóng</span>`
+          : `<span class="badge badge-soft-warning">Chưa đóng</span>`;
+      }
+
+      // update số dư menu (nếu backend trả về data.wallet.balance)
+      if (data.wallet && typeof data.wallet.balance !== 'undefined') {
+        const menuBalanceEl = document.getElementById('menuBalance');
+        if (menuBalanceEl) {
+          menuBalanceEl.textContent = Number(data.wallet.balance || 0).toLocaleString('vi-VN');
+        }
+        const menuHeldEl = document.getElementById('menuHeld');
+    if (menuHeldEl) menuHeldEl.textContent = Number(data.wallet.held_balance||0).toLocaleString('vi-VN');
+      }
+
+    })
+    .catch(err => {
+      el.checked = oldState; // rollback khi lỗi
+      showCenterError(err.message || 'Có lỗi xảy ra, vui lòng thử lại!');
+    });
+  });
+});
+</script>
+
+
+<!-- select2 multiple JavaScript -->
+<script src="admin_asset/select2/js/select2.min.js"></script>
+<script src="admin_asset/select2/js/select2-searchInputPlaceholder.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() { $('.select2').select2({ searchInputPlaceholder: '...' }); });
+</script>
 
 @endsection

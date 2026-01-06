@@ -204,6 +204,16 @@
                                 </div>
                                 @endif
                             </td>
+                            <td>
+        <a class="media align-items-center text-dark" >
+          <div class="avatar avatar-xs avatar-circle mr-2">
+            <img class="avatar-img" src="{{ $val->handler?->avatar ?? '' }}" alt="Image Description">
+          </div>
+          <div class="media-body ">
+            <span class="text-hover-primary">{{ $val->handler?->yourname ?? '---' }}</span>
+          </div>
+        </a>
+      </td>
                             <td>{{ $val->handler?->yourname ?? '---' }}</td>
                             <td>{{ $val->Department_lv2?->name }}</td>
                             <td>{{ $val->department?->name }}</td>
@@ -232,18 +242,13 @@
                                 >
                               </div>
                             </td>
-                            <td class="ghichu" title="{{ $val->content }}">
-                                <span class="tooltip-wrapper">
-                                    <span class="text-truncate-set-1 text-truncate-set">
-                                        {{ $val->content }}
-                                    </span>
-                                    <span class="tooltip">
-                                        {{ $val->content }}
-                                    </span>
-                                </span>
-                            </td>
                             <td>
-                                <input type="text" @if($val->paid ==1) disabled @endif class="task-kpi form-control form-select-sm" value="{{ $val->kpi ?? '' }}" data-id="{{ $val->id }}" placeholder="..." >
+                                  <div class="note" data-toggle="tooltip" data-placement="top" title="" data-original-title="{{ $val->content ?? '' }}">
+                                    {{ $val->content ?? '' }}
+                                  </div>
+                                </td>
+                            <td>
+                                <input style="max-width:120px;" type="text" @if($val->paid ==1) disabled @endif class="task-kpi form-control form-select-sm" value="{{ $val->kpi ?? '' }}" data-id="{{ $val->id }}" placeholder="..." >
                             </td>
                             <td>
                                 <label class="row toggle-switch-sm switch mg-0" for="avail111{{ $val->id }}">
