@@ -104,19 +104,19 @@
                         <td>{{ $d->user->department?->name }}</td>
                         <td>{{ number_format($d->amount) }}</td>
                         <td>
-  <select
-      class="form-control js-bank-name"
-      data-id="{{ $d->id }}"
-  >
-  <option value="">...</option>
-    <option value="Phan Thị Hằng" {{ $d->bank_name === 'Phan Thị Hằng' ? 'selected' : '' }}>
-      Phan Thị Hằng
-    </option>
-    <option value="Nguyễn Văn Tuấn" {{ $d->bank_name === 'Nguyễn Văn Tuấn' ? 'selected' : '' }}>
-      Nguyễn Văn Tuấn
-    </option>
-  </select>
-</td>
+                            <select
+                                class="form-control js-bank-name"
+                                data-id="{{ $d->id }}"
+                            >
+                            <option value="">...</option>
+                              <option value="Phan Thị Hằng" {{ $d->bank_name === 'Phan Thị Hằng' ? 'selected' : '' }}>
+                                Phan Thị Hằng
+                              </option>
+                              <option value="Nguyễn Văn Tuấn" {{ $d->bank_name === 'Nguyễn Văn Tuấn' ? 'selected' : '' }}>
+                                Nguyễn Văn Tuấn
+                              </option>
+                            </select>
+                          </td>
 
                         <td>{{ $d->transaction_code }}
 

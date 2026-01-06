@@ -185,7 +185,7 @@
                             <td></td>
                             <td></td>
                             <td></td>
-                            <td class="text-end">{{ number_format($tongTien, 0, ',', '.') }}</td>
+                            <td class="text-end">{{ number_format($tongTien, 0, ',', ',') }}</td>
                             <td></td>
                             <td></td>
                             <td></td>
@@ -221,8 +221,8 @@
                             <td class="text-end"><input @if($val->paid ==1) disabled @endif type="text" style="width: 100px" class="form-control form-select-sm expected-cost-input" value="{{ number_format($val->expected_costs, 0, ',', '.') }}" data-id="{{ $val->id }}">
                             </td>
                             <td class="text-end total-cost-cell" data-days="{{ $val->days }}" data-rate="{{ $val->rate }}" >
-                                <span class="total-cost-text" title="{{ number_format($val->expected_costs, 0, ',', '.') }}đ * {{ $val->days }} ngày">
-                                    {{ number_format($val->total_costs ?? $val->days * $val->expected_costs, 0, ',', '.') }}
+                                <span class="total-cost-text" title="{{ number_format($val->expected_costs, 0, ',', ',') }}đ * {{ $val->days }} ngày">
+                                    {{ number_format($val->total_costs ?? $val->days * $val->expected_costs, 0, ',', ',') }}
                                 </span>
                             </td>
                             <td>
