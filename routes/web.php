@@ -216,6 +216,7 @@ Route::middleware(['user'])->group(function () {
         // quản lý deposit
         Route::get('deposits', [DepositController::class, 'index'])->name('deposits.index');
         Route::post('deposits/{deposit}/update-status', [DepositController::class, 'updateStatus'])->name('deposits.updateStatus');
+        Route::post('deposits/{deposit}/bank-name', [DepositController::class, 'updateBankName'])->name('deposits.updateBankName');
         
     });
 });

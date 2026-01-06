@@ -88,6 +88,7 @@
                         <th>Họ Tên</th>
                         <th>Sàn/Nhóm</th>
                         <th>Số tiền</th>
+                        <th>TK nhận tiền</th>
                         <th>Check</th>
                         <th>Tình trạng</th>
                         <th>Thời gian</th><th>Thao tác</th>
@@ -102,6 +103,20 @@
                         <td>{{ $d->user->yourname }}</td>
                         <td>{{ $d->user->department?->name }}</td>
                         <td>{{ number_format($d->amount) }}</td>
+                        <td>
+  <select
+      class="form-control js-bank-name"
+      data-id="{{ $d->id }}"
+  >
+    <option value="Phan Thị Hằng" {{ $d->bank_name === 'Phan Thị Hằng' ? 'selected' : '' }}>
+      Phan Thị Hằng
+    </option>
+    <option value="Nguyễn Văn Tuấn" {{ $d->bank_name === 'Nguyễn Văn Tuấn' ? 'selected' : '' }}>
+      Tuấn
+    </option>
+  </select>
+</td>
+
                         <td>{{ $d->transaction_code }}
 
                             @if($d->proof_image)
@@ -343,6 +358,63 @@ $(function () {
     $('#proofModalImg').attr('src', '');
   });
 </script>
+
+<script>
+  // setup CSRF cho ajax
+  $.ajaxSetup({
+    headers: {
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    }
+  });
+
+  $(document).on('focus', '.js-bank-name', function () {
+    $(this).data('old', $(this).val());
+  });
+
+  $(document).on('change', '.js-bank-name', function () {
+    const $select   = $(this);
+    const depositId = $select.data('id');
+    const bankName  = $select.val();
+    const oldVal    = $select.data('old');
+
+    $select.prop('disabled', true);
+
+    $.ajax({
+      url: `{{ url('account/deposits') }}/${depositId}/bank-name`,
+      method: 'POST',
+      dataType: 'json',
+      data: { bank_name: bankName },
+
+      success: function (res) {
+        if (!res || !res.ok) {
+          $select.val(oldVal);
+          showToast('error', 'Cập nhật bank thất bại.');
+          return;
+        }
+
+        // cập nhật old để lần sau revert đúng giá trị mới
+        $select.data('old', bankName);
+
+        showToast('success', 'Đã cập nhật bank thành công!');
+      },
+
+      error: function (xhr) {
+        $select.val(oldVal);
+
+        if (xhr.status === 422 && xhr.responseJSON?.errors?.bank_name?.length) {
+          showToast('warning', xhr.responseJSON.errors.bank_name[0]);
+        } else {
+          showToast('error', 'Có lỗi xảy ra khi cập nhật bank_name.');
+        }
+      },
+
+      complete: function () {
+        $select.prop('disabled', false);
+      }
+    });
+  });
+</script>
+
 
 
 @endsection

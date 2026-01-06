@@ -156,4 +156,29 @@ public function index(Request $request)
 
         return back()->with('success', 'Cập nhật trạng thái thành công');
     }
+
+    public function updateBankName(Request $request, Deposit $deposit)
+    {
+        // nếu có phân quyền thì mở ra:
+        // $this->authorize('update', $deposit);
+
+        $request->validate([
+            'bank_name' => ['required', 'string', 'max:255'],
+        ]);
+
+        $deposit->bank_name = $request->bank_name;
+        $deposit->save();
+
+        // Nếu bạn muốn lưu lịch sử giống hệ thống histories:
+        // $deposit->histories()->create([
+        //     'admin_id' => auth()->id(),
+        //     'action' => 'bank_name',
+        //     'note' => 'Update bank: '.$request->bank_name,
+        // ]);
+
+        return response()->json([
+            'ok' => true,
+            'bank_name' => $deposit->bank_name,
+        ]);
+    }
 }
