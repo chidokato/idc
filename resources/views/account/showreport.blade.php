@@ -68,7 +68,7 @@
                 <button class="btn button-search form-control btn-success">Lọc</button>
             </div>
           </div>
-        
+        <button type="button" class="btn btn-success btn-sm js-export-excel" data-table="#walletsTable" data-filename="wallets.xlsx"> Xuất Excel</button>
         </div>
         </form>
         <div class="row">
@@ -79,7 +79,7 @@
             <div class="table-responsive">
                 
             
-                <table class="table table-hover table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table dataTable no-footer">
+                <table id="walletsTable" class="table table-hover table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table dataTable no-footer">
                     <thead class="thead-light">
                         <tr >
                             <th style="width:36px" class="text-center">
@@ -214,7 +214,6 @@
           </div>
         </a>
       </td>
-                            <td>{{ $val->handler?->yourname ?? '---' }}</td>
                             <td>{{ $val->Department_lv2?->name }}</td>
                             <td>{{ $val->department?->name }}</td>
                             <td class="duan" data-duan="{{ $val->Post?->id }}">{{ $val->Post?->name }} </td>
@@ -867,6 +866,62 @@ $('#btnSaveTaskModal').on('click', function () {
   });
 });
 
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script>
+(function () {
+  function sanitizeCellText(td) {
+    // Nếu cell có input/select/textarea -> lấy value
+    const input = td.querySelector('input, select, textarea');
+    if (input) return (input.value ?? '').toString().trim();
+
+    // Nếu có data-export -> ưu tiên lấy
+    const v = td.getAttribute('data-export');
+    if (v !== null) return v.toString().trim();
+
+    // Text thường
+    return (td.innerText ?? '').toString().trim();
+  }
+
+  function buildCleanTable(originalTable) {
+    const clone = originalTable.cloneNode(true);
+
+    // Bỏ các cột/ô bạn không muốn export: gắn class "no-export"
+    clone.querySelectorAll('.no-export').forEach(el => el.remove());
+
+    // Bỏ button/icon không cần thiết
+    clone.querySelectorAll('button, a.btn, .btn, .tio-edit, .tio-delete, .dropdown, .avatar, img').forEach(el => el.remove());
+
+    // Convert input/select/textarea thành text
+    clone.querySelectorAll('td, th').forEach(cell => {
+      const val = sanitizeCellText(cell);
+      cell.innerHTML = '';
+      cell.textContent = val;
+    });
+
+    return clone;
+  }
+
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.js-export-excel');
+    if (!btn) return;
+
+    const selector = btn.getAttribute('data-table');
+    const filename = btn.getAttribute('data-filename') || 'export.xlsx';
+    if (!selector) return;
+
+    const table = document.querySelector(selector);
+    if (!table) return;
+
+    const cleanTable = buildCleanTable(table);
+
+    // Xuất workbook
+    const wb = XLSX.utils.table_to_book(cleanTable, { sheet: "Sheet1" });
+    XLSX.writeFile(wb, filename);
+  });
+})();
 </script>
 
 @endsection
