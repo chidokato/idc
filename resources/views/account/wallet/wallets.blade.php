@@ -66,6 +66,7 @@
                     <th>Họ tên</th>
                     <th>Phòng ban</th>
                     <th>Số dư</th>
+                    <th>Tiền Hold</th>
                     <th>Lịch sử</th>
                     <th>Cập nhật</th>
                   </tr>
@@ -75,18 +76,20 @@
                   @forelse($wallets as $w)
                     <tr>
                       <td>{{ $w->user?->employee_code ?? '---' }}</td>
+                      <td>{{ $w->user?->email ?? '---' }}</td>
                       <td>{{ $w->user?->yourname ?? '---' }}</td>
                       <td>{{ $w->user?->department?->name ?? '---' }}</td>
                       <td>{{ number_format($w->balance ?? 0) }} đ</td>
+                      <td>{{ number_format($w->held_balance ?? 0) }} đ</td>
                       <td>
                         <a class="btn btn-xs btn-white mr-2 btn-wallet-history"
-   href="javascript:;"
-   data-wallet-id="{{ $w->id }}"
-   data-user-name="{{ $w->user?->yourname ?? '---' }}"
-   data-toggle="modal"
-   data-target="#editCardModal">
-  <i class="tio-edit mr-1"></i> Lịch sử
-</a>
+                           href="javascript:;"
+                           data-wallet-id="{{ $w->id }}"
+                           data-user-name="{{ $w->user?->yourname ?? '---' }}"
+                           data-toggle="modal"
+                           data-target="#editCardModal">
+                          <i class="tio-edit mr-1"></i> Lịch sử
+                        </a>
 
 
                       </td>
