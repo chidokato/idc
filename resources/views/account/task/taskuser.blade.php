@@ -49,9 +49,9 @@
       </div>
       <div class="col-sm-2 col-md-2 mb-sm-0">
         <select name="approved" id="filterApproved" class="form-control">
-          <option value="">-- Duyệt ?? --</option>
           <option value="1">Đã duyệt</option>
           <option value="0">Không duyệt</option>
+          <option value="">Tất cả</option>
         </select>
       </div>
     </div>

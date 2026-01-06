@@ -68,7 +68,7 @@
 
   @if(auth()->check() && in_array($rank, [1,2,3], true))
     <label class="toggle-switch toggle-switch-sm switch" for="{{ $switchId }}">
-      <input type="checkbox"
+      <input @if($task->approved != 1) disabled @endif type="checkbox"
              class="toggle-switch-input active-toggle"
              id="{{ $switchId }}"
              data-url="{{ route('tasks.updatePaid', $task->id) }}"
