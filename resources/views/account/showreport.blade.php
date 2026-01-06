@@ -297,12 +297,12 @@
         <!-- <div class="form-group">
           <label>Expected costs</label>
           <input type="text" class="form-control" id="modal_expected_costs">
-        </div>
+        </div>  -->
 
         <div class="form-group">
           <label>Days</label>
           <input type="number" class="form-control" id="modal_days">
-        </div> -->
+        </div>
 
         <div class="form-group">
           <label>Dự án</label>
@@ -773,7 +773,7 @@ document.addEventListener('DOMContentLoaded', function () {
       $('#duan').val(duan);
       $('#modal_task_id').val(id);
       // $('#modal_expected_costs').val(expected);
-      // $('#modal_days').val(days);
+      $('#modal_days').val(days);
       $('#modal_rate').val(rate);
       // $('#modal_kpi').val(kpi);
       // $('#modal_content').val(content);
@@ -787,7 +787,7 @@ $('#btnSaveTaskModal').on('click', function () {
   const id = $('#modal_task_id').val();
 
   // const expectedNum = toNumber($('#modal_expected_costs').val());
-  // const days = parseInt($('#modal_days').val(), 10) || 0;
+  const days = parseInt($('#modal_days').val(), 10) || 0;
   const rate = parseInt($('#modal_rate').val(), 10) || 0;
   // const kpi = $('#modal_kpi').val() || '';
   // const content = $('#modal_content').val() || '';
@@ -801,7 +801,7 @@ $('#btnSaveTaskModal').on('click', function () {
     },
     data: {
       // expected_costs: expectedNum,
-      // days: days,
+      days: days,
       rate: rate,
       post_id: post_id
       // kpi: kpi,
@@ -825,10 +825,10 @@ $('#btnSaveTaskModal').on('click', function () {
       // $row.find('td.ghichu .text-truncate-set').text(t.content ?? '');
       // $row.find('td.ghichu .tooltip').text(t.content ?? '');
 
-      // $row.find('.total-cost-cell').data('days', t.days).attr('data-days', t.days);
-      // $row.find('.total-cost-text')
-      //   .text(formatVn(t.total_costs))
-      //   .attr('title', `${formatVn(t.expected_costs)}đ * ${t.days} ngày`);
+      $row.find('.total-cost-cell').data('days', t.days).attr('data-days', t.days);
+      $row.find('.total-cost-text')
+        .text(formatVn(t.total_costs))
+        .attr('title', `${formatVn(t.expected_costs)}đ * ${t.days} ngày`);
 
       if (t.post_id) {
         $row.find('.duan')

@@ -591,7 +591,7 @@ class TaskController extends Controller
     {
         $data = $request->validate([
             // 'expected_costs' => ['nullable', 'integer', 'min:0'],
-            // 'days'           => ['nullable', 'integer', 'min:0'],
+            'days'           => ['nullable', 'integer', 'min:0'],
             'rate'           => ['nullable', 'integer', 'min:0', 'max:100'],
             // 'kpi'            => ['nullable', 'string', 'max:255'],
             // 'content'        => ['nullable', 'string'],
@@ -601,7 +601,7 @@ class TaskController extends Controller
         $rate = (int) $request->input('rate', $task->rate);
 
         $task->update([
-            // 'days'           => $data['days'] ?? $task->days,
+            'days'           => $data['days'] ?? $task->days,
             'rate'           => $rate,
             'post_id' => $data['post_id'] ?? $task->post_id,
         ]);
@@ -613,12 +613,12 @@ class TaskController extends Controller
             'task' => [
                 'id' => $task->id,
                 // 'expected_costs' => $task->expected_costs,
-                // 'days' => $task->days,
+                'days' => $task->days,
                 'rate' => $task->rate,
                 // 'kpi' => $task->kpi,
                 // 'content' => $task->content,
                 // 'approved' => (bool)$task->approved,
-                // 'total_costs' => $task->total_costs,
+                'total_costs' => $task->days * $task->expected_costs,
                 'post_id' => $task->post_id,
                 'post_name' => $task->Post?->name,
             ]
