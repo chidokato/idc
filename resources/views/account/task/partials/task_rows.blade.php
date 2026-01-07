@@ -10,9 +10,9 @@
   <tr>
     <td>
       @if($task->approved == 1)
-          <span class="badge btn-success">Đã duyệt</span>
+          <span class="badge btn-success">Duyệt</span>
       @else
-          <span class="badge btn-warning">Không duyệt</span>
+          <span class="badge btn-warning">Không</span>
       @endif
     </td>
     <td>{{ $task->handler?->employee_code }}</td>
@@ -40,8 +40,6 @@
     <td class="text-end">
       {{ number_format((float)(($task->expected_costs * $task->days) * (1 - $task->rate/100)), 0, ',', '.') }}
     </td>
-
-   
 
  <td class="text-center">
   @php

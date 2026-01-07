@@ -50,6 +50,7 @@
           <th>Tổng tiền</th> 
           <th>Tiền nộp</th> 
           <th>Thực tế</th> 
+          <th>Tất toán</th>
           <th>Ghi chú</th> 
           <th></th>
         </tr>
@@ -101,7 +102,7 @@
         {{ number_format((float)(($task->expected_costs * $task->days) * (1 - $task->rate/100)), 0, ',', '.') }}
       </div>
       @endif
-    </td>
+    </td> <!-- số tiền hold paid=1 -> đã hold, paid=0 hoặc null -> chưa hold -->
 
     <td>
       <input
@@ -118,7 +119,7 @@
         data-url="{{ route('tasks.ajaxUpdateActualCosts', $task) }}"
         placeholder="Nhập..."
       >
-    </td>
+    </td> <!-- chi phí thực tế -->
 
     <td class="text-end">
       <span class="js-actual-diff">
@@ -129,10 +130,17 @@
             )
           : '' }}
       </span>
-    </td>
+    </td> <!-- số tiền thực tế người dùng phải trả -->
+
+    <td><label class="toggle-switch toggle-switch-sm" for="stocksCheckbox{{$task->id}}">
+        <input type="checkbox" class="toggle-switch-input" id="stocksCheckbox{{$task->id}}">
+        <span class="toggle-switch-label">
+          <span class="toggle-switch-indicator"></span>
+        </span>
+      </label></td>
 
     <td>
-      <div class="note" data-toggle="tooltip" data-placement="top" title="" data-original-title="{{ $task->content ?? '' }}">
+      <div style="width: 200px;" class="note" data-toggle="tooltip" data-placement="top" title="" data-original-title="{{ $task->content ?? '' }}">
         {{ $task->content ?? '' }}
       </div>
     </td>
