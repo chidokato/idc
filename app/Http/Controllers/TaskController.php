@@ -44,7 +44,7 @@ class TaskController extends Controller
             $selectedDeptId = (int) ($user->department_id ?? 0);
         }
 
-        $keyword = trim((string) $request->input('yourname', ''));
+        $keyword = trim((string) $request->input('yourname', $user->yourname));
 
         // report filter (nếu có)
         $reportId = (int) $request->input('report_id', $max_id);
