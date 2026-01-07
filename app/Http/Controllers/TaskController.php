@@ -628,111 +628,13 @@ class TaskController extends Controller
 
     public function actualcosts(Request $request)
     {
-        $user = Auth::user();
-
-        $max_id = Report::max('id');
-
-        // Load departments 1 lần để: (1) build options (2) lấy danh sách con cháu nhanh
-        $departments = Department::select('id', 'parent', 'name')
-            ->orderBy('name')
-            ->get();
-
-        // selected department: ưu tiên request, không có thì lấy department_lv2 của user
-        $selectedDeptId = (int) $request->input('department_id', $user->department_id ?? 0);
-        if ($selectedDeptId <= 0) {
-            $selectedDeptId = (int) ($user->department_id ?? 0);
-        }
-
-        $keyword = trim((string) $request->input('yourname', ''));
-
-        // report filter (nếu có)
-        $reportId = (int) $request->input('report_id', $max_id);
-
-        // Lấy tất cả id con cháu + chính nó (KHÔNG N+1 query)
-        $deptIds = [];
-        if ($selectedDeptId > 0) {
-            $deptIds = $this->getChildIdsFromCollection($departments, $selectedDeptId);
-        }
-
-        $approved = $request->input('approved', 1); // '1' | '0' | null
-
-        // Query tasks theo department_id IN (...)
-        $q = Task::query()
-            ->with(['handler', 'department', 'Post', 'channel'])
-            ->orderBy('department_id', 'asc');
-
-        if ($keyword !== '') {
-            $q->whereHas('handler', function ($qq) use ($keyword) {
-                $qq->where('yourname', 'like', "%{$keyword}%")
-                   ->orWhere('email', 'like', "%{$keyword}%")
-                   ->orWhere('employee_code', 'like', "%{$keyword}%");
-            });
-        }
-
-        if (!empty($deptIds)) {
-            $q->whereIn('department_id', $deptIds);
-        } else {
-            // nếu không xác định được phòng ban => trả rỗng
-            $q->whereRaw('1=0');
-        }
-
-        // nếu tasks có cột report_id thì mới lọc
-        if ($reportId > 0 && Schema::hasColumn('tasks', 'report_id')) {
-            $q->where('report_id', $reportId);
-        }
-        
-        // lọc approved nếu có chọn
-        if ($approved !== null && $approved !== '') {
-            $q->where('approved', (int) $approved);
-        }
-
-        $tasks = $q->get();
-
-        // tính tổng
         $sumTotal = 0;
-        $sumPaid  = 0;
-
-        foreach ($tasks as $task) {
-            $rowTotal = $task->expected_costs * $task->days;
-            $rowPaid  = $rowTotal * (1 - $task->rate / 100);
-
-            $sumTotal += $rowTotal;
-            $sumPaid  += $rowPaid;
-        }
-
-        // ===== AJAX: chỉ trả tbody rows =====
-        if ($request->ajax()) {
-            $html = view('account.task.partials.task_rows', compact('tasks'))->render();
-
-            return response()->json([
-              'html' => $html,
-              'sumTotal' => $sumTotal,
-              'sumPaid' => $sumPaid,
-            ]);
-        }
-
-        // ===== Render trang =====
-        $reports = Report::orderByDesc('id')->get();
-        $departmentOptions = TreeHelper::buildOptions(
-            $departments,
-            0,
-            '',
-            $selectedDeptId,
-            'id',
-            'parent',
-            'name'
-        );
-
-
-        return view('account.task.taskuser', compact(
-            'user',
+        $sumPaid = 0;
+        $tasks = Task::get();
+        return view('account.task.actualcosts', compact(
             'tasks',
-            'departmentOptions',
-            'selectedDeptId',
-            'reports',
-            'reportId',
             'sumTotal',
-            'sumPaid'
+            'sumPaid',
         ));
     }
 
