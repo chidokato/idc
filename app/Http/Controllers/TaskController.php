@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Schema;
 
+use App\Services\TaskFinanceService;
+
 class TaskController extends Controller
 {
     public function show(Request $request, Task $task = null)
@@ -637,5 +639,45 @@ class TaskController extends Controller
             'sumPaid',
         ));
     }
+
+    public function ajaxUpdateActualCosts(Request $request, Task $task)
+    {
+        $data = $request->validate([
+            'actual_costs' => ['required', 'numeric', 'min:0'],
+        ]);
+
+        // Nếu có policy:
+        // $this->authorize('update', $task);
+
+        $task->actual_costs = (float) $data['actual_costs'];
+        $task->save();
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Thành công',
+            'task' => [
+                'id' => $task->id,
+                'actual_costs' => (float) $task->actual_costs,
+            ],
+        ]);
+    }
+
+
+    // public function updateActualCost(Request $request, $taskId, TaskFinanceService $service)
+    // {
+    //     $data = $request->validate([
+    //         'actual_costs' => ['required','numeric','min:0'],
+    //     ]);
+
+    //     $task = $service->updateActualCost((int)$taskId, (float)$data['actual_costs']);
+
+    //     return back()->with('success', 'Cập nhật chi phí thực tế thành công.');
+    // }
+
+    // public function finalize($taskId, TaskFinanceService $service)
+    // {
+    //     $task = $service->finalize((int)$taskId);
+    //     return back()->with('success', 'Đã chốt tiền tác vụ.');
+    // }
 
 }

@@ -191,8 +191,13 @@ Route::middleware(['user'])->group(function () {
         Route::post('tasks/{task}/update-paid', [TaskController::class, 'updatePaid'])->name('tasks.updatePaid');
         Route::get('tasks/user', [TaskController::class, 'tasksuser'])->name('tasks.user');
         Route::put('tasks/{task}', [TaskController::class, 'updateall'])->name('tasks.update');
+
         // chi phí thực tế actualcosts
         Route::get('actualcosts', [TaskController::class, 'actualcosts'])->name('tasks.actualcosts');
+        Route::post('/tasks/{task}/actual-costs', [\App\Http\Controllers\TaskController::class, 'ajaxUpdateActualCosts'])->name('tasks.ajaxUpdateActualCosts');
+        // Route::post('tasks/{task}/actual-cost', [TaskController::class, 'updateActualCost']);
+        // Route::post('tasks/{task}/finalize', [TaskController::class, 'finalize']);
+
 
         // report
         Route::resource('report',ReportController::class);
