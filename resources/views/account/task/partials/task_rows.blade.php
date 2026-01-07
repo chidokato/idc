@@ -35,7 +35,7 @@
       {{ number_format((float)($task->expected_costs * $task->days), 0, ',', '.') }}
     </td>
 
-    <td class="text-end">{{ $task->rate }}%</td>
+    <td class="text-end">{{ (float)$task->rate }}%</td>
 
     <td class="text-end">
       {{ number_format((float)(($task->expected_costs * $task->days) * (1 - $task->rate/100)), 0, ',', '.') }}
