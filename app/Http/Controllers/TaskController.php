@@ -630,68 +630,203 @@ class TaskController extends Controller
 
     public function actualcosts(Request $request)
     {
-        $sumTotal = 0;
-        $sumPaid = 0;
-        $tasks = Task::get();
+        $user = auth()->user();
+        $maxReportId = Report::max('id'); // có thể null nếu chưa có report
+        $selectedReportId = $request->has('report_id')
+            ? ($request->filled('report_id') ? (int)$request->report_id : null)
+            : (int)$maxReportId;
+        // Load departments 1 lần để build options + lọc đệ quy
+        $departments = Department::select('id', 'parent', 'name')
+            ->orderBy('name')
+            ->get();
+
+        // selected department: ưu tiên request, không có thì lấy department_id của user
+        $selectedDeptId = $request->filled('department_id')
+            ? (int) $request->department_id
+            : null; // hoặc 0
+
+        $q = Task::query()
+            ->with(['handler', 'department', 'Post', 'channel'])
+            ->orderByDesc('id');
+
+        // Tìm theo mã NV / tên NV
+        if ($request->filled('name')) {
+            $key = trim($request->name);
+
+            $q->whereHas('handler', function ($h) use ($key) {
+                $h->where('employee_code', 'like', "%{$key}%")
+                  ->orWhere('yourname', 'like', "%{$key}%");
+            });
+        }
+
+        // Lọc phòng/nhóm (đệ quy: gồm cả con cháu)
+        if ($request->filled('department_id')) {
+            $deptId = (int) $request->department_id;
+
+            // lấy danh sách id con cháu + chính nó
+            $deptIds = TreeHelper::descendantIds($departments, $deptId, true);
+
+            $q->whereIn('department_id', $deptIds);
+        }
+
+        // Lọc report
+        if (!empty($selectedReportId)) {
+            $q->where('report_id', $selectedReportId);
+        }
+        // if ($request->filled('report_id')) {
+        //     $q->where('report_id', (int)$request->report_id);
+        // }
+
+        $tasks = $q->paginate(200)->appends($request->query());
+
+        // Tổng theo trang hiện tại
+        $sumTotal = $tasks->getCollection()->sum(function ($t) {
+            return (float)($t->expected_costs ?? 0) * (float)($t->days ?? 0);
+        });
+
+        $sumPaid = $tasks->getCollection()->sum(function ($t) {
+            $total = (float)($t->expected_costs ?? 0) * (float)($t->days ?? 0);
+            $rate  = (float)($t->rate ?? 0);
+            return $total * (1 - $rate / 100);
+        });
+
+        // Render filter options
+        $reports = Report::orderByDesc('id')->get();
+
+        // selected option ưu tiên request('department_id') nếu có, fallback user dept
+        // $selectedForOptions = $request->filled('department_id')
+        //     ? (int)$request->department_id
+        //     : (int)($user->department_id ?? 0);
+
+        $departmentOptions = TreeHelper::buildOptions(
+            $departments,
+            0,
+            '',
+            $selectedDeptId,
+            'id',
+            'parent',
+            'name'
+        );
+
         return view('account.task.actualcosts', compact(
+            'reports',
+            'departmentOptions',
             'tasks',
             'sumTotal',
             'sumPaid',
+            'selectedReportId',
         ));
     }
 
+
     public function ajaxUpdateActualCosts(Request $request, Task $task)
-{
-    $data = $request->validate([
-        'actual_costs' => ['required', 'integer', 'min:0'],
-    ]);
+    {
+        // input có thể là "1.200.000" hoặc "1,200,000" => sanitize
+        $raw = (string) $request->input('actual_costs', '');
+        $clean = preg_replace('/[^\d\-]/', '', $raw); // giữ số và dấu -
 
-    $task->actual_costs = (int) $data['actual_costs'];
-    $task->save();
+        $data = $request->merge(['actual_costs' => $clean])->validate([
+            'actual_costs' => ['required', 'numeric', 'min:0'],
+        ]);
 
-    $paid = (int)($task->paid ?? 0);
+        $task->actual_costs = (int) $data['actual_costs'];
+        $task->save();
 
-    $expected = (float)($task->expected_costs ?? 0);
-    $days     = (float)($task->days ?? 0);
-    $rate     = (float)($task->rate ?? 0);
+        $paid = (int)($task->paid ?? 0);
 
-    $total  = $expected * $days;
-    $actual = (float)$task->actual_costs;
-    $hold   = $total * (1 - $rate / 100);
+        $expected = (float)($task->expected_costs ?? 0);
+        $days     = (float)($task->days ?? 0);
+        $rate     = (float)($task->rate ?? 0);
 
-    $isCase2 = false;
-    $isDanger = false;
+        $total  = $expected * $days;
+        $actual = (float)$task->actual_costs;
+        $hold   = $total * (1 - $rate / 100);
 
-    if ($paid !== 1) {
-        // NEW RULE
-        $diff = $actual;
-        $isDanger = true;
-    } else {
-        if ($actual <= $total) {
-            $diff = ($total - $actual) * (1 - $rate / 100);
+        $isCase2 = false;
+        $isDanger = false;
+
+        if ($paid !== 1) {
+            // NEW RULE
+            $diff = $actual;
+            $isDanger = true;
         } else {
-            $diff = ($actual - $total) + $hold; // case 2
-            $isCase2 = true;
-            $isDanger = true; // case 2 đỏ
+            if ($actual <= $total) {
+                $diff = ($total - $actual) * (1 - $rate / 100);
+            } else {
+                $diff = ($actual - $total) + $hold;
+                $isCase2 = true;
+                $isDanger = true;
+            }
         }
+
+        $diff = (int) round($diff);
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Thành công',
+            'task' => [
+                'id' => $task->id,
+                'paid' => $paid,
+                'actual_costs' => (int)$task->actual_costs,
+                'actual_costs_formatted' => number_format((int)$task->actual_costs, 0, ',', '.'),
+                'diff' => $diff,
+                'diff_formatted' => number_format($diff, 0, ',', '.'),
+                'is_case2' => $isCase2,
+                'is_danger' => $isDanger,
+            ],
+        ]);
     }
 
-    $diff = (int) round($diff);
+    public function ajaxSearchTasks(Request $request)
+    {
+        $q = Task::query()
+            ->with(['handler', 'department', 'Post', 'channel'])
+            ->orderByDesc('id');
 
-    return response()->json([
-        'ok' => true,
-        'message' => 'Thành công',
-        'task' => [
-            'id' => $task->id,
-            'paid' => $paid,
-            'actual_costs' => (int)$task->actual_costs,
-            'diff' => $diff,
-            'diff_formatted' => number_format($diff, 0, ',', '.'),
-            'is_case2' => $isCase2,
-            'is_danger' => $isDanger,
-        ],
-    ]);
-}
+        if ($request->filled('name')) {
+            $key = trim($request->name);
+
+            $q->whereHas('handler', function ($h) use ($key) {
+                $h->where('employee_code', 'like', "%{$key}%")
+                  ->orWhere('yourname', 'like', "%{$key}%");
+            });
+        }
+
+        if ($request->filled('department_id')) {
+            $q->where('department_id', $request->department_id);
+        }
+
+        if ($request->filled('report_id')) {
+            $q->where('report_id', $request->report_id);
+            // nếu là post_id thì đổi:
+            // $q->where('post_id', $request->report_id);
+        }
+
+        $tasks = $q->paginate(20)->appends($request->query());
+
+        $sumTotal = $tasks->getCollection()->sum(function ($t) {
+            return (float)($t->expected_costs ?? 0) * (float)($t->days ?? 0);
+        });
+
+        $sumPaid = $tasks->getCollection()->sum(function ($t) {
+            $total = (float)($t->expected_costs ?? 0) * (float)($t->days ?? 0);
+            $rate  = (float)($t->rate ?? 0);
+            return $total * (1 - $rate/100);
+        });
+
+        // !!! đổi đúng path partial của bạn:
+        $tbodyHtml = view('account.task.partials._rows', compact('tasks'))->render();
+        $paginationHtml = view('account.task.partials._pagination', compact('tasks'))->render();
+
+        return response()->json([
+            'ok' => true,
+            'tbody_html' => $tbodyHtml,
+            'pagination_html' => $paginationHtml,
+            'sum_total' => number_format($sumTotal, 0, ',', '.'),
+            'sum_paid'  => number_format($sumPaid, 0, ',', '.'),
+            'has_rows'  => $tasks->count() > 0,
+        ]);
+    }
 
 
 

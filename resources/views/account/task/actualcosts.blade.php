@@ -26,169 +26,84 @@
   </div>
   <div class="card">
   <!-- Header -->
-  <div class="card-header">
-    <div class="row align-items-center flex-grow-1" id="filterBar">
-      <div class="col-sm-2 col-md-2 mb-sm-0">
-        <input type="text" name="name" class="form-control" placeholder="...">
-      </div>
+ <div class="card-header">
+  <form id="filterForm" method="GET" action="{{ url()->current() }}">
+  <div class="row align-items-center flex-grow-1 g-2" id="filterBar">
 
+    <div class="col-sm-3 col-md-3">
+      <input type="text"
+             name="name"
+             class="form-control"
+             placeholder="Mã NV / Họ tên"
+             value="{{ request('name') }}">
     </div>
-    <!-- End Row -->
+
+    <div class="col-sm-3 col-md-3">
+      <select name="department_id" class="form-control">
+        <option value="">-- Phòng/nhóm --</option>
+        {!! $departmentOptions !!}
+      </select>
+    </div>
+
+    <div class="col-sm-3 col-md-3">
+      <select name="report_id" class="form-control">
+        <option value="">-- Báo cáo --</option>
+        @foreach($reports as $val)
+          <option value="{{ $val->id }}" {{ (string)$selectedReportId === (string)$val->id ? 'selected' : '' }}>
+            {{ $val->name }}
+          </option>
+        @endforeach
+      </select>
+    </div>
+
+    <div class="col-sm-2 col-md-2 d-flex gap-2">
+      <button type="submit" class="btn btn-primary" id="btnSearch">Lọc</button>
+
+      <a href="{{ url()->current() }}" class="btn btn-warning" id="btnReset">Reset</a>
+    </div>
+
   </div>
+</form>
+
+</div>
   <!-- End Header -->
   <!-- Table -->
   <div class="table-responsive datatable-custom">
-    <table id="taskTable" class="table table-lg table-thead-bordered table-nowrap table-align-middle card-table">
-      <thead class="thead-light"> 
-        <tr> 
-          <th></th>
-          <th>Mã NV</th>
-          <th>Họ & Tên</th> 
-          <th>Phòng / nhóm</th> 
-          <th>Dự án</th> 
-          <th>Kênh</th> 
-          <th>Tổng tiền</th> 
-          <th>Tiền nộp</th> 
-          <th>Thực tế</th> 
-          <th>Tất toán</th>
-          <th>Ghi chú</th> 
-          <th></th>
-        </tr>
-        @if($tasks->count())
-        <tr class="font-weight-bold bg-light">
-          <td colspan="6" class="text-end">Tổng:</td>
-          <td class="text-end" id="sumTotalText">{{ number_format($sumTotal, 0, ',', '.') }}</td>
-          <td></td>
-          <td class="text-end" id="sumPaidText">{{ number_format($sumPaid, 0, ',', '.') }}</td>
-          <td colspan="3"></td>
-        </tr>
-        @endif
-      </thead>
-      <tbody id="taskTableBody">
-        @forelse($tasks as $task)
-      @php
-        // dùng lại cách ép số giống controller (nhanh gọn ở đây)
-        $cost = (float) preg_replace('/[^\d\-]/', '', (string)($task->expected_costs ?? 0));
-        $days = (float) preg_replace('/[^0-9\.\-]/', '', str_replace(',', '.', (string)($task->days ?? 0)));
-        $rate = (float) preg_replace('/[^0-9\.\-]/', '', str_replace(',', '.', (string)($task->rate ?? 0)));
-        $rowTotal = $cost * $days;
-        $rowPaid  = $rowTotal * (1 - $rate/100);
-      @endphp
-  <tr>
-    <td>
-      @if($task->approved == 1)
-          <span class="badge btn-success">Duyệt</span>
-      @else
-          <span class="badge btn-danger">Không</span>
-      @endif
-    </td>
-    <td>{{ $task->handler?->employee_code }}</td>
-    <td>{{ $task->handler?->yourname }}</td>
-    <td>{{ $task->department?->name }}</td>
-    <td>{{ $task->Post?->name }}</td>
-    <td>{{ $task->channel?->name ?? $task->channel ?? '' }}</td>
+  <table id="taskTable" class="table table-lg table-thead-bordered table-nowrap table-align-middle card-table">
+    <thead class="thead-light">
+      <tr>
+        <th></th>
+        <th>Mã NV</th>
+        <th>Họ & Tên</th>
+        <th>Phòng / nhóm</th>
+        <th>Dự án</th>
+        <th>Kênh</th>
+        <th class="text-end">Tổng tiền</th>
+        <th class="text-end">Tiền nộp</th>
+        <th>Thực tế</th>
+        <th class="text-end">Tất toán</th>
+        <th>Ghi chú</th>
+        <th></th>
+      </tr>
 
-    <td class="text-end">
-      {{ number_format((float)($task->expected_costs * $task->days), 0, ',', '.') }}
-    </td>
+      <tr id="sumRow" class="font-weight-bold bg-light" style="{{ $tasks->count() ? '' : 'display:none' }}">
+        <td colspan="6" class="text-end">Tổng:</td>
+        <td class="text-end" id="sumTotalText">{{ number_format($sumTotal, 0, ',', '.') }}</td>
+        <td></td>
+        <td class="text-end" id="sumPaidText">{{ number_format($sumPaid, 0, ',', '.') }}</td>
+        <td colspan="3"></td>
+      </tr>
+    </thead>
 
-    <td class="text-end">
-      @if(($task->paid ?? 0) == 1)
-      <div class="note text-success" data-toggle="tooltip" data-placement="left" title="" data-original-title="{{ (int) $task->rate }}%">
-        {{ number_format((float)(($task->expected_costs * $task->days) * (1 - $task->rate/100)), 0, ',', '.') }}
-      </div>
-      @else
-      <div class="note text-danger" data-toggle="tooltip" data-placement="left" title="" data-original-title="{{ (int) $task->rate }}%">
-        {{ number_format((float)(($task->expected_costs * $task->days) * (1 - $task->rate/100)), 0, ',', '.') }}
-      </div>
-      @endif
-    </td> <!-- số tiền hold paid=1 -> đã hold, paid=0 hoặc null -> chưa hold -->
+    <tbody id="taskTableBody">
+      @include('account.task.partials._rows', ['tasks' => $tasks])
+    </tbody>
+  </table>
+</div>
 
-    <td>
-      <input
-        style="width: 120px;"
-        class="form-control actual-cost-input"
-        type="text"
-        name="actual_costs"
-        value="{{ number_format((float)($task->actual_costs), 0, ',', '.') }}"
-        data-task-id="{{ $task->id }}"
-        data-last="{{ (float)($task->actual_costs ?? 0) }}"
-        data-expected="{{ (float)($task->expected_costs ?? 0) }}"
-        data-days="{{ (float)($task->days ?? 0) }}"
-        data-rate="{{ (float)($task->rate ?? 0) }}"
-        data-paid="{{ (int)($task->paid ?? 0) }}"
-        data-url="{{ route('tasks.ajaxUpdateActualCosts', $task) }}"
-        placeholder="Nhập..."
-      >
-    </td> <!-- chi phí thực tế -->
-
-@php
-  $paid     = (int)($task->paid ?? 0);
-
-  $expected = (float)($task->expected_costs ?? 0);
-  $days     = (float)($task->days ?? 0);
-  $rate     = (float)($task->rate ?? 0);
-
-  $total  = $expected * $days;
-  $actual = (float)($task->actual_costs ?? 0);
-  $hold   = $total * (1 - $rate/100);
-
-  $isCase2 = false;
-  $isDanger = false;
-
-  if ($paid !== 1) {
-    $diff = $actual;
-    $isDanger = true;
-  } else {
-    if ($actual <= $total) {
-      $diff = ($total - $actual) * (1 - $rate/100);
-    } else {
-      $diff = ($actual - $total) + $hold;
-      $isCase2 = true;
-      $isDanger = true;
-    }
-  }
-
-  $diff = (int) round($diff);
-
-  // rule hiển thị (giữ theo bạn đang dùng: paid=1 hoặc actual>0)
-  $showDiff = ($paid === 1) || ($actual > 0);
-@endphp
-
-<td class="text-end">
-  <span class="js-actual-diff {{ $showDiff && $isDanger ? 'text-danger' : '' }}">
-    {{ $showDiff ? number_format($diff, 0, ',', '.') : '' }}
-  </span>
-</td>
-
-
-
-
- <!-- số tiền thực tế người dùng phải trả -->
-
-    <td>
-      <label class="toggle-switch toggle-switch-sm" for="stocksCheckbox{{$task->id}}">
-        <input name="settlement" type="checkbox" class="toggle-switch-input" id="stocksCheckbox{{$task->id}}">
-        <span class="toggle-switch-label">
-          <span class="toggle-switch-indicator"></span>
-        </span>
-      </label>
-    </td>
-
-    <td>
-      <div style="width: 200px;" class="note" data-toggle="tooltip" data-placement="top" title="" data-original-title="{{ $task->content ?? '' }}">
-        {{ $task->content ?? '' }}
-      </div>
-    </td>
-  </tr>
-  @empty
-    <tr>
-      <td colspan="11" class="text-center text-muted py-4">Không có dữ liệu phù hợp</td>
-    </tr>
-  @endforelse
-      </tbody>
-    </table>
-  </div>
+<div id="paginationWrap">
+  @include('account.task.partials._pagination', ['tasks' => $tasks])
+</div>
   <!-- End Table -->
   </div>
 </div>
@@ -212,24 +127,9 @@ function formatVnMoneyDigits(digits) {
 }
 
 /* =======================
-   SHOW DIFF RULE
-   show if paid=1 OR actual>0
-======================= */
-function isPaidRow($input) {
-  return $input.closest('tr')
-    .find('input.toggle-switch-input[name="settlement"]')
-    if ($chk.length) return $chk.is(':checked');
-    return Number($input.data('paid') || 0) === 1;
-}
-function shouldShowDiff($input, actualVal) {
-  return isPaidRow($input) || (Number(actualVal || 0) > 0);
-}
-
-/* =======================
    AJAX SAVE
-   force=true => gọi lại để lấy diff dù actual không đổi
 ======================= */
-function saveActualCosts($input, force = false) {
+function saveActualCosts($input) {
   const url = $input.data('url');
   if (!url) return;
 
@@ -239,7 +139,7 @@ function saveActualCosts($input, force = false) {
   const numberVal = rawDigits ? parseInt(rawDigits, 10) : 0;
 
   const last = parseInt($input.data('last') || 0, 10);
-  if (!force && numberVal === last) return;
+  if (numberVal === last) return;
 
   $input.prop('disabled', true).addClass('is-loading');
 
@@ -264,19 +164,10 @@ function saveActualCosts($input, force = false) {
       $input[0].dataset.raw = String(actual);
       $input.data('last', actual);
 
-      // update diff theo rule: paid=1 OR actual>0
+      // update diff từ server
       const $diffEl = $input.closest('tr').find('.js-actual-diff');
-const show = shouldShowDiff($input, actual);
-
-if (show) {
-  $diffEl.text(res.task?.diff_formatted ?? '');
-  $diffEl.toggleClass('text-danger', !!res.task?.is_danger);
-} else {
-  $diffEl.text('');
-  $diffEl.removeClass('text-danger');
-}
-
-
+      $diffEl.text(res.task?.diff_formatted ?? '');
+      $diffEl.toggleClass('text-danger', !!res.task?.is_danger);
 
       showToast?.('success', res.message || 'Đã lưu');
     },
@@ -341,40 +232,12 @@ $(document).on('keydown', '.actual-cost-input', function(e) {
   }
 });
 
-// Toggle paid: bật/tắt chỉ ảnh hưởng hiển thị diff, và khi bật thì fetch diff mới nhất
-$(document).on('change', 'input.toggle-switch-input[name="settlement"]', function() {
-  const $row = $(this).closest('tr');
-  const $input = $row.find('.actual-cost-input');
-  const actualNow = parseInt($input.data('last') || 0, 10);
-
-  if ($(this).is(':checked')) {
-    // paid=1 => gọi lại để lấy diff_formatted mới nhất
-    saveActualCosts($input, true);
-  } else {
-    // paid=0: vẫn có thể hiện diff nếu actual>0
-    const $diffEl = $row.find('.js-actual-diff');
-    if (actualNow > 0) {
-      // nếu server đã render sẵn diff thì giữ nguyên; còn muốn chắc thì gọi force:
-      saveActualCosts($input, true);
-    } else {
-      $diffEl.text('');
-    }
-  }
-});
-
-// Init: format input + ẩn diff nếu không thỏa (paid=1 OR actual>0)
+// Init format cho input có sẵn
 $(function() {
   $('.actual-cost-input').each(function() {
     const digits = vnMoneyToDigits(this.value);
     this.value = formatVnMoneyDigits(digits);
     this.dataset.raw = digits;
-
-    const $input = $(this);
-    const actualVal = parseInt($input.data('last') || 0, 10);
-
-    if (!shouldShowDiff($input, actualVal)) {
-      $input.closest('tr').find('.js-actual-diff').text('');
-    }
   });
 });
 </script>
