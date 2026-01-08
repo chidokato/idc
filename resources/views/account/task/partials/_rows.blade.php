@@ -77,14 +77,14 @@
       </span>
     </td>
 
-    <td>
+    <!-- <td>
       <label class="toggle-switch toggle-switch-sm" for="stocksCheckbox{{$task->id}}">
         <input name="settlement" type="checkbox" class="toggle-switch-input" id="stocksCheckbox{{$task->id}}">
         <span class="toggle-switch-label">
           <span class="toggle-switch-indicator"></span>
         </span>
       </label>
-    </td>
+    </td> -->
 
     <td>
       <div style="width: 200px;" class="note" data-toggle="tooltip" data-placement="top"
