@@ -647,6 +647,7 @@ class TaskController extends Controller
 
         $q = Task::query()
             ->with(['handler', 'department', 'Post', 'channel'])
+            ->orderBy('department_lv1')   // ưu tiên 1
             ->orderBy('department_lv2')   // ưu tiên 1
             ->orderBy('department_id')       // ưu tiên 2
             ->orderBy('user')          // ưu tiên 3 (hoặc user_id)
