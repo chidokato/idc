@@ -101,10 +101,6 @@
   </table>
 </div>
 
-<div id="paginationWrap">
-  @include('account.task.partials._pagination', ['tasks' => $tasks])
-</div>
-  <!-- End Table -->
   </div>
 </div>
 

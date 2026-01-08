@@ -677,17 +677,17 @@ class TaskController extends Controller
         //     $q->where('report_id', (int)$request->report_id);
         // }
 
-        $tasks = $q->paginate(200)->appends($request->query());
+        $tasks = $q->get();
 
         // Tổng theo trang hiện tại
-        $sumTotal = $tasks->getCollection()->sum(function ($t) {
+        $sumTotal = $tasks->sum(function ($t) {
             return (float)($t->expected_costs ?? 0) * (float)($t->days ?? 0);
         });
 
-        $sumPaid = $tasks->getCollection()->sum(function ($t) {
+        $sumPaid = $tasks->sum(function ($t) {
             $total = (float)($t->expected_costs ?? 0) * (float)($t->days ?? 0);
             $rate  = (float)($t->rate ?? 0);
-            return $total * (1 - $rate / 100);
+            return $total * (1 - $rate/100);
         });
 
         // Render filter options
