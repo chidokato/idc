@@ -70,13 +70,13 @@
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="#passwordSection">
-                      - Nạp tiền (dành cho quản lý)
+                      - Nạp tiền
                     </a>
                   </li>
                 
                   <li class="nav-item">
                     <a class="nav-link" href="#deleteAccountSection">
-                      - Chuyển tiền (dành cho quản lý)
+                      - Chuyển tiền
                     </a>
                   </li>
                 </ul>

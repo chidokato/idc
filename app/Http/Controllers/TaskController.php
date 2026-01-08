@@ -643,24 +643,39 @@ class TaskController extends Controller
     public function ajaxUpdateActualCosts(Request $request, Task $task)
     {
         $data = $request->validate([
-            'actual_costs' => ['required', 'numeric', 'min:0'],
+            'actual_costs' => ['required', 'integer', 'min:0'],
         ]);
 
-        // Nếu có policy:
-        // $this->authorize('update', $task);
-
-        $task->actual_costs = (float) $data['actual_costs'];
+        $task->actual_costs = (int) $data['actual_costs'];
         $task->save();
+
+        $expected = (float) ($task->expected_costs ?? 0);
+        $days     = (float) ($task->days ?? 0);
+        $rate     = (float) ($task->rate ?? 0);
+
+        $total  = $expected * $days;
+        $actual = (float) $task->actual_costs;
+
+        if ($actual <= $total) {
+            $diff = ($total - $actual) * (1 - $rate / 100);
+        } else {
+            $diff = $total - $actual; // số âm
+        }
+
+        $diff = (int) round($diff); // làm tròn
 
         return response()->json([
             'ok' => true,
             'message' => 'Thành công',
             'task' => [
                 'id' => $task->id,
-                'actual_costs' => (float) $task->actual_costs,
+                'actual_costs' => (int) $task->actual_costs,
+                'diff' => $diff,
+                'diff_formatted' => number_format($diff, 0, ',', '.'), // số âm tự hiện "-"
             ],
         ]);
     }
+
 
 
     // public function updateActualCost(Request $request, $taskId, TaskFinanceService $service)

@@ -121,23 +121,35 @@
       >
     </td> <!-- chi phí thực tế -->
 
-    <td class="text-end">
-      <span class="js-actual-diff">
-        {{ ((float)$task->actual_costs > 0)
-          ? number_format(
-              round((float)$task->actual_costs * (1 - ((float)($task->rate ?? 0) / 100))),
-              0, ',', '.'
-            )
-          : '' }}
-      </span>
-    </td> <!-- số tiền thực tế người dùng phải trả -->
+    @php
+      $expected = (float)($task->expected_costs ?? 0);
+      $days     = (float)($task->days ?? 0);
+      $rate     = (float)($task->rate ?? 0);
+      $total    = $expected * $days;
+      $actual   = (float)($task->actual_costs ?? 0);
 
-    <td><label class="toggle-switch toggle-switch-sm" for="stocksCheckbox{{$task->id}}">
-        <input type="checkbox" class="toggle-switch-input" id="stocksCheckbox{{$task->id}}">
+      if ($actual <= $total) {
+        $diff = ($total - $actual) * (1 - $rate/100);
+      } else {
+        $diff = $total - $actual;
+      }
+
+      $diff = (int) round($diff);
+    @endphp
+
+    <td class="text-end">
+      <span class="js-actual-diff">{{ number_format($diff, 0, ',', '.') }}</span>
+    </td>
+ <!-- số tiền thực tế người dùng phải trả -->
+
+    <td>
+      <label class="toggle-switch toggle-switch-sm" for="stocksCheckbox{{$task->id}}">
+        <input name="settlement" type="checkbox" class="toggle-switch-input" id="stocksCheckbox{{$task->id}}">
         <span class="toggle-switch-label">
           <span class="toggle-switch-indicator"></span>
         </span>
-      </label></td>
+      </label>
+    </td>
 
     <td>
       <div style="width: 200px;" class="note" data-toggle="tooltip" data-placement="top" title="" data-original-title="{{ $task->content ?? '' }}">
@@ -162,106 +174,145 @@
 
 @section('js')
 
-<script> 
-function vnMoneyToNumber(str) {
-  return (str || '').toString().replace(/[^\d]/g, ''); // bỏ hết không phải số
-}
-function formatVnMoney(rawDigits) {
-  rawDigits = (rawDigits || '').replace(/[^\d]/g, '');
-  if (!rawDigits) return '';
-  return rawDigits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+<script>
+/* =======================
+   VN MONEY INPUT HELPERS
+======================= */
+function vnMoneyToDigits(str) {
+  return (str || '').toString().replace(/[^\d]/g, '');
 }
 
+function formatVnMoneyDigits(digits) {
+  digits = (digits || '').toString().replace(/[^\d]/g, '');
+  if (!digits) return '';
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+/* =======================
+   AJAX SAVE
+======================= */
 function saveActualCosts($input) {
   const url = $input.data('url');
-  const taskId = $input.data('task-id');
+  if (!url) return;
 
-  const raw = vnMoneyToNumber($input.val()); // "1234567"
-  const numberVal = raw ? Number(raw) : 0;
+  const token = $('meta[name="csrf-token"]').attr('content');
 
-  const last = Number($input.data('last') || 0);
-  if (numberVal === last) return; // không đổi thì khỏi gọi
+  // lấy số thật từ dataset.raw (đã set khi input)
+  const rawDigits = ($input[0].dataset.raw || vnMoneyToDigits($input.val()) || '');
+  const numberVal = rawDigits ? parseInt(rawDigits, 10) : 0;
+
+  const last = parseInt($input.data('last') || 0, 10);
+  if (numberVal === last) return; // không đổi -> khỏi save
+
+  // UI state
+  $input.prop('disabled', true).addClass('is-loading');
 
   $.ajax({
     url: url,
     type: 'POST',
     data: {
-      _token: $('meta[name="csrf-token"]').attr('content'),
+      _token: token,
       actual_costs: numberVal
     },
     success: function(res) {
-      if (!res.ok) {
-        showToast?.('error', res.message || 'Lỗi cập nhật');
+      if (!res || !res.ok) {
+        showToast?.('error', res?.message || 'Lỗi cập nhật');
+
+        // rollback
+        $input.val(formatVnMoneyDigits(String(last)));
+        $input[0].dataset.raw = String(last);
         return;
       }
 
-      const actual = Number(res.task.actual_costs || 0); // tiền thực tế
-      $input.val(formatVnMoney(String(Math.trunc(actual))));
+      // cập nhật actual (server trả về)
+      const actual = parseInt(res.task?.actual_costs || 0, 10);
+      $input.val(formatVnMoneyDigits(String(actual)));
+      $input[0].dataset.raw = String(actual);
       $input.data('last', actual);
 
-      // ===== update cột chênh lệch =====
-      const expected = Number($input.data('expected') || 0); // tiền dự kiến
-      const days = Number($input.data('days') || 0); // số ngày
-      const rate = Number($input.data('rate') || 0); // tỷ lệ hỗ trợ
-
-      const diff = actual > 0 ? (actual * (1 - rate/100)) : null;
-
-      const $diffEl = $input.closest('tr').find('.js-actual-diff');
-      $diffEl.text(diff === null ? '' : formatVnMoney(String(Math.round(diff))));
+      // update cột chênh lệch từ server (đã tính + format)
+      const diffFormatted = res.task?.diff_formatted ?? '';
+      $input.closest('tr').find('.js-actual-diff').text(diffFormatted);
 
       showToast?.('success', res.message || 'Đã lưu');
-    }
-    ,
+    },
     error: function(xhr) {
       const msg = xhr?.responseJSON?.message || 'Lỗi server';
       showToast?.('error', msg);
 
-      // trả về giá trị cũ
-      $input.val(formatVnMoney(String(last)));
+      // rollback
+      $input.val(formatVnMoneyDigits(String(last)));
+      $input[0].dataset.raw = String(last);
+    },
+    complete: function() {
+      $input.prop('disabled', false).removeClass('is-loading');
     }
   });
 }
 
-// Chặn ký tự lạ (chỉ cho số)
+/* =======================
+   EVENTS
+======================= */
+
+// 1) Chặn ký tự lạ khi gõ (chỉ cho digit + phím điều hướng + ctrl/cmd)
 $(document).on('keydown', '.actual-cost-input', function(e) {
-  const allow = ['Backspace','Delete','Tab','Enter','Escape','ArrowLeft','ArrowRight','Home','End'];
+  const allow = [
+    'Backspace','Delete','Tab','Enter','Escape',
+    'ArrowLeft','ArrowRight','ArrowUp','ArrowDown',
+    'Home','End'
+  ];
+
   if ((e.ctrlKey || e.metaKey) && ['a','c','v','x'].includes(e.key.toLowerCase())) return;
   if (allow.includes(e.key)) return;
   if (/^\d$/.test(e.key)) return;
 
   e.preventDefault();
-  // showToast?.('warning', 'Chỉ nhập số (tiền VNĐ)');
 });
 
-// Auto format khi gõ
+// 2) Format khi đang gõ + lưu raw vào dataset
 $(document).on('input', '.actual-cost-input', function() {
-  const oldPos = this.selectionStart || 0;
-  const old = this.value;
+  const el = this;
 
-  const raw = vnMoneyToNumber(old);
-  const formatted = formatVnMoney(raw);
+  const oldVal = el.value;
+  const oldPos = el.selectionStart || 0;
 
-  this.value = formatted;
+  const digits = vnMoneyToDigits(oldVal);
+  const newVal = formatVnMoneyDigits(digits);
 
-  const diff = formatted.length - old.length;
-  const newPos = Math.max(0, oldPos + diff);
-  this.setSelectionRange(newPos, newPos);
+  el.value = newVal;
+  el.dataset.raw = digits;
+
+  // giữ caret tương đối
+  const diffLen = newVal.length - oldVal.length;
+  const newPos = Math.max(0, oldPos + diffLen);
+  try { el.setSelectionRange(newPos, newPos); } catch (e) {}
 });
 
-// Lưu khi blur
+// 3) Blur: format lại + gọi save
 $(document).on('blur', '.actual-cost-input', function() {
+  const digits = vnMoneyToDigits(this.value);
+  this.value = formatVnMoneyDigits(digits);
+  this.dataset.raw = digits;
+
   saveActualCosts($(this));
 });
 
-// Lưu khi Enter
+// 4) Enter: trigger blur -> save
 $(document).on('keydown', '.actual-cost-input', function(e) {
   if (e.key === 'Enter') {
     e.preventDefault();
-    $(this).blur(); // kích hoạt save
+    $(this).blur();
   }
 });
 
-
+// 5) Init format cho các input có sẵn value khi load
+$(function() {
+  $('.actual-cost-input').each(function() {
+    const digits = vnMoneyToDigits(this.value);
+    this.value = formatVnMoneyDigits(digits);
+    this.dataset.raw = digits;
+  });
+});
 </script>
 
 
