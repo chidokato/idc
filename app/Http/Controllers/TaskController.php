@@ -684,6 +684,10 @@ class TaskController extends Controller
             return (float)($t->expected_costs ?? 0) * (float)($t->days ?? 0);
         });
 
+        $sumActual = $tasks->sum(function ($t) {
+            return (float)($t->actual_costs ?? 0);
+        });
+
         $sumPaid = $tasks->sum(function ($t) {
             $total = (float)($t->expected_costs ?? 0) * (float)($t->days ?? 0);
             $rate  = (float)($t->rate ?? 0);
@@ -713,6 +717,7 @@ class TaskController extends Controller
             'departmentOptions',
             'tasks',
             'sumTotal',
+            'sumActual',
             'sumPaid',
             'selectedReportId',
         ));

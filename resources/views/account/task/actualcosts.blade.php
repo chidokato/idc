@@ -89,8 +89,8 @@
       <tr id="sumRow" class="font-weight-bold bg-light" style="{{ $tasks->count() ? '' : 'display:none' }}">
         <td colspan="6" class="text-end">Tổng:</td>
         <td class="text-end" id="sumTotalText">{{ number_format($sumTotal, 0, ',', '.') }}</td>
-        <td></td>
         <td class="text-end" id="sumPaidText">{{ number_format($sumPaid, 0, ',', '.') }}</td>
+        <td class="text-end" id="">{{ number_format($sumActual, 0, ',', '.') }}</td>
         <td colspan="3"></td>
       </tr>
     </thead>
