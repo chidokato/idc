@@ -758,7 +758,7 @@ class TaskController extends Controller
             if ($actual <= $total) {
                 $diff = ($total - $actual) * (1 - $rate / 100);
             } else {
-                $diff = ($actual - $total) + $hold;
+                $diff = ($actual - $total);
                 $isCase2 = true;
                 $isDanger = true;
             }

@@ -21,7 +21,7 @@
       if ($actual <= $rowTotal) {
         $diff = ($rowTotal - $actual) * (1 - $rate/100);
       } else {
-        $diff = ($actual - $rowTotal) + $hold;
+        $diff = ($actual - $rowTotal);
         $isCase2 = true;
         $isDanger = true;
       }
