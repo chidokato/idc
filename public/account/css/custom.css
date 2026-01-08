@@ -59,4 +59,4 @@
     height: 1.3rem;
 }
 
-.table tr td .form-control{ height: calc(.6em + 1.21875rem) !important; padding: 0 .5rem; }
+.table tr td .form-control, .table tr td .btn{ height: calc(.6em + 1.21875rem) !important; padding: 0 .5rem; }
