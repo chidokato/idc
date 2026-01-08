@@ -58,3 +58,5 @@
     width: 1.3rem;
     height: 1.3rem;
 }
+
+.table tr td .form-control{ height: calc(.6em + 1.21875rem) !important; }
