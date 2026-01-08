@@ -39,7 +39,7 @@
     </div>
 
     <div class="col-sm-3 col-md-3">
-      <select name="department_id" class="form-control">
+      <select name="department_id" class="form-control select2">
         <option value="">-- Phòng/nhóm --</option>
         {!! $departmentOptions !!}
       </select>
@@ -238,7 +238,12 @@ $(function() {
 });
 </script>
 
-
+<!-- select2 multiple JavaScript -->
+<script src="admin_asset/select2/js/select2.min.js"></script>
+<script src="admin_asset/select2/js/select2-searchInputPlaceholder.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() { $('.select2').select2({ searchInputPlaceholder: '...' }); });
+</script>
 
 
 @endsection
