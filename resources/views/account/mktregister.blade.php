@@ -189,11 +189,11 @@
                             <td>{{$val->handler?->yourname ?? '-'}}</td>
                             <td>{{ $val->Department->name }}</td>
                             <td>{{$val->Post?->name}}</td>
-                            <td>{{$val->rate}}%</td>
+                            <td>{{(float)$val->rate}}%</td>
                             <td>{{$val->Channel?->name}}</td>
-                            <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td>
-                            <td>{{ number_format(($val->days * $val->expected_costs), 0, ',', '.') }} đ</td>
-                            <td>{{ number_format(($val->days * $val->expected_costs * (1 - $val->rate/100)), 0, ',', '.') }} đ</td>
+                            <td>{{ number_format($val->expected_costs, 0, ',', '.') }}</td>
+                            <td>{{ number_format(($val->days * $val->expected_costs), 0, ',', '.') }}</td>
+                            <td>{{ number_format(($val->days * $val->expected_costs * (1 - $val->rate/100)), 0, ',', '.') }}</td>
                             <td>
                                 {{ $val->content }}
                             </td>
@@ -227,19 +227,14 @@
                             <td>{{$val->Post?->name}}</td>
                             <td>{{$val->rate}}%</td>
                             <td>{{$val->Channel?->name}}</td>
-                            <td>{{ number_format($val->expected_costs, 0, ',', '.') }} đ</td>
-                            <td>{{ number_format(($val->days * $val->expected_costs), 0, ',', '.') }} đ</td>
-                            <td>{{ number_format(($val->days * $val->expected_costs * (1 - $val->rate/100)), 0, ',', '.') }} đ</td>
-                            <td class="ghichu" title="{{ $val->content }}">
-                                <span class="tooltip-wrapper">
-                                    <span class="text-truncate-set-1 text-truncate-set">
-                                        {{ $val->content }}
-                                    </span>
-                                    <span class="tooltip">
-                                        {{ $val->content }}
-                                    </span>
-                                </span>
-                            </td>
+                            <td>{{ number_format($val->expected_costs, 0, ',', '.') }}</td>
+                            <td>{{ number_format(($val->days * $val->expected_costs), 0, ',', '.') }}</td>
+                            <td>{{ number_format(($val->days * $val->expected_costs * (1 - $val->rate/100)), 0, ',', '.') }}</td>
+                            <td>
+                                  <div class="note" data-toggle="tooltip" data-placement="top" title="" data-original-title="{{ $val->content ?? '' }}">
+                                    {{ $val->content ?? '' }}
+                                  </div>
+                                </td>
                             <td>
                                 @if($val->approved)
                                     <span class="badge bg-success">Đã duyệt</span>
