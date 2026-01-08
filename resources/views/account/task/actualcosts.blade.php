@@ -116,30 +116,54 @@
         data-expected="{{ (float)($task->expected_costs ?? 0) }}"
         data-days="{{ (float)($task->days ?? 0) }}"
         data-rate="{{ (float)($task->rate ?? 0) }}"
+        data-paid="{{ (int)($task->paid ?? 0) }}"
         data-url="{{ route('tasks.ajaxUpdateActualCosts', $task) }}"
         placeholder="Nhập..."
       >
     </td> <!-- chi phí thực tế -->
 
-    @php
-      $expected = (float)($task->expected_costs ?? 0);
-      $days     = (float)($task->days ?? 0);
-      $rate     = (float)($task->rate ?? 0);
-      $total    = $expected * $days;
-      $actual   = (float)($task->actual_costs ?? 0);
+@php
+  $paid     = (int)($task->paid ?? 0);
 
-      if ($actual <= $total) {
-        $diff = ($total - $actual) * (1 - $rate/100);
-      } else {
-        $diff = $total - $actual;
-      }
+  $expected = (float)($task->expected_costs ?? 0);
+  $days     = (float)($task->days ?? 0);
+  $rate     = (float)($task->rate ?? 0);
 
-      $diff = (int) round($diff);
-    @endphp
+  $total  = $expected * $days;
+  $actual = (float)($task->actual_costs ?? 0);
+  $hold   = $total * (1 - $rate/100);
 
-    <td class="text-end">
-      <span class="js-actual-diff">{{ number_format($diff, 0, ',', '.') }}</span>
-    </td>
+  $isCase2 = false;
+  $isDanger = false;
+
+  if ($paid !== 1) {
+    $diff = $actual;
+    $isDanger = true;
+  } else {
+    if ($actual <= $total) {
+      $diff = ($total - $actual) * (1 - $rate/100);
+    } else {
+      $diff = ($actual - $total) + $hold;
+      $isCase2 = true;
+      $isDanger = true;
+    }
+  }
+
+  $diff = (int) round($diff);
+
+  // rule hiển thị (giữ theo bạn đang dùng: paid=1 hoặc actual>0)
+  $showDiff = ($paid === 1) || ($actual > 0);
+@endphp
+
+<td class="text-end">
+  <span class="js-actual-diff {{ $showDiff && $isDanger ? 'text-danger' : '' }}">
+    {{ $showDiff ? number_format($diff, 0, ',', '.') : '' }}
+  </span>
+</td>
+
+
+
+
  <!-- số tiền thực tế người dùng phải trả -->
 
     <td>
@@ -181,7 +205,6 @@
 function vnMoneyToDigits(str) {
   return (str || '').toString().replace(/[^\d]/g, '');
 }
-
 function formatVnMoneyDigits(digits) {
   digits = (digits || '').toString().replace(/[^\d]/g, '');
   if (!digits) return '';
@@ -189,31 +212,41 @@ function formatVnMoneyDigits(digits) {
 }
 
 /* =======================
-   AJAX SAVE
+   SHOW DIFF RULE
+   show if paid=1 OR actual>0
 ======================= */
-function saveActualCosts($input) {
+function isPaidRow($input) {
+  return $input.closest('tr')
+    .find('input.toggle-switch-input[name="settlement"]')
+    if ($chk.length) return $chk.is(':checked');
+    return Number($input.data('paid') || 0) === 1;
+}
+function shouldShowDiff($input, actualVal) {
+  return isPaidRow($input) || (Number(actualVal || 0) > 0);
+}
+
+/* =======================
+   AJAX SAVE
+   force=true => gọi lại để lấy diff dù actual không đổi
+======================= */
+function saveActualCosts($input, force = false) {
   const url = $input.data('url');
   if (!url) return;
 
   const token = $('meta[name="csrf-token"]').attr('content');
 
-  // lấy số thật từ dataset.raw (đã set khi input)
   const rawDigits = ($input[0].dataset.raw || vnMoneyToDigits($input.val()) || '');
   const numberVal = rawDigits ? parseInt(rawDigits, 10) : 0;
 
   const last = parseInt($input.data('last') || 0, 10);
-  if (numberVal === last) return; // không đổi -> khỏi save
+  if (!force && numberVal === last) return;
 
-  // UI state
   $input.prop('disabled', true).addClass('is-loading');
 
   $.ajax({
     url: url,
     type: 'POST',
-    data: {
-      _token: token,
-      actual_costs: numberVal
-    },
+    data: { _token: token, actual_costs: numberVal },
     success: function(res) {
       if (!res || !res.ok) {
         showToast?.('error', res?.message || 'Lỗi cập nhật');
@@ -224,15 +257,26 @@ function saveActualCosts($input) {
         return;
       }
 
-      // cập nhật actual (server trả về)
       const actual = parseInt(res.task?.actual_costs || 0, 10);
+
+      // update input + last
       $input.val(formatVnMoneyDigits(String(actual)));
       $input[0].dataset.raw = String(actual);
       $input.data('last', actual);
 
-      // update cột chênh lệch từ server (đã tính + format)
-      const diffFormatted = res.task?.diff_formatted ?? '';
-      $input.closest('tr').find('.js-actual-diff').text(diffFormatted);
+      // update diff theo rule: paid=1 OR actual>0
+      const $diffEl = $input.closest('tr').find('.js-actual-diff');
+const show = shouldShowDiff($input, actual);
+
+if (show) {
+  $diffEl.text(res.task?.diff_formatted ?? '');
+  $diffEl.toggleClass('text-danger', !!res.task?.is_danger);
+} else {
+  $diffEl.text('');
+  $diffEl.removeClass('text-danger');
+}
+
+
 
       showToast?.('success', res.message || 'Đã lưu');
     },
@@ -254,25 +298,18 @@ function saveActualCosts($input) {
    EVENTS
 ======================= */
 
-// 1) Chặn ký tự lạ khi gõ (chỉ cho digit + phím điều hướng + ctrl/cmd)
+// Chặn ký tự lạ
 $(document).on('keydown', '.actual-cost-input', function(e) {
-  const allow = [
-    'Backspace','Delete','Tab','Enter','Escape',
-    'ArrowLeft','ArrowRight','ArrowUp','ArrowDown',
-    'Home','End'
-  ];
-
+  const allow = ['Backspace','Delete','Tab','Enter','Escape','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'];
   if ((e.ctrlKey || e.metaKey) && ['a','c','v','x'].includes(e.key.toLowerCase())) return;
   if (allow.includes(e.key)) return;
   if (/^\d$/.test(e.key)) return;
-
   e.preventDefault();
 });
 
-// 2) Format khi đang gõ + lưu raw vào dataset
+// Format khi gõ + lưu raw
 $(document).on('input', '.actual-cost-input', function() {
   const el = this;
-
   const oldVal = el.value;
   const oldPos = el.selectionStart || 0;
 
@@ -282,13 +319,12 @@ $(document).on('input', '.actual-cost-input', function() {
   el.value = newVal;
   el.dataset.raw = digits;
 
-  // giữ caret tương đối
   const diffLen = newVal.length - oldVal.length;
   const newPos = Math.max(0, oldPos + diffLen);
   try { el.setSelectionRange(newPos, newPos); } catch (e) {}
 });
 
-// 3) Blur: format lại + gọi save
+// Blur => save
 $(document).on('blur', '.actual-cost-input', function() {
   const digits = vnMoneyToDigits(this.value);
   this.value = formatVnMoneyDigits(digits);
@@ -297,7 +333,7 @@ $(document).on('blur', '.actual-cost-input', function() {
   saveActualCosts($(this));
 });
 
-// 4) Enter: trigger blur -> save
+// Enter => blur => save
 $(document).on('keydown', '.actual-cost-input', function(e) {
   if (e.key === 'Enter') {
     e.preventDefault();
@@ -305,15 +341,44 @@ $(document).on('keydown', '.actual-cost-input', function(e) {
   }
 });
 
-// 5) Init format cho các input có sẵn value khi load
+// Toggle paid: bật/tắt chỉ ảnh hưởng hiển thị diff, và khi bật thì fetch diff mới nhất
+$(document).on('change', 'input.toggle-switch-input[name="settlement"]', function() {
+  const $row = $(this).closest('tr');
+  const $input = $row.find('.actual-cost-input');
+  const actualNow = parseInt($input.data('last') || 0, 10);
+
+  if ($(this).is(':checked')) {
+    // paid=1 => gọi lại để lấy diff_formatted mới nhất
+    saveActualCosts($input, true);
+  } else {
+    // paid=0: vẫn có thể hiện diff nếu actual>0
+    const $diffEl = $row.find('.js-actual-diff');
+    if (actualNow > 0) {
+      // nếu server đã render sẵn diff thì giữ nguyên; còn muốn chắc thì gọi force:
+      saveActualCosts($input, true);
+    } else {
+      $diffEl.text('');
+    }
+  }
+});
+
+// Init: format input + ẩn diff nếu không thỏa (paid=1 OR actual>0)
 $(function() {
   $('.actual-cost-input').each(function() {
     const digits = vnMoneyToDigits(this.value);
     this.value = formatVnMoneyDigits(digits);
     this.dataset.raw = digits;
+
+    const $input = $(this);
+    const actualVal = parseInt($input.data('last') || 0, 10);
+
+    if (!shouldShowDiff($input, actualVal)) {
+      $input.closest('tr').find('.js-actual-diff').text('');
+    }
   });
 });
 </script>
+
 
 
 
