@@ -65,6 +65,12 @@
   </div>
 </form>
 
+<div id="addtask" data-toggle="popover-dark">
+  <a class="btn btn-primary" href="javascript:;" data-toggle="modal" data-target="#newProjectModal">
+    <i class="tio-add mr-1"></i> New project
+  </a>
+</div>
+
 </div>
   <!-- End Header -->
   <!-- Table -->
@@ -101,6 +107,64 @@
   </table>
 </div>
 
+  </div>
+</div>
+
+<div class="modal fade" id="newProjectModal" tabindex="-1" role="dialog" aria-labelledby="editCardModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+    <div class="modal-content">
+      <!-- Header -->
+      <div class="modal-header">
+        <h4 id="editCardModalTitle" class="modal-title">Thêm mới</h4>
+        <button type="button" class="btn btn-icon btn-sm btn-ghost-secondary" data-dismiss="modal" aria-label="Close">
+          <i class="tio-clear tio-lg"></i>
+        </button>
+      </div>
+      <!-- End Header -->
+
+      <!-- Body -->
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label class="input-label">Họ tên nhân viên</label>
+              <select class="custom-select select2" >
+                <option value="">sdfsdf</option>
+                <option value="">sdfssssssdf</option>
+                <option value="">sdfsdf</option>
+                <option value="">sdfsdf</option>
+                <option value="">sdfsdf</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label for="post_id" class="input-label">Dự án</label>
+              <div class="input-group input-group-merge">
+                <input type="text" class="form-control" name="post_id" id="post_id" placeholder="Dự án">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label for="channel_id" class="input-label">Kênh chạy</label>
+              <div class="input-group input-group-merge">
+                <input type="text" class="form-control" name="channel_id" id="channel_id" placeholder="Dự án">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label for="expected_costs" class="input-label">Số tiền</label>
+              <div class="input-group input-group-merge">
+                <input type="text" class="form-control" name="expected_costs" id="expected_costs" placeholder="Dự án">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Body -->
+    </div>
   </div>
 </div>
 

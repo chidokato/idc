@@ -31,7 +31,7 @@
           <!-- End Dashboards -->
 
           <li class="nav-item">
-            <small class="nav-subtitle" title="Pages">Marketing</small>
+            <small class="nav-subtitle" title="Marketing">Marketing</small>
             <small class="tio-more-horizontal nav-subtitle-replacer"></small>
           </li>
 
@@ -52,29 +52,29 @@
           </li>
           @if(auth()->check() && in_array((int)auth()->user()->rank, [1], true))
           <li class="nav-item">
-            <small class="nav-subtitle" title="Pages">Quản lý</small>
+            <small class="nav-subtitle" title="Quản lý">Quản lý</small>
             <small class="tio-more-horizontal nav-subtitle-replacer"></small>
           </li>
           <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/report" title="Quản lý tổng" data-placement="left">
+            <a class="js-nav-tooltip-link nav-link " href="account/report" title="Duyệt Marketing" data-placement="left">
               <i class="tio-dashboard nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Duyệt Marketing</span>
             </a>
           </li>
           <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/actualcosts" title="Quản lý tổng" data-placement="left">
+            <a class="js-nav-tooltip-link nav-link " href="account/actualcosts" title="Chi phí thực tế" data-placement="left">
               <i class="tio-dashboard nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Chi phí thực tế</span>
             </a>
           </li>
           <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/deposits" title="Quản lý tổng" data-placement="left">
+            <a class="js-nav-tooltip-link nav-link " href="account/deposits" title="Duyệt đóng tiền" data-placement="left">
               <i class="tio-dashboard nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Duyệt đóng tiền</span>
             </a>
           </li>
           <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/wallets" title="Quản lý tổng" data-placement="left">
+            <a class="js-nav-tooltip-link nav-link " href="account/wallets" title="Quản lý ví tiền" data-placement="left">
               <i class="tio-dashboard nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Quản lý ví tiền</span>
             </a>
@@ -82,7 +82,7 @@
           @endif
 
           <li class="nav-item">
-            <small class="nav-subtitle" title="Pages">Quản lý tiền</small>
+            <small class="nav-subtitle" title="Quản lý tiền">Quản lý tiền</small>
             <small class="tio-more-horizontal nav-subtitle-replacer"></small>
           </li>
 
@@ -100,7 +100,7 @@
           </li>
 
           <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/wallet/transfer" title="Nạp tiền" data-placement="left">
+            <a class="js-nav-tooltip-link nav-link " href="account/wallet/transfer" title="Chuyển tiền" data-placement="left">
               <i class="tio-money nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Chuyển tiền</span>
             </a>
@@ -111,7 +111,7 @@
             <small class="tio-more-horizontal nav-subtitle-replacer"></small>
           </li>
           <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/opened" title="Ví tiền" data-placement="left">
+            <a class="js-nav-tooltip-link nav-link " href="account/opened" title="Hướng dẫn sử dụng" data-placement="left">
               <i class="tio-book-opened nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Hướng dẫn sử dụng</span>
             </a>
