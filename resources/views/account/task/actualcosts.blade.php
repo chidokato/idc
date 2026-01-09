@@ -29,7 +29,6 @@
  <div class="card-header">
   <form id="filterForm" method="GET" action="{{ url()->current() }}">
   <div class="row align-items-center" id="filterBar">
-
     <div class="col-sm-3 col-md-3">
       <input type="text"
              name="name"
@@ -37,14 +36,12 @@
              placeholder="Mã NV / Họ tên"
              value="{{ request('name') }}">
     </div>
-
     <div class="col-sm-3 col-md-3">
       <select name="department_id" class="form-control select2">
         <option value="">-- Phòng/nhóm --</option>
         {!! $departmentOptions !!}
       </select>
     </div>
-
     <div class="col-sm-3 col-md-3">
       <select name="report_id" class="form-control">
         <option value="">-- Báo cáo --</option>
