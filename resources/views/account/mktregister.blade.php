@@ -199,9 +199,9 @@
                             </td>
                             <td>
                                 @if($val->approved)
-                                    <span class="badge bg-success">Đã duyệt</span>
+                                    <span class="badge btn-success">Đã duyệt</span>
                                 @else
-                                    <span class="badge bg-warning">Chờ duyệt</span>
+                                    <span class="badge btn-warning">Chờ duyệt</span>
                                 @endif
                             </td>
                             <td>
@@ -237,9 +237,9 @@
                                 </td>
                             <td>
                                 @if($val->approved)
-                                    <span class="badge bg-success">Đã duyệt</span>
+                                    <span class="badge btn-success">Đã duyệt</span>
                                 @else
-                                    <span class="badge bg-warning">Chờ duyệt</span>
+                                    <span class="badge btn-warning">Chờ duyệt</span>
                                 @endif
                             </td>
                             <td></td>

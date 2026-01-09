@@ -28,7 +28,7 @@
   <!-- Header -->
  <div class="card-header">
   <form id="filterForm" method="GET" action="{{ url()->current() }}">
-  <div class="row align-items-center flex-grow-1 g-2" id="filterBar">
+  <div class="row align-items-center" id="filterBar">
 
     <div class="col-sm-3 col-md-3">
       <input type="text"
