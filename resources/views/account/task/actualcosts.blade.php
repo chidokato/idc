@@ -24,51 +24,58 @@
     </div>
     <!-- End Row -->
   </div>
-  <div class="card">
+  <div class="card overflow-hidden mb-3 mb-lg-5">
+    <div class="card-header">
+      <div class="row align-items-sm-center flex-grow-1">
+        <div class="col-sm mb-2 mb-sm-0">
+          <form id="filterForm" method="GET" action="{{ url()->current() }}">
+            <div class="row" id="filterBar">
+              <div class="col-sm-2 col-md-2">
+                <input type="text"
+                       name="name"
+                       class="form-control"
+                       placeholder="Mã NV / Họ tên"
+                       value="{{ request('name') }}">
+              </div>
+              <div class="col-sm-3 col-md-3">
+                <select name="department_id" class="form-control select2">
+                  <option value="">-- Phòng/nhóm --</option>
+                  {!! $departmentOptions !!}
+                </select>
+              </div>
+              <div class="col-sm-3 col-md-3">
+                <select name="report_id" class="form-control">
+                  <option value="">-- Báo cáo --</option>
+                  @foreach($reports as $val)
+                    <option value="{{ $val->id }}" {{ (string)$selectedReportId === (string)$val->id ? 'selected' : '' }}>
+                      {{ \Carbon\Carbon::parse($val->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($val->time_end)->format('d/m/Y') }}
+                    </option>
+                  @endforeach
+                </select>
+              </div>
+
+              <div class="col-sm-2 col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary" id="btnSearch">Lọc</button>
+                <a href="{{ url()->current() }}" class="btn btn-warning" id="btnReset">Reset</a>
+              </div>
+
+            </div>
+          </form>
+        </div>
+        <div class="col-sm-auto">
+          <div id="addtask" data-toggle="popover-dark">
+            <a class="btn btn-primary" href="javascript:;" data-toggle="modal" data-target="#newProjectModal">
+              <i class="tio-add mr-1"></i> New project
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- End Row -->
+    </div>
+
+
   <!-- Header -->
- <div class="card-header">
-  <form id="filterForm" method="GET" action="{{ url()->current() }}">
-  <div class="row align-items-center" id="filterBar">
-    <div class="col-sm-3 col-md-3">
-      <input type="text"
-             name="name"
-             class="form-control"
-             placeholder="Mã NV / Họ tên"
-             value="{{ request('name') }}">
-    </div>
-    <div class="col-sm-3 col-md-3">
-      <select name="department_id" class="form-control select2">
-        <option value="">-- Phòng/nhóm --</option>
-        {!! $departmentOptions !!}
-      </select>
-    </div>
-    <div class="col-sm-3 col-md-3">
-      <select name="report_id" class="form-control">
-        <option value="">-- Báo cáo --</option>
-        @foreach($reports as $val)
-          <option value="{{ $val->id }}" {{ (string)$selectedReportId === (string)$val->id ? 'selected' : '' }}>
-            {{ $val->name }}
-          </option>
-        @endforeach
-      </select>
-    </div>
 
-    <div class="col-sm-2 col-md-2 d-flex gap-2">
-      <button type="submit" class="btn btn-primary" id="btnSearch">Lọc</button>
-
-      <a href="{{ url()->current() }}" class="btn btn-warning" id="btnReset">Reset</a>
-    </div>
-
-  </div>
-</form>
-
-<div id="addtask" data-toggle="popover-dark">
-  <a class="btn btn-primary" href="javascript:;" data-toggle="modal" data-target="#newProjectModal">
-    <i class="tio-add mr-1"></i> New project
-  </a>
-</div>
-
-</div>
   <!-- End Header -->
   <!-- Table -->
   <div class="table-responsive datatable-custom">
