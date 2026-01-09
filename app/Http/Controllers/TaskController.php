@@ -9,6 +9,8 @@ use App\Models\User;
 use App\Models\Department;
 use App\Models\Wallet;
 use App\Models\Report;
+use App\Models\Post;
+use App\Models\Channel;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\TreeHelperLv2Only;
 use App\Helpers\TreeHelper;
@@ -700,6 +702,9 @@ class TaskController extends Controller
 
         // Render filter options
         $reports = Report::orderByDesc('id')->get();
+        $users = User::get();
+        $posts = Post::where('sort_by', 'Product')->get();
+        $channels = Channel::get();
 
         // selected option ưu tiên request('department_id') nếu có, fallback user dept
         // $selectedForOptions = $request->filled('department_id')
@@ -724,6 +729,9 @@ class TaskController extends Controller
             'sumActual',
             'sumPaid',
             'selectedReportId',
+            'users',
+            'posts',
+            'channels',
         ));
     }
 
@@ -837,6 +845,51 @@ class TaskController extends Controller
         ]);
     }
 
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'user_id'        => ['required', 'integer', 'exists:users,id'],
+            'post_id'        => ['required', 'integer', 'exists:posts,id'],
+            'channel_id'     => ['required', 'integer', 'exists:channels,id'],
+            'expected_costs' => ['required', 'integer', 'min:0'],
+            'redirect_url'   => ['nullable', 'string'],
+            'addreport_id'   => ['nullable', 'string'],
+        ]);
+
+        $user = User::find($data['user_id']);
+        $post = Post::find($data['post_id']);
+        $report = Report::find($data['addreport_id']);
+
+        // TODO: map field đúng với DB của bạn (vd handler_id, Post_id...)
+        $task = Task::create([
+            'user_id'        => Auth::user()->id,
+            'user'           => $data['user_id'],
+            'report_id'      => $data['addreport_id'],
+            'days'           => $report['days'],
+            'department_lv1' => $user['department_lv1'],
+            'department_lv2' => $user['department_lv2'],
+            'department_id'  => $user['department_id'],
+            'rate'           => $post->rate,
+            'post_id'        => $data['post_id'],
+            'channel_id'     => $data['channel_id'],
+            'expected_costs' => $data['expected_costs'],
+        ]);
+
+        $redirect = $data['redirect_url'] ?: url()->previous();
+
+        // Nếu submit bằng AJAX thì trả JSON để frontend redirect
+        if ($request->expectsJson()) {
+            return response()->json([
+                'ok' => true,
+                'message' => 'Đã thêm mới',
+                'redirect' => $redirect,
+                'id' => $task->id,
+            ]);
+        }
+
+        // Submit thường
+        return redirect()->to($redirect)->with('success', 'Đã thêm mới');
+    }
 
 
 

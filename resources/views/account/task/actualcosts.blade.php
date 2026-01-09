@@ -113,60 +113,95 @@
 <div class="modal fade" id="newProjectModal" tabindex="-1" role="dialog" aria-labelledby="editCardModalTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
     <div class="modal-content">
-      <!-- Header -->
+
       <div class="modal-header">
         <h4 id="editCardModalTitle" class="modal-title">Thêm mới</h4>
         <button type="button" class="btn btn-icon btn-sm btn-ghost-secondary" data-dismiss="modal" aria-label="Close">
           <i class="tio-clear tio-lg"></i>
         </button>
       </div>
-      <!-- End Header -->
 
-      <!-- Body -->
-      <div class="modal-body">
-        <div class="row">
-          <div class="col-sm-4">
-            <div class="form-group">
-              <label class="input-label">Họ tên nhân viên</label>
-              <select class="custom-select select2" >
-                <option value="">sdfsdf</option>
-                <option value="">sdfssssssdf</option>
-                <option value="">sdfsdf</option>
-                <option value="">sdfsdf</option>
-                <option value="">sdfsdf</option>
-              </select>
-            </div>
-          </div>
-          <div class="col-sm-4">
-            <div class="form-group">
-              <label for="post_id" class="input-label">Dự án</label>
-              <div class="input-group input-group-merge">
-                <input type="text" class="form-control" name="post_id" id="post_id" placeholder="Dự án">
+      {{-- FORM --}}
+      <form id="createTaskForm" method="POST" action="{{ route('account.task.store') }}">
+        @csrf
+        <input type="hidden" name="addreport_id" value="{{ (string)$selectedReportId }}">
+        {{-- URL hiện tại (có cả filter + page) để redirect về đúng chỗ --}}
+        <input type="hidden" name="redirect_url" value="{{ url()->full() }}">
+
+        <div class="modal-body">
+          <div class="row">
+
+            <div class="col-sm-3">
+              <div class="form-group">
+                <label class="input-label">Họ tên nhân viên</label>
+                <select name="user_id" required class="custom-select select2">
+                  <option value="">...</option>
+                  @foreach($users as $val)
+                    <option value="{{ $val->id }}">{{ $val->yourname }}</option>
+                  @endforeach
+                </select>
               </div>
             </div>
-          </div>
-          <div class="col-sm-4">
-            <div class="form-group">
-              <label for="channel_id" class="input-label">Kênh chạy</label>
-              <div class="input-group input-group-merge">
-                <input type="text" class="form-control" name="channel_id" id="channel_id" placeholder="Dự án">
+
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="input-label">Dự án</label>
+                <select name="post_id" required class="custom-select select2">
+                  <option value="">...</option>
+                  @foreach($posts as $val)
+                    <option value="{{ $val->id }}">{{ $val->name }}</option>
+                  @endforeach
+                </select>
               </div>
             </div>
-          </div>
-          <div class="col-sm-4">
-            <div class="form-group">
-              <label for="expected_costs" class="input-label">Số tiền</label>
-              <div class="input-group input-group-merge">
-                <input type="text" class="form-control" name="expected_costs" id="expected_costs" placeholder="Dự án">
+
+            <div class="col-sm-3">
+              <div class="form-group">
+                <label class="input-label">Kênh chạy</label>
+                <select name="channel_id" required class="custom-select select2">
+                  <option value="">...</option>
+                  @foreach($channels as $val)
+                    <option value="{{ $val->id }}" {{ $val->name == 'Facebook' ? 'selected' : '' }}>
+                      {{ $val->name }}
+                    </option>
+                  @endforeach
+                </select>
               </div>
+            </div>
+
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label for="expected_costs" class="input-label">Số tiền</label>
+                <div class="input-group input-group-merge">
+                  <input
+                    type="text"
+                    class="form-control actual-cost-input"
+                    name="expected_costs"
+                    id="expected_costs"
+                    value="500000"
+                    placeholder="Số tiền"
+                  >
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="d-flex align-items-center">
+            <div class="ml-auto">
+              <button type="submit" class="btn btn-primary" id="btnCreateTask">
+                <i class="tio-save"></i> Lưu lại
+              </button>
             </div>
           </div>
         </div>
-      </div>
-      <!-- End Body -->
+      </form>
+      {{-- END FORM --}}
+
     </div>
   </div>
 </div>
+
 
 @endsection
 
@@ -308,6 +343,53 @@ $(function() {
 <script type="text/javascript">
     $(document).ready(function() { $('.select2').select2({ searchInputPlaceholder: '...' }); });
 </script>
+
+
+<script>
+  // Submit tạo task
+  $(document).on('submit', '#createTaskForm', function(e) {
+    e.preventDefault();
+
+    const $form = $(this);
+    const $btn  = $('#btnCreateTask');
+
+    // đổi tiền VN sang digits trước khi gửi
+    const digits = vnMoneyToDigits($('#expected_costs').val());
+    $('#expected_costs').val(digits ? digits : '0');
+
+    $btn.prop('disabled', true);
+
+    $.ajax({
+      url: $form.attr('action'),
+      type: 'POST',
+      data: $form.serialize(),
+      dataType: 'json',
+      success: function(res) {
+        if (!res || !res.ok) {
+          showToast?.('error', res?.message || 'Thêm mới thất bại');
+          return;
+        }
+
+        // đóng modal (tuỳ bạn)
+        $('#newProjectModal').modal('hide');
+
+        // redirect về đúng trang hiện tại (giữ filter + page)
+        window.location.href = res.redirect || "{{ url()->full() }}";
+      },
+      error: function(xhr) {
+        const msg = xhr?.responseJSON?.message || 'Lỗi server';
+        showToast?.('error', msg);
+
+        // nếu muốn show lỗi validate chi tiết:
+        // console.log(xhr?.responseJSON?.errors);
+      },
+      complete: function() {
+        $btn.prop('disabled', false);
+      }
+    });
+  });
+</script>
+
 
 
 @endsection

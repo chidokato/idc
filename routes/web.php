@@ -194,6 +194,8 @@ Route::middleware(['user'])->group(function () {
 
         Route::get('actualcosts', [TaskController::class, 'actualcosts'])->name('tasks.actualcosts');
         Route::post('tasks/{task}/actual-costs', [TaskController::class, 'ajaxUpdateActualCosts'])->name('tasks.ajaxUpdateActualCosts');
+        Route::post('tasks/store', [TaskController::class, 'store'])->name('account.task.store');
+
 
 
 
