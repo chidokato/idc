@@ -84,7 +84,8 @@
         <th>Thực tế</th> 
         <th>Hoàn lại</th> 
         <th>Đóng thêm</th> 
-        <th></th>
+        <th>Thời gian</th>
+        <th>Ghi chú</th>
       </tr>
       @if($tasks->count())
       <tr class="font-weight-bold bg-light">
@@ -92,7 +93,7 @@
         <td class="text-end" id="sumTotalText">{{ number_format($sumTotal, 0, ',', '.') }}</td>
         <td></td>
         <td class="text-end" id="sumPaidText">{{ number_format($sumPaid, 0, ',', '.') }}</td>
-        <td colspan="3"></td>
+        <td colspan="4"></td>
       </tr>
       @endif
     </thead>

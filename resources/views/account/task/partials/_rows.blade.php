@@ -63,8 +63,6 @@
       </span>
     </td>
 
-
-
     <td>
       <div style="width: 200px;" class="note" data-toggle="tooltip" data-placement="top"
            data-original-title="{{ $task->content ?? '' }}">
@@ -72,7 +70,8 @@
       </div>
     </td>
 
-    <td></td>
+    <td>
+    </td>
   </tr>
 
 @empty

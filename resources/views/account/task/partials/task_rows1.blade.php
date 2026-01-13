@@ -45,6 +45,11 @@
       <span class="text-danger">{{ number_format((float)($task->extra_money), 0, ',', '.') }}</span>
     </td>
 
+    
+    <td>
+      <span><strong>{{ \Carbon\Carbon::parse($task->Report->time_start)->format('d') }} - {{ \Carbon\Carbon::parse($task->Report->time_end)->format('d') }}/{{ \Carbon\Carbon::parse($task->Report->time_start)->format('m/Y') }}</strong></span>
+    </td>
+
     <td class="d-flex">
       <div class="note" data-toggle="tooltip" data-placement="top" title="" data-original-title="{{ $task->content ?? '' }}">
         {{ $task->content ?? '' }}
