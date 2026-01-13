@@ -92,13 +92,15 @@
         <td colspan="6" class="text-end">Tổng:</td>
         <td class="text-end" id="sumTotalText">{{ number_format($sumTotal, 0, ',', '.') }}</td>
         <td></td>
-        <td class="text-end" id="sumPaidText">{{ number_format($sumPaid, 0, ',', '.') }}</td>
-        <td colspan="4"></td>
+        <td class="text-end" id="sumPaidText">{{ number_format($sumActual, 0, ',', '.') }}</td>
+        <td class="text-end" id="sumrefundText">{{ number_format($sum_refund_money, 0, ',', '.') }}</td>
+        <td class="text-end" id="sumextraText">{{ number_format($sum_extra_money, 0, ',', '.') }}</td>
+        <td colspan="2"></td>
       </tr>
       @endif
     </thead>
     <tbody id="taskTableBody">
-      @include('account.task.partials.task_rows1', ['tasks' => $tasks])
+      @include('account.task.partials._expense', ['tasks' => $tasks])
     </tbody>
   </table>
 </div>
