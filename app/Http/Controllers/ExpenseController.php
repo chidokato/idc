@@ -92,6 +92,7 @@ class ExpenseController extends Controller
             ->orderBy('department_lv2')   // ưu tiên 1
             ->orderBy('department_id')       // ưu tiên 2
             ->orderBy('user')          // ưu tiên 3 (hoặc user_id)
+            ->orderBy('post_id')       // ưu tiên 2
             ->orderByDesc('id');             // phụ: cho ổn định
 
         // Tìm theo mã NV / tên NV
