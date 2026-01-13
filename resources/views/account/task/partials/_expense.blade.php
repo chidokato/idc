@@ -38,7 +38,7 @@
     </td>
 
     <td class="text-end">
-      {{ number_format((float)($task->refund_money), 0, ',', '.') }}
+      <span class="text-success">{{ number_format((float)($task->refund_money), 0, ',', '.') }}</span>
     </td>
 
     <td class="text-end">
