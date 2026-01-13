@@ -26,35 +26,35 @@ class ExpenseController extends Controller
         $tasks = Task::get();
         // $tasks = Task::where('user', auth()->id())->get();
         
-        foreach ($tasks as $task) {
-            $approved = (int) ($task->approved ?? 0);
-            $paid     = (int) ($task->paid ?? 0);
+        // foreach ($tasks as $task) {
+        //     $approved = (int) ($task->approved ?? 0);
+        //     $paid     = (int) ($task->paid ?? 0);
 
-            // Không duyệt hoặc chưa trả: extra = actual, refund = 0
-            if ($approved !== 1 || $paid !== 1) {
-                $task->extra_money  = (float) ($task->actual_costs ?? 0);
-                $task->refund_money = 0;
-                $task->save();
-                continue;
-            }
+        //     // Không duyệt hoặc chưa trả: extra = actual, refund = 0
+        //     if ($approved !== 1 || $paid !== 1) {
+        //         $task->extra_money  = (float) ($task->actual_costs ?? 0);
+        //         $task->refund_money = 0;
+        //         $task->save();
+        //         continue;
+        //     }
 
-            // approved = 1 và paid = 1
-            $actual   = (float) ($task->actual_costs ?? 0);
-            $expected = (float) (($task->expected_costs ?? 0) * ($task->days ?? 0));
-            $rate     = (float) ($task->rate ?? 0);
+        //     // approved = 1 và paid = 1
+        //     $actual   = (float) ($task->actual_costs ?? 0);
+        //     $expected = (float) (($task->expected_costs ?? 0) * ($task->days ?? 0));
+        //     $rate     = (float) ($task->rate ?? 0);
 
-            if ($actual > $expected) {
-                $task->extra_money  = $actual - $expected;
-                $task->refund_money = 0;
-            } else {
-                // tiền giữ lại (hold) = (expected - actual) * (1 - rate/100)
-                $diff = $expected - $actual; // luôn >= 0
-                $task->extra_money  = 0;
-                $task->refund_money = $diff * (1 - $rate / 100);
-            }
+        //     if ($actual > $expected) {
+        //         $task->extra_money  = $actual - $expected;
+        //         $task->refund_money = 0;
+        //     } else {
+        //         // tiền giữ lại (hold) = (expected - actual) * (1 - rate/100)
+        //         $diff = $expected - $actual; // luôn >= 0
+        //         $task->extra_money  = 0;
+        //         $task->refund_money = $diff * (1 - $rate / 100);
+        //     }
 
-            $task->save();
-        }
+        //     $task->save();
+        // }
 
 
 
