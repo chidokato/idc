@@ -32,25 +32,33 @@
             <div class="row" id="filterBar">
               <div class="col-sm-2 col-md-2">
                 <select name="user_id" class="form-control select2">
-                  @foreach($users as $val)
-                    <option {{ $val->id == auth()->id() ? 'selected':''}} value="{{ $val->id }}">{{ $val->yourname }} </option>
-                  @endforeach
-                </select>
+  @foreach($users as $val)
+    <option value="{{ $val->id }}"
+      {{ (int)($userId ?? auth()->id()) === (int)$val->id ? 'selected' : '' }}>
+      {{ $val->yourname }}
+    </option>
+  @endforeach
+</select>
+
               </div>
               <div class="col-sm-3 col-md-3">
                 <select name="report_id" class="form-control">
-                  <option value="">-- Thời gian --</option>
-                  @foreach($reports as $val)
-                    <option value="{{ $val->id }}">
-                      {{ \Carbon\Carbon::parse($val->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($val->time_end)->format('d/m/Y') }}
-                    </option>
-                  @endforeach
-                </select>
+  <option value="">-- Thời gian --</option>
+  @foreach($reports as $val)
+    <option value="{{ $val->id }}"
+      {{ (int)($selectedReportId ?? 0) === (int)$val->id ? 'selected' : '' }}>
+      {{ \Carbon\Carbon::parse($val->time_start)->format('d/m/Y') }}
+      -
+      {{ \Carbon\Carbon::parse($val->time_end)->format('d/m/Y') }}
+    </option>
+  @endforeach
+</select>
               </div>
 
               <div class="col-sm-2 col-md-2 d-flex gap-2">
                 <button type="submit" class="btn btn-primary" id="btnSearch">Lọc</button>
-                <a href="{{ url()->current() }}" class="btn btn-warning" id="btnReset">Reset</a>
+<a href="{{ url()->current() }}" class="btn btn-warning" id="btnReset">Reset</a>
+
               </div>
 
             </div>

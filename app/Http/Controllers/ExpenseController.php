@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Services\WalletService;
@@ -22,79 +22,64 @@ use App\Services\TaskFinanceService;
 
 class ExpenseController extends Controller
 {
-    public function expense(Request $request){
-        // $tasks = Task::get();
-        $tasks = Task::where('user', auth()->id())->get();
-        
-        // foreach ($tasks as $task) {
-        //     $approved = (int) ($task->approved ?? 0);
-        //     $paid     = (int) ($task->paid ?? 0);
+    public function expense(Request $request)
+{
+    // mặc định user đang đăng nhập
+    $userId = (int)($request->user_id ?? auth()->id());
 
-        //     // Không duyệt hoặc chưa trả: extra = actual, refund = 0
-        //     if ($approved !== 1 || $paid !== 1) {
-        //         $task->extra_money  = (float) ($task->actual_costs ?? 0);
-        //         $task->refund_money = 0;
-        //         $task->save();
-        //         continue;
-        //     }
+    $q = Task::query()
+        ->where('user', $userId)
+        ->orderByDesc('id');
 
-        //     // approved = 1 và paid = 1
-        //     $actual   = (float) ($task->actual_costs ?? 0);
-        //     $expected = (float) (($task->expected_costs ?? 0) * ($task->days ?? 0));
-        //     $rate     = (float) ($task->rate ?? 0);
+    // report_id: mặc định lấy report mới nhất
+    $selectedReportId = $request->has('report_id')
+        ? ($request->filled('report_id') ? (int)$request->report_id : null)
+        : (int)Report::max('id');
 
-        //     if ($actual > $expected) {
-        //         $task->extra_money  = $actual - $expected;
-        //         $task->refund_money = 0;
-        //     } else {
-        //         // tiền giữ lại (hold) = (expected - actual) * (1 - rate/100)
-        //         $diff = $expected - $actual; // luôn >= 0
-        //         $task->extra_money  = 0;
-        //         $task->refund_money = $diff * (1 - $rate / 100);
-        //     }
+    // nếu có chọn report_id thì lọc theo khoảng thời gian của report
+    if (!empty($selectedReportId)) {
+        $report = Report::find($selectedReportId);
+        if ($report) {
+            $start = Carbon::parse($report->time_start)->startOfDay();
+            $end   = Carbon::parse($report->time_end)->endOfDay();
 
-        //     $task->save();
-        // }
-
-
-
-        // Tổng theo trang hiện tại
-        $sumTotal = $tasks->sum(function ($t) {
-            return (float)($t->expected_costs ?? 0) * (float)($t->days ?? 0);
-        });
-
-        $sumActual = $tasks->sum(function ($t) {
-            return (float)($t->actual_costs ?? 0);
-        });
-
-        $sumPaid = $tasks->sum(function ($t) {
-            $total = (float)($t->expected_costs ?? 0) * (float)($t->days ?? 0);
-            $rate  = (float)($t->rate ?? 0);
-            return $total * (1 - $rate/100);
-        });
-        // tìm kiếm
-        $reports = Report::orderByDesc('id')->get();
-        $users = User::get();
-        $posts = Post::where('sort_by', 'Product')->get();
-        $channels = Channel::get();
-        $selectedReportId = $request->has('report_id')
-            ? ($request->filled('report_id') ? (int)$request->report_id : null)
-            : (int)Report::max('id');
-
-        return view('account.task.expense', compact(
-            'tasks',
-            'sumTotal',
-            'sumActual',
-            'sumPaid',
-
-            //tìm kiếm
-            'users',
-            'reports',
-            'posts',
-            'channels',
-            'selectedReportId',
-        ));
+            // đổi created_at thành field ngày bạn muốn lọc nếu khác
+            $q->whereBetween('created_at', [$start, $end]);
+        }
     }
+
+    $tasks = $q->get();
+
+    // tổng theo danh sách đã lọc
+    $sumTotal = $tasks->sum(fn($t) => (float)($t->expected_costs ?? 0) * (float)($t->days ?? 0));
+
+    $sumActual = $tasks->sum(fn($t) => (float)($t->actual_costs ?? 0));
+
+    $sumPaid = $tasks->sum(function ($t) {
+        $total = (float)($t->expected_costs ?? 0) * (float)($t->days ?? 0);
+        $rate  = (float)($t->rate ?? 0);
+        return $total * (1 - $rate / 100);
+    });
+
+    // data filter
+    $reports  = Report::orderByDesc('id')->get();
+    $users    = User::get();
+    $posts    = Post::where('sort_by', 'Product')->get();
+    $channels = Channel::get();
+
+    return view('account.task.expense', compact(
+        'tasks',
+        'sumTotal',
+        'sumActual',
+        'sumPaid',
+        'users',
+        'reports',
+        'posts',
+        'channels',
+        'selectedReportId',
+        'userId'
+    ));
+}
     public function actualcosts(Request $request)
     {
         $user = auth()->user();
