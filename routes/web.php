@@ -43,6 +43,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\DepositController;
+use App\Http\Controllers\ExpenseController;
 
 Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
      \UniSharp\LaravelFilemanager\Lfm::routes();
@@ -186,18 +187,18 @@ Route::middleware(['user'])->group(function () {
         Route::post('tasks/update-rate', [TaskController::class, 'updateRate'])->name('tasks.updateRate');
         Route::post('task/update-kpi', [TaskController::class, 'updateKpi'])->name('task.updateKpi');
         Route::post('task/update-expected-cost', [TaskController::class, 'updateExpectedCost'])->name('task.updateExpectedCost');
+        
         // Route::post('tasks/{id}/update-paid', [TaskController::class, 'updatePaid'])->name('tasks.updatePaid');
         Route::post('tasks/bulk-update', [TaskController::class, 'bulkUpdateTasks'])->name('account.tasks.bulkUpdate');
         Route::post('tasks/{task}/update-paid', [TaskController::class, 'updatePaid'])->name('tasks.updatePaid');
         Route::get('tasks/user', [TaskController::class, 'tasksuser'])->name('tasks.user');
         Route::put('tasks/{task}', [TaskController::class, 'updateall'])->name('tasks.update');
 
-        Route::get('actualcosts', [TaskController::class, 'actualcosts'])->name('tasks.actualcosts');
-        Route::post('tasks/{task}/actual-costs', [TaskController::class, 'ajaxUpdateActualCosts'])->name('tasks.ajaxUpdateActualCosts');
-        Route::post('tasks/store', [TaskController::class, 'store'])->name('account.task.store');
-
-
-
+        // quản lý chi phí
+        Route::get('actualcosts', [ExpenseController::class, 'actualcosts'])->name('tasks.actualcosts');
+        Route::post('tasks/{task}/actual-costs', [ExpenseController::class, 'ajaxUpdateActualCosts'])->name('tasks.ajaxUpdateActualCosts');
+        Route::post('tasks/store', [ExpenseController::class, 'store'])->name('account.task.store');
+        Route::get('tasks/expense', [ExpenseController::class, 'expense'])->name('tasks.expense');
 
         // report
         Route::resource('report',ReportController::class);

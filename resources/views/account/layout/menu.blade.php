@@ -50,6 +50,12 @@
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Quản lý Marketing</span>
             </a>
           </li>
+          <li class="nav-item ">
+            <a class="js-nav-tooltip-link nav-link " href="{{ route('tasks.expense') }}" title="Quản lý Marketing" data-placement="left">
+               <i class="tio-layers-outlined nav-icon"></i>
+              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Quản lý chi phí</span>
+            </a>
+          </li>
           @if(auth()->check() && in_array((int)auth()->user()->rank, [1], true))
           <li class="nav-item">
             <small class="nav-subtitle" title="Quản lý">Quản lý</small>
