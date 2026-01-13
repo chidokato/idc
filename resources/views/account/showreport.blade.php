@@ -117,11 +117,11 @@
                         </tr>
                     </thead>
                     @if($canBulkEdit)
-                    <div class="d-flex gap-2 align-items-center mb-2">
+                    <!-- <div class="d-flex gap-2 align-items-center mb-2">
                         <button type="button" class="btn btn-primary btn-sm" id="btn-open-bulk-modal" disabled>
                             Sửa hàng loạt (<span id="bulk-count">0</span>)
                         </button>
-                    </div>
+                    </div> -->
 
                     <!-- Modal -->
                   <div class="modal fade" id="bulkEditModal" tabindex="-1" aria-hidden="true">
