@@ -3,6 +3,19 @@
 @section('title') Công Ty Cổ Phần Bất Động Sản Indochine @endsection
 
 @section('css')
+<style>
+  .s2-user{ display:flex; gap:10px; }
+  .s2-user__name{
+    font-weight: 600;
+    line-height: 1.1;
+  }
+  .s2-user__pos{
+    font-size: 12px;
+    opacity: .7;
+    margin-top: 2px;
+    line-height: 1.1;
+  }
+</style>
 
 @endsection
 
@@ -44,14 +57,17 @@
                 </select>
               </div>
               <div class="col-sm-8 col-md-8">
-                <select name="user_ids[]" class="form-control select2" multiple>
+                <select name="user_ids[]" class="form-control select2-users" multiple>
                   @foreach($users as $val)
-                    <option value="{{ $val->id }}"
+                    <option
+                      data-text="{{ $val->department?->name }}"
+                      value="{{ $val->id }}"
                       {{ in_array((int)$val->id, $selectedUserIds ?? []) ? 'selected' : '' }}>
                       {{ $val->yourname }}
                     </option>
                   @endforeach
                 </select>
+
 
 
               </div>
@@ -119,5 +135,39 @@
 <script src="admin_asset/select2/js/select2.min.js"></script>
 <script type="text/javascript"> $(document).ready(function() { $('.select2').select2({ searchInputPlaceholder: '...' }); }); </script>
 <script src="account/js/expense.js"></script>
+
+<script>
+$(document).ready(function () {
+
+  function formatUserOption(state) {
+    if (!state.id) return state.text; // placeholder
+
+    // lấy data-text từ <option>
+    const dept = $(state.element).data('text') || '';
+
+    // render 2 dòng: tên + phòng ban (position)
+    const $wrap = $(`
+      <div class="s2-user">
+        <div class="s2-user__name">${state.text}</div>
+        ${dept ? `<div class="s2-user__pos">${dept}</div>` : ``}
+      </div>
+    `);
+
+    return $wrap;
+  }
+
+  $('.select2-users').select2({
+    placeholder: 'Chọn nhân viên...',
+    width: '100%',
+    closeOnSelect: false,
+    templateResult: formatUserOption,     // dropdown list
+    templateSelection: function (state) { // khi đã chọn -> chỉ hiện tên gọn
+      return state.text || state.id;
+    },
+    escapeMarkup: function (m) { return m; } // cho phép HTML
+  });
+
+});
+</script>
 
 @endsection
