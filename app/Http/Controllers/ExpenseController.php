@@ -23,8 +23,8 @@ use App\Services\TaskFinanceService;
 class ExpenseController extends Controller
 {
     public function expense(Request $request){
-        $tasks = Task::get();
-        // $tasks = Task::where('user', auth()->id())->get();
+        // $tasks = Task::get();
+        $tasks = Task::where('user', auth()->id())->get();
         
         // foreach ($tasks as $task) {
         //     $approved = (int) ($task->approved ?? 0);
