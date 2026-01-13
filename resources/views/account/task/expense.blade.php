@@ -31,17 +31,6 @@
           <form id="filterForm" method="GET" action="{{ url()->current() }}">
             <div class="row" id="filterBar">
               <div class="col-sm-2 col-md-2">
-                <select name="user_id" class="form-control select2">
-                  @foreach($users as $val)
-                    <option value="{{ $val->id }}"
-                      {{ (int)($userId ?? auth()->id()) === (int)$val->id ? 'selected' : '' }}>
-                      {{ $val->yourname }}
-                    </option>
-                  @endforeach
-                </select>
-
-              </div>
-              <div class="col-sm-3 col-md-3">
                 <select name="report_id" class="form-control">
                   <option value="">-- Thời gian --</option>
                   @foreach($reports as $val)
@@ -54,11 +43,21 @@
                   @endforeach
                 </select>
               </div>
+              <div class="col-sm-8 col-md-8">
+                <select name="user_ids[]" class="form-control select2" multiple>
+  @foreach($users as $val)
+    <option value="{{ $val->id }}"
+      {{ in_array((int)$val->id, $selectedUserIds ?? []) ? 'selected' : '' }}>
+      {{ $val->yourname }}
+    </option>
+  @endforeach
+</select>
 
+
+              </div>
               <div class="col-sm-2 col-md-2 d-flex gap-2">
                 <button type="submit" class="btn btn-primary" id="btnSearch">Lọc</button>
-<a href="{{ url()->current() }}" class="btn btn-warning" id="btnReset">Reset</a>
-
+                  <a href="{{ url()->current() }}" class="btn btn-warning" id="btnReset">Reset</a>
               </div>
 
             </div>
