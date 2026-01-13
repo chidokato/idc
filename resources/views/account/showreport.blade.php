@@ -29,6 +29,16 @@
       <div class="card-header"> 
           <div class="row align-items-center flex-grow-1">
             <div class="col-sm-2 col-md-2 mb-sm-0">
+                <select name="user_id" class="form-control select2">
+                    <option value="">-- Nhân viên --</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}" {{ request('user_id') == $user->id ? 'selected' : '' }}>
+                            {{ $user->yourname }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-sm-2 col-md-2 mb-sm-0">
                 <select name="department_id" class="form-control select2">
                     <option value="">-- Sàn / Nhóm --</option>
                     {!! $departmentOptions !!}

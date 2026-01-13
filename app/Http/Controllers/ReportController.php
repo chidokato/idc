@@ -129,6 +129,10 @@ class ReportController extends HomeController
 
         }
 
+        if ($request->user_id) {
+            $query->where('user', $request->user_id);
+        }
+
         if ($request->post_id) {
             $query->where('post_id', $request->post_id);
         }
@@ -146,6 +150,7 @@ class ReportController extends HomeController
         $task = $query->paginate(1000)->appends($request->query());
 
         // Select filter
+        $users = User::get();
         $departments = Department::all();
         $departmentOptions = TreeHelper::buildOptions($departments,0,'',$request->department_id);
 
@@ -158,6 +163,7 @@ class ReportController extends HomeController
         });
 
         return view('account.showreport', compact(
+            'users',
             'report',
             'task',
             'days',
