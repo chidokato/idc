@@ -32,6 +32,8 @@ class Task extends Model
         'hold_transaction_id',
         'capture_transaction_id',
         'status',
+        'extra_money',
+        'refund_money',
     ];
 
     protected $casts = [
@@ -41,6 +43,8 @@ class Task extends Model
         'days'           => 'integer',
         'price_expected' => 'decimal:2',
         'price_final'    => 'decimal:2',
+        'extra_money' => 'decimal:2',
+        'refund_money' => 'decimal:2',
     ];
 
     public function User()

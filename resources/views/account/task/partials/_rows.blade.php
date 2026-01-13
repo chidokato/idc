@@ -10,26 +10,6 @@
     $paid     = (int)($task->paid ?? 0);
     $actual   = (float)($task->actual_costs ?? 0);
     $hold     = $rowPaid;
-
-    $isCase2  = false;
-    $isDanger = false;
-
-    if ($paid !== 1) {
-      $diff = $actual;
-      $isDanger = true;
-    } else {
-      if ($actual <= $rowTotal) {
-        $diff = ($rowTotal - $actual) * (1 - $rate/100);
-      } else {
-        $diff = ($actual - $rowTotal);
-        $isCase2 = true;
-        $isDanger = true;
-      }
-    }
-
-    $diff = (int) round($diff);
-
-    $showDiff = ($paid === 1) || ($actual > 0);
   @endphp
 
   <tr id="row-{{ $task->id }}">
@@ -72,10 +52,18 @@
     </td>
 
     <td class="text-end">
-      <span class="js-actual-diff {{ $showDiff && $isDanger ? 'text-danger' : '' }}">
-        {{ $showDiff ? number_format($diff, 0, ',', '.') : '' }}
+      <span class="js-refund-money text-success">
+        {{ number_format((float)$task->refund_money, 0, ',', '.') }}
       </span>
     </td>
+
+    <td class="text-end">
+      <span class="js-extra-money text-danger">
+        {{ number_format((float)$task->extra_money, 0, ',', '.') }}
+      </span>
+    </td>
+
+
 
     <td>
       <div style="width: 200px;" class="note" data-toggle="tooltip" data-placement="top"

@@ -45,13 +45,13 @@
               </div>
               <div class="col-sm-8 col-md-8">
                 <select name="user_ids[]" class="form-control select2" multiple>
-  @foreach($users as $val)
-    <option value="{{ $val->id }}"
-      {{ in_array((int)$val->id, $selectedUserIds ?? []) ? 'selected' : '' }}>
-      {{ $val->yourname }}
-    </option>
-  @endforeach
-</select>
+                  @foreach($users as $val)
+                    <option value="{{ $val->id }}"
+                      {{ in_array((int)$val->id, $selectedUserIds ?? []) ? 'selected' : '' }}>
+                      {{ $val->yourname }}
+                    </option>
+                  @endforeach
+                </select>
 
 
               </div>

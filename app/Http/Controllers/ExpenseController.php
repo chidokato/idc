@@ -178,60 +178,65 @@ class ExpenseController extends Controller
     public function ajaxUpdateActualCosts(Request $request, Task $task)
     {
         // input có thể là "1.200.000" hoặc "1,200,000" => sanitize
-        $raw = (string) $request->input('actual_costs', '');
+        $raw   = (string) $request->input('actual_costs', '');
         $clean = preg_replace('/[^\d\-]/', '', $raw); // giữ số và dấu -
 
         $data = $request->merge(['actual_costs' => $clean])->validate([
             'actual_costs' => ['required', 'numeric', 'min:0'],
         ]);
 
-        $task->actual_costs = (int) $data['actual_costs'];
-        $task->save();
+        // cập nhật actual_costs
+        $task->actual_costs = (float) $data['actual_costs'];
 
-        $paid = (int)($task->paid ?? 0);
+        // ====== TÍNH & LƯU extra_money + refund_money ======
+        $approved = (int) ($task->approved ?? 0);
+        $paid     = (int) ($task->paid ?? 0);
 
-        $expected = (float)($task->expected_costs ?? 0);
-        $days     = (float)($task->days ?? 0);
-        $rate     = (float)($task->rate ?? 0);
+        $actual   = (float) ($task->actual_costs ?? 0);
+        $expected = (float) (($task->expected_costs ?? 0) * ($task->days ?? 0));
+        $rate     = (float) ($task->rate ?? 0);
 
-        $total  = $expected * $days;
-        $actual = (float)$task->actual_costs;
-        $hold   = $total * (1 - $rate / 100);
-
-        $isCase2 = false;
-        $isDanger = false;
-
-        if ($paid !== 1) {
-            // NEW RULE
-            $diff = $actual;
-            $isDanger = true;
+        if ($approved !== 1 || $paid !== 1) {
+            $task->extra_money  = $actual;
+            $task->refund_money = 0;
         } else {
-            if ($actual <= $total) {
-                $diff = ($total - $actual) * (1 - $rate / 100);
+            if ($actual > $expected) {
+                $task->extra_money  = $actual - $expected;
+                $task->refund_money = 0;
             } else {
-                $diff = ($actual - $total);
-                $isCase2 = true;
-                $isDanger = true;
+                $diff = $expected - $actual; // >= 0
+                $task->extra_money  = 0;
+                $task->refund_money = $diff * (1 - $rate / 100);
             }
         }
 
-        $diff = (int) round($diff);
+        $task->save();
 
         return response()->json([
             'ok' => true,
             'message' => 'Thành công',
             'task' => [
                 'id' => $task->id,
+                'approved' => $approved,
                 'paid' => $paid,
-                'actual_costs' => (int)$task->actual_costs,
-                'actual_costs_formatted' => number_format((int)$task->actual_costs, 0, ',', '.'),
-                'diff' => $diff,
-                'diff_formatted' => number_format($diff, 0, ',', '.'),
-                'is_case2' => $isCase2,
-                'is_danger' => $isDanger,
+
+                'actual_costs' => (float)$task->actual_costs,
+                'actual_costs_formatted' => number_format((float)$task->actual_costs, 0, ',', '.'),
+
+                'extra_money' => (float)$task->extra_money,
+                'extra_money_formatted' => number_format((float)$task->extra_money, 0, ',', '.'),
+
+                'refund_money' => (float)$task->refund_money,
+                'refund_money_formatted' => number_format((float)$task->refund_money, 0, ',', '.'),
+
+                'extra_money' => (float)$task->extra_money,
+                'extra_money_formatted' => number_format((float)$task->extra_money, 0, ',', '.'),
+                'refund_money' => (float)$task->refund_money,
+                'refund_money_formatted' => number_format((float)$task->refund_money, 0, ',', '.'),
             ],
         ]);
     }
+
 
     public function ajaxSearchTasks(Request $request)
     {

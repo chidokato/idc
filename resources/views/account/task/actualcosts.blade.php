@@ -263,10 +263,22 @@ function saveActualCosts($input) {
       $input[0].dataset.raw = String(actual);
       $input.data('last', actual);
 
-      // update diff từ server
-      const $diffEl = $input.closest('tr').find('.js-actual-diff');
-      $diffEl.text(res.task?.diff_formatted ?? '');
-      $diffEl.toggleClass('text-danger', !!res.task?.is_danger);
+      // update refund + extra
+      const $row = $input.closest('tr');
+      $row.find('.js-refund-money').text(res.task?.refund_money_formatted ?? '0');
+      $row.find('.js-extra-money').text(res.task?.extra_money_formatted ?? '0');
+
+      // (optional) đổi màu theo giá trị
+      const refundVal = parseFloat(res.task?.refund_money || 0);
+      const extraVal  = parseFloat(res.task?.extra_money || 0);
+
+      $row.find('.js-refund-money')
+        .toggleClass('text-success', refundVal > 0)
+        .toggleClass('text-muted', refundVal <= 0);
+
+      $row.find('.js-extra-money')
+        .toggleClass('text-danger', extraVal > 0)
+        .toggleClass('text-muted', extraVal <= 0);
 
       showToast?.('success', res.message || 'Đã lưu');
     },
