@@ -62,7 +62,7 @@ public function index(Request $request)
 
 
 
-    $deposits = $query->paginate(30)->withQueryString();
+    $deposits = $query->paginate(100)->withQueryString();
 
     // Build options
     $departments = Department::orderBy('name')->get(['id', 'name', 'parent']);
