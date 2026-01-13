@@ -109,8 +109,8 @@
         <td class="text-end" id="sumTotalText">{{ number_format($sumTotal, 0, ',', '.') }}</td>
         <td></td>
         <td class="text-end" id="sumPaidText">{{ number_format($sumActual, 0, ',', '.') }}</td>
-        <td class="text-end" id="sumrefundText">{{ number_format($sum_refund_money, 0, ',', '.') }}</td>
-        <td class="text-end" id="sumextraText">{{ number_format($sum_extra_money, 0, ',', '.') }}</td>
+        <td class="text-end text-success" id="sumrefundText">{{ number_format($sum_refund_money, 0, ',', '.') }}</td>
+        <td class="text-end text-danger" id="sumextraText">{{ number_format($sum_extra_money, 0, ',', '.') }}</td>
         <td colspan="2"></td>
       </tr>
       @endif
