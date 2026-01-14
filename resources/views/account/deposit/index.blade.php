@@ -97,6 +97,18 @@
                     </thead>
 
                     <tbody>
+                      <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>{{ number_format($sumAmount) }}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                      </tr>
                     @foreach($deposits as $d)
                     <tr>
                         <td>{{ $d->user->employee_code }}</td>

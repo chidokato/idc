@@ -61,8 +61,11 @@ public function index(Request $request)
 
 
 
-
     $deposits = $query->paginate(100)->withQueryString();
+
+    $sumAmount = $deposits->sum(function ($t) {
+        return (float)($t->amount ?? 0);
+    });
 
     // Build options
     $departments = Department::orderBy('name')->get(['id', 'name', 'parent']);
@@ -76,7 +79,7 @@ public function index(Request $request)
         'name'
     );
 
-    return view('account.deposit.index', compact('deposits', 'departmentOptions'));
+    return view('account.deposit.index', compact('deposits', 'departmentOptions', 'sumAmount'));
 }
 
 
