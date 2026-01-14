@@ -45,12 +45,19 @@
               </select>
               </div>
               <div class="col-lg-2">
-              <select name="status" class="form-control">
-              <option value="">-- Tất cả trạng thái --</option>
-              <option value="pending"  {{ request('status')=='pending'  ? 'selected':'' }}>Chờ duyệt</option>
-              <option value="approved" {{ request('status')=='approved' ? 'selected':'' }}>Đã duyệt</option>
-              <option value="rejected" {{ request('status')=='rejected' ? 'selected':'' }}>Từ chối</option>
-              </select>
+                <select name="status" class="form-control">
+                  <option value="">-- Tất cả trạng thái --</option>
+                  <option value="pending"  {{ request('status')=='pending'  ? 'selected':'' }}>Chờ duyệt</option>
+                  <option value="approved" {{ request('status')=='approved' ? 'selected':'' }}>Đã duyệt</option>
+                  <option value="rejected" {{ request('status')=='rejected' ? 'selected':'' }}>Từ chối</option>
+                </select>
+              </div>
+              <div class="col-lg-2">
+                <select name="bank" class="form-control">
+                  <option value="">-- Ngân hàng --</option>
+                  <option value="Phan Thị Hằng"  {{ request('bank')=='Phan Thị Hằng'  ? 'selected':'' }}>Phan Thị Hằng</option>
+                  <option value="Nguyễn Văn Tuấn"  {{ request('bank')=='Nguyễn Văn Tuấn'  ? 'selected':'' }}>Nguyễn Văn Tuấn</option>
+                </select>
               </div>
 
               <div class="col-lg-2 d-flex gap-2">

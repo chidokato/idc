@@ -34,6 +34,10 @@ public function index(Request $request)
         });
     }
 
+    if ($request->filled('bank')) {
+        $query->where('bank_name', $request->bank);
+    }
+
     if ($request->filled('department_id')) {
         $rootId = (int) $request->department_id;
         $ids = Department::getChildIds($rootId);
