@@ -44,7 +44,7 @@
               {!! $departmentOptions !!}
               </select>
               </div>
-              <div class="col-lg-2">
+              <div class="col-lg-1">
                 <select name="status" class="form-control">
                   <option value="">-- Tất cả trạng thái --</option>
                   <option value="pending"  {{ request('status')=='pending'  ? 'selected':'' }}>Chờ duyệt</option>
