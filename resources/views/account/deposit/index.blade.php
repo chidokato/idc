@@ -74,10 +74,6 @@
               <button type="button" class="btn btn-success btn-sm js-export-excel" data-table="#walletsTable" data-filename="wallets.xlsx"> Xuất Excel</button>
               </div>
               </form>
-
-              <div class="d-flex gap-2 mb-2">
-
-</div>
               <!-- Body -->
                 <!-- Bar Chart -->
                 <div class="table-responsive">
