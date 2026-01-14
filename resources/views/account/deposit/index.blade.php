@@ -40,13 +40,13 @@
               </div>
               <div class="col-lg-2">
               <select name="department_id" class="form-control">
-              <option value="">-- Sàn/phòng/nhóm --</option>
+              <option value="">Nhóm/phòng ??</option>
               {!! $departmentOptions !!}
               </select>
               </div>
               <div class="col-lg-1">
                 <select name="status" class="form-control">
-                  <option value="">-- Tất cả trạng thái --</option>
+                  <option value="">Duyệt ??</option>
                   <option value="pending"  {{ request('status')=='pending'  ? 'selected':'' }}>Chờ duyệt</option>
                   <option value="approved" {{ request('status')=='approved' ? 'selected':'' }}>Đã duyệt</option>
                   <option value="rejected" {{ request('status')=='rejected' ? 'selected':'' }}>Từ chối</option>
@@ -54,7 +54,7 @@
               </div>
               <div class="col-lg-2">
                 <select name="bank" class="form-control">
-                  <option value="">-- Ngân hàng --</option>
+                  <option value="">Ngân hàng ??</option>
                   <option value="Phan Thị Hằng"  {{ request('bank')=='Phan Thị Hằng'  ? 'selected':'' }}>Phan Thị Hằng</option>
                   <option value="Nguyễn Văn Tuấn"  {{ request('bank')=='Nguyễn Văn Tuấn'  ? 'selected':'' }}>Nguyễn Văn Tuấn</option>
                 </select>
