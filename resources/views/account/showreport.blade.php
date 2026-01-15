@@ -520,7 +520,7 @@ $(document).on('blur', '.expected-cost-input', function () {
     let rawValue = input.val().replace(/\./g, '');
 
     if (rawValue === '' || isNaN(rawValue)) {
-        alert('Số tiền không hợp lệ');
+        // alert('Số tiền không hợp lệ');
         return;
     }
 
