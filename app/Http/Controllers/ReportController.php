@@ -123,8 +123,8 @@ class ReportController extends HomeController
             ->orderBy('department_lv1')
             ->orderBy('department_lv2')
             ->orderBy('department_id')
-            ->orderBy('post_id')
-            ->orderBy('user');
+            ->orderBy('user')
+            ->orderBy('post_id');
         if ($request->department_id) {
             $departmentIds = Department::getChildIds($request->department_id);
             $query->whereHas('department', function($q) use ($departmentIds) {
