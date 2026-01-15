@@ -27,7 +27,7 @@
     </div>
 
     <div class="card">
-      <form method="GET">
+      <form method="GET" class="sticky">
       <div class="card-header"> 
           <div class="row align-items-center flex-grow-1">
             <div class="col-sm-2 col-md-2 mb-sm-0">
