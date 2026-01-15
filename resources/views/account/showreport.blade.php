@@ -76,7 +76,7 @@
                     </option>
                 </select>
             </div>
-            <div class="col-md-1">
+            <div class="col-md-2">
                 <button class="btn button-search form-control btn-success">Lọc</button>
                 <a href="{{ url()->current() }}" class="btn btn-warning" id="btnReset">Reset</a>
             </div>
