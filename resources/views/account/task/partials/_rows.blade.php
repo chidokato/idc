@@ -14,13 +14,20 @@
 
   <tr id="row-{{ $task->id }}">
     <td>
-      @if($task->approved == 1)
-        <span class="badge btn-success">Duyệt</span>
-      @else
-        <span class="badge btn-danger">Không</span>
-      @endif
+        <label class="row toggle-switch-sm switch mg-0" for="avail111{{ $task->id }}">
+          <span class="col-4 col-sm-3">
+            <input type="checkbox" class="toggle-switch-input active-toggle" 
+              id="avail111{{ $task->id }}"
+              data-id="{{ $task->id }}" 
+              data-url="{{ route('task.toggleApproved', ['task' => $task->id]) }}"
+              {{ $task->approved ? 'checked' : '' }}>
+            <span class="toggle-switch-label ml-auto">
+              <span class="toggle-switch-indicator"></span>
+            </span>
+          </span>
+        </label>
+        <!-- <input type="hidden" class="date" value="{{ $task->created_at }}"> -->
     </td>
-
     <td>{{ $task->handler?->employee_code }}</td>
     <td>{{ $task->handler?->yourname }}</td>
     <td>{{ $task->department?->name }}</td>
@@ -71,6 +78,17 @@
     </td>
 
     <td>
+      @if($task->paid !=1 )
+      <div class="edit-button">
+        <a class="btn btn-sm btn-white btn-edit-task"
+             href="javascript:;"
+             data-id="{{ $task->id }}"
+             data-toggle="modal"
+             data-target="#invoiceReceiptModal">
+            <i class="tio-edit"></i>
+          </a>
+      </div>
+      @endif
     </td>
   </tr>
 

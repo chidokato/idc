@@ -337,17 +337,27 @@ class TaskController extends Controller
 
     public function toggleApproved(Request $request, Task $task)
     {
-        // Lấy trạng thái từ request
-        $approved = $request->input('approved') == 'true' ? 1 : 0;
+        // Chặn nếu đã paid = 1
+        if ((int) $task->paid === 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'link này đã thanh toán nên không thể đổi trạng thái duyệt.',
+            ], 403);
+        }
+
+        $approved = $request->boolean('approved') ? 1 : 0;
 
         $task->approved = $approved;
         $task->save();
 
         return response()->json([
-            'success' => true,
-            'approved' => $task->approved,
+          'success' => true,
+          'approved' => $task->approved,
+          'message' => 'Đã cập nhật trạng thái duyệt',
         ]);
+
     }
+
 
     // Form tạo mới
     public function create()

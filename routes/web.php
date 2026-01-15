@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
@@ -25,8 +24,6 @@ use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\ChannelController;
 use App\Http\Controllers\Admin\DuanController;
 
-
-
 use App\Http\Controllers\Admin\ProvinceController;
 use App\Http\Controllers\Admin\DistrictController;
 use App\Http\Controllers\Admin\WardController;
@@ -43,7 +40,8 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\DepositController;
-use App\Http\Controllers\ExpenseController;
+
+use App\Http\Controllers\Account\ExpenseController;
 
 Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
      \UniSharp\LaravelFilemanager\Lfm::routes();

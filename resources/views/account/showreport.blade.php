@@ -3,7 +3,7 @@
 @section('title') Công Ty Cổ Phần Bất Động Sản Indochine @endsection
 
 @section('css')
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
 @endsection
 
 @section('body')  @endsection
@@ -215,15 +215,15 @@
                                 @endif
                             </td>
                             <td>
-        <a class="media align-items-center text-dark" >
-          <div class="avatar avatar-xs avatar-circle mr-2">
-            <img class="avatar-img" src="{{ $val->handler?->avatar ?? '' }}" alt="Image Description">
-          </div>
-          <div class="media-body ">
-            <span class="text-hover-primary">{{ $val->handler?->yourname ?? '---' }}</span>
-          </div>
-        </a>
-      </td>
+                                <a class="media align-items-center text-dark" >
+                                  <div class="avatar avatar-xs avatar-circle mr-2">
+                                    <img class="avatar-img" src="{{ $val->handler?->avatar ?? '' }}" alt="Image Description">
+                                  </div>
+                                  <div class="media-body ">
+                                    <span class="text-hover-primary">{{ $val->handler?->yourname ?? '---' }}</span>
+                                  </div>
+                                </a>
+                              </td>
                             <td>{{ $val->Department_lv2?->name }}</td>
                             <td>{{ $val->department?->name }}</td>
                             <td class="duan" data-duan="{{ $val->Post?->id }}">{{ $val->Post?->name }} </td>
@@ -262,7 +262,11 @@
                             <td>
                                 <label class="row toggle-switch-sm switch mg-0" for="avail111{{ $val->id }}">
                                   <span class="col-4 col-sm-3">
-                                    <input @if($val->paid ==1) disabled @endif type="checkbox" class="toggle-switch-input active-toggle" id="avail111{{ $val->id }}" data-id="{{ $val->id }}" {{ $val->approved ? 'checked' : '' }}>
+                                    <input type="checkbox" class="toggle-switch-input active-toggle" 
+                                      id="avail111{{ $val->id }}"
+                                      data-id="{{ $val->id }}" 
+                                      data-url="{{ route('task.toggleApproved', ['task' => $val->id]) }}"
+                                      {{ $val->approved ? 'checked' : '' }}>
                                     <span class="toggle-switch-label ml-auto">
                                       <span class="toggle-switch-indicator"></span>
                                     </span>
@@ -271,7 +275,10 @@
                                 <input type="hidden" class="date" value="{{ $val->created_at }}">
                             </td>
                             <td class="cell-actions">
-                                @if($val->approved) <span class="badge btn-success">Đã duyệt</span> @else <span class="badge btn-warning">Chờ duyệt</span> @endif 
+                                <span class="badge js-approved-badge {{ $val->approved ? 'btn-success' : 'btn-warning' }}">
+                                  {{ $val->approved ? 'Đã duyệt' : 'Chờ duyệt' }}
+                                </span>
+
                                 @if($val->paid !=1 )
                                 <div class="edit-button">
                                   <a class="btn btn-sm btn-white btn-edit-task"
@@ -373,40 +380,8 @@
         $('.select2').select2();
     });
 </script>
-
+<script src="account/js/account.js"></script>
 <script>
-    $(document).ready(function() {
-    $('.active-toggle').on('change', function() {
-        let checkbox = $(this);
-        let taskId = checkbox.data('id');
-        let approved = checkbox.is(':checked'); // true/false
-
-        $.ajax({
-            url: 'account/task/toggle-approved/' + taskId,
-            type: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                approved: approved
-            },
-            success: function(res) {
-                if(res.success) {
-                    let badge = checkbox.closest('tr').find('td:last span');
-                    if(res.approved) {
-                        badge.removeClass('btn-warning').addClass('btn-success').text('Đã duyệt');
-                    } else {
-                        badge.removeClass('btn-success').addClass('btn-warning').text('Chờ duyệt');
-                    }
-                }
-            },
-            error: function(err) {
-                alert('Cập nhật thất bại!');
-                // revert checkbox
-                checkbox.prop('checked', !approved);
-            }
-        });
-    });
-});
-
 $(document).on('click', '.del-db', function (e) {
     e.preventDefault();
 
