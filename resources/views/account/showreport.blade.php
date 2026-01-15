@@ -78,6 +78,7 @@
             </div>
             <div class="col-md-1">
                 <button class="btn button-search form-control btn-success">Lọc</button>
+                <a href="{{ url()->current() }}" class="btn btn-warning" id="btnReset">Reset</a>
             </div>
           </div>
         <button type="button" class="btn btn-success btn-sm js-export-excel" data-table="#walletsTable" data-filename="wallets.xlsx"> Xuất Excel</button>
