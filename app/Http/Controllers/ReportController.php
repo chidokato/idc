@@ -119,8 +119,12 @@ class ReportController extends HomeController
         $days = Carbon::parse($report->time_start)->diffInDays(Carbon::parse($report->time_end)) + 1;
 
         // Base query
-        $query = Task::where('report_id', $id);
-       
+        $query = Task::where('report_id', $id)
+            ->orderBy('department_lv1')
+            ->orderBy('department_lv2')
+            ->orderBy('department_id')
+            ->orderBy('post_id')
+            ->orderBy('user');
         if ($request->department_id) {
             $departmentIds = Department::getChildIds($request->department_id);
             $query->whereHas('department', function($q) use ($departmentIds) {
@@ -145,7 +149,6 @@ class ReportController extends HomeController
         if ($request->filled('approved')) {
             $query->where('approved', $request->approved);
         }
-
 
         $task = $query->paginate(1000)->appends($request->query());
 
