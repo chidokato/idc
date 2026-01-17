@@ -59,6 +59,7 @@
     height: 1.3rem;
 }
 
+
 .sticky{ position:sticky; top:50px; background:#fff; z-index:9 }
 
 /*.table tr td .form-control, .table tr td .btn{ height: calc(.6em + 1.21875rem) !important; padding: 0 .5rem; }*/

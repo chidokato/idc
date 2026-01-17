@@ -99,6 +99,11 @@
 
 
 @section('js')
+
+<script src="admin_asset/select2/js/select2.min.js"></script>
+<script src="admin_asset/select2/js/select2-searchInputPlaceholder.js"></script>
+<!-- <script src="account/js/account.js"></script> -->
+
 <script>
   (function () {
     const input = document.getElementById('quickSearch');
@@ -299,14 +304,6 @@ document.addEventListener('change', function (e) {
     });
   });
 });
-</script>
-
-
-<!-- select2 multiple JavaScript -->
-<script src="admin_asset/select2/js/select2.min.js"></script>
-<script src="admin_asset/select2/js/select2-searchInputPlaceholder.js"></script>
-<script type="text/javascript">
-    $(document).ready(function() { $('.select2').select2({ searchInputPlaceholder: '...' }); });
 </script>
 
 @endsection

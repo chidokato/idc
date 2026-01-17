@@ -52,7 +52,7 @@
               </div>
               <div class="col-sm-3 col-md-3">
                 <select name="report_id" class="form-control">
-                  <option value="">-- Báo cáo --</option>
+                  <option value="">-- Thời gian --</option>
                   @foreach($reports as $val)
                     <option value="{{ $val->id }}" {{ (string)$selectedReportId === (string)$val->id ? 'selected' : '' }}>
                       {{ \Carbon\Carbon::parse($val->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($val->time_end)->format('d/m/Y') }}
@@ -84,25 +84,28 @@
     <thead class="thead-light">
       <tr>
         <th>Duyệt</th>
-        <th>Mã NV</th>
-        <th>Họ & Tên</th>
-        <th>Phòng / nhóm</th>
-        <th>Dự án</th>
-        <th>Kênh</th>
-        <th class="text-end">Tổng tiền</th>
-        <th class="text-end">Tiền nộp</th>
-        <th class="text-end">Tất toán</th>
+        <th class="text-center">Họ & Tên</th>
+        <th class="text-center">Phòng / nhóm</th>
+        <th class="text-center">Dự án</th>
+        <th class="text-center">Kênh</th>
+        <th class="text-right">Tổng tiền</th>
+        <th class="text-right">Tiền nộp</th>
+        <th class="text-center">Đóng tiền</th>
         <th>Thực tế</th>
-        <th class="text-end" title="Nộp thêm/Trả lại">Nộp/Trả</th>
+        <th>Trả lại</th>
+        <th>Đóng thêm</th>
         <th>Ghi chú</th>
         <th colspan="2"></th>
       </tr>
 
       <tr id="sumRow" class="font-weight-bold bg-light" style="{{ $tasks->count() ? '' : 'display:none' }}">
-        <td colspan="6" class="text-end"></td>
-        <td class="text-end" id="sumTotalText">{{ number_format($sumTotal, 0, ',', '.') }}</td>
-        <td class="text-end" id="sumPaidText">{{ number_format($sumPaid, 0, ',', '.') }}</td>
-        <td class="text-end" id="">{{ number_format($sumActual, 0, ',', '.') }}</td>
+        <td colspan="5"></td>
+        <td class="text-right" id="sumTotalText">{{ number_format($sumTotal, 0, ',', '.') }}</td>
+        <td class="text-right" id="sumPaidText">{{ number_format($sumPaid, 0, ',', '.') }}</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <!-- <td class="text-right" id="">{{ number_format($sumActual, 0, ',', '.') }}</td> -->
         <td colspan="4"></td>
       </tr>
     </thead>
@@ -218,9 +221,5 @@
 <script src="admin_asset/select2/js/select2.min.js"></script>
 <script src="admin_asset/select2/js/select2-searchInputPlaceholder.js"></script>
 <script src="account/js/account.js"></script>
-
-<script>
-
-</script>
 
 @endsection

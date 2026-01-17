@@ -207,7 +207,7 @@ $(function () {
   });
 
   // delegation để bắt event cả khi table render lại
-  $(document).on('change', '.active-toggle', function () {
+  $(document).on('change', '.active-toggle-approved', function () {
     const checkbox = $(this);
     const approved = checkbox.is(':checked') ? 1 : 0;
     const url = checkbox.data('url');
@@ -309,8 +309,94 @@ $(document).on('change', '.js-toggle-settled', function () {
     });
 });
 
+/*=========== DUYỆT đóng tiền marketing ================*/
+document.addEventListener('change', function (e) {
+  const el = e.target;
+  if (!el.classList.contains('active-toggle-updatePaid')) return;
+
+  const url = el.dataset.url;
+  const paid = el.checked ? 1 : 0;              // 1 = HOLD, 0 = RELEASE
+  const oldState = !el.checked;                 // rollback UI nếu hủy/lỗi
+
+  const rank = parseInt(el.dataset.rank || '0', 10);
+  const isMine = parseInt(el.dataset.mine || '0', 10) === 1;
+  const sameDept = parseInt(el.dataset.samedept || '0', 10) === 1;
+
+  // ===== RULE UI (theo yêu cầu bạn đã chốt) =====
+  // rank2: chỉ HOLD nếu cùng department_id, không RELEASE
+  if (rank === 2) {
+    if (paid === 0) { el.checked = true; showCenterError('Bạn không được hủy giữ tiền (RELEASE).'); return; }
+    if (!sameDept)  { el.checked = false; showCenterError('Bạn chỉ được giữ tiền cho tác vụ cùng phòng ban (department).'); return; }
+  }
+  // rank3: chỉ HOLD task của mình, không RELEASE
+  if (rank === 3) {
+    if (paid === 0) { el.checked = true; showCenterError('Bạn không được hủy giữ tiền (RELEASE).'); return; }
+    if (!isMine)    { el.checked = false; showCenterError('Bạn chỉ được giữ tiền (HOLD) tác vụ của mình.'); return; }
+  }
+
+  // ===== Confirm trước khi gọi API =====
+  const confirmTitle = paid ? 'Xác nhận đóng tiền (HOLD)?' : 'Xác nhận nhả giữ (RELEASE)?';
+  const confirmText  = paid
+    ? 'Bạn có chắc muốn đóng tiền cho tác vụ này không?'
+    : 'Bạn có chắc muốn nhả giữ tiền cho tác vụ này không?';
+
+  Swal.fire({
+    icon: 'question',
+    title: confirmTitle,
+    text: confirmText,
+    showCancelButton: true,
+    confirmButtonText: paid ? 'Đóng tiền' : 'Nhả giữ',
+    cancelButtonText: 'Không',
+    reverseButtons: true
+  }).then((result) => {
+    if (!result.isConfirmed) {
+      el.checked = oldState; // người dùng bấm Hủy -> rollback UI
+      return;
+    }
+
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ paid })
+    })
+    .then(async (res) => {
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.status === false) throw new Error(data.message || 'Có lỗi xảy ra');
+
+      showToast('success', data.message || 'Thành công');
+
+      // update UI trong cùng dòng
+      const tr = el.closest('tr');
+      const badgeEl = tr?.querySelector('.hold-badge');
+      if (badgeEl) {
+        badgeEl.classList.toggle('text-success', paid === 1);
+        badgeEl.classList.toggle('text-danger',  paid === 0);
+      }
 
 
-/*=========== DUYỆT MARKETING ================*/
+      // update số dư menu (nếu backend trả về data.wallet.balance)
+      if (data.wallet && typeof data.wallet.balance !== 'undefined') {
+        const menuBalanceEl = document.getElementById('menuBalance');
+        if (menuBalanceEl) {
+          menuBalanceEl.textContent = Number(data.wallet.balance || 0).toLocaleString('vi-VN');
+        }
+        const menuHeldEl = document.getElementById('menuHeld');
+    if (menuHeldEl) menuHeldEl.textContent = Number(data.wallet.held_balance||0).toLocaleString('vi-VN');
+      }
+
+    })
+    .catch(err => {
+      el.checked = oldState; // rollback khi lỗi
+      showCenterError(err.message || 'Có lỗi xảy ra, vui lòng thử lại!');
+    });
+  });
+});
+
+
+
 /*=========== DUYỆT MARKETING ================*/
 /*=========== DUYỆT MARKETING ================*/
