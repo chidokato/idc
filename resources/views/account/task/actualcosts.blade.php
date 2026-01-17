@@ -91,6 +91,7 @@
         <th>Kênh</th>
         <th class="text-end">Tổng tiền</th>
         <th class="text-end">Tiền nộp</th>
+        <th class="text-end">Tất toán</th>
         <th>Thực tế</th>
         <th class="text-end" title="Nộp thêm/Trả lại">Nộp/Trả</th>
         <th>Ghi chú</th>

@@ -337,4 +337,66 @@ class ExpenseController extends Controller
     }
 
 
+
+    public function toggleSettled(Request $request, Task $task, WalletService $walletService)
+    {
+        $data = $request->validate([
+            'settled' => ['required', 'in:0,1'],
+        ]);
+        $toSettled = (int) $data['settled'];
+
+        if ($toSettled === (int) $task->settled) {
+            return response()->json(['ok' => true, 'message' => 'No change.']);
+        }
+
+        try {
+            if ($toSettled === 1) {
+                $result = $walletService->settleTask($task, auth()->id());
+
+                // refresh task để chắc chắn settled_at/by đã update
+                $task->refresh();
+
+                return response()->json([
+                    'ok' => true,
+                    'message' => 'Đã tất toán',
+                    'task' => [
+                        'id' => $task->id,
+                        'settled' => 1,
+                        'refund_money' => (float) $result['refund'],
+                        'extra_money'  => (float) $result['extra'],
+                    ],
+                ]);
+            }
+
+            // =========================
+            // settled = 0: ĐẢO NGƯỢC (đảo ví + ghi lịch sử)
+            // =========================
+            $walletService->unsettleTask($task, auth()->id());
+
+            $task->refresh();
+
+            return response()->json([
+                'ok' => true,
+                'message' => 'Đã hủy tất toán',
+                'task' => [
+                    'id' => $task->id,
+                    'settled' => 0,
+                    'refund_money' => (float) ($task->refund_money ?? 0),
+                    'extra_money'  => (float) ($task->extra_money ?? 0),
+                ],
+            ]);
+
+        } catch (ValidationException $e) {
+            $msg = collect($e->errors())->flatten()->first() ?? 'Thất bại';
+            return response()->json(['ok' => false, 'message' => $msg], 409);
+        } catch (\Throwable $e) {
+            return response()->json(['ok' => false, 'message' => 'Có lỗi xảy ra.'], 500);
+        }
+    }
+
+
+
+
+
+
 }

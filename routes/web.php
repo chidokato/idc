@@ -197,6 +197,8 @@ Route::middleware(['user'])->group(function () {
         Route::post('tasks/{task}/actual-costs', [ExpenseController::class, 'ajaxUpdateActualCosts'])->name('tasks.ajaxUpdateActualCosts');
         Route::post('tasks/store', [ExpenseController::class, 'store'])->name('account.task.store');
         Route::get('tasks/expense', [ExpenseController::class, 'expense'])->name('tasks.expense');
+        Route::post('tasks/{task}/toggle-settled', [ExpenseController::class, 'toggleSettled'])->name('tasks.toggleSettled');
+
 
         // report
         Route::resource('report',ReportController::class);

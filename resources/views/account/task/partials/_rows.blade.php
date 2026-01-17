@@ -44,6 +44,8 @@
       </div>
     </td>
 
+    <td>{{ $task->price_expected }}</td>
+
     <td>
       <input
         style="width: 120px;"
@@ -70,6 +72,18 @@
       </span>
     </td>
 
+    <!-- <td>
+      <label class="toggle-switch-sm switch mg-0">
+        <input type="checkbox"
+          class="toggle-switch-input js-toggle-settled"
+          data-url="{{ route('tasks.toggleSettled', $task) }}"
+          {{ (int)$task->settled === 1 ? 'checked' : '' }}>
+        <span class="toggle-switch-label">
+          <span class="toggle-switch-indicator"></span>
+        </span>
+      </label>
+    </td> -->
+
     <td>
       <div style="width: 200px;" class="note" data-toggle="tooltip" data-placement="top"
            data-original-title="{{ $task->content ?? '' }}">
@@ -78,17 +92,7 @@
     </td>
 
     <td>
-      @if($task->paid !=1 )
-      <div class="edit-button">
-        <a class="btn btn-sm btn-white btn-edit-task"
-             href="javascript:;"
-             data-id="{{ $task->id }}"
-             data-toggle="modal"
-             data-target="#invoiceReceiptModal">
-            <i class="tio-edit"></i>
-          </a>
-      </div>
-      @endif
+      
     </td>
   </tr>
 

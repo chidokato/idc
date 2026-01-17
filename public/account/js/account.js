@@ -265,9 +265,52 @@ $(function () {
 
 
 
+/*=========== nút tất toán chi phí task ================*/
+$(document).on('change', '.js-toggle-settled', function () {
+  const cb = $(this);
+  const url = cb.data('url');
+  const settled = cb.is(':checked') ? 1 : 0;
+
+  cb.prop('disabled', true);
+
+  $.post(url, { settled })
+    .done(function (res) {
+      if (res && (res.ok === true || res.success === true)) {
+        // optional: update UI theo response
+        // ví dụ: res.task.refund_money_formatted / extra_money_formatted
+        const $row = cb.closest('tr');
+
+        if (res.task) {
+          if (res.task.refund_money_formatted !== undefined) {
+            $row.find('.js-refund-money').text(res.task.refund_money_formatted);
+          }
+          if (res.task.extra_money_formatted !== undefined) {
+            $row.find('.js-extra-money').text(res.task.extra_money_formatted);
+          }
+        }
+
+        if (typeof showToast === 'function') {
+          showToast('success', res.message || (settled ? 'Đã tất toán' : 'Đã hủy tất toán'));
+        }
+      } else {
+        cb.prop('checked', !cb.is(':checked')); // revert
+        if (typeof showToast === 'function') {
+          showToast('error', (res && res.message) || 'Thất bại');
+        }
+      }
+    })
+    .fail(function (xhr) {
+      cb.prop('checked', !cb.is(':checked')); // revert
+      const msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Thất bại';
+      if (typeof showToast === 'function') showToast('error', msg);
+    })
+    .always(function () {
+      cb.prop('disabled', false);
+    });
+});
 
 
-/*=========== DUYỆT MARKETING ================*/
+
 /*=========== DUYỆT MARKETING ================*/
 /*=========== DUYỆT MARKETING ================*/
 /*=========== DUYỆT MARKETING ================*/
