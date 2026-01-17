@@ -69,12 +69,12 @@
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Duyệt Marketing</span>
             </a>
           </li>
-          <li class="nav-item ">
+          <!-- <li class="nav-item ">
             <a class="js-nav-tooltip-link nav-link " href="account/actualcosts" title="Chi phí thực tế" data-placement="left">
               <i class="tio-dashboard nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Chi phí thực tế</span>
             </a>
-          </li>
+          </li> -->
           <li class="nav-item ">
             <a class="js-nav-tooltip-link nav-link " href="account/deposits" title="Duyệt đóng tiền" data-placement="left">
               <i class="tio-dashboard nav-icon"></i>
