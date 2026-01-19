@@ -1,6 +1,6 @@
 @forelse($tasks as $task)
   @php
-    $rank = (int)(auth()->user()->rank ?? 0);
+    
     $expected = (float)($task->expected_costs ?? 0);
     $days     = (float)($task->days ?? 0);
     $rate     = (float)($task->rate ?? 0);

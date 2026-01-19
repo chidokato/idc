@@ -45,6 +45,10 @@ class Task extends Model
         'price_final'    => 'decimal:2',
         'extra_money' => 'decimal:2',
         'refund_money' => 'decimal:2',
+        'settled_at' => 'datetime',
+        // nếu có:
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function User()

@@ -9,6 +9,7 @@
 @section('body') @endsection
 
 @section('content')
+<?php $rank = (int)(auth()->user()->rank ?? 0); ?>
 <div class="content container-fluid">
   <div class="page-header">
     <div class="row align-items-end">
@@ -22,11 +23,13 @@
         <h1 class="page-header-title">Danh sách link đăng ký MKT</h1>
       </div>
       <div class="col-sm-auto">
+        @if($rank === 1)
           <div id="addtask" data-toggle="popover-dark">
             <a class="btn btn-primary" href="javascript:;" data-toggle="modal" data-target="#newProjectModal">
               <i class="tio-add mr-1"></i> New project
             </a>
           </div>
+          @endif
         </div>
     </div>
     <!-- End Row -->

@@ -390,8 +390,17 @@ class ExpenseController extends Controller
             $msg = collect($e->errors())->flatten()->first() ?? 'Thất bại';
             return response()->json(['ok' => false, 'message' => $msg], 409);
         } catch (\Throwable $e) {
+            // local thì trả message thật để debug (toast sẽ hiện góc trái dưới)
+            if (config('app.debug')) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => $e->getMessage(),
+                ], 500);
+            }
+
             return response()->json(['ok' => false, 'message' => 'Có lỗi xảy ra.'], 500);
         }
+
     }
 
 

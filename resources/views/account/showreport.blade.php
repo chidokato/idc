@@ -269,7 +269,7 @@
                             <td>
                                 <label class="row toggle-switch-sm switch mg-0" for="avail111{{ $val->id }}">
                                   <span class="col-4 col-sm-3">
-                                    <input type="checkbox" class="toggle-switch-input active-toggle" 
+                                    <input type="checkbox" class="toggle-switch-input active-toggle-approved" 
                                       id="avail111{{ $val->id }}"
                                       data-id="{{ $val->id }}" 
                                       data-url="{{ route('task.toggleApproved', ['task' => $val->id]) }}"

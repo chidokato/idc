@@ -408,7 +408,7 @@ class WalletService
             $extra  = bcadd((string)($task->extra_money ?? '0.00'), '0', 2);
 
             // idempotency theo cycle (bạn đang có hold_cycle)
-            $cycle = (int)($task->hold_cycle ?? 1);
+            $cycle = (int)($task->settle_cycle ?? 1);
             $idkRelease = "task:{$task->id}:settle_release:{$cycle}";
             $idkRefund  = "task:{$task->id}:settle_refund:{$cycle}";
             $idkExtra   = "task:{$task->id}:settle_extra:{$cycle}";
@@ -559,15 +559,60 @@ class WalletService
             $refund = bcadd((string)($task->refund_money ?? '0.00'), '0', 2);
             $extra  = bcadd((string)($task->extra_money ?? '0.00'), '0', 2);
 
-            // dùng settled_at làm "cycle" để idempotent mỗi lần bật/tắt
-            $stamp = $task->settled_at ? $task->settled_at->timestamp : time();
+            // ✅ Chỉ khôi phục hold nếu task đã hold trước đó
+            $hadHold = ((int)($task->paid ?? 0) === 1)
+                && !empty($task->hold_transaction_id)
+                && bccomp($hold, '0', 2) > 0;
 
-            $idkReturnExtra   = "task:{$task->id}:unsettle:return_extra:{$stamp}";
-            $idkReclaimRefund = "task:{$task->id}:unsettle:reclaim_refund:{$stamp}";
-            $idkRestoreFund   = "task:{$task->id}:unsettle:restore_hold_fund:{$stamp}";
-            $idkHoldAgain     = "task:{$task->id}:unsettle:hold_again:{$stamp}";
+            // stamp để idempotent cho lần toggle off này
+            $cycle = (int)($task->settle_cycle ?? 1);
 
-            // 1) Hoàn tác EXTRA (nếu trước đó đã thu thêm) => cộng lại balance
+            $idkReturnExtra   = "task:{$task->id}:unsettle:return_extra:{$cycle}";
+            $idkReclaimRefund = "task:{$task->id}:unsettle:reclaim_refund:{$cycle}";
+            $idkRestoreFund   = "task:{$task->id}:unsettle:restore_hold_fund:{$cycle}";
+            $idkHoldAgain     = "task:{$task->id}:unsettle:hold_again:{$cycle}";
+
+            // ==========================================================
+            // 0) (Quan trọng) Nếu task đã hold trước đó -> RESTORE quỹ hold
+            //    (đưa tiền hold "đã tiêu" về lại ví), để tránh lỗi thiếu balance
+            // ==========================================================
+            if ($hadHold) {
+                $dupFund = WalletTransaction::where('wallet_id', $wallet->id)
+                    ->where('idempotency_key', $idkRestoreFund)
+                    ->first();
+
+                if (!$dupFund) {
+                    $balanceBefore = (string)$wallet->balance;
+                    $heldBefore    = (string)($wallet->held_balance ?? '0.00');
+
+                    // +hold vào balance (khôi phục quỹ)
+                    $wallet->balance = $this->bc_add($wallet->balance, $hold, 2);
+                    $wallet->save();
+
+                    WalletTransaction::create([
+                        'wallet_id'       => $wallet->id,
+                        'type'            => 'rollback',
+                        'amount'          => $hold,
+                        'description'     => "Khôi phục quỹ hold task #{$task->id} (admin_toggle_off)",
+                        'ref_type'        => 'task',
+                        'ref_id'          => $task->id,
+                        'idempotency_key' => $idkRestoreFund,
+                        'meta'            => [
+                            'reason' => 'unsettle_restore_hold_fund',
+                            'admin_id' => $adminId,
+                            'wallet_user_id' => $wallet->user_id,
+                        ],
+                        'balance_before'  => $balanceBefore,
+                        'balance_after'   => (string)$wallet->balance,
+                        'held_before'     => $heldBefore,
+                        'held_after'      => (string)($wallet->held_balance ?? '0.00'),
+                    ]);
+                }
+            }
+
+            // ==========================================================
+            // 1) Hoàn tác EXTRA: nếu trước đó đã trừ ví chính -> cộng lại
+            // ==========================================================
             if (bccomp($extra, '0', 2) > 0 && bccomp($refund, '0', 2) <= 0) {
 
                 $dup = WalletTransaction::where('wallet_id', $wallet->id)
@@ -585,7 +630,7 @@ class WalletService
                         'wallet_id'       => $wallet->id,
                         'type'            => 'rollback',
                         'amount'          => $extra,
-                        'description'     => "Trả lại tiền đã thu thêm task #{$task->id} (admin_toggle_off)",
+                        'description'     => "Cộng lại tiền đã thu thêm task #{$task->id} (admin_toggle_off)",
                         'ref_type'        => 'task',
                         'ref_id'          => $task->id,
                         'idempotency_key' => $idkReturnExtra,
@@ -602,7 +647,10 @@ class WalletService
                 }
             }
 
-            // 2) Hoàn tác REFUND (nếu trước đó đã hoàn) => trừ lại balance
+            // ==========================================================
+            // 2) Hoàn tác REFUND: nếu trước đó đã cộng ví chính -> trừ lại
+            //    (sau restore fund thì thường sẽ đủ balance)
+            // ==========================================================
             if (bccomp($refund, '0', 2) > 0 && bccomp($extra, '0', 2) <= 0) {
 
                 $dup = WalletTransaction::where('wallet_id', $wallet->id)
@@ -626,7 +674,7 @@ class WalletService
                         'wallet_id'       => $wallet->id,
                         'type'            => 'withdraw',
                         'amount'          => $refund,
-                        'description'     => "Thu hồi tiền đã hoàn task #{$task->id} (admin_toggle_off)",
+                        'description'     => "Trừ lại tiền đã hoàn task #{$task->id} (admin_toggle_off)",
                         'ref_type'        => 'task',
                         'ref_id'          => $task->id,
                         'idempotency_key' => $idkReclaimRefund,
@@ -643,49 +691,21 @@ class WalletService
                 }
             }
 
-            // 3) Khôi phục HOLD cho task (để quay lại trạng thái "đang hold")
-            //    làm 2 bước: rollback +hold (restore fund) rồi hold -hold
-            if (bccomp($hold, '0', 2) > 0) {
-
-                // 3a) rollback: +hold vào balance (hoàn tác chi)
-                $dupFund = WalletTransaction::where('wallet_id', $wallet->id)
-                    ->where('idempotency_key', $idkRestoreFund)
-                    ->first();
-
-                if (!$dupFund) {
-                    $balanceBefore = (string)$wallet->balance;
-                    $heldBefore    = (string)($wallet->held_balance ?? '0.00');
-
-                    $wallet->balance = $this->bc_add($wallet->balance, $hold, 2);
-                    $wallet->save();
-
-                    WalletTransaction::create([
-                        'wallet_id'       => $wallet->id,
-                        'type'            => 'rollback',
-                        'amount'          => $hold,
-                        'description'     => "Khôi phục quỹ hold task #{$task->id} (admin_toggle_off)",
-                        'ref_type'        => 'task',
-                        'ref_id'          => $task->id,
-                        'idempotency_key' => $idkRestoreFund,
-                        'meta'            => [
-                            'reason' => 'unsettle_restore_hold_fund',
-                            'admin_id' => $adminId,
-                            'wallet_user_id' => $wallet->user_id,
-                        ],
-                        'balance_before'  => $balanceBefore,
-                        'balance_after'   => (string)$wallet->balance,
-                        'held_before'     => $heldBefore,
-                        'held_after'      => (string)($wallet->held_balance ?? '0.00'),
-                    ]);
-                }
-
-                // 3b) hold lại: balance -> held
+            // ==========================================================
+            // 3) Nếu task đã hold trước đó -> HOLD LẠI (balance -> held)
+            // ==========================================================
+            if ($hadHold) {
                 $dupHold = WalletTransaction::where('wallet_id', $wallet->id)
                     ->where('idempotency_key', $idkHoldAgain)
                     ->first();
 
                 if (!$dupHold) {
-                    // sau bước 3a chắc chắn balance đủ hold
+                    if (bccomp((string)$wallet->balance, $hold, 2) < 0) {
+                        throw ValidationException::withMessages([
+                            'balance' => 'Không đủ số dư để hold lại khi hủy tất toán.'
+                        ]);
+                    }
+
                     $balanceBefore = (string)$wallet->balance;
                     $heldBefore    = (string)($wallet->held_balance ?? '0.00');
 
@@ -714,15 +734,16 @@ class WalletService
                 }
             }
 
-            // Update task: chỉ hủy cờ tất toán (không đụng paid/hold_transaction/status)
-            $task->settled    = 0;
-            $task->settled_at = null;
-            $task->settled_by = null;
+            // Update task: hủy cờ tất toán
+            $task->settled      = 0;
+            $task->settled_at   = null;
+            $task->settled_by   = null;
+            $task->settle_cycle = $cycle + 1; // <<< quan trọng: cho phép tất toán lại lần sau
             $task->save();
-
-            return ['refund' => $refund, 'extra' => $extra, 'hold' => $hold];
+            return ['refund' => $refund, 'extra' => $extra, 'hold' => $hold, 'had_hold' => $hadHold ? 1 : 0];
         });
     }
+
 
 
 }
