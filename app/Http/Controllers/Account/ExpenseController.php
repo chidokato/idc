@@ -122,6 +122,27 @@ class ExpenseController extends Controller
         // if ($request->filled('report_id')) {
         //     $q->where('report_id', (int)$request->report_id);
         // }
+        // duyệt ?
+        if ($request->filled('approved')) {
+            $q->where('approved', $request->approved);
+        }
+        // đóng tiền ?
+        if ($request->filled('paid')) {
+            $q->where('paid', $request->paid);
+        }
+        // tất toán ?
+        if ($request->filled('settled')) {
+            $q->where('settled', $request->settled);
+        }
+        // kênh
+        if ($request->channel_id) {
+            $channelIds = Channel::getChildIds($request->channel_id); // lấy tất cả con
+            $q->whereIn('channel_id', $channelIds);
+        }
+        // dự án
+        if ($request->post_id) {
+            $q->where('post_id', $request->post_id);
+        }
 
         $tasks = $q->get();
 
@@ -143,8 +164,9 @@ class ExpenseController extends Controller
         // Render filter options
         $reports = Report::orderByDesc('id')->get();
         $users = User::get();
-        $posts = Post::where('sort_by', 'Product')->get();
-        $channels = Channel::get();
+        $posts = Post::where('sort_by', 'Product')->where('rate', '!=', Null)->get();
+        $channels = Channel::all();
+        $channelsOptions = TreeHelper::buildOptions($channels,0,'',$request->channel_id);
 
         // selected option ưu tiên request('department_id') nếu có, fallback user dept
         // $selectedForOptions = $request->filled('department_id')
@@ -171,7 +193,7 @@ class ExpenseController extends Controller
             'selectedReportId',
             'users',
             'posts',
-            'channels',
+            'channelsOptions',
         ));
     }
 

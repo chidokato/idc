@@ -122,7 +122,7 @@
     <td>
       @if($rank === 1)
       <input
-        style="width: 120px;"
+        style="width: 90px;"
         class="form-control actual-cost-input"
         type="text"
         name="actual_costs"
@@ -149,7 +149,7 @@
       </span>
     </td>
     @if($rank === 1)
-    <td>
+    <td class="text-center">
       <label class="toggle-switch-sm switch mg-0">
         <input type="checkbox"
           class="toggle-switch-input js-toggle-settled"

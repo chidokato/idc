@@ -38,7 +38,7 @@ class ChannelController extends Controller
             'code' => $code,
             'description' => $request->description,
             'user_id' => Auth::user()->id,
-            'parent' => $request->parent && $request->parent != 0 ? $request->parent : null,
+            'parent' => $request->parent && $request->parent != 0 ? $request->parent : 0,
         ]);
 
         return redirect()->route('channels.index')->with('success', 'Thêm channel thành công');
@@ -74,7 +74,7 @@ class ChannelController extends Controller
             'code' => $request->code ?: 'CH-' . strtoupper(substr(uniqid(), -6)),
             'description' => $request->description,
             'user_id' => Auth::user()->id,
-            'parent' => $request->parent && $request->parent != 0 ? $request->parent : null,
+            'parent' => $request->parent && $request->parent != 0 ? $request->parent : 0,
         ]);
 
         return redirect()->route('channels.index')->with('success', 'Cập nhật thành công!');

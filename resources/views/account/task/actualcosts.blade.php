@@ -40,33 +40,112 @@
         <div class="col-sm mb-2 mb-sm-0">
           <form id="filterForm" method="GET" action="{{ url()->current() }}">
             <div class="row" id="filterBar">
+              
               <div class="col-sm-2 col-md-2">
-                <input type="text"
+                <div class="form-group">
+                  <select name="report_id" class="form-control">
+                  <option value="">-- Thời gian --</option>
+                  @foreach($reports as $val)
+                    <option value="{{ $val->id }}" {{ (string)$selectedReportId === (string)$val->id ? 'selected' : '' }}>
+                      {{ \Carbon\Carbon::parse($val->time_start)->format('d/m') }} - {{ \Carbon\Carbon::parse($val->time_end)->format('d/m') }} _ {{ \Carbon\Carbon::parse($val->time_start)->format('Y') }}
+                    </option>
+                  @endforeach
+                </select>
+                </div>
+              </div>
+
+              <div class="col-sm-4 col-md-4">
+                <div class="form-group">
+                  <input type="text"
                        name="name"
                        class="form-control"
                        placeholder="Mã NV / Họ tên"
                        value="{{ request('name') }}">
+                </div>
               </div>
-              <div class="col-sm-3 col-md-3">
-                <select name="department_id" class="form-control select2">
+
+              <div class="col-sm-2 col-md-2">
+                <div class="form-group">
+                  <select name="approved" class="form-control select2">
+                  <option value="">-- Duyệt ??</option>
+                  <option value="1" {{ request('approved') === '1' ? 'selected' : '' }}>
+                      Đã duyệt
+                  </option>
+                  <option value="0" {{ request('approved') === '0' ? 'selected' : '' }}>
+                      Chưa duyệt
+                  </option>
+                  
+                </select>
+                </div>
+              </div>
+
+              <div class="col-sm-2 col-md-2">
+                <div class="form-group">
+                  <select name="paid" class="form-control select2">
+                  <option value="">-- Đóng tiền ??</option>
+                  <option value="1" {{ request('paid') === '1' ? 'selected' : '' }}>
+                      Đã đóng
+                  </option>
+                  <option value="0" {{ request('paid') === '0' ? 'selected' : '' }}>
+                      Chưa đóng
+                  </option>
+                </select>
+                </div>
+              </div>
+
+              <div class="col-sm-2 col-md-2">
+                <div class="form-group">
+                  <select name="settled" class="form-control select2">
+                  <option value="">-- Tất toán ??</option>
+                  <option value="1" {{ request('settled') === '1' ? 'selected' : '' }}>
+                      Đã tất toán
+                  </option>
+                  <option value="0" {{ request('settled') === '0' ? 'selected' : '' }}>
+                      Chưa tất toán
+                  </option>
+                </select>
+                </div>
+              </div>
+
+              <div class="col-sm-2 col-md-2">
+                <div class="form-group">
+                  <select name="post_id" class="form-control select2">
+                  <option value="">-- Dự án --</option>
+                  @foreach($posts as $p)
+                  <option value="{{ $p->id }}" {{ request('post_id') == $p->id ? 'selected' : '' }}>
+                      {{ $p->name }}
+                  </option>
+                  @endforeach
+                </select>
+                </div>
+              </div>
+
+              <div class="col-sm-2 col-md-2">
+                <div class="form-group">
+                  <select name="department_id" class="form-control select2">
                   <option value="">-- Phòng/nhóm --</option>
                   {!! $departmentOptions !!}
                 </select>
-              </div>
-              <div class="col-sm-3 col-md-3">
-                <select name="report_id" class="form-control">
-                  <option value="">-- Thời gian --</option>
-                  @foreach($reports as $val)
-                    <option value="{{ $val->id }}" {{ (string)$selectedReportId === (string)$val->id ? 'selected' : '' }}>
-                      {{ \Carbon\Carbon::parse($val->time_start)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($val->time_end)->format('d/m/Y') }}
-                    </option>
-                  @endforeach
-                </select>
+                </div>
               </div>
 
-              <div class="col-sm-2 col-md-2 d-flex gap-2">
-                <button type="submit" class="btn btn-primary" id="btnSearch">Lọc</button>
-                <a href="{{ url()->current() }}" class="btn btn-warning" id="btnReset">Reset</a>
+              <div class="col-sm-2 col-md-2">
+                <div class="form-group">
+                  <select name="channel_id" class="form-control select2">
+                  <option value="">-- Kênh ??</option>
+                  {!! $channelsOptions !!}
+                </select>
+                </div>
+              </div>
+
+              
+              
+
+              <div class="col-sm-2 col-md-2">
+                <div class="form-group">
+                  <button type="submit" class="btn btn-primary" id="btnSearch">Lọc</button>
+                  <a href="{{ url()->current() }}" class="btn btn-warning" id="btnReset">Reset</a>
+                </div>
               </div>
 
             </div>
@@ -95,8 +174,9 @@
         <th class="text-right">Tiền nộp</th>
         <th class="text-center">Đóng tiền</th>
         <th>Thực tế</th>
-        <th>Trả lại</th>
-        <th>Đóng thêm</th>
+        <th class="text-right">Trả lại</th>
+        <th class="text-right">Đóng thêm</th>
+        <th class="text-center">Tất toán</th>
         <th>Ghi chú</th>
         <th colspan="2"></th>
       </tr>
@@ -160,10 +240,12 @@
             <div class="col-sm-4">
               <div class="form-group">
                 <label class="input-label">Dự án</label>
-                <select name="post_id" required class="custom-select select2">
-                  <option value="">...</option>
-                  @foreach($posts as $val)
-                    <option value="{{ $val->id }}">{{ $val->name }}</option>
+                <select name="post_id" class="form-control select2">
+                  <option value="">-- Dự án --</option>
+                  @foreach($posts as $p)
+                  <option value="{{ $p->id }}" {{ request('post_id') == $p->id ? 'selected' : '' }}>
+                      {{ $p->name }}
+                  </option>
                   @endforeach
                 </select>
               </div>
@@ -174,11 +256,7 @@
                 <label class="input-label">Kênh chạy</label>
                 <select name="channel_id" required class="custom-select select2">
                   <option value="">...</option>
-                  @foreach($channels as $val)
-                    <option value="{{ $val->id }}" {{ $val->name == 'Facebook' ? 'selected' : '' }}>
-                      {{ $val->name }}
-                    </option>
-                  @endforeach
+                  {!! $channelsOptions !!}
                 </select>
               </div>
             </div>
