@@ -3,7 +3,19 @@
 @section('title') Công Ty Cổ Phần Bất Động Sản Indochine @endsection
 
 @section('css')
-
+<style>
+  .s2-user{ display:flex; gap:10px; }
+  .s2-user__name{
+    font-weight: 600;
+    line-height: 1.1;
+  }
+  .s2-user__pos{
+    font-size: 12px;
+    opacity: .7;
+    margin-top: 2px;
+    line-height: 1.1;
+  }
+</style>
 @endsection
 
 @section('body') @endsection
@@ -59,6 +71,7 @@
                   <select name="handler_ids[]" class="form-control select2" multiple>
                     @foreach($users as $us)
                       <option value="{{ $us->id }}"
+                        data-text="{{ $val->department?->name }}"
                         {{ in_array($us->id, (array) request('handler_ids', [])) ? 'selected' : '' }}>
                         {{ $us->yourname }}
                       </option>
