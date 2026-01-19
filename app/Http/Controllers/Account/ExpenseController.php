@@ -96,14 +96,13 @@ class ExpenseController extends Controller
             ->orderByDesc('id');             // phụ: cho ổn định
 
         // Tìm theo mã NV / tên NV
-        if ($request->filled('name')) {
-            $key = trim($request->name);
-
-            $q->whereHas('handler', function ($h) use ($key) {
-                $h->where('employee_code', 'like', "%{$key}%")
-                  ->orWhere('yourname', 'like', "%{$key}%");
-            });
+        if ($request->filled('handler_ids')) {
+            $handlerIds = array_values(array_filter(array_map('intval', (array)$request->handler_ids)));
+            if (!empty($handlerIds)) {
+                $q->whereIn('user', $handlerIds); // nếu cột là user_id thì đổi thành user_id
+            }
         }
+
 
         // Lọc phòng/nhóm (đệ quy: gồm cả con cháu)
         if ($request->filled('department_id')) {

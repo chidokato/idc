@@ -56,26 +56,30 @@
 
               <div class="col-sm-4 col-md-4">
                 <div class="form-group">
-                  <input type="text"
-                       name="name"
-                       class="form-control"
-                       placeholder="Mã NV / Họ tên"
-                       value="{{ request('name') }}">
+                  <select name="handler_ids[]" class="form-control select2" multiple>
+                    @foreach($users as $us)
+                      <option value="{{ $us->id }}"
+                        {{ in_array($us->id, (array) request('handler_ids', [])) ? 'selected' : '' }}>
+                        {{ $us->yourname }}
+                      </option>
+                    @endforeach
+                  </select>
                 </div>
               </div>
+
 
               <div class="col-sm-2 col-md-2">
                 <div class="form-group">
                   <select name="approved" class="form-control select2">
-                  <option value="">-- Duyệt ??</option>
-                  <option value="1" {{ request('approved') === '1' ? 'selected' : '' }}>
-                      Đã duyệt
-                  </option>
-                  <option value="0" {{ request('approved') === '0' ? 'selected' : '' }}>
-                      Chưa duyệt
-                  </option>
-                  
-                </select>
+                    <option value="">-- Duyệt ??</option>
+                    <option value="1" {{ request('approved') === '1' ? 'selected' : '' }}>
+                        Đã duyệt
+                    </option>
+                    <option value="0" {{ request('approved') === '0' ? 'selected' : '' }}>
+                        Chưa duyệt
+                    </option>
+                    
+                  </select>
                 </div>
               </div>
 
