@@ -466,6 +466,14 @@ class TaskController extends Controller
         $meId = (int) auth()->id();
         $paid = (int) $request->input('paid', 0);
 
+        // ❌ CHẶN SETTLED
+        if ((int)$task->settled === 1) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Tác vụ này đã được quyết toán, không thể giữ hoặc nhả tiền.'
+            ], 403);
+        }
+
         // LV3 = department_id
         $myDept   = (int) (auth()->user()->department_id ?? 0);
         $taskDept = (int) ($task->department_id ?? 0);
