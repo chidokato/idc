@@ -4,6 +4,8 @@
 
 @section('css')
 <style>
+  .select2-selection--multiple{ height:41px }
+  .select2-search__field{ height:30px }
   .s2-user{ display:flex; gap:10px; }
   .s2-user__name{
     font-weight: 600;
@@ -68,10 +70,10 @@
 
               <div class="col-sm-4 col-md-4">
                 <div class="form-group">
-                  <select name="handler_ids[]" class="form-control select2" multiple>
+                  <select name="handler_ids[]" class="form-control yourname2" multiple>
                     @foreach($users as $us)
                       <option value="{{ $us->id }}"
-                        data-text="{{ $val->department?->name }}"
+                        data-department="{{ $us->department?->name }}"
                         {{ in_array($us->id, (array) request('handler_ids', [])) ? 'selected' : '' }}>
                         {{ $us->yourname }}
                       </option>
@@ -319,5 +321,32 @@
 <script src="admin_asset/select2/js/select2.min.js"></script>
 <script src="admin_asset/select2/js/select2-searchInputPlaceholder.js"></script>
 <script src="account/js/account.js"></script>
+<script>
+$(document).ready(function () {
+  $('.yourname2').select2({
+    placeholder: 'Nhập Họ và Tên',
+    allowClear: true,
+    matcher: function (params, data) {
+      if ($.trim(params.term) === '') {
+        return data;
+      }
+
+      if (typeof data.text === 'undefined') {
+        return null;
+      }
+
+      let term = params.term.toLowerCase();
+      let text = data.text.toLowerCase();
+      let department = $(data.element).data('department')?.toLowerCase() || '';
+
+      if (text.includes(term) || department.includes(term)) {
+        return data;
+      }
+
+      return null;
+    }
+  });
+});
+</script>
 
 @endsection
