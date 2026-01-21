@@ -159,6 +159,17 @@
 
               <div class="col-sm-2 col-md-2">
                 <div class="form-group">
+                  <select name="outstanding" class="form-control select2">
+                  <option value="">-- Đối soát ??</option>
+                  <option {{ request('outstanding') === '1' ? 'selected' : '' }} value="1">-- Đóng thêm ??</option>
+                  <option {{ request('outstanding') === '0' ? 'selected' : '' }} value="0">-- Trả lại ??</option>
+
+                </select>
+                </div>
+              </div>
+
+              <div class="col-sm-2 col-md-2">
+                <div class="form-group">
                   <button type="submit" class="btn btn-primary" id="btnSearch">Lọc</button>
                   <a href="{{ url()->current() }}" class="btn btn-warning" id="btnReset">Reset</a>
                 </div>

@@ -143,6 +143,15 @@ class ExpenseController extends Controller
             $q->where('post_id', $request->post_id);
         }
 
+        if ($request->filled('outstanding') && in_array((int)$request->outstanding, [0, 1], true)) {
+            $outstanding = (int) $request->outstanding;
+
+            $outstanding === 1
+                ? $q->where('extra_money', '>', 0)
+                : $q->where('refund_money', '>', 0);
+        }
+
+
         $tasks = $q->get();
 
         // Tổng theo trang hiện tại
