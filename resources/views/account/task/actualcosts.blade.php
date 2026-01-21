@@ -157,9 +157,6 @@
                 </div>
               </div>
 
-              
-              
-
               <div class="col-sm-2 col-md-2">
                 <div class="form-group">
                   <button type="submit" class="btn btn-primary" id="btnSearch">Lọc</button>
@@ -204,10 +201,10 @@
         <td colspan="5"></td>
         <td class="text-right" id="sumTotalText">{{ number_format($sumTotal, 0, ',', '.') }}</td>
         <td class="text-right" id="sumPaidText">{{ number_format($sumPaid, 0, ',', '.') }}</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <!-- <td class="text-right" id="">{{ number_format($sumActual, 0, ',', '.') }}</td> -->
+        <td class="text-center" id="">{{ number_format($sum_expected, 0, ',', '.') }}</td>
+        <td class="" id="">{{ number_format($sum_actual_costs, 0, ',', '.') }}</td>
+        <td class="text-right" id="">{{ number_format($sum_refund_money, 0, ',', '.') }}</td>
+        <td class="text-right" id="">{{ number_format($sum_extra_money, 0, ',', '.') }}</td>
         <td colspan="4"></td>
       </tr>
     </thead>

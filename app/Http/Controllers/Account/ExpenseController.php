@@ -160,6 +160,19 @@ class ExpenseController extends Controller
             return $total * (1 - $rate/100);
         });
 
+        $sum_expected = $tasks->sum(function ($t) {
+            return (float)($t->price_expected ?? 0);
+        });
+        $sum_actual_costs = $tasks->sum(function ($t) {
+            return (float)($t->actual_costs ?? 0);
+        });
+        $sum_refund_money = $tasks->sum(function ($t) {
+            return (float)($t->refund_money ?? 0);
+        });
+        $sum_extra_money = $tasks->sum(function ($t) {
+            return (float)($t->extra_money ?? 0);
+        });
+
         // Render filter options
         $reports = Report::orderByDesc('id')->get();
         $users = User::get();
@@ -193,6 +206,10 @@ class ExpenseController extends Controller
             'users',
             'posts',
             'channelsOptions',
+            'sum_expected',
+            'sum_actual_costs',
+            'sum_refund_money',
+            'sum_extra_money',
         ));
     }
 
