@@ -37,14 +37,17 @@
         <h1 class="page-header-title">Danh sách link đăng ký MKT</h1>
       </div>
       <div class="col-sm-auto">
+        <button type="button" class="btn btn-success js-export-excel" data-table="#taskTable" data-filename="tasks_{{ date('Ymd_His') }}.xlsx"> Xuất Excel</button>
+      </div>
+      <div class="col-sm-auto">
         @if($rank === 1)
-          <div id="addtask" data-toggle="popover-dark">
-            <a class="btn btn-primary" href="javascript:;" data-toggle="modal" data-target="#newProjectModal">
-              <i class="tio-add mr-1"></i> New project
-            </a>
-          </div>
-          @endif
+        <div id="addtask" data-toggle="popover-dark">
+          <a class="btn btn-primary" href="javascript:;" data-toggle="modal" data-target="#newProjectModal">
+            <i class="tio-add mr-1"></i> New project
+          </a>
         </div>
+        @endif
+      </div>
     </div>
     <!-- End Row -->
   </div>
@@ -210,12 +213,12 @@
 
       <tr id="sumRow" class="font-weight-bold bg-light" style="{{ $tasks->count() ? '' : 'display:none' }}">
         <td colspan="5"></td>
-        <td class="text-right" id="sumTotalText">{{ number_format($sumTotal, 0, ',', '.') }}</td>
-        <td class="text-right" id="sumPaidText">{{ number_format($sumPaid, 0, ',', '.') }}</td>
-        <td class="text-center" id="">{{ number_format($sum_expected, 0, ',', '.') }}</td>
-        <td class="" id="">{{ number_format($sum_actual_costs, 0, ',', '.') }}</td>
-        <td class="text-right" id="">{{ number_format($sum_refund_money, 0, ',', '.') }}</td>
-        <td class="text-right" id="">{{ number_format($sum_extra_money, 0, ',', '.') }}</td>
+        <td class="text-right money" id="sumTotalText">{{ number_format($sumTotal, 0, ',', '.') }}</td>
+        <td class="text-right money" id="sumPaidText">{{ number_format($sumPaid, 0, ',', '.') }}</td>
+        <td class="text-center money" id="">{{ number_format($sum_expected, 0, ',', '.') }}</td>
+        <td class="money" id="">{{ number_format($sum_actual_costs, 0, ',', '.') }}</td>
+        <td class="text-right money" id="">{{ number_format($sum_refund_money, 0, ',', '.') }}</td>
+        <td class="text-right money" id="">{{ number_format($sum_extra_money, 0, ',', '.') }}</td>
         <td colspan="4"></td>
       </tr>
     </thead>
@@ -328,7 +331,9 @@
 @section('js')
 <script src="admin_asset/select2/js/select2.min.js"></script>
 <script src="admin_asset/select2/js/select2-searchInputPlaceholder.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="account/js/account.js"></script>
+
 <script>
 $(document).ready(function () {
   $('.yourname2').select2({

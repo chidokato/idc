@@ -398,5 +398,76 @@ document.addEventListener('change', function (e) {
 
 
 
-/*=========== DUYỆT MARKETING ================*/
+/*=========== Xuất file excel ================*/
+(function () {
+
+  function sanitizeCellText(td) {
+    let text = '';
+
+    // Nếu cell có input/select/textarea -> lấy value
+    const input = td.querySelector('input, select, textarea');
+    if (input) {
+      text = (input.value ?? '').toString();
+    } else {
+      // Nếu có data-export -> ưu tiên
+      const v = td.getAttribute('data-export');
+      text = v !== null ? v.toString() : (td.innerText ?? '').toString();
+    }
+
+    text = text.trim();
+
+    // ===== CHỈ XỬ LÝ CỘT TIỀN =====
+    // <td class="money">1.000.000 ₫</td>
+    if (td.classList.contains('money')) {
+      text = text
+        .replace(/[₫đ]/gi, '')     // bỏ ký tự ₫ đ
+        .replace(/VNĐ/gi, '')      // bỏ VNĐ
+        .replace(/[.,\s]/g, '');   // bỏ . , khoảng trắng
+    }
+
+    return text;
+  }
+
+  function buildCleanTable(originalTable) {
+    const clone = originalTable.cloneNode(true);
+
+    // Bỏ các cột / ô không export
+    clone.querySelectorAll('.no-export').forEach(el => el.remove());
+
+    // Bỏ button / icon
+    clone.querySelectorAll(
+      'button, a.btn, .btn, .tio-edit, .tio-delete, .dropdown, .avatar, img'
+    ).forEach(el => el.remove());
+
+    // Convert tất cả cell thành text sạch
+    clone.querySelectorAll('td, th').forEach(cell => {
+      const val = sanitizeCellText(cell);
+      cell.innerHTML = '';
+      cell.textContent = val;
+    });
+
+    return clone;
+  }
+
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.js-export-excel');
+    if (!btn) return;
+
+    const selector = btn.getAttribute('data-table');
+    const filename = btn.getAttribute('data-filename') || 'export.xlsx';
+    if (!selector) return;
+
+    const table = document.querySelector(selector);
+    if (!table) return;
+
+    const cleanTable = buildCleanTable(table);
+
+    const wb = XLSX.utils.table_to_book(cleanTable, { sheet: "Sheet1" });
+    XLSX.writeFile(wb, filename);
+  });
+
+})();
+
+
+
 /*=========== DUYỆT MARKETING ================*/

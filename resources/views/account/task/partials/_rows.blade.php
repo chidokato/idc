@@ -86,7 +86,7 @@
         </div>
     </td>
 
-    <td class="text-right">
+    <td class="text-right money">
       <div class="hold-badge {{ $paid == 1 ? 'text-success' : 'text-danger' }}"
            data-toggle="tooltip" data-placement="left"
            data-original-title="{{ (int)$rate }}%">
@@ -94,7 +94,7 @@
       </div>
     </td>
 
-    <td class="text-center">
+    <td class="text-center money">
       @if(auth()->check() && in_array($rank, [1,2,3], true))
         <label class="toggle-switch toggle-switch-sm switch" for="{{ $switchId }}" style="justify-content: center;">
           <input @if($task->approved != 1) disabled @endif type="checkbox"
@@ -119,7 +119,7 @@
 
     <!-- <td>{{ $task->price_expected }}</td> -->
 
-    <td>
+    <td class="money">
       @if($rank === 1)
       <input
         style="width: 90px;"
@@ -137,19 +137,19 @@
       @endif
     </td>
 
-    <td class="text-right">
+    <td class="text-right money">
       <span class="js-refund-money text-success">
         {{ number_format((float)$task->refund_money, 0, ',', '.') }}
       </span>
     </td>
 
-    <td class="text-right">
+    <td class="text-right money">
       <span class="js-extra-money text-danger">
         {{ number_format((float)$task->extra_money, 0, ',', '.') }}
       </span>
     </td>
     @if($rank === 1)
-    <td class="text-center">
+    <td class="text-center money">
       <label class="toggle-switch-sm switch mg-0">
         <input type="checkbox"
           class="toggle-switch-input js-toggle-settled"
