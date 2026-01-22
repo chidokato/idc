@@ -146,7 +146,7 @@ class WalletService
             $holdAmount = $amount ?? $this->calcExpectedAmount($task);
             $holdAmount = bcadd((string)$holdAmount, '0', 2);
 
-            if (bccomp($holdAmount, '0', 2) <= 0) {
+            if (bccomp($holdAmount, '0', 2) < 0) {
                 throw ValidationException::withMessages(['amount' => 'Số tiền hold không hợp lệ.']);
             }
 

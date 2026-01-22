@@ -483,8 +483,6 @@ class TaskController extends Controller
         $taskUserId = (int) ($task->user ?? 0);
         $isMine = ($taskUserId === $meId);
 
-        
-
         // Rank 1: full
         if ($rank === 1) {
             // ok
