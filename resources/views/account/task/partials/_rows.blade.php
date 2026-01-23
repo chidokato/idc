@@ -119,7 +119,7 @@
 
     <!-- <td>{{ $task->price_expected }}</td> -->
 
-    <td class="money">
+    <td class="money d-flex align-items-center">
       @if($rank === 1)
       <input
         style="width: 90px;"
@@ -135,12 +135,14 @@
       @else
       {{ number_format((float)$task->actual_costs, 0, ',', '.') }}
       @endif
-    </td>
 
+      
+    </td>
     <td class="text-right money">
       <span class="js-refund-money text-success">
         {{ number_format((float)$task->refund_money, 0, ',', '.') }}
       </span>
+
     </td>
 
     <td class="text-right money">

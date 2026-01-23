@@ -211,7 +211,7 @@ class WalletService
 
             $task = Task::whereKey($task->id)->lockForUpdate()->firstOrFail();
 
-            if (empty($task->hold_transaction_id) || bccomp((string)$task->price_expected, '0', 2) <= 0) {
+            if (empty($task->hold_transaction_id) || bccomp((string)$task->price_expected, '0', 2) < 0) {
                 throw ValidationException::withMessages(['task' => 'Task chưa hold tiền.']);
             }
 
