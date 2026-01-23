@@ -57,6 +57,17 @@
 
 <main id="content" role="main" class="main pointer-event bg-light">
 
+<div class="row-alert">
+	<div>
+		<p>Nợ tiền quảng cáo: <span class="price">{{ number_format((float)$sumPrice) }}</span></p>
+		<p>Vui lòng thanh toán sớm để được đăng ký marketing kỳ tiếp theo</p>
+	</div>
+	<div>
+		<a href="account/actualcosts?report_id=&handler_ids%5B%5D=43&approved=&paid=&settled=0&post_id=&department_id=&channel_id=&outstanding=1">
+			<button type="button" class="btn">Xem chi tiết</button>
+		</a>
+	</div>
+</div>
 
 @yield('content')
 
