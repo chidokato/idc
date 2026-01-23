@@ -64,7 +64,7 @@
 		<p>Vui lòng thanh toán sớm để được đăng ký marketing kỳ tiếp theo</p>
 	</div>
 	<div>
-		<a href="account/actualcosts?report_id=&handler_ids%5B%5D=43&approved=&paid=&settled=0&post_id=&department_id=&channel_id=&outstanding=1">
+		<a href="account/actualcosts?report_id=&handler_ids%5B%5D={{Auth::id()}}&approved=&paid=&settled=0&post_id=&department_id=&channel_id=&outstanding=1">
 			<button type="button" class="btn">Xem chi tiết</button>
 		</a>
 	</div>
