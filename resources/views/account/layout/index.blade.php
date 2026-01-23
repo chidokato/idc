@@ -57,6 +57,7 @@
 
 <main id="content" role="main" class="main pointer-event bg-light">
 
+@if($sumPrice > 0)
 <div class="row-alert">
 	<div>
 		<p>Nợ tiền quảng cáo: <span class="price">{{ number_format((float)$sumPrice) }}</span></p>
@@ -68,6 +69,7 @@
 		</a>
 	</div>
 </div>
+@endif
 
 @yield('content')
 
