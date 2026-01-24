@@ -77,10 +77,10 @@
     <td class="text-center">{{ $task->Post?->name }}</td>
     <td class="text-center">{{ $task->channel?->name ?? $task->channel ?? '' }}</td>
 
-    <td class="text-end total-cost-cell " data-days="{{ $val->days }}" data-rate="{{ $val->rate }}" >
+    <td class="text-end total-cost-cell " data-days="{{ $task->days }}" data-rate="{{ $task->rate }}" >
         <div class="d-flex space-between">
-            <span><a class="badge badge-soft-dark ml-1" href="javascript:;" data-toggle="tooltip" data-placement="left" data-original-title="Ngày">{{ $val->days }}</a></span>
-        <span class="total-cost-text" title="{{ number_format($val->expected_costs, 0, ',', ',') }}đ * {{ $val->days }} ngày">
+            <span><a class="badge badge-soft-dark ml-1" href="javascript:;" data-toggle="tooltip" data-placement="left" data-original-title="Ngày">{{ $task->days }}</a></span>
+        <span class="total-cost-text" title="{{ number_format($task->expected_costs, 0, ',', ',') }}đ * {{ $task->days }} ngày">
             {{ number_format($rowTotal, 0, ',', '.') }}
         </span>
         </div>
