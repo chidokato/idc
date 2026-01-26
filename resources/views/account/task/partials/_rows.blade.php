@@ -171,7 +171,7 @@
     </td>
 
     <td class="cell-actions d-flex">
-      @if($val->paid !=1 )
+      @if($rank ===1 )
       <div class="edit">
         <a class="btn btn-sm btn-white btn-edit-task"
            href="javascript:;"
@@ -182,8 +182,9 @@
            data-target="#invoiceReceiptModal">
           <i class="tio-edit"></i>
         </a>
-
       </div>
+      @endif
+      
       <div class="delete-button ml-1">
         <a class="btn btn-sm btn-white js-delete-task"
            href="javascript:;"
@@ -192,8 +193,7 @@
           <i class="tio-delete-outlined"></i>
         </a>
       </div>
-
-      @endif
+      
     </td>
   </tr>
 
