@@ -140,7 +140,7 @@ class AccountController extends HomeController
                     'groupIds',
                 ));
             }else{
-                return redirect()->route('tasks.user')->with('center_warning','Các kỳ đăng ký Marketing đã đóng hoặc chưa mở kỳ mới, Vui lòng thử lại sau');
+                return redirect()->route('tasks.actualcosts')->with('center_warning','Các kỳ đăng ký Marketing đã đóng hoặc chưa mở kỳ mới, Vui lòng thử lại sau');
             }
         }
         
