@@ -22,122 +22,121 @@ use App\Services\TaskFinanceService;
 
 class TaskController extends Controller
 {
-    public function show(Request $request, Task $task = null)
-    {
-        // nếu bạn không dùng show chi tiết task, cho nó chạy như trang danh sách
-        return $this->tasksuser($request);
-    }
+    // public function show(Request $request, Task $task = null)
+    // {
+    //     return $this->tasksuser($request);
+    // }
     
 
-    public function tasksuser(Request $request)
-    {
-        $user = Auth::user();
+    // public function tasksuser(Request $request)
+    // {
+    //     $user = Auth::user();
 
-        $max_id = Report::max('id');
+    //     $max_id = Report::max('id');
 
-        // Load departments 1 lần để: (1) build options (2) lấy danh sách con cháu nhanh
-        $departments = Department::select('id', 'parent', 'name')
-            ->orderBy('name')
-            ->get();
+    //     // Load departments 1 lần để: (1) build options (2) lấy danh sách con cháu nhanh
+    //     $departments = Department::select('id', 'parent', 'name')
+    //         ->orderBy('name')
+    //         ->get();
 
-        // selected department: ưu tiên request, không có thì lấy department_lv2 của user
-        $selectedDeptId = (int) $request->input('department_id', $user->department_id ?? 0);
-        if ($selectedDeptId <= 0) {
-            $selectedDeptId = (int) ($user->department_id ?? 0);
-        }
+    //     // selected department: ưu tiên request, không có thì lấy department_lv2 của user
+    //     $selectedDeptId = (int) $request->input('department_id', $user->department_id ?? 0);
+    //     if ($selectedDeptId <= 0) {
+    //         $selectedDeptId = (int) ($user->department_id ?? 0);
+    //     }
 
-        $keyword = trim((string) $request->input('yourname', $user->yourname));
+    //     $keyword = trim((string) $request->input('yourname', $user->yourname));
 
-        // report filter (nếu có)
-        $reportId = (int) $request->input('report_id', $max_id);
+    //     // report filter (nếu có)
+    //     $reportId = (int) $request->input('report_id', $max_id);
 
-        // Lấy tất cả id con cháu + chính nó (KHÔNG N+1 query)
-        $deptIds = [];
-        if ($selectedDeptId > 0) {
-            $deptIds = $this->getChildIdsFromCollection($departments, $selectedDeptId);
-        }
+    //     // Lấy tất cả id con cháu + chính nó (KHÔNG N+1 query)
+    //     $deptIds = [];
+    //     if ($selectedDeptId > 0) {
+    //         $deptIds = $this->getChildIdsFromCollection($departments, $selectedDeptId);
+    //     }
 
-        $approved = $request->input('approved', 1); // '1' | '0' | null
+    //     $approved = $request->input('approved', 1); // '1' | '0' | null
 
-        // Query tasks theo department_id IN (...)
-        $q = Task::query()
-            ->with(['handler', 'department', 'Post', 'channel'])
-            ->orderBy('department_id', 'asc');
+    //     // Query tasks theo department_id IN (...)
+    //     $q = Task::query()
+    //         ->with(['handler', 'department', 'Post', 'channel'])
+    //         ->orderBy('department_id', 'asc');
 
-        if ($keyword !== '') {
-            $q->whereHas('handler', function ($qq) use ($keyword) {
-                $qq->where('yourname', 'like', "%{$keyword}%")
-                   ->orWhere('email', 'like', "%{$keyword}%")
-                   ->orWhere('employee_code', 'like', "%{$keyword}%");
-            });
-        }
+    //     if ($keyword !== '') {
+    //         $q->whereHas('handler', function ($qq) use ($keyword) {
+    //             $qq->where('yourname', 'like', "%{$keyword}%")
+    //                ->orWhere('email', 'like', "%{$keyword}%")
+    //                ->orWhere('employee_code', 'like', "%{$keyword}%");
+    //         });
+    //     }
 
-        if (!empty($deptIds)) {
-            $q->whereIn('department_id', $deptIds);
-        } else {
-            // nếu không xác định được phòng ban => trả rỗng
-            $q->whereRaw('1=0');
-        }
+    //     if (!empty($deptIds)) {
+    //         $q->whereIn('department_id', $deptIds);
+    //     } else {
+    //         // nếu không xác định được phòng ban => trả rỗng
+    //         $q->whereRaw('1=0');
+    //     }
 
-        // nếu tasks có cột report_id thì mới lọc
-        if ($reportId > 0 && Schema::hasColumn('tasks', 'report_id')) {
-            $q->where('report_id', $reportId);
-        }
+    //     // nếu tasks có cột report_id thì mới lọc
+    //     if ($reportId > 0 && Schema::hasColumn('tasks', 'report_id')) {
+    //         $q->where('report_id', $reportId);
+    //     }
         
-        // lọc approved nếu có chọn
-        if ($approved !== null && $approved !== '') {
-            $q->where('approved', (int) $approved);
-        }
+    //     // lọc approved nếu có chọn
+    //     if ($approved !== null && $approved !== '') {
+    //         $q->where('approved', (int) $approved);
+    //     }
 
-        $tasks = $q->get();
+    //     $tasks = $q->get();
 
-        // tính tổng
-        $sumTotal = 0;
-        $sumPaid  = 0;
+    //     // tính tổng
+    //     $sumTotal = 0;
+    //     $sumPaid  = 0;
 
-        foreach ($tasks as $task) {
-            $rowTotal = $task->expected_costs * $task->days;
-            $rowPaid  = $rowTotal * (1 - $task->rate / 100);
+    //     foreach ($tasks as $task) {
+    //         $rowTotal = $task->expected_costs * $task->days;
+    //         $rowPaid  = $rowTotal * (1 - $task->rate / 100);
 
-            $sumTotal += $rowTotal;
-            $sumPaid  += $rowPaid;
-        }
+    //         $sumTotal += $rowTotal;
+    //         $sumPaid  += $rowPaid;
+    //     }
 
-        // ===== AJAX: chỉ trả tbody rows =====
-        if ($request->ajax()) {
-            $html = view('account.task.partials.task_rows', compact('tasks'))->render();
+    //     // ===== AJAX: chỉ trả tbody rows =====
+    //     if ($request->ajax()) {
+    //         $html = view('account.task.partials.task_rows', compact('tasks'))->render();
 
-            return response()->json([
-              'html' => $html,
-              'sumTotal' => $sumTotal,
-              'sumPaid' => $sumPaid,
-            ]);
-        }
+    //         return response()->json([
+    //           'html' => $html,
+    //           'sumTotal' => $sumTotal,
+    //           'sumPaid' => $sumPaid,
+    //         ]);
+    //     }
 
-        // ===== Render trang =====
-        $reports = Report::orderByDesc('id')->get();
-        $departmentOptions = TreeHelper::buildOptions(
-            $departments,
-            0,
-            '',
-            $selectedDeptId,
-            'id',
-            'parent',
-            'name'
-        );
+    //     // ===== Render trang =====
+    //     $reports = Report::orderByDesc('id')->get();
+    //     $departmentOptions = TreeHelper::buildOptions(
+    //         $departments,
+    //         0,
+    //         '',
+    //         $selectedDeptId,
+    //         'id',
+    //         'parent',
+    //         'name'
+    //     );
 
 
-        return view('account.task.taskuser', compact(
-            'user',
-            'tasks',
-            'departmentOptions',
-            'selectedDeptId',
-            'reports',
-            'reportId',
-            'sumTotal',
-            'sumPaid'
-        ));
-    }
+    //     return view('account.task.taskuser', compact(
+    //         'user',
+    //         'tasks',
+    //         'departmentOptions',
+    //         'selectedDeptId',
+    //         'reports',
+    //         'reportId',
+    //         'sumTotal',
+    //         'sumPaid'
+    //     ));
+    // }
 
     private function moneyToFloat($v): float
     {
@@ -345,6 +344,13 @@ class TaskController extends Controller
             ], 403);
         }
 
+        if ((int) $task->settled === 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'link này đã tất toán nên không thể đổi trạng thái duyệt.',
+            ], 403);
+        }
+
         $approved = $request->boolean('approved') ? 1 : 0;
 
         $task->approved = $approved;
@@ -381,28 +387,49 @@ class TaskController extends Controller
     }
 
     // Xóa tác vụ
-    public function destroy($id)
+    public function destroy(Task $task)
     {
-        Task::destroy($id);
-        return redirect()->back()->with('success','Đã xóa tác vụ!');
+        // ====== CHECK TRẠNG THÁI ======
+        if (
+            (int)$task->paid === 1 ||
+            (int)$task->settled === 1 ||
+            (int)$task->approved === 1
+        ) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Task đã được duyệt nên không thể xóa.',
+            ], 422);
+        }
+
+        // ====== CHECK TIỀN ======
+        if (
+            (float)$task->actual_costs > 0 ||
+            (float)$task->extra_money > 0 ||
+            (float)$task->refund_money > 0
+        ) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Tác vụ đã phát sinh chi phí nên không thể xóa.',
+            ], 422);
+        }
+
+        $task->delete();
+
+        return response()->json([
+            'ok' => true,
+            'id' => $task->id,
+            'message' => 'Deleted',
+        ]);
     }
 
-    // Báo cáo tổng hợp
-    // public function report()
-    // {
-    //     $report = Task::select(
-    //         'du_an',
-    //         'kenh',
-    //         \DB::raw('SUM(chi_phi_du_kien) as tong_chi_phi_du_kien'),
-    //         \DB::raw('SUM(chi_phi_thuc_te) as tong_chi_phi_thuc_te'),
-    //         \DB::raw('AVG(ti_le_ho_tro) as ti_le_ho_tro_tb'),
-    //         \DB::raw('SUM(xac_nhan) as tong_xac_nhan')
-    //     )
-    //     ->groupBy('du_an','kenh')
-    //     ->get();
+    public function show(Task $task)
+    {
+        return response()->json([
+            'ok' => true,
+            'data' => $task,
+        ]);
+    }
 
-    //     return view('tasks.report', compact('report'));
-    // }
 
     public function updateRate(Request $request)
     {

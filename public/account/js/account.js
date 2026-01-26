@@ -470,4 +470,129 @@ document.addEventListener('change', function (e) {
 
 
 
-/*=========== DUYỆT MARKETING ================*/
+/*=========== Xóa task ================*/
+$(document).on('click', '.js-delete-task', function (e) {
+    e.preventDefault();
+
+    const $btn = $(this);
+    const url  = $btn.data('url');
+    const id   = $btn.data('id');
+
+    if (!url || !id) return;
+
+    confirmDelete(function () {
+        $btn.prop('disabled', true).addClass('disabled');
+
+        $.ajax({
+            url: url,
+            type: 'DELETE',
+            dataType: 'json',
+            success: function (res) {
+                if (res.ok) {
+                    // ✅ xóa row
+                    $('#row-' + id).remove();
+
+                    // ✅ toast thành công
+                    showToast('success', res.message || 'Đã xóa task');
+                } else {
+                    // ❌ lỗi nghiệp vụ
+                    showCenterWarning(res.message || 'Không thể xóa task này');
+                    $btn.prop('disabled', false).removeClass('disabled');
+                }
+            },
+            error: function (xhr) {
+                let msg = 'Xóa thất bại';
+
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                }
+
+                // ❌ lỗi backend
+                showCenterError(msg);
+                $btn.prop('disabled', false).removeClass('disabled');
+            }
+        });
+    });
+});
+
+
+
+// JS đổ dữ liệu vào modal (tận dụng SweetAlert)
+$(document).on('click', '.btn-edit-task', function () {
+    const $btn = $(this);
+    const url = $btn.data('url');
+    const updateUrl = $btn.data('update-url');
+    const id = $btn.data('id');
+
+    if (!url || !id) return;
+
+    // reset form trước khi fill
+    const $form = $('#editTaskForm');
+    $form[0].reset();
+    $('#edit_task_id').val(id);
+
+    // lưu updateUrl vào form để submit dùng
+    $form.data('update-url', updateUrl);
+
+    $.get(url)
+      .done(function(res){
+          if (!res || !res.ok) {
+              showCenterError(res?.message || 'Không thể tải dữ liệu task');
+              return;
+          }
+          const t = res.data;
+
+          // fill dữ liệu vào modal
+          $('#edit_task_id').val(t.id);
+
+          $form.find('input[name="actual_costs"]').val(t.actual_costs ?? 0);
+          $form.find('input[name="extra_money"]').val(t.extra_money ?? 0);
+          $form.find('input[name="refund_money"]').val(t.refund_money ?? 0);
+          $form.find('textarea[name="content"]').val(t.content ?? '');
+
+          // nếu muốn chặn sửa khi task đã paid/settled/approved
+          const locked = (parseInt(t.paid) === 1) || (parseInt(t.settled) === 1) || (parseInt(t.approved) === 1);
+          $form.find('input, textarea, button[type="submit"]').prop('disabled', locked);
+
+          if (locked) {
+              showToast('warning', 'Task đã PAID/SETTLED/APPROVED nên không thể sửa');
+          }
+      })
+      .fail(function(){
+          showCenterError('Lỗi tải dữ liệu task');
+      });
+});
+
+// JS submit modal (PUT) + toast/center error
+$('#editTaskForm').on('submit', function (e) {
+    e.preventDefault();
+    const $form = $(this);
+    const updateUrl = $form.data('update-url');
+    if (!updateUrl) {
+        showCenterError('Thiếu đường dẫn cập nhật');
+        return;
+    }
+    const payload = $form.serialize(); // task_id + các field
+    $.ajax({
+        url: updateUrl,
+        type: 'PUT',
+        data: payload,
+        dataType: 'json',
+        success: function (res) {
+            if (res.ok) {
+                showToast('success', res.message || 'Cập nhật thành công');
+                $('#invoiceReceiptModal').modal('hide');
+
+                // ✅ nếu bạn muốn cập nhật UI tại chỗ thì làm ở đây
+                // tạm thời reload cho chắc:
+                location.reload();
+            } else {
+                showCenterWarning(res.message || 'Không thể cập nhật');
+            }
+        },
+        error: function (xhr) {
+            const msg = xhr.responseJSON?.message || 'Cập nhật thất bại';
+            showCenterError(msg);
+        }
+    });
+});

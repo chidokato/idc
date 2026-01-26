@@ -234,6 +234,53 @@
   </div>
 </div>
 
+<div class="modal fade" id="invoiceReceiptModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Sửa tác vụ</h5>
+        <button type="button" class="btn btn-icon btn-sm btn-ghost-secondary" data-dismiss="modal" aria-label="Close">
+          <i class="tio-clear tio-lg"></i>
+        </button>
+      </div>
+
+      <form id="editTaskForm">
+        <div class="modal-body">
+
+          <input type="hidden" name="task_id" id="edit_task_id">
+
+          <div class="mb-3">
+            <label>Actual Costs</label>
+            <input type="number" class="form-control" name="actual_costs">
+          </div>
+
+          <div class="mb-3">
+            <label>Extra Money</label>
+            <input type="number" class="form-control" name="extra_money">
+          </div>
+
+          <div class="mb-3">
+            <label>Refund Money</label>
+            <input type="number" class="form-control" name="refund_money">
+          </div>
+
+          <div class="mb-3">
+            <label>Note</label>
+            <textarea class="form-control" name="content"></textarea>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary"><i class="tio-save"></i> Lưu lại</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
 <div class="modal fade" id="newProjectModal" tabindex="-1" role="dialog" aria-labelledby="editCardModalTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
     <div class="modal-content">
@@ -312,7 +359,7 @@
           <div class="d-flex align-items-center">
             <div class="ml-auto">
               <button type="submit" class="btn btn-primary" id="btnCreateTask">
-                <i class="tio-save"></i> Lưu lại
+                <i class="tio-save"></i> Thêm mới
               </button>
             </div>
           </div>

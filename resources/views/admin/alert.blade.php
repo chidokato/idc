@@ -13,9 +13,6 @@
         });
     }
 
-
-
-
     document.addEventListener('DOMContentLoaded', function() {
         @if (session('success'))
             showToast('success', '{{ session('success') }}');
@@ -62,4 +59,22 @@
             showCenterWarning('{{ session('center_warning') }}');
         @endif
     });
+
+
+    function confirmDelete(callback) {
+        Swal.fire({
+            title: 'Xác nhận xóa',
+            text: 'Bạn chắc chắn muốn xóa bản ghi này?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy',
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                callback();
+            }
+        });
+    }
+
 </script>
