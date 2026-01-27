@@ -212,8 +212,12 @@ Route::middleware(['user'])->group(function () {
 
         // wallet
         Route::get('wallet', [WalletController::class, 'index'])->name('wallet.index');
-        Route::get('wallet/deposit', [WalletController::class, 'depositForm'])->name('wallet.deposit.form');
-        Route::post('wallet/deposit', [WalletController::class, 'depositSubmit'])->name('wallet.deposit.submit');
+        Route::get('wallet/deposit', [DepositController::class, 'depositForm'])->name('wallet.deposit.form');
+        Route::post('wallet/deposit/create', [DepositController::class, 'depositCreate'])->name('wallet.deposit.create');
+        Route::post('wallet/deposit/{deposit}/upload', [DepositController::class, 'depositUploadProof'])->name('wallet.deposit.upload');
+        Route::post('wallet/deposit/{deposit}/expire', [DepositController::class, 'depositExpire'])->name('wallet.deposit.expire');
+
+
         Route::get('wallet/deposits', [WalletController::class, 'myDeposits'])->name('wallet.deposits');
         Route::get('wallet/transfer', [WalletController::class, 'bulkTransferForm'])->name('wallet.bulk.form');
         Route::post('wallet/transfer', [WalletController::class, 'bulkTransferSubmit'])->name('wallet.bulk.submit');

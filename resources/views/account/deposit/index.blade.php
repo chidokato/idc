@@ -145,13 +145,56 @@
                         </td>
                         
                         <td>
-                            @if($d->status=='pending')
-                                <span class="badge bg-warning">Chờ duyệt</span>
-                            @elseif($d->status=='approved')
-                                <span class="badge bg-success">Đã duyệt</span>
-                            @else
-                                <span class="badge bg-danger">Từ chối</span>
-                            @endif
+                            @switch($d->status)
+
+                            @case('pending_upload')
+                              <span class="badge badge-soft-warning">
+                                ⏳ Chờ chuyển khoản
+                              </span>
+                              @if($d->expires_at)
+                                <div class="small text-muted">
+                                  Hết hạn:
+                                  {{ $d->expires_at->format('H:i d/m') }}
+                                </div>
+                              @endif
+                            @break
+
+                            @case('pending')
+                              <span class="badge badge-soft-primary">
+                                🔍 Chờ duyệt
+                              </span>
+                            @break
+
+                            @case('approved')
+                              <span class="badge badge-soft-success">
+                                ✅ Đã duyệt
+                              </span>
+                            @break
+
+                            @case('rejected')
+                              <span class="badge badge-soft-danger">
+                                ❌ Từ chối
+                              </span>
+                            @break
+
+                            @case('expired')
+                              <span class="badge badge-soft-secondary">
+                                ⌛ Hết hạn
+                              </span>
+                            @break
+
+                            @case('canceled')
+                              <span class="badge badge-soft-dark">
+                                🚫 Đã huỷ
+                              </span>
+                            @break
+
+                            @default
+                              <span class="badge badge-soft-light">
+                                —
+                              </span>
+
+                          @endswitch
                         </td>
 
                         <td>

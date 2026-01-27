@@ -89,55 +89,55 @@ class WalletController extends Controller
         return view('account.wallet.index', compact('wallet', 'transactions'));
     }
 
-    public function depositForm()
-    {
-        $deposits = Deposit::where('user_id', auth()->id())
-        ->latest()
-        ->paginate(10);
+    // public function depositForm()
+    // {
+    //     $deposits = Deposit::where('user_id', auth()->id())
+    //     ->latest()
+    //     ->paginate(10);
 
-        $user = auth()->user();
+    //     $user = auth()->user();
 
-        $wallet = $user->wallet()->firstOrCreate([
-            'user_id' => $user->id
-        ]);
+    //     $wallet = $user->wallet()->firstOrCreate([
+    //         'user_id' => $user->id
+    //     ]);
 
-        return view('account.wallet.deposit', compact('deposits', 'wallet', 'user'));
-    }
+    //     return view('account.wallet.deposit', compact('deposits', 'wallet', 'user'));
+    // }
 
 
-    public function depositSubmit(Request $request)
-    {
-        $request->validate([
-            'amount' => 'required|numeric|min:1000',
-            'proof_image'      => 'required|image|max:20480', // tối đa 20MB
-        ]);
+    // public function depositSubmit(Request $request)
+    // {
+    //     $request->validate([
+    //         'amount' => 'required|numeric|min:1000',
+    //         'proof_image'      => 'required|image|max:20480', // tối đa 20MB
+    //     ]);
 
-        $user = Auth::user();
+    //     $user = Auth::user();
 
-        $imagePath = null;
-        if ($request->hasFile('proof_image')) {
-            $file = $request->file('proof_image');
+    //     $imagePath = null;
+    //     if ($request->hasFile('proof_image')) {
+    //         $file = $request->file('proof_image');
 
-            $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+    //         $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
 
-            $imagePath = $file->storeAs(
-                'deposits',
-                $filename,
-                'public'
-            );
-        }
+    //         $imagePath = $file->storeAs(
+    //             'deposits',
+    //             $filename,
+    //             'public'
+    //         );
+    //     }
 
-        Deposit::create([
-            'user_id' => auth()->id(),
-            'amount' => $request->amount,
-            'proof_image'      => $imagePath,
-            'status' => 'pending',
-        ]);
+    //     Deposit::create([
+    //         'user_id' => auth()->id(),
+    //         'amount' => $request->amount,
+    //         'proof_image'      => $imagePath,
+    //         'status' => 'pending',
+    //     ]);
 
-        return redirect()
-            ->route('wallet.deposit.form')
-            ->with('success', 'Đã gửi yêu cầu nạp tiền. Vui lòng chờ admin duyệt.');
-    }
+    //     return redirect()
+    //         ->route('wallet.deposit.form')
+    //         ->with('success', 'Đã gửi yêu cầu nạp tiền. Vui lòng chờ admin duyệt.');
+    // }
 
     private function toCents($value): int
     {

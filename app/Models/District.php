@@ -9,6 +9,8 @@ class District extends Model
 {
     use HasFactory;
     public $timestamps = true;
+
+    
     
     public function Province()
     {

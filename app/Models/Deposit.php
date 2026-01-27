@@ -17,11 +17,16 @@ class Deposit extends Model
         'status',
         'approved_by',
         'approved_at',
-        'proof_image'
+        'proof_image',
+        'expires_at',
+        'proof_uploaded_at'
     ];
 
     protected $casts = [
+        'expires_at' => 'datetime',
         'approved_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     /* ================== RELATIONSHIP ================== */

@@ -82,3 +82,10 @@
 .row-alert p{ margin:0; padding:0 }
 .row-alert .price{ font-weight:bold; font-size:1.4rem }
 
+.bankinfo{ display: flex;
+  justify-content: center; }
+.bankinfo .maqr{ width:250px; text-align:center; }
+.bankinfo .price{ font-size:1.5rem; color:#1f913f; font-weight:bold; margin-bottom:2rem }
+#countdown{ font-size:1.5rem; font-weight:bold; }
+.bankname .form-group{ margin-bottom:.5rem; display:flex; gap:5px; align-items: center; }
+.bankname .form-group label{ width:200px }

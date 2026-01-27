@@ -4,12 +4,14 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\DB;
 
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Setting;
 use App\Models\Menu;
 use App\Models\Task;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useBootstrap();
         // Nếu bạn dùng BS4 thì đổi thành:
         // Paginator::useBootstrapFour();
+        DB::statement("SET time_zone = '+07:00'");
 
         View::composer('*', function ($view) {
             $setting = Setting::find(1); // có thể dùng số luôn

@@ -36,10 +36,10 @@
         </nav>
         <h1 class="page-header-title">Danh sách link đăng ký MKT</h1>
       </div>
-      <div class="col-sm-auto">
+      <div class="col-sm-auto d-none d-sm-block">
         <button type="button" class="btn btn-success js-export-excel" data-table="#taskTable" data-filename="tasks_{{ date('Ymd_His') }}.xlsx"> Xuất Excel</button>
       </div>
-      <div class="col-sm-auto">
+      <div class="col-sm-auto d-none d-sm-block">
         @if($rank === 1)
         <div id="addtask" data-toggle="popover-dark">
           <a class="btn btn-primary" href="javascript:;" data-toggle="modal" data-target="#newProjectModal">
@@ -51,8 +51,11 @@
     </div>
     <!-- End Row -->
   </div>
+
   <div class="card overflow-hidden mb-3 mb-lg-5">
-    <div class="card-header">
+    <!-- <button type="button" class="btn-search-mobi" data-search-toggle>Lọc tìm</button> -->
+    <!-- <div class="search-overlay" onclick="toggleSearch()"></div> -->
+    <div class="card-header search-mobi">
       <div class="row align-items-sm-center flex-grow-1">
         <div class="col-sm mb-2 mb-sm-0">
           <form id="filterForm" method="GET" action="{{ url()->current() }}">
@@ -408,5 +411,9 @@ $(document).ready(function () {
   });
 });
 </script>
+
+
+
+
 
 @endsection
