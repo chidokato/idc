@@ -79,7 +79,7 @@
                       <label>Ảnh UNC</label>
                       <input type="file" name="proof_image" class="form-control" accept="image/*" required>
                     </div>
-                    <button class="btn btn-primary w-100">Upload UNC</button>
+                    <button class="btn btn-primary w-100">Gửi yêu cầu nạp tiền !!</button>
                   </form>
                 </div>
                 
@@ -119,8 +119,11 @@
               <h2 class="card-header-title h5">Lịch sử nạp tiền</h2>
             </div>
 
-            <div class="card-body">
-              <table class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
+            <div class="card-body ">
+              <div class="table-responsive datatable-custom">
+                
+              
+              <table class="table table-lg table-thead-bordered table-nowrap table-align-middle card-table">
                 <thead class="thead-light">
                   <tr>
                     <th>Ngày tạo</th>
@@ -209,10 +212,11 @@
                   @endforelse
                 </tbody>
               </table>
-
               <div class="mt-3">
                 {{ $deposits->links() }}
               </div>
+              </div>
+
             </div>
           </div>
 
