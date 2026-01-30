@@ -90,8 +90,6 @@
                            data-target="#editCardModal">
                           <i class="tio-edit mr-1"></i> Lịch sử
                         </a>
-
-
                       </td>
                       <td>{{ $w->updated_at }}</td>
                     </tr>

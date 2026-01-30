@@ -42,6 +42,7 @@ use App\Http\Controllers\WalletController;
 use App\Http\Controllers\DepositController;
 
 use App\Http\Controllers\Account\ExpenseController;
+use App\Http\Controllers\Account\TaskCostPeriodController;
 
 Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
      \UniSharp\LaravelFilemanager\Lfm::routes();
@@ -221,7 +222,7 @@ Route::middleware(['user'])->group(function () {
         Route::get('wallet/deposits', [WalletController::class, 'myDeposits'])->name('wallet.deposits');
         Route::get('wallet/transfer', [WalletController::class, 'bulkTransferForm'])->name('wallet.bulk.form');
         Route::post('wallet/transfer', [WalletController::class, 'bulkTransferSubmit'])->name('wallet.bulk.submit');
-        Route::post('/wallet/transactions/{id}/recall', [WalletController::class, 'recallTransfer'])->name('wallet.transactions.recall')->middleware('auth');
+        Route::post('/wallet/transactions/{id}/recall', [WalletController::class, 'recallTransfer'])->name('wallet.transactions.recall');
 
         Route::get('wallets', [WalletController::class, 'wallets'])->name('account.wallets');
         Route::get('wallets/{wallet}/histories', [WalletController::class, 'histories'])->name('wallets.histories');
@@ -231,6 +232,9 @@ Route::middleware(['user'])->group(function () {
         Route::get('deposits', [DepositController::class, 'index'])->name('deposits.index');
         Route::post('deposits/{deposit}/update-status', [DepositController::class, 'updateStatus'])->name('deposits.updateStatus');
         Route::post('deposits/{deposit}/bank-name', [DepositController::class, 'updateBankName'])->name('deposits.updateBankName');
+
+        Route::get('task-cost-period', [TaskCostPeriodController::class, 'index'])->name('task_cost_period.index');
+        Route::post('task-cost-period/rebuild', [TaskCostPeriodController::class, 'rebuild'])->name('task_cost_period.rebuild');
         
     });
 });
