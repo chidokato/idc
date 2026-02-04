@@ -12,7 +12,7 @@
   </div>
 
   <div class="row">
-    <div class="col-sm-4">
+    <div class="col-sm-4 mb-3">
       @if ($errors->any())
       <div class="alert alert-danger">
         <ul class="mb-0">
