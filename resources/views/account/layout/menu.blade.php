@@ -87,6 +87,12 @@
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Quản lý ví tiền</span>
             </a>
           </li>
+          <!-- <li class="nav-item ">
+            <a class="js-nav-tooltip-link nav-link " href="account/bulk-mail" title="Gửi mail" data-placement="left">
+              <i class="tio-dashboard nav-icon"></i>
+              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Gửi mail</span>
+            </a>
+          </li> -->
           @endif
 
           <li class="nav-item">
@@ -115,13 +121,19 @@
           </li>
 
           <li class="nav-item">
-            <small class="nav-subtitle" title="Pages">Hướng dẫn</small>
+            <small class="nav-subtitle" title="Pages">Tiện ích</small>
             <small class="tio-more-horizontal nav-subtitle-replacer"></small>
           </li>
           <li class="nav-item ">
             <a class="js-nav-tooltip-link nav-link " href="account/opened" title="Hướng dẫn sử dụng" data-placement="left">
               <i class="tio-book-opened nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Hướng dẫn sử dụng</span>
+            </a>
+          </li>
+          <li class="nav-item ">
+            <a class="js-nav-tooltip-link nav-link " href="account/invite" title="Hướng dẫn sử dụng" data-placement="left">
+              <i class="tio-book-opened nav-icon"></i>
+              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Tạo thư mời</span>
             </a>
           </li>
         </ul>

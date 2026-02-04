@@ -36,7 +36,7 @@ class TaskCostPeriodController extends Controller
                 ->withQueryString();
         }
 
-        return view('task_cost_period.index', [
+        return view('account.index', [
             'reports'  => $reports,
             'reportId' => $reportId,
             'groupBy'  => $groupBy,

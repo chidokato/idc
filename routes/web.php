@@ -32,6 +32,8 @@ use App\Http\Controllers\Admin\StreetController;
 use App\Http\Controllers\Admin\UploadController;
 use App\Http\Controllers\Auth\GoogleController;
 
+use App\Http\Controllers\InviteController;
+
 use App\Http\Controllers\AjaxController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\HomeController;
@@ -41,8 +43,20 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\DepositController;
 
+use Illuminate\Support\Facades\Mail;
+
 use App\Http\Controllers\Account\ExpenseController;
 use App\Http\Controllers\Account\TaskCostPeriodController;
+use App\Http\Controllers\Account\BulkMailController;
+
+// Route::get('/test-mail', function () {
+//     Mail::raw('Hello test', function ($m) {
+//         $m->to('tuannv.idc@dxmb.vn')->subject('Test Gmail SMTP');
+//     });
+
+//     return 'sent';
+// });
+
 
 Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
      \UniSharp\LaravelFilemanager\Lfm::routes();
@@ -170,7 +184,7 @@ Route::prefix('admin')->group(function () {
 Route::get('dangnhap', [AccountController::class, 'dangnhap'])->name('dangnhap');
 Route::middleware(['user'])->group(function () {
     Route::prefix('account')->group(function () {
-        Route::get('main', [AccountController::class, 'index'])->name('account.main');
+        // Route::get('main', [AccountController::class, 'index'])->name('account.main');
         Route::get('opened', [AccountController::class, 'opened'])->name('account.opened');
         Route::get('edit', [AccountController::class, 'edit'])->name('account.edit');
         Route::post('update', [AccountController::class, 'update'])->name('account.update');
@@ -233,9 +247,18 @@ Route::middleware(['user'])->group(function () {
         Route::post('deposits/{deposit}/update-status', [DepositController::class, 'updateStatus'])->name('deposits.updateStatus');
         Route::post('deposits/{deposit}/bank-name', [DepositController::class, 'updateBankName'])->name('deposits.updateBankName');
 
-        Route::get('task-cost-period', [TaskCostPeriodController::class, 'index'])->name('task_cost_period.index');
+        // Task Cost Period
+        Route::get('main', [TaskCostPeriodController::class, 'index'])->name('task_cost_period.index');
         Route::post('task-cost-period/rebuild', [TaskCostPeriodController::class, 'rebuild'])->name('task_cost_period.rebuild');
-        
+
+        // BulkMailController
+        Route::get('bulk-mail', [BulkMailController::class, 'create'])->name('admin.bulk_mail.create');
+        Route::post('bulk-mail/send', [BulkMailController::class, 'send'])->name('admin.bulk_mail.send');
+
+        // thư mời
+        Route::get('invite', [InviteController::class, 'create'])->name('invite.create');
+        Route::post('/invite', [InviteController::class, 'store'])->name('invite.store');
+        Route::get('invite/{invite}/download', [InviteController::class, 'download'])->name('invite.download');
     });
 });
 

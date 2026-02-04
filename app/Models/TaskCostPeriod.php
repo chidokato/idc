@@ -27,5 +27,6 @@ class TaskCostPeriod extends Model
         'period_start' => 'date',
         'period_end'   => 'date',
         'sum_actual'   => 'decimal:2',
+        'last_calc_at' => 'datetime',
     ];
 }
