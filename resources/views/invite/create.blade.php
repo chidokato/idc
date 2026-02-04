@@ -49,14 +49,14 @@
     </div>
 
     <div class="col-sm-3">
-      <div class="w-100"><img class="w-100" src="templates/anhmau.jpg"></div>
+      <div class="w-100 img-result"><img class="w-100" src="templates/anhmau.jpg"></div>
     </div>
 
-    <div class="col-sm-3">
+    <!-- <div class="col-sm-3">
       <div class="w-100 img-result">
         <div class="text-muted">Ảnh kết quả sẽ hiện ở đây.</div>
       </div>
-    </div>
+    </div> -->
 
   </div>
   
