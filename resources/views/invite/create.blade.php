@@ -44,7 +44,7 @@
           <input type="text" name="title" class="form-control" value="{{ old('title') }}">
         </div>
 
-        <button class="btn btn-primary">Tạo ảnh & tải về</button>
+        <button class="btn btn-primary">Tạo ảnh & tải về !</button>
       </form>
     </div>
 
