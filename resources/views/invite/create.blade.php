@@ -63,6 +63,14 @@
     </div>
 
   </div>
+
+  @if(auth()->check() && in_array((int)auth()->user()->rank, [1], true))
+  <div class="row">
+    @foreach($data as $val)
+    <div class="col-sm-2 mb-3"><img class="w-100" src="{{$val->output_path}}"></div>
+    @endforeach
+  </div>
+  @endif
   
 </div>
 @endsection

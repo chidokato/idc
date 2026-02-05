@@ -10,7 +10,8 @@ class InviteController extends Controller
 {
     public function create()
     {
-        return view('invite.create');
+        $data = Invite::get();
+        return view('invite.create', compact('data'));
     }
 
     public function store(Request $request)
