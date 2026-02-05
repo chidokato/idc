@@ -115,12 +115,15 @@ class InviteController extends Controller
 
         // ====== AVATAR ======
         $avatarAbs = public_path($invite->avatar_path);
+        
         if (!file_exists($avatarAbs)) {
             throw new \Exception('Không tìm thấy avatar: ' . $avatarAbs);
         }
 
         $avatarSize = 650;
-        $avatar = Image::make($avatarAbs)->fit($avatarSize, $avatarSize);
+        $avatar = Image::make($avatarAbs)
+            ->orientate()               // ✅ auto xoay đúng theo EXIF
+            ->fit($avatarSize, $avatarSize);
 
         // mask tròn
         $mask = Image::canvas($avatarSize, $avatarSize);
