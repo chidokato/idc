@@ -6,57 +6,61 @@
   <div class="page-header">
     <div class="row align-items-center">
       <div class="col-sm mb-2 mb-sm-0">
-        <h1 class="page-header-title">Trang chủ</h1>
+        <h1 class="page-header-title">TẠO THƯ MỜI ONLINE</h1>
       </div>
     </div>
   </div>
 
   <div class="row">
-    <div class="col-sm-4 mb-3">
-      @if ($errors->any())
-      <div class="alert alert-danger">
-        <ul class="mb-0">
-          @foreach ($errors->all() as $e) <li>{{ $e }}</li> @endforeach
-        </ul>
-      </div>
-      @endif
-      <form id="inviteForm" method="POST" action="{{ route('invite.store') }}" enctype="multipart/form-data">
-        @csrf
-        <div class="mb-3">
-          <label class="form-label">Ảnh avatar</label>
-          <input type="file" name="avatar" class="form-control" accept="image/*" required>
-          <small class="text-muted">PNG/JPG/WebP, tối đa 4MB</small>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Họ và tên</label>
-          <div class="input-group">
-            <select name="gender" class="form-control" style="max-width:120px">
-              <option value="MR">MR</option>
-              <option value="MS">MS</option>
-            </select>
-            <input type="text" name="full_name" class="form-control" value="{{ old('full_name') }}" required>
+    <div class="col-sm-3 mb-3 ">
+      <div class="card">
+        <div class="card-body">
+          @if ($errors->any())
+          <div class="alert alert-danger">
+            <ul class="mb-0">
+              @foreach ($errors->all() as $e) <li>{{ $e }}</li> @endforeach
+            </ul>
           </div>
-        </div>
+          @endif
+          <form id="inviteForm" method="POST" action="{{ route('invite.store') }}" enctype="multipart/form-data">
+            @csrf
+            <div class="mb-3">
+              <label class="form-label">Ảnh avatar</label>
+              <input type="file" name="avatar" class="form-control" accept="image/*" required>
+              <small class="text-muted">PNG/JPG/WebP, tối đa 4MB</small>
+            </div>
 
-        <div class="mb-3">
-          <label class="form-label">Chức vụ</label>
-          <input type="text" name="title" class="form-control" value="{{ old('title') }}">
-        </div>
+            <div class="mb-3">
+              <label class="form-label">Họ và tên</label>
+              <div class="input-group">
+                <select name="gender" class="form-control" style="max-width:120px">
+                  <option value="MR">MR</option>
+                  <option value="MS">MS</option>
+                </select>
+                <input type="text" name="full_name" class="form-control" value="{{ old('full_name') }}" required>
+              </div>
+            </div>
 
-        <button class="btn btn-primary">Tạo ảnh & tải về !</button>
-      </form>
+            <div class="mb-3">
+              <label class="form-label">Chức vụ</label>
+              <input type="text" name="title" class="form-control" value="{{ old('title') }}">
+            </div>
+
+            <button class="btn btn-primary">Tạo ảnh & tải về !</button>
+          </form>
+        </div>
+      </div>
     </div>
 
-    <div class="col-sm-3">
+    <div class="col-sm-3 mb-3">
       <div class="w-100 img-result"><img class="w-100" src="templates/anhmau.jpg"></div>
     </div>
 
-    <!-- <div class="col-sm-3">
-      <div class="w-100 img-result">
-        <div class="text-muted">Ảnh kết quả sẽ hiện ở đây.</div>
+    <div class="col-sm-6 mb-3">
+      <div>
+        <img class="w-100" src="templates/Timeline.jpg">
       </div>
-    </div> -->
+    </div>
 
   </div>
   

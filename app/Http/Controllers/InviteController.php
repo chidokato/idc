@@ -115,7 +115,7 @@ class InviteController extends Controller
 
         // ====== AVATAR ======
         $avatarAbs = public_path($invite->avatar_path);
-        
+
         if (!file_exists($avatarAbs)) {
             throw new \Exception('Không tìm thấy avatar: ' . $avatarAbs);
         }
@@ -157,7 +157,7 @@ class InviteController extends Controller
         $name = mb_strtoupper($invite->full_name);
 
         // tên
-        $img->text($name, intval($w / 2), $avatarY + $avatarSize + 170, function ($font) use ($fontRegAbs) {
+        $img->text($name, intval($w / 2), $avatarY + $avatarSize + 180, function ($font) use ($fontRegAbs) {
             $font->file($fontRegAbs); // FONT ITALIC
             $font->size(120);
             $font->color('#ffffff');
@@ -168,7 +168,7 @@ class InviteController extends Controller
 
         // chức vụ
         if (!empty($invite->title)) {
-            $img->text($invite->title, intval($w / 2), $avatarY + $avatarSize + 320, function ($font) use ($fontXBold) {
+            $img->text($invite->title, intval($w / 2), $avatarY + $avatarSize + 330, function ($font) use ($fontXBold) {
                 $font->file($fontXBold);
                 $font->size(90);
                 $font->color('#fff');
