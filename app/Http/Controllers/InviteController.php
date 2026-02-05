@@ -10,7 +10,7 @@ class InviteController extends Controller
 {
     public function create()
     {
-        $data = Invite::get();
+        $data = Invite::orderByDesc('id')->get();
         return view('invite.create', compact('data'));
     }
 
