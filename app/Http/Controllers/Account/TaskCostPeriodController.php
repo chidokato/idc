@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\TaskCostPeriod;
 use App\Models\Report; // nếu bạn có model Report
+use Illuminate\Support\Carbon;
 
 class TaskCostPeriodController extends Controller
 {
@@ -36,7 +37,7 @@ class TaskCostPeriodController extends Controller
                 ->withQueryString();
         }
 
-        return view('account.index', [
+        return view('account.report.statistical', [
             'reports'  => $reports,
             'reportId' => $reportId,
             'groupBy'  => $groupBy,
@@ -50,87 +51,113 @@ class TaskCostPeriodController extends Controller
      * - sum_actual = SUM(COALESCE(actual_costs,0))
      *   (Nếu bạn muốn net: actual + extra - refund, nói mình sửa)
      */
-    public function rebuild(Request $request)
+    
+
+    public function updateMonthly(Request $request, $note)
     {
-        $reportId = (string) $request->report_id;
-        if (!$reportId) {
-            return redirect()->back()->with('error', 'Thiếu report_id');
+        // note: post|san|nhom... (hiện bạn cần post)
+        if ($note !== 'post') {
+            return response()->json([
+                'ok' => false,
+                'message' => "Chưa hỗ trợ note = {$note} (hiện chỉ làm post)."
+            ], 422);
         }
 
-        // Lấy period_start/period_end từ bảng report (nếu có)
-        // Nếu report table của bạn khác cấu trúc, sửa tại đây.
-        $report = Report::find($reportId);
-        if (!$report) {
-            return redirect()->back()->with('error', 'Không tìm thấy report');
+        $data = $request->validate([
+            'year'  => ['required','integer','min:2000','max:2100'],
+            'month' => ['required','integer','min:1','max:12'],
+        ]);
+
+        $year  = (int) $data['year'];
+        $month = (int) $data['month'];
+
+        // 2 kỳ: 1-15 và 16-cuối tháng
+        $periods = $this->buildPeriods($year, $month);
+
+        $now = now();
+        $totalUpsert = 0;
+
+        DB::beginTransaction();
+        try {
+            foreach ($periods as $p) {
+                // Query tổng hợp theo post_id
+                $rows = DB::table('tasks')
+                    ->select([
+                        DB::raw("'{$year}' as year"),
+                        DB::raw("'{$month}' as month"),
+                        DB::raw((int)$p['period_no']." as period_no"),
+                        DB::raw("'{$p['start']}' as period_start"),
+                        DB::raw("'{$p['end']}' as period_end"),
+                        DB::raw("NULL as report_id"),
+                        'post_id',
+                        DB::raw('COALESCE(SUM(actual_costs),0) as sum_actual'),
+                    ])
+                    ->whereNotNull('post_id')
+                    ->where('post_id', '!=', '')
+                    // Giả định tasks có created_at để lọc theo kỳ
+                    ->whereDate('created_at', '>=', $p['start'])
+                    ->whereDate('created_at', '<=', $p['end'])
+                    // chỉ lấy những task có actual_costs (tuỳ bạn bỏ dòng này)
+                    ->whereNotNull('actual_costs')
+                    ->groupBy('post_id')
+                    ->get();
+
+                // Upsert vào bảng tổng hợp
+                foreach ($rows as $r) {
+                    DB::table('task_cost_monthly')->updateOrInsert(
+                        [
+                            'year'       => (string)$year,     // cột year là char(7) nhưng bạn đang dùng "2026" => ok
+                            'month'      => (string)$month,
+                            'period_no'  => (int)$p['period_no'],
+                            'post_id'    => $r->post_id,
+                            'period_start' => $p['start'],
+                            'period_end'   => $p['end'],
+                        ],
+                        [
+                            'sum_actual'   => (float)$r->sum_actual,
+                            'last_calc_at' => $now,
+                            'updated_at'   => $now,
+                            'created_at'   => $now, // updateOrInsert sẽ set luôn nếu insert
+                        ]
+                    );
+                    $totalUpsert++;
+                }
+            }
+
+            DB::commit();
+            return response()->json([
+                'ok' => true,
+                'message' => "Đã tổng hợp chi phí theo dự án (post_id) cho {$month}/{$year}.",
+                'rows_upserted' => $totalUpsert,
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'ok' => false,
+                'message' => 'Lỗi khi tổng hợp: '.$e->getMessage(),
+            ], 500);
         }
-
-        // Giả định report có start_date/end_date (date)
-        // Nếu report của bạn lưu kiểu khác, bạn map lại.
-        $start = $report->start_date; // '2026-01-01'
-        $end   = $report->end_date;   // '2026-01-15' hoặc '2026-01-31'
-
-        // Tính year_month + period_no (tùy bạn dùng, vẫn lưu cho rõ)
-        $yearMonth = date('Y-m', strtotime($start));
-        $dayStart  = (int) date('d', strtotime($start));
-        $periodNo  = ($dayStart <= 15) ? 1 : 2;
-
-        // Xóa dữ liệu cũ của report này trước (an toàn, tránh sót)
-        DB::table('task_cost_period')->where('report_id', $reportId)->delete();
-
-        // Insert lại từ tasks
-        // Nếu bạn muốn chỉ approved=1, active=1... bạn thêm WHERE ở dưới.
-        DB::table('task_cost_period')->insertUsing(
-            [
-                'year_month',
-                'period_no',
-                'period_start',
-                'period_end',
-                'report_id',
-                'department_id',
-                'department_lv1',
-                'department_lv2',
-                'user_id',
-                'channel_id',
-                'sum_actual',
-                'last_calc_at',
-                'created_at',
-                'updated_at',
-            ],
-            DB::table('tasks')
-                ->selectRaw("
-                    ? as year_month,
-                    ? as period_no,
-                    ? as period_start,
-                    ? as period_end,
-                    report_id,
-                    department_id,
-                    department_lv1,
-                    department_lv2,
-                    user_id,
-                    channel_id,
-                    SUM(COALESCE(actual_costs,0)) as sum_actual,
-                    NOW() as last_calc_at,
-                    NOW() as created_at,
-                    NOW() as updated_at
-                ", [$yearMonth, $periodNo, $start, $end])
-                ->where('report_id', $reportId)
-                ->where('approved', 1)
-                // ->where('active', '1') // nếu bạn muốn
-                ->groupBy([
-                    'report_id',
-                    'department_id',
-                    'department_lv1',
-                    'department_lv2',
-                    'user_id',
-                    'channel_id',
-                ])
-        );
-
-        return redirect()->route('task_cost_period.index', [
-            'report_id' => $reportId,
-            'group_by' => $request->get('group_by', 'full'),
-        ])->with('success', 'Rebuild thành công cho kỳ: ' . $reportId);
     }
+
+    /**
+     * Trả về 2 kỳ trong tháng:
+     * - period_no=1: 01-15
+     * - period_no=2: 16-lastday
+     */
+    protected function buildPeriods(int $year, int $month): array
+    {
+        $start1 = Carbon::create($year, $month, 1)->toDateString();
+        $end1   = Carbon::create($year, $month, 15)->toDateString();
+
+        $start2 = Carbon::create($year, $month, 16)->toDateString();
+        $end2   = Carbon::create($year, $month, 1)->endOfMonth()->toDateString();
+
+        return [
+            ['period_no' => 1, 'start' => $start1, 'end' => $end1],
+            ['period_no' => 2, 'start' => $start2, 'end' => $end2],
+        ];
+    }
+
 
     private function groupCols($groupBy)
     {

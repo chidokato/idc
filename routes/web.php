@@ -184,7 +184,7 @@ Route::prefix('admin')->group(function () {
 Route::get('dangnhap', [AccountController::class, 'dangnhap'])->name('dangnhap');
 Route::middleware(['user'])->group(function () {
     Route::prefix('account')->group(function () {
-        // Route::get('main', [AccountController::class, 'index'])->name('account.main');
+        Route::get('main', [AccountController::class, 'index'])->name('account.main');
         Route::get('opened', [AccountController::class, 'opened'])->name('account.opened');
         Route::get('edit', [AccountController::class, 'edit'])->name('account.edit');
         Route::post('update', [AccountController::class, 'update'])->name('account.update');
@@ -248,8 +248,9 @@ Route::middleware(['user'])->group(function () {
         Route::post('deposits/{deposit}/bank-name', [DepositController::class, 'updateBankName'])->name('deposits.updateBankName');
 
         // Task Cost Period
-        Route::get('main', [TaskCostPeriodController::class, 'index'])->name('task_cost_period.index');
-        Route::post('task-cost-period/rebuild', [TaskCostPeriodController::class, 'rebuild'])->name('task_cost_period.rebuild');
+        Route::get('statistical', [TaskCostPeriodController::class, 'index'])->name('task_cost_period.index');
+        Route::post('task-cost-post/update/{note}', [TaskCostPeriodController::class, 'updateMonthly'])->name('task_cost_post.update');
+
 
         // BulkMailController
         Route::get('bulk-mail', [BulkMailController::class, 'create'])->name('admin.bulk_mail.create');
@@ -257,7 +258,7 @@ Route::middleware(['user'])->group(function () {
 
         // thư mời
         Route::get('invite', [InviteController::class, 'create'])->name('invite.create');
-        Route::post('/invite', [InviteController::class, 'store'])->name('invite.store');
+        Route::post('invite', [InviteController::class, 'store'])->name('invite.store');
         Route::get('invite/{invite}/download', [InviteController::class, 'download'])->name('invite.download');
     });
 });
