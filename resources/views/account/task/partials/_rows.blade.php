@@ -150,10 +150,10 @@
         {{ number_format((float)$task->extra_money, 0, ',', '.') }}
       </span>
     </td>
-    @if($rank === 1)
+    
     <td class="text-center money">
       <label class="toggle-switch-sm switch mg-0">
-        <input type="checkbox"
+        <input type="checkbox" @if($rank != 1) disabled @endif
           class="toggle-switch-input js-toggle-settled"
           data-url="{{ route('tasks.toggleSettled', $task) }}"
           {{ (int)$task->settled === 1 ? 'checked' : '' }}>
@@ -162,7 +162,7 @@
         </span>
       </label>
     </td>
-    @endif
+    
     <td>
       <div style="width: 200px;" class="note" data-toggle="tooltip" data-placement="top"
            data-original-title="{{ $task->content ?? '' }}">

@@ -3,6 +3,7 @@
 @section('title') Công Ty Cổ Phần Bất Động Sản Indochine @endsection
 
 @section('css')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
   .select2-selection--multiple{ height:41px }
   .select2-search__field{ height:30px }
@@ -16,6 +17,16 @@
     opacity: .7;
     margin-top: 2px;
     line-height: 1.1;
+  }
+
+  .select2-container--default .select2-selection--multiple {
+      min-height: 38px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+  }
+
+  .select2-results__option {
+      padding: 8px 12px;
   }
 </style>
 @endsection
@@ -67,7 +78,7 @@
                   <option value="">-- Thời gian --</option>
                   @foreach($reports as $val)
                     <option value="{{ $val->id }}" {{ (string)$selectedReportId === (string)$val->id ? 'selected' : '' }}>
-                      {{ \Carbon\Carbon::parse($val->time_start)->format('d/m') }} - {{ \Carbon\Carbon::parse($val->time_end)->format('d/m') }} _ {{ \Carbon\Carbon::parse($val->time_start)->format('Y') }}
+                      {{ \Carbon\Carbon::parse($val->time_start)->format('d') }} - {{ \Carbon\Carbon::parse($val->time_end)->format('d') }} _ Th {{ \Carbon\Carbon::parse($val->time_start)->format('m') }} {{ \Carbon\Carbon::parse($val->time_start)->format('Y') }}
                     </option>
                   @endforeach
                 </select>
@@ -75,18 +86,18 @@
               </div>
 
               <div class="col-sm-4 col-md-4">
-                <div class="form-group">
-                  <select name="handler_ids[]" class="form-control yourname2" multiple>
-                    @foreach($users as $us)
-                      <option value="{{ $us->id }}"
-                        data-department="{{ $us->department?->name }}"
-                        {{ in_array($us->id, (array) request('handler_ids', [])) ? 'selected' : '' }}>
-                        {{ $us->yourname }}
-                      </option>
-                    @endforeach
-                  </select>
+                    <div class="form-group">
+                        <select name="handler_ids[]" class="form-control yourname2" multiple>
+                            @foreach($users as $us)
+                                <option value="{{ $us->id }}"
+                                    data-department="{{ $us->department?->name }}"
+                                    {{ in_array($us->id, (array) request('handler_ids', [])) ? 'selected' : '' }}>
+                                    {{ $us->yourname }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
-              </div>
 
 
               <div class="col-sm-2 col-md-2">
@@ -384,36 +395,38 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="account/js/account.js"></script>
 
+
+
 <script>
 $(document).ready(function () {
-  $('.yourname2').select2({
-    placeholder: 'Nhập Họ và Tên',
-    allowClear: true,
-    matcher: function (params, data) {
-      if ($.trim(params.term) === '') {
-        return data;
-      }
+    $('.yourname2').select2({
+        width: '100%',
+        placeholder: "Tìm theo tên",
+        allowClear: true,
+        templateResult: function (data) {
 
-      if (typeof data.text === 'undefined') {
-        return null;
-      }
+            if (!data.id) return data.text;
 
-      let term = params.term.toLowerCase();
-      let text = data.text.toLowerCase();
-      let department = $(data.element).data('department')?.toLowerCase() || '';
+            let department = $(data.element).data('department') ?? '';
 
-      if (text.includes(term) || department.includes(term)) {
-        return data;
-      }
+            return $(`
+                <div style="position:relative; width:100%;">
+                    <span>${data.text}</span>
+                    <span style="
+                        position:absolute;
+                        right:10px;
+                        top:0;
+                        font-size:12px;
+                        color:#999;">
+                        ${department}
+                    </span>
+                </div>
+            `);
+        }
+    });
 
-      return null;
-    }
-  });
 });
 </script>
-
-
-
 
 
 @endsection
