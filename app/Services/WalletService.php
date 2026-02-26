@@ -545,6 +545,15 @@ class WalletService
     public function unsettleTask(Task $task, int $adminId): array
     {
         return DB::transaction(function () use ($task, $adminId) {
+            
+            // ✅ CHẶN: rank > 1 không được hủy tất toán
+            $actor = User::query()->select('id', 'rank')->findOrFail($adminId);
+            $actorRank = (int)($actor->rank ?? 0);
+            if ($actorRank !== 1) {
+                throw ValidationException::withMessages([
+                    'permission' => 'Bạn không có quyền hủy tất toán (chỉ Admin rank = 1).',
+                ]);
+            }
 
             $task = Task::whereKey($task->id)->lockForUpdate()->firstOrFail();
 
