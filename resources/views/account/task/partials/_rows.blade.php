@@ -26,6 +26,7 @@
 
     $isMine = ($taskUserId === $meId);
     $isHeld = ((int)($task->paid ?? 0) === 1);
+    $isExtra = ((float)($task->extra_money) > 0);
 
     $switchId = 'holdSwitch'.$task->id;
 
@@ -152,8 +153,9 @@
     </td>
     
     <td class="text-center money">
+      @if($rank ===1 || $isMine && $isExtra) 
       <label class="toggle-switch-sm switch mg-0">
-        <input type="checkbox" @if($rank != 1) disabled @endif
+        <input type="checkbox"
           class="toggle-switch-input js-toggle-settled"
           data-url="{{ route('tasks.toggleSettled', $task) }}"
           {{ (int)$task->settled === 1 ? 'checked' : '' }}>
@@ -161,6 +163,7 @@
           <span class="toggle-switch-indicator"></span>
         </span>
       </label>
+      @endif
     </td>
     
     <td>
