@@ -269,15 +269,44 @@ $(function () {
 $(document).on('change', '.js-toggle-settled', function () {
   const cb = $(this);
   const url = cb.data('url');
-  const settled = cb.is(':checked') ? 1 : 0;
 
+  const settled = cb.is(':checked') ? 1 : 0;
+  const oldState = !cb.is(':checked'); // dùng để rollback UI nếu hủy/lỗi
+
+  // ✅ Chỉ confirm khi BẬT (ON). Nếu bạn muốn confirm cả OFF thì bỏ if này.
+  if (settled === 1) {
+    Swal.fire({
+      icon: 'question',
+      title: 'Xác nhận tất toán?',
+      text: 'Bạn có đồng ý thực hiện tất toán cho tác vụ này không?',
+      showCancelButton: true,
+      confirmButtonText: 'Đồng ý',
+      cancelButtonText: 'Không',
+      reverseButtons: true
+    }).then((result) => {
+      if (!result.isConfirmed) {
+        cb.prop('checked', oldState); // rollback về OFF
+        return;
+      }
+      // user đồng ý -> gọi API
+      doToggleSettled(cb, url, settled, oldState);
+    });
+
+    return; // dừng ở đây để chờ confirm
+  }
+
+  // OFF (nếu user không được tắt thì checkbox đã disabled từ Blade rồi,
+  // nhưng cứ để an toàn: nếu vẫn lọt vào đây thì gọi API hoặc rollback tùy bạn)
+  doToggleSettled(cb, url, settled, oldState);
+});
+
+
+function doToggleSettled(cb, url, settled, oldState) {
   cb.prop('disabled', true);
 
   $.post(url, { settled })
     .done(function (res) {
       if (res && (res.ok === true || res.success === true)) {
-        // optional: update UI theo response
-        // ví dụ: res.task.refund_money_formatted / extra_money_formatted
         const $row = cb.closest('tr');
 
         if (res.task) {
@@ -293,21 +322,21 @@ $(document).on('change', '.js-toggle-settled', function () {
           showToast('success', res.message || (settled ? 'Đã tất toán' : 'Đã hủy tất toán'));
         }
       } else {
-        cb.prop('checked', !cb.is(':checked')); // revert
+        cb.prop('checked', oldState); // revert
         if (typeof showToast === 'function') {
           showToast('error', (res && res.message) || 'Thất bại');
         }
       }
     })
     .fail(function (xhr) {
-      cb.prop('checked', !cb.is(':checked')); // revert
+      cb.prop('checked', oldState); // revert
       const msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Thất bại';
       if (typeof showToast === 'function') showToast('error', msg);
     })
     .always(function () {
       cb.prop('disabled', false);
     });
-});
+}
 
 /*=========== DUYỆT đóng tiền marketing ================*/
 document.addEventListener('change', function (e) {
