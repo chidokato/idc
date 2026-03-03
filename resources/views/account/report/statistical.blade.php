@@ -70,17 +70,22 @@
           </div>
         </div>
         <div class="card-body">
-          <table>
-            <th>
-              <td>Dự án</td>
-              <td>Tổng tiền</td>
-            </th>
-            @foreach($duan_idc as $val)
+          <table class="table table-lg table-thead-bordered table-nowrap table-align-middle card-table">
+            <thead class="thead-light"> 
+            <tr>
+              <th>Dự án</th>
+              <th>Tổng tiền</th>
+            </tr>
+          </thead>
+          <tbody>
+@foreach($duan_idc as $val)
             <tr>
               <td>{{ $val->Post->name }}</td>
               <td>{{ $val->total_cost }}</td>
             </tr>
             @endforeach
+          </tbody>
+            
           </table>
         </div>
       </div>
