@@ -70,7 +70,18 @@
           </div>
         </div>
         <div class="card-body">
-          
+          <table>
+            <th>
+              <td>Dự án</td>
+              <td>Tổng tiền</td>
+            </th>
+            @foreach($duan_idc as $val)
+            <tr>
+              <td>{{ $val->Post->name }}</td>
+              <td>{{ $val->total_cost }}</td>
+            </tr>
+            @endforeach
+          </table>
         </div>
       </div>
     </div>

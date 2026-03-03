@@ -15,6 +15,7 @@ class TaskCostPeriodController extends Controller
 {
     public function index(Request $request)
     {
+        $duan_idc = TaskCostPeriod::get();
         // Lấy danh sách report để dropdown
         // Nếu table report tên khác, bạn sửa lại model/logic ở đây.
         $reports = Report::orderByDesc('id')->get();
@@ -47,6 +48,7 @@ class TaskCostPeriodController extends Controller
             'groupBy'  => $groupBy,
             'rows'     => $rows,
             'departments'     => $departments,
+            'duan_idc'     => $duan_idc,
         ]);
     }
 

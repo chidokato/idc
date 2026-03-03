@@ -29,4 +29,9 @@ class TaskCostPeriod extends Model
         'sum_actual'   => 'decimal:2',
         'last_calc_at' => 'datetime',
     ];
+
+    public function Post()
+    {
+        return $this->belongsTo(Post::class, 'post_id');
+    }
 }
