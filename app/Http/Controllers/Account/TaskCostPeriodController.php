@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Account;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
+use App\Models\Department;
 use Illuminate\Support\Facades\DB;
 use App\Models\TaskCostPeriod;
+use App\Models\Task;
 use App\Models\Report; // nếu bạn có model Report
 use Illuminate\Support\Carbon;
 
@@ -16,6 +18,8 @@ class TaskCostPeriodController extends Controller
         // Lấy danh sách report để dropdown
         // Nếu table report tên khác, bạn sửa lại model/logic ở đây.
         $reports = Report::orderByDesc('id')->get();
+
+        $departments = Department::where('parent', 0)->get();
 
         $reportId = $request->filled('report_id')
             ? (string) $request->report_id
@@ -42,6 +46,7 @@ class TaskCostPeriodController extends Controller
             'reportId' => $reportId,
             'groupBy'  => $groupBy,
             'rows'     => $rows,
+            'departments'     => $departments,
         ]);
     }
 
@@ -53,90 +58,37 @@ class TaskCostPeriodController extends Controller
      */
     
 
-    public function updateMonthly(Request $request, $note)
+    public function updateMonthly(Request $request)
     {
-        // note: post|san|nhom... (hiện bạn cần post)
-        if ($note !== 'post') {
-            return response()->json([
-                'ok' => false,
-                'message' => "Chưa hỗ trợ note = {$note} (hiện chỉ làm post)."
-            ], 422);
-        }
+        $departmentId = $request->department_id;
+        $reportIds    = $request->report_id; // mảng
+        
+        $rows = Task::query()
+        ->where('actual_costs', '>', 0)
+        ->when($departmentId, fn($q) => $q->where('department_lv1', $departmentId))
+        ->when($reportIds, fn($q) => $q->whereIn('report_id', $reportIds))
+        ->selectRaw('post_id, SUM(actual_costs) as total_cost')
+        ->groupBy('post_id')
+        ->get();
 
-        $data = $request->validate([
-            'year'  => ['required','integer','min:2000','max:2100'],
-            'month' => ['required','integer','min:1','max:12'],
-        ]);
-
-        $year  = (int) $data['year'];
-        $month = (int) $data['month'];
-
-        // 2 kỳ: 1-15 và 16-cuối tháng
-        $periods = $this->buildPeriods($year, $month);
-
+        // Chuẩn bị data để upsert
         $now = now();
-        $totalUpsert = 0;
+        $upsertData = $rows->map(function ($r) use ($now, $departmentId, $reportIds) {
+            return [
+                'post_id' => (int) $r->post_id,
+                'total_cost' => (float) $r->total_cost,
+                'department_lv1' => $departmentId,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+        })->all();
 
-        DB::beginTransaction();
-        try {
-            foreach ($periods as $p) {
-                // Query tổng hợp theo post_id
-                $rows = DB::table('tasks')
-                    ->select([
-                        DB::raw("'{$year}' as year"),
-                        DB::raw("'{$month}' as month"),
-                        DB::raw((int)$p['period_no']." as period_no"),
-                        DB::raw("'{$p['start']}' as period_start"),
-                        DB::raw("'{$p['end']}' as period_end"),
-                        DB::raw("NULL as report_id"),
-                        'post_id',
-                        DB::raw('COALESCE(SUM(actual_costs),0) as sum_actual'),
-                    ])
-                    ->whereNotNull('post_id')
-                    ->where('post_id', '!=', '')
-                    // Giả định tasks có created_at để lọc theo kỳ
-                    ->whereDate('created_at', '>=', $p['start'])
-                    ->whereDate('created_at', '<=', $p['end'])
-                    // chỉ lấy những task có actual_costs (tuỳ bạn bỏ dòng này)
-                    ->whereNotNull('actual_costs')
-                    ->groupBy('post_id')
-                    ->get();
+        DB::table('task_cost_period')->upsert(
+            $upsertData,
+            ['post_id'],                 // key chống trùng
+            ['total_cost'] // fields update khi đã tồn tại
+        );
 
-                // Upsert vào bảng tổng hợp
-                foreach ($rows as $r) {
-                    DB::table('task_cost_monthly')->updateOrInsert(
-                        [
-                            'year'       => (string)$year,     // cột year là char(7) nhưng bạn đang dùng "2026" => ok
-                            'month'      => (string)$month,
-                            'period_no'  => (int)$p['period_no'],
-                            'post_id'    => $r->post_id,
-                            'period_start' => $p['start'],
-                            'period_end'   => $p['end'],
-                        ],
-                        [
-                            'sum_actual'   => (float)$r->sum_actual,
-                            'last_calc_at' => $now,
-                            'updated_at'   => $now,
-                            'created_at'   => $now, // updateOrInsert sẽ set luôn nếu insert
-                        ]
-                    );
-                    $totalUpsert++;
-                }
-            }
-
-            DB::commit();
-            return response()->json([
-                'ok' => true,
-                'message' => "Đã tổng hợp chi phí theo dự án (post_id) cho {$month}/{$year}.",
-                'rows_upserted' => $totalUpsert,
-            ]);
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            return response()->json([
-                'ok' => false,
-                'message' => 'Lỗi khi tổng hợp: '.$e->getMessage(),
-            ], 500);
-        }
     }
 
     /**

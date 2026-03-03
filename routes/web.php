@@ -249,7 +249,7 @@ Route::middleware(['user'])->group(function () {
 
         // Task Cost Period
         Route::get('statistical', [TaskCostPeriodController::class, 'index'])->name('task_cost_period.index');
-        Route::post('task-cost-post/update/{note}', [TaskCostPeriodController::class, 'updateMonthly'])->name('task_cost_post.update');
+        Route::post('task-cost-post/update', [TaskCostPeriodController::class, 'updateMonthly'])->name('task_cost_post.update');
 
 
         // BulkMailController
