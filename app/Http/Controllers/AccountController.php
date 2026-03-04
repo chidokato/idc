@@ -122,12 +122,14 @@ class AccountController extends HomeController
 
     public function mktregister()
     {
+        $sumPrice = Task::where('extra_money', '>', 0)->where('user', Auth::id())->where('settled', 0)->sum('extra_money');
+
         if (Auth::User()->department_id == null) {
             return redirect()->route('account.edit')->with('center_warning','Cần cập nhật thông tin cá nhân trước khi đăng ký marketing');
         }else{
             $groupIds = Department::where('parent', Auth::user()->Department->parent)->pluck('id')->toArray();
             $r = Report::where('active', 1)->count();
-            if ($r > 0) {
+            if ($r > 0 && $sumPrice <= 0) {
                 $users = User::where('department_lv2', Auth::User()->department_lv2)->whereNotNull('department_lv2')->where('department_lv2', '!=', '')->get();
                 $posts = Post::where('sort_by', 'Product')->where('rate', '!=', null)->orderBy('name', 'asc')->get();
                 $channels = Channel::where('parent', '!=', 0)->get();
@@ -140,7 +142,7 @@ class AccountController extends HomeController
                     'groupIds',
                 ));
             }else{
-                return redirect()->route('tasks.actualcosts')->with('center_warning','Các kỳ đăng ký Marketing đã đóng hoặc chưa mở kỳ mới, Vui lòng thử lại sau');
+                return redirect()->route('tasks.actualcosts')->with('center_warning','Không có kỳ đăng ký nào đang MỞ hoặc Bạn đang NỢ tiền MKT');
             }
         }
         
