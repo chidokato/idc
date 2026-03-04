@@ -69,19 +69,19 @@
             </div>
           </div>
         </div>
-        <div class="card-body">
+        <div class="">
           <table class="table table-lg table-thead-bordered table-nowrap table-align-middle card-table">
-            <thead class="thead-light"> 
-            <tr>
-              <th>Dự án</th>
-              <th>Tổng tiền</th>
-            </tr>
-          </thead>
+            <!-- <thead class="thead-light"> 
+              <tr>
+                <th>Dự án</th>
+                <th>Tổng tiền</th>
+              </tr>
+            </thead> -->
           <tbody>
-@foreach($duan_idc as $val)
-            <tr>
+            @foreach($duan_idc as $val)
+            <tr class="">
               <td>{{ $val->Post->name }}</td>
-              <td>{{ $val->total_cost }}</td>
+              <td style="text-align: right;">{{ number_format($val->total_cost) }}</td>
             </tr>
             @endforeach
           </tbody>
