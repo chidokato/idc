@@ -431,31 +431,61 @@ document.addEventListener('change', function (e) {
 (function () {
 
   function sanitizeCellText(td) {
-    let text = '';
+  let text = '';
 
-    // Nếu cell có input/select/textarea -> lấy value
-    const input = td.querySelector('input, select, textarea');
-    if (input) {
-      text = (input.value ?? '').toString();
+  const input = td.querySelector('input, select, textarea');
+
+  if (input) {
+
+    // ===== CHECKBOX =====
+    if (input.type === 'checkbox') {
+
+      if (input.checked) {
+        // lấy giá trị tiền của cột trước
+        const prevTd = td.previousElementSibling;
+
+        if (prevTd) {
+          let prevText = prevTd.innerText || '';
+
+          prevText = prevText
+            .replace(/[₫đ]/gi, '')
+            .replace(/VNĐ/gi, '')
+            .replace(/[.,\s]/g, '');
+
+          text = prevText;
+        } else {
+          text = '0';
+        }
+
+      } else {
+        text = '0';
+      }
+
     } else {
-      // Nếu có data-export -> ưu tiên
-      const v = td.getAttribute('data-export');
-      text = v !== null ? v.toString() : (td.innerText ?? '').toString();
+      text = (input.value ?? '').toString();
     }
 
-    text = text.trim();
-
-    // ===== CHỈ XỬ LÝ CỘT TIỀN =====
-    // <td class="money">1.000.000 ₫</td>
-    if (td.classList.contains('money')) {
-      text = text
-        .replace(/[₫đ]/gi, '')     // bỏ ký tự ₫ đ
-        .replace(/VNĐ/gi, '')      // bỏ VNĐ
-        .replace(/[.,\s]/g, '');   // bỏ . , khoảng trắng
-    }
-
-    return text;
+  } else {
+    const v = td.getAttribute('data-export');
+    text = v !== null ? v.toString() : (td.innerText ?? '').toString();
   }
+
+  text = text.trim();
+
+  // ===== XỬ LÝ CỘT TIỀN =====
+  if (td.classList.contains('money')) {
+    const hasCheckbox = td.querySelector('input[type="checkbox"]');
+
+    if (!hasCheckbox) {
+      text = text
+        .replace(/[₫đ]/gi, '')
+        .replace(/VNĐ/gi, '')
+        .replace(/[.,\s]/g, '');
+    }
+  }
+
+  return text;
+}
 
   function buildCleanTable(originalTable) {
     const clone = originalTable.cloneNode(true);
