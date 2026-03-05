@@ -216,6 +216,7 @@
         <th class="text-center">Phòng / nhóm</th>
         <th class="text-center">Dự án</th>
         <th class="text-center">Kênh</th>
+        <th class="text-center"></th>
         <th class="text-right">Tổng tiền</th>
         <th class="text-right">Tiền nộp</th>
         <th class="text-center">Đóng tiền</th>
@@ -228,7 +229,7 @@
       </tr>
 
       <tr id="sumRow" class="font-weight-bold bg-light" style="{{ $tasks->count() ? '' : 'display:none' }}">
-        <td colspan="5"></td>
+        <td colspan="6"></td>
         <td class="text-right money" id="sumTotalText">{{ number_format($sumTotal, 0, ',', '.') }}</td>
         <td class="text-right money" id="sumPaidText">{{ number_format($sumPaid, 0, ',', '.') }}</td>
         <td class="text-center money" id="">{{ number_format($sum_expected, 0, ',', '.') }}</td>
