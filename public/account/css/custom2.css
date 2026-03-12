@@ -65,7 +65,7 @@
 /*.table tr td .form-control, .table tr td .btn{ height: calc(.6em + 1.21875rem) !important; padding: 0 .5rem; }*/
 
 .table tr td{}
-.table tr td .form-control, .table tr td .btn-group-sm>.btn, .table tr td .btn-sm{ padding: .2rem .3rem; height: calc(1.6em + .21875rem); }
+.table tr td .form-control, .table tr td .btn-group-sm>.btn, .table tr td .btn-sm{ padding: 0rem .3rem; height: calc(1.7em + .21875rem); }
 .table tr td .toggle-switch-sm .toggle-switch-indicator {
     width: .7rem;
     height: .7rem;
