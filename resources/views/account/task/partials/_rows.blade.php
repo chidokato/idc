@@ -57,7 +57,8 @@
   @endphp
 
   <tr id="row-{{ $task->id }}">
-    <td>
+    <td data-toggle="tooltip" data-placement="right"
+           data-original-title="{{ $task->id ?? '' }}">
       @if($rank === 1)
         <label class="row toggle-switch-sm switch mg-0" for="avail111{{ $task->id }}">
           <span class="col-4 col-sm-3">
@@ -88,7 +89,7 @@
     <td class="text-center">{{ $task->department?->name }}</td>
     <td class="text-center">{{ $task->Post?->name }}</td>
     <td class="text-center">{{ $task->channel?->name ?? $task->channel ?? '' }}</td>
-    <td>{{ $task->days }}</td>
+    <td > <div class="total-cost-cell" data-days="{{ $task->days }}">{{ $task->days }}</div></td>
     <td class="text-right money">
         {{ number_format($rowTotal, 0, ',', '.') }}
     </td>
@@ -183,9 +184,7 @@
       <div class="edit">
         <a class="btn btn-sm btn-white btn-edit-task"
            href="javascript:;"
-           data-id="{{ $task->id }}"
-           data-url="{{ route('task.show', $task) }}"
-           data-update-url="{{ route('tasks.update', $task) }}"
+           data-id="{{ $val->id }}"
            data-toggle="modal"
            data-target="#invoiceReceiptModal">
           <i class="tio-edit"></i>

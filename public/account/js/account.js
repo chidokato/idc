@@ -655,3 +655,37 @@ $('#editTaskForm').on('submit', function (e) {
         }
     });
 });
+
+
+
+// sửa task
+$(document).on('click', '.btn-edit-task', function () {
+  const id = $(this).data('id');
+  const $row = $('#row-' + id);
+
+  // lấy từ input trong row
+  const expected = $row.find('.expected-cost-input').val(); // ví dụ "1.000.000"
+  const rate = $row.find('.rate-input').val();
+  const kpi = $row.find('.task-kpi').val();
+
+  const date = $row.find('.date').val();
+  
+  // lấy từ data-attribute trong cell total-cost (bạn có sẵn)
+  const days = $row.find('.total-cost-cell').data('days');
+  alert(days);
+  const duan = $row.find('.duan').data('duan'); // lấy id dự án
+
+  // content đang nằm trong td.ghichu (bạn có title)
+  const content = $row.find('td.ghichu').attr('title') || $row.find('td.ghichu').text().trim();
+
+  // đổ vào modal
+  $('#duan').val(duan);
+  $('#modal_task_id').val(id);
+  // $('#modal_expected_costs').val(expected);
+  $('#modal_days').val(days);
+  $('#modal_rate').val(rate);
+  // $('#modal_kpi').val(kpi);
+  // $('#modal_content').val(content);
+  $('#modal_date').val(date);
+  $('#duan').val(duan).trigger('change'); 
+});

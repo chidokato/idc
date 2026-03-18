@@ -251,47 +251,69 @@
   </div>
 </div>
 
-<div class="modal fade" id="invoiceReceiptModal" tabindex="-1">
-  <div class="modal-dialog modal-lg">
+<div class="modal fade" id="invoiceReceiptModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Sửa tác vụ</h5>
-        <button type="button" class="btn btn-icon btn-sm btn-ghost-secondary" data-dismiss="modal" aria-label="Close">
-          <i class="tio-clear tio-lg"></i>
-        </button>
+        <!-- Header -->
+          <div class="modal-header">
+            <h4 id="editUserModalTitle" class="modal-title">Chi tiết</h4>
+
+            <button type="button" class="btn btn-icon btn-sm btn-ghost-secondary" data-dismiss="modal" aria-label="Close">
+              <i class="tio-clear tio-lg"></i>
+            </button>
+          </div>
+          <!-- End Header -->
+      <div class="modal-body">
+        <input type="hidden" id="modal_task_id">
+
+        <!-- <div class="form-group">
+          <label>Expected costs</label>
+          <input type="text" class="form-control" id="modal_expected_costs">
+        </div>  -->
+
+        <div class="form-group">
+          <label>Days</label>
+          <input type="number" class="form-control" id="modal_days">
+        </div>
+
+        <div class="form-group">
+          <label>Dự án</label>
+          <select id="duan" class="form-control select2">
+              @foreach($posts as $p)
+                <option value="{{ $p->id }}" {{ request('post_id') == $p->id ? 'selected' : '' }}>
+                    {{ $p->name }}
+                </option>
+            @endforeach
+          </select>
+          <!-- <input type="text" class="form-control" id="duan" > -->
+        </div>
+
+        <div class="form-group">
+          <label>Rate (%)</label>
+          <input type="number" class="form-control" id="modal_rate" min="0" max="100">
+        </div>
+
+        <div class="form-group">
+          <label>Ngày tạo</label>
+          <input type="text" class="form-control" id="modal_date">
+        </div>
+
+        <!-- <div class="form-group">
+          <label>KPI</label>
+          <input type="text" class="form-control" id="modal_kpi">
+        </div>
+
+        <div class="form-group">
+          <label>Content</label>
+          <textarea class="form-control" id="modal_content" rows="3"></textarea>
+        </div> -->
+
+        <div class="d-flex justify-content-end">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+          <button type="button" class="btn btn-primary ml-2" id="btnSaveTaskModal">Lưu</button>
+        </div>
       </div>
 
-      <form id="editTaskForm">
-        <div class="modal-body">
-
-          <input type="hidden" name="task_id" id="edit_task_id">
-
-          <div class="mb-3">
-            <label>Actual Costs</label>
-            <input type="number" class="form-control" name="actual_costs">
-          </div>
-
-          <div class="mb-3">
-            <label>Extra Money</label>
-            <input type="number" class="form-control" name="extra_money">
-          </div>
-
-          <div class="mb-3">
-            <label>Refund Money</label>
-            <input type="number" class="form-control" name="refund_money">
-          </div>
-
-          <div class="mb-3">
-            <label>Note</label>
-            <textarea class="form-control" name="content"></textarea>
-          </div>
-
-        </div>
-
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary"><i class="tio-save"></i> Lưu lại</button>
-        </div>
-      </form>
     </div>
   </div>
 </div>
@@ -398,8 +420,6 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="account/js/account.js"></script>
 
-
-
 <script>
 $(document).ready(function () {
     $('.yourname2').select2({
@@ -431,5 +451,75 @@ $(document).ready(function () {
 });
 </script>
 
+<script>
+$('#btnSaveTaskModal').on('click', function () {
+  const id = $('#modal_task_id').val();
 
+  // const expectedNum = toNumber($('#modal_expected_costs').val());
+  const days = parseInt($('#modal_days').val(), 10) || 0;
+  const rate = parseInt($('#modal_rate').val(), 10) || 0;
+  // const kpi = $('#modal_kpi').val() || '';
+  // const content = $('#modal_content').val() || '';
+  const post_id = parseInt($('#duan').val(), 10) || null;
+
+  $.ajax({
+    url: 'account/tasks/' + id,
+    method: 'PUT',
+    headers: {
+      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    },
+    data: {
+      // expected_costs: expectedNum,
+      days: days,
+      rate: rate,
+      post_id: post_id
+      // kpi: kpi,
+      // content: content
+    },
+    success: function (res) {
+      if (!res?.ok) {
+        alert('Lưu thất bại');
+        return;
+      }
+
+      // Update lại UI theo dữ liệu server trả về (an toàn nhất)
+      const t = res.task;
+      const $row = $('#row-' + t.id);
+
+      // $row.find('.expected-cost-input').val(formatVn(t.expected_costs));
+      $row.find('.rate-input').val(parseInt(t.rate, 10) || 0);
+      // $row.find('.task-kpi').val(t.kpi ?? '');
+
+      // $row.find('td.ghichu').attr('title', t.content ?? '');
+      // $row.find('td.ghichu .text-truncate-set').text(t.content ?? '');
+      // $row.find('td.ghichu .tooltip').text(t.content ?? '');
+
+      $row.find('.total-cost-cell').data('days', t.days).attr('data-days', t.days);
+      $row.find('.total-cost-text')
+        .text(formatVn(t.total_costs))
+        .attr('title', `${formatVn(t.expected_costs)}đ * ${t.days} ngày`);
+
+      if (t.post_id) {
+        $row.find('.duan')
+          .data('duan', t.post_id)
+          .attr('data-duan', t.post_id)
+          .text(t.post_name || '');
+      }
+
+
+      $('#invoiceReceiptModal').modal('hide');
+    },
+    error: function (xhr) {
+      // Laravel validation errors
+      if (xhr.status === 422) {
+        const errors = xhr.responseJSON?.errors || {};
+        alert(Object.values(errors).flat().join('\n'));
+        return;
+      }
+      alert('Có lỗi khi lưu, vui lòng thử lại.');
+    }
+  });
+});
+
+</script>
 @endsection
