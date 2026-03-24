@@ -636,6 +636,13 @@ class TaskController extends Controller
 
     public function updateall(Request $request, Task $task)
     {
+        if ((int) $task->paid === 1) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Task da dong tien, khong the sua.'
+            ], 422);
+        }
+
         $data = $request->validate([
             // 'expected_costs' => ['nullable', 'integer', 'min:0'],
             'days'           => ['nullable', 'integer', 'min:0'],

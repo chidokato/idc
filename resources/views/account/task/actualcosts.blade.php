@@ -594,6 +594,21 @@ $(function () {
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('click', function (event) {
+    const editBtn = event.target.closest('.btn-edit-task');
+
+    if (!editBtn) {
+      return;
+    }
+
+    if (parseInt(editBtn.getAttribute('data-paid') || '0', 10) === 1) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      alert('Task da dong tien, khong the sua.');
+    }
+  }, true);
+
   const saveBtn = document.getElementById('btnSaveTaskModal');
 
   if (!saveBtn) {
@@ -609,6 +624,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const rate = parseInt($('#modal_rate').val(), 10) || 0;
     const postIdRaw = $('#duan').val();
     const postId = postIdRaw ? parseInt(postIdRaw, 10) : null;
+    const activeEditBtn = document.querySelector('.btn-edit-task[data-id="' + id + '"]');
+
+    if (activeEditBtn && parseInt(activeEditBtn.getAttribute('data-paid') || '0', 10) === 1) {
+      alert('Task da dong tien, khong the sua.');
+      return;
+    }
 
     $.ajax({
       url: "{{ url('account/tasks') }}/" + id,
@@ -637,6 +658,12 @@ document.addEventListener('DOMContentLoaded', function () {
       },
       error: function (xhr) {
         if (xhr.status === 422) {
+          const directMessage = xhr.responseJSON?.message;
+          if (directMessage) {
+            alert(directMessage);
+            return;
+          }
+
           const errors = xhr.responseJSON?.errors || {};
           alert(Object.values(errors).flat().join('\n'));
           return;

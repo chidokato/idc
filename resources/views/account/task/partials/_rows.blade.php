@@ -28,6 +28,7 @@
     $isHeld = ((int)($task->paid ?? 0) === 1);
     $isExtra = ((float)($task->extra_money ?? 0) > 0);
     $isSettled = ((int)$task->settled === 1);
+    $editLocked = $isHeld;
 
     $disabledSettled = !auth()->check()
     || (
@@ -184,7 +185,7 @@
       @if($rank ===1 )
       <div class="edit">
         <a class="btn btn-sm btn-white btn-edit-task"
-           href="javascript:;"
+           href="{{ $editLocked ? 'javascript:void(0);' : 'javascript:;' }}"
            data-id="{{ $task->id }}"
            data-user-id="{{ $task->user ?? '' }}"
            data-user-name="{{ $task->handler?->yourname ?? '' }}"
@@ -206,8 +207,13 @@
            data-paid="{{ (int)($task->paid ?? 0) }}"
            data-settled="{{ (int)($task->settled ?? 0) }}"
            data-created-at="{{ optional($task->created_at)->format('d/m/Y H:i') ?? '' }}"
+           @if(!$editLocked)
            data-toggle="modal"
-           data-target="#invoiceReceiptModal">
+           data-target="#invoiceReceiptModal"
+           @endif
+           style="{{ $editLocked ? 'pointer-events:none;opacity:.5;cursor:not-allowed;' : '' }}"
+           title="{{ $editLocked ? 'Task đã đóng tiền, không thể sửa' : '' }}"
+           aria-disabled="{{ $editLocked ? 'true' : 'false' }}">
           <i class="tio-edit"></i>
         </a>
       </div>
