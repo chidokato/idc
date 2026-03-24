@@ -28,7 +28,9 @@
     $isHeld = ((int)($task->paid ?? 0) === 1);
     $isExtra = ((float)($task->extra_money ?? 0) > 0);
     $isSettled = ((int)$task->settled === 1);
+    $isApproved = ((int)($task->approved ?? 0) === 1);
     $editLocked = $isHeld;
+    $deleteLocked = ($isApproved || $isHeld || $isSettled);
 
     $disabledSettled = !auth()->check()
     || (
@@ -219,9 +221,17 @@
       </div>
       <div class="delete-button ml-1">
         <a class="btn btn-sm btn-white js-delete-task"
-           href="javascript:;"
+           href="{{ $deleteLocked ? 'javascript:void(0);' : 'javascript:;' }}"
+           @if(!$deleteLocked)
            data-url="{{ route('task.destroy', $task) }}"
-           data-id="{{ $task->id }}">
+           @endif
+           data-id="{{ $task->id }}"
+           data-approved="{{ (int)($task->approved ?? 0) }}"
+           data-paid="{{ (int)($task->paid ?? 0) }}"
+           data-settled="{{ (int)($task->settled ?? 0) }}"
+           style="{{ $deleteLocked ? 'pointer-events:none;opacity:.5;cursor:not-allowed;' : '' }}"
+           title="{{ $deleteLocked ? 'Task đã duyệt, đóng tiền hoặc tất toán nên không thể xóa' : '' }}"
+           aria-disabled="{{ $deleteLocked ? 'true' : 'false' }}">
           <i class="tio-delete-outlined"></i>
         </a>
       </div>

@@ -59,19 +59,19 @@
           </li>
           <li class="nav-item ">
             <a class="js-nav-tooltip-link nav-link " href="account/report" title="Duyệt Marketing" data-placement="left">
-              <i class="tio-dashboard nav-icon"></i>
+              <i class="tio-checkmark-circle nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Duyệt Marketing</span>
             </a>
           </li>
           <!-- <li class="nav-item ">
             <a class="js-nav-tooltip-link nav-link " href="account/actualcosts" title="Chi phí thực tế" data-placement="left">
-              <i class="tio-dashboard nav-icon"></i>
+              <i class="tio-receipt nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Chi phí thực tế</span>
             </a>
           </li> -->
           <li class="nav-item ">
             <a class="js-nav-tooltip-link nav-link " href="account/deposits" title="Duyệt đóng tiền" data-placement="left">
-              <i class="tio-dashboard nav-icon"></i>
+              <i class="tio-credit-card-outlined nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Duyệt đóng tiền</span>
             </a>
           </li>
@@ -89,7 +89,7 @@
           </li> -->
           <li class="nav-item ">
             <a class="js-nav-tooltip-link nav-link " href="account/statistical" title="Quản lý Marketing" data-placement="left">
-               <i class="tio-layers-outlined nav-icon"></i>
+               <i class="tio-chart-bar-1 nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Thống kê</span>
             </a>
           </li>
@@ -108,14 +108,14 @@
           </li>
           <li class="nav-item ">
             <a class="js-nav-tooltip-link nav-link " href="account/wallet/deposit" title="Nạp tiền" data-placement="left">
-              <i class="tio-money nav-icon"></i>
+              <i class="tio-download-to nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Nạp tiền</span>
             </a>
           </li>
 
           <li class="nav-item ">
             <a class="js-nav-tooltip-link nav-link " href="account/wallet/transfer" title="Chuyển tiền" data-placement="left">
-              <i class="tio-money nav-icon"></i>
+              <i class="tio-swap-horizontal nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Chuyển tiền</span>
             </a>
           </li>
@@ -126,13 +126,13 @@
           </li>
           <li class="nav-item ">
             <a class="js-nav-tooltip-link nav-link " href="account/opened" title="Hướng dẫn sử dụng" data-placement="left">
-              <i class="tio-book-opened nav-icon"></i>
+              <i class="tio-mail nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Hướng dẫn sử dụng</span>
             </a>
           </li>
           <li class="nav-item ">
             <a class="js-nav-tooltip-link nav-link " href="account/invite" title="Hướng dẫn sử dụng" data-placement="left">
-              <i class="tio-book-opened nav-icon"></i>
+              <i class="tio-book-outlined nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Tạo thư mời</span>
             </a>
           </li>
