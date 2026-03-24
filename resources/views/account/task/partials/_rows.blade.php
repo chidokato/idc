@@ -87,15 +87,16 @@
       </div>
     </td>
     <td class="text-center">{{ $task->department?->name }}</td>
-    <td class="text-center">{{ $task->Post?->name }}</td>
+    <td class="text-center js-post-name">{{ $task->Post?->name }}</td>
     <td class="text-center">{{ $task->channel?->name ?? $task->channel ?? '' }}</td>
-    <td > <div class="total-cost-cell" data-days="{{ $task->days }}">{{ $task->days }}</div></td>
-    <td class="text-right money">
+    <td> <div class="total-cost-cell" data-days="{{ $task->days }}">{{ $task->days }}</div></td>
+    <td class="text-right money js-row-total">
         {{ number_format($rowTotal, 0, ',', '.') }}
     </td>
 
     <td class="text-right money">
       <div class="hold-badge {{ $paid == 1 ? 'text-success' : 'text-danger' }}"
+           data-rate="{{ (int)$rate }}"
            data-toggle="tooltip" data-placement="left"
            data-original-title="{{ (int)$rate }}%">
         {{ number_format($rowPaid, 0, ',', '.') }}
@@ -184,7 +185,27 @@
       <div class="edit">
         <a class="btn btn-sm btn-white btn-edit-task"
            href="javascript:;"
-           data-id="{{ $val->id }}"
+           data-id="{{ $task->id }}"
+           data-user-id="{{ $task->user ?? '' }}"
+           data-user-name="{{ $task->handler?->yourname ?? '' }}"
+           data-department-id="{{ $task->department_id ?? '' }}"
+           data-department-name="{{ $task->department?->name ?? '' }}"
+           data-post-id="{{ $task->post_id ?? '' }}"
+           data-post-name="{{ $task->Post?->name ?? '' }}"
+           data-channel-id="{{ $task->channel_id ?? '' }}"
+           data-channel-name="{{ $task->channel?->name ?? $task->channel ?? '' }}"
+           data-report-id="{{ $task->report_id ?? '' }}"
+           data-expected-costs="{{ (float)($task->expected_costs ?? 0) }}"
+           data-actual-costs="{{ (float)($task->actual_costs ?? 0) }}"
+           data-days="{{ (int)($task->days ?? 0) }}"
+           data-rate="{{ (float)($task->rate ?? 0) }}"
+           data-extra-money="{{ (float)($task->extra_money ?? 0) }}"
+           data-refund-money="{{ (float)($task->refund_money ?? 0) }}"
+           data-content="{{ $task->content ?? '' }}"
+           data-approved="{{ (int)($task->approved ?? 0) }}"
+           data-paid="{{ (int)($task->paid ?? 0) }}"
+           data-settled="{{ (int)($task->settled ?? 0) }}"
+           data-created-at="{{ optional($task->created_at)->format('d/m/Y H:i') ?? '' }}"
            data-toggle="modal"
            data-target="#invoiceReceiptModal">
           <i class="tio-edit"></i>

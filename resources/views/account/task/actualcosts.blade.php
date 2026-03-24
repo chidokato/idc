@@ -418,7 +418,7 @@
 <script src="admin_asset/select2/js/select2.min.js"></script>
 <script src="admin_asset/select2/js/select2-searchInputPlaceholder.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-<script src="account/js/account.js"></script>
+<script src="account/js/account.js?v={{ filemtime(public_path('account/js/account.js')) }}"></script>
 
 <script>
 $(document).ready(function () {
@@ -463,7 +463,7 @@ $('#btnSaveTaskModal').on('click', function () {
   const post_id = parseInt($('#duan').val(), 10) || null;
 
   $.ajax({
-    url: 'account/tasks/' + id,
+    url: "{{ url('account/tasks') }}/" + id,
     method: 'PUT',
     headers: {
       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -508,6 +508,7 @@ $('#btnSaveTaskModal').on('click', function () {
 
 
       $('#invoiceReceiptModal').modal('hide');
+      window.location.reload();
     },
     error: function (xhr) {
       // Laravel validation errors
@@ -521,5 +522,130 @@ $('#btnSaveTaskModal').on('click', function () {
   });
 });
 
+</script>
+
+<script>
+$(function () {
+  $('#btnSaveTaskModal').off('click').on('click', function () {
+    const id = $('#modal_task_id').val();
+    const days = parseInt($('#modal_days').val(), 10) || 0;
+    const rate = parseInt($('#modal_rate').val(), 10) || 0;
+    const postIdRaw = $('#duan').val();
+    const postId = postIdRaw ? parseInt(postIdRaw, 10) : null;
+
+    $.ajax({
+      url: "{{ url('account/tasks') }}/" + id,
+      method: 'PUT',
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      data: {
+        days: days,
+        rate: rate,
+        post_id: postId
+      },
+      success: function (res) {
+        if (!res?.ok) {
+          alert('Luu that bai');
+          return;
+        }
+
+        const t = res.task || {};
+        const $row = $('#row-' + t.id);
+        const rateValue = parseInt(t.rate, 10) || 0;
+        const totalCosts = Number(t.total_costs || 0);
+        const paidTotal = Number(t.paid_total || 0);
+
+        $row.find('.total-cost-cell')
+          .data('days', t.days)
+          .attr('data-days', t.days)
+          .text(t.days);
+
+        $row.find('.js-row-total').text(formatVn(totalCosts));
+
+        $row.find('.hold-badge')
+          .attr('data-rate', rateValue)
+          .attr('data-original-title', rateValue + '%')
+          .text(formatVn(paidTotal));
+
+        $row.find('.js-post-name').text(t.post_name || '');
+
+        $row.find('.btn-edit-task')
+          .attr('data-post-id', t.post_id || '')
+          .attr('data-post-name', t.post_name || '')
+          .attr('data-days', t.days)
+          .attr('data-rate', rateValue);
+
+        $('#invoiceReceiptModal').modal('hide');
+      },
+      error: function (xhr) {
+        if (xhr.status === 422) {
+          const errors = xhr.responseJSON?.errors || {};
+          alert(Object.values(errors).flat().join('\n'));
+          return;
+        }
+
+        alert(xhr.responseJSON?.message || 'Co loi khi luu, vui long thu lai.');
+      }
+    });
+  });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const saveBtn = document.getElementById('btnSaveTaskModal');
+
+  if (!saveBtn) {
+    return;
+  }
+
+  saveBtn.addEventListener('click', function (event) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+
+    const id = $('#modal_task_id').val();
+    const days = parseInt($('#modal_days').val(), 10) || 0;
+    const rate = parseInt($('#modal_rate').val(), 10) || 0;
+    const postIdRaw = $('#duan').val();
+    const postId = postIdRaw ? parseInt(postIdRaw, 10) : null;
+
+    $.ajax({
+      url: "{{ url('account/tasks') }}/" + id,
+      method: 'PUT',
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      data: {
+        days: days,
+        rate: rate,
+        post_id: postId
+      },
+      success: function (res) {
+        if (!res?.ok) {
+          alert('Luu that bai');
+          return;
+        }
+
+        $('#invoiceReceiptModal').modal('hide');
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+
+        setTimeout(function () {
+          window.location.reload();
+        }, 150);
+      },
+      error: function (xhr) {
+        if (xhr.status === 422) {
+          const errors = xhr.responseJSON?.errors || {};
+          alert(Object.values(errors).flat().join('\n'));
+          return;
+        }
+
+        alert(xhr.responseJSON?.message || 'Co loi khi luu, vui long thu lai.');
+      }
+    });
+  }, true);
+});
 </script>
 @endsection

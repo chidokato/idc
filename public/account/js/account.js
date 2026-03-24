@@ -672,7 +672,6 @@ $(document).on('click', '.btn-edit-task', function () {
   
   // lấy từ data-attribute trong cell total-cost (bạn có sẵn)
   const days = $row.find('.total-cost-cell').data('days');
-  alert(days);
   const duan = $row.find('.duan').data('duan'); // lấy id dự án
 
   // content đang nằm trong td.ghichu (bạn có title)
@@ -688,4 +687,37 @@ $(document).on('click', '.btn-edit-task', function () {
   // $('#modal_content').val(content);
   $('#modal_date').val(date);
   $('#duan').val(duan).trigger('change'); 
+});
+
+// Override fill logic for actual-cost modal using the full task payload
+// already attached to the edit button. This avoids relying on partial DOM data.
+$(document).on('click', '.btn-edit-task', function () {
+  const $btn = $(this);
+
+  setTimeout(function () {
+    const taskId = $btn.data('id') || '';
+    const postId = $btn.data('post-id') || '';
+    const postName = $btn.data('post-name') || '';
+    const days = $btn.data('days') || 0;
+    const rate = $btn.data('rate') || 0;
+    const createdAt = $btn.data('created-at') || '';
+
+    $('#editUserModalTitle').text(taskId ? ('Chi tiết task #' + taskId) : 'Chi tiết');
+    $('#modal_task_id').val(taskId);
+    $('#modal_days').val(days);
+    $('#modal_rate').val(rate);
+    $('#modal_date').val(createdAt);
+
+    if (postId) {
+      $('#duan').val(postId).trigger('change');
+      return;
+    }
+
+    if (postName) {
+      $('#duan').append(new Option(postName, '', true, true)).trigger('change');
+      return;
+    }
+
+    $('#duan').val('').trigger('change');
+  }, 0);
 });

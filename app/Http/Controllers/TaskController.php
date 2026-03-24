@@ -660,12 +660,15 @@ class TaskController extends Controller
             'task' => [
                 'id' => $task->id,
                 // 'expected_costs' => $task->expected_costs,
+                'expected_costs' => (float) $task->expected_costs,
                 'days' => $task->days,
                 'rate' => $task->rate,
+                'paid' => (int) $task->paid,
                 // 'kpi' => $task->kpi,
                 // 'content' => $task->content,
                 // 'approved' => (bool)$task->approved,
                 'total_costs' => $task->days * $task->expected_costs,
+                'paid_total' => ($task->days * $task->expected_costs) * (1 - ((float) $task->rate / 100)),
                 'post_id' => $task->post_id,
                 'post_name' => $task->Post?->name,
             ]
