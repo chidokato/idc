@@ -128,7 +128,7 @@
               @forelse($departmentSummaries as $row)
                 <tr>
                   <td>
-                    <div>{{ $row->department_name }}</div>
+                    {{ $row->department_name }} / 
                     @if(!empty($row->parent_department_name))
                       <small class="text-muted">{{ $row->parent_department_name }}</small>
                     @endif
