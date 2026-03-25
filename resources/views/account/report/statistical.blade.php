@@ -91,7 +91,7 @@
           </div>
         </div>
         <div class="table-responsive">
-          <table id="project-cost-table" class="table table-lg table-thead-bordered table-align-middle card-table js-statistical-table">
+          <table id="project-cost-table" class="table table-lg table-thead-bordered table-align-middle card-table">
             <thead class="thead-light">
               <tr>
                 <th>Dự án</th>
@@ -130,7 +130,7 @@
           </div>
         </div>
         <div class="table-responsive">
-          <table id="department-cost-table" class="table table-lg table-thead-bordered table-align-middle card-table js-statistical-table">
+          <table id="department-cost-table" class="table table-lg table-thead-bordered table-align-middle card-table">
             <thead class="thead-light">
               <tr>
                 <th>Nhóm / Phòng</th>
@@ -174,7 +174,7 @@
           </div>
         </div>
         <div class="table-responsive">
-          <table id="company-cost-table" class="table table-lg table-thead-bordered table-align-middle card-table js-statistical-table">
+          <table id="company-cost-table" class="table table-lg table-thead-bordered table-align-middle card-table">
             <thead class="thead-light">
               <tr>
                 <th>Công ty</th>
@@ -213,7 +213,7 @@
           </div>
         </div>
         <div class="table-responsive">
-          <table id="floor-cost-table" class="table table-lg table-thead-bordered table-align-middle card-table js-statistical-table">
+          <table id="floor-cost-table" class="table table-lg table-thead-bordered table-align-middle card-table">
             <thead class="thead-light">
               <tr>
                 <th>Sàn</th>
