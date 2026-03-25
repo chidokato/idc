@@ -34,6 +34,14 @@ class TaskCostPeriodController extends Controller
                 fn ($query) => $query->whereIn('tasks.report_id', $selectedReportIds->all())
             );
 
+        $baseDepartmentQuery = Task::query()
+            ->leftJoin('departments as current_department', 'current_department.id', '=', 'tasks.department_id')
+            ->leftJoin('departments as parent_department', 'parent_department.id', '=', 'current_department.parent')
+            ->when(
+                $selectedReportIds->isNotEmpty(),
+                fn ($query) => $query->whereIn('tasks.report_id', $selectedReportIds->all())
+            );
+
         $summary = (clone $baseTaskQuery)
             ->selectRaw('COUNT(tasks.id) as total_tasks')
             ->selectRaw('COUNT(DISTINCT tasks.post_id) as total_projects')
@@ -41,20 +49,6 @@ class TaskCostPeriodController extends Controller
             ->selectRaw('COALESCE(SUM(tasks.extra_money), 0) as total_extra_money')
             ->selectRaw('COALESCE(SUM(tasks.refund_money), 0) as total_refund_money')
             ->first();
-
-        $reportSummaries = (clone $baseTaskQuery)
-            ->selectRaw('tasks.report_id')
-            ->selectRaw('reports.name as report_name')
-            ->selectRaw('reports.time_start as report_time_start')
-            ->selectRaw('reports.time_end as report_time_end')
-            ->selectRaw('COUNT(tasks.id) as total_tasks')
-            ->selectRaw('COUNT(DISTINCT tasks.post_id) as total_projects')
-            ->selectRaw('COALESCE(SUM(tasks.actual_costs), 0) as total_actual_costs')
-            ->selectRaw('COALESCE(SUM(tasks.extra_money), 0) as total_extra_money')
-            ->selectRaw('COALESCE(SUM(tasks.refund_money), 0) as total_refund_money')
-            ->groupBy('tasks.report_id', 'reports.name', 'reports.time_start', 'reports.time_end')
-            ->orderByDesc('tasks.report_id')
-            ->get();
 
         $projectSummaries = (clone $baseTaskQuery)
             ->selectRaw('tasks.post_id')
@@ -71,14 +65,29 @@ class TaskCostPeriodController extends Controller
 
         $projectTotalActualCosts = (float) $projectSummaries->sum('total_actual_costs');
 
+        $departmentSummaries = (clone $baseDepartmentQuery)
+            ->selectRaw('tasks.department_id')
+            ->selectRaw('COALESCE(current_department.name, "Khong xac dinh") as department_name')
+            ->selectRaw('COALESCE(parent_department.name, "") as parent_department_name')
+            ->selectRaw('COUNT(tasks.id) as total_tasks')
+            ->selectRaw('COUNT(DISTINCT tasks.report_id) as total_reports')
+            ->selectRaw('COALESCE(SUM(tasks.actual_costs), 0) as total_actual_costs')
+            ->groupBy('tasks.department_id', 'current_department.name', 'parent_department.name')
+            ->havingRaw('COALESCE(SUM(tasks.actual_costs), 0) > 0')
+            ->orderByDesc('total_actual_costs')
+            ->get();
+
+        $departmentTotalActualCosts = (float) $departmentSummaries->sum('total_actual_costs');
+
         return view('account.report.statistical', [
             'reports' => $reports,
             'departments' => $departments,
             'selectedReportIds' => $selectedReportIds,
             'summary' => $summary,
-            'reportSummaries' => $reportSummaries,
             'projectSummaries' => $projectSummaries,
             'projectTotalActualCosts' => $projectTotalActualCosts,
+            'departmentSummaries' => $departmentSummaries,
+            'departmentTotalActualCosts' => $departmentTotalActualCosts,
         ]);
     }
 }

@@ -22,7 +22,7 @@
       <form method="GET" action="{{ route('task_cost_period.index') }}">
         <div class="row align-items-end">
           <div class="col-lg-8 mb-3">
-            <label class="input-label">Chọn kỳ report để thống kê theo thời gian</label>
+            <label class="input-label">Chọn kỳ report</label>
             <select name="report_ids[]" class="form-control js-report-select" multiple>
               @foreach($reports as $rep)
                 <option value="{{ $rep->id }}" {{ collect($selectedReportIds)->contains((int) $rep->id) ? 'selected' : '' }}>
@@ -65,54 +65,14 @@
   </div>
 
   <div class="row">
-    <div class="col-xl-7 mb-3">
+    <div class="col-xl-6 mb-3">
       <div class="card">
         <div class="card-header">
-          <h4 class="card-header-title">Chi phí theo thời gian / kỳ report</h4>
-        </div>
-        <div class="table-responsive">
-          <table class="table table-lg table-thead-bordered table-align-middle card-table">
-            <thead class="thead-light">
-              <tr>
-                <th>Kỳ report</th>
-                <th>Thời gian</th>
-                <th class="text-center">Task</th>
-                <th class="text-center">Dự án</th>
-                <th class="text-right">Chi phí thực tế</th>
-                <th class="text-right">Bù thêm</th>
-                <th class="text-right">Hoàn lại</th>
-              </tr>
-            </thead>
-            <tbody>
-              @forelse($reportSummaries as $row)
-                <tr>
-                  <td>{{ $row->report_name ?: ('Report #' . $row->report_id) }}</td>
-                  <td>{{ $row->report_time_start ?: '--' }} - {{ $row->report_time_end ?: '--' }}</td>
-                  <td class="text-center">{{ $row->total_tasks }}</td>
-                  <td class="text-center">{{ $row->total_projects }}</td>
-                  <td class="text-right">{{ number_format((float) $row->total_actual_costs, 0, ',', '.') }}</td>
-                  <td class="text-right text-danger">{{ number_format((float) $row->total_extra_money, 0, ',', '.') }}</td>
-                  <td class="text-right text-success">{{ number_format((float) $row->total_refund_money, 0, ',', '.') }}</td>
-                </tr>
-              @empty
-                <tr>
-                  <td colspan="7" class="text-center text-muted">Chưa có dữ liệu theo kỳ report.</td>
-                </tr>
-              @endforelse
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-xl-5 mb-3">
-      <div class="card">
-        <div class="card-header">
-          <div class="row justify-content-between align-items-center flex-grow-1">
+          <div class="d-flex justify-content-between align-items-center flex-grow-1">
             <h4 class="card-header-title mb-0">Chi phí theo dự án</h4>
-            <div class="text-right">
+            <h4 class="text-right">
               <strong>{{ number_format((float) ($projectTotalActualCosts ?? 0), 0, ',', '.') }}</strong>
-            </div>
+            </h4>
           </div>
         </div>
         <div class="table-responsive">
@@ -136,6 +96,50 @@
               @empty
                 <tr>
                   <td colspan="4" class="text-center text-muted">Chưa có dữ liệu theo dự án.</td>
+                </tr>
+              @endforelse
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-6 mb-3">
+      <div class="card">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center flex-grow-1">
+            <h4 class="card-header-title mb-0">Chi phí theo nhóm/phòng</h4>
+            <h4 class="text-right">
+              <strong>{{ number_format((float) ($departmentTotalActualCosts ?? 0), 0, ',', '.') }}</strong>
+            </h4>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-lg table-thead-bordered table-align-middle card-table">
+            <thead class="thead-light">
+              <tr>
+                <th>Nhóm / Phòng</th>
+                <th class="text-center">Task</th>
+                <th class="text-center">Kỳ</th>
+                <th class="text-right">Chi phí thực tế</th>
+              </tr>
+            </thead>
+            <tbody>
+              @forelse($departmentSummaries as $row)
+                <tr>
+                  <td>
+                    <div>{{ $row->department_name }}</div>
+                    @if(!empty($row->parent_department_name))
+                      <small class="text-muted">{{ $row->parent_department_name }}</small>
+                    @endif
+                  </td>
+                  <td class="text-center">{{ $row->total_tasks }}</td>
+                  <td class="text-center">{{ $row->total_reports }}</td>
+                  <td class="text-right">{{ number_format((float) $row->total_actual_costs, 0, ',', '.') }}</td>
+                </tr>
+              @empty
+                <tr>
+                  <td colspan="4" class="text-center text-muted">Chưa có dữ liệu theo nhóm/phòng.</td>
                 </tr>
               @endforelse
             </tbody>
