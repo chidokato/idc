@@ -574,6 +574,51 @@ $(document).on('click', '.js-delete-task', function (e) {
     });
 });
 
+/*=========== Up task ================*/
+$(document).on('click', '.btn-up-task', function (e) {
+    e.preventDefault();
+
+    const $btn = $(this);
+    const url = $btn.data('url');
+    const actualCosts = parseFloat($btn.data('actual-costs') || 0);
+    const paid = parseInt($btn.data('paid') || 0, 10);
+
+    if (!url) return;
+
+    if (paid === 1) {
+        showCenterWarning?.('Task da dong tien, khong the sua');
+        return;
+    }
+
+    if (actualCosts <= 0) {
+        showCenterWarning?.('Task chua co chi phi thuc te, khong the up');
+        return;
+    }
+
+    $btn.prop('disabled', true).addClass('disabled');
+
+    $.ajax({
+        url: url,
+        type: 'POST',
+        dataType: 'json',
+        success: function (res) {
+            if (!res || !res.ok) {
+                showCenterWarning?.(res?.message || 'Khong the up task');
+                $btn.prop('disabled', false).removeClass('disabled');
+                return;
+            }
+
+            showToast?.('success', res.message || 'Da up task');
+            window.location.reload();
+        },
+        error: function (xhr) {
+            const msg = xhr?.responseJSON?.message || 'Up task that bai';
+            showCenterError?.(msg);
+            $btn.prop('disabled', false).removeClass('disabled');
+        }
+    });
+});
+
 
 
 // JS đổ dữ liệu vào modal (tận dụng SweetAlert)

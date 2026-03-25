@@ -219,6 +219,19 @@
           <i class="tio-edit"></i>
         </a>
       </div>
+      <div class="ml-1">
+        <a class="btn btn-sm btn-white btn-up-task"
+           href="{{ $editLocked ? 'javascript:void(0);' : 'javascript:;' }}"
+           data-id="{{ $task->id }}"
+           @if(!$editLocked)
+           data-url="{{ route('tasks.up', $task) }}"
+           @endif
+           data-paid="{{ (int)($task->paid ?? 0) }}"
+           data-actual-costs="{{ (float)($task->actual_costs ?? 0) }}"
+           title="Up">
+          <i class="tio-arrow-upward"></i>
+        </a>
+      </div>
       <div class="delete-button ml-1">
         <a class="btn btn-sm btn-white js-delete-task"
            href="{{ $deleteLocked ? 'javascript:void(0);' : 'javascript:;' }}"

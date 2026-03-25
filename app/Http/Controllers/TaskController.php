@@ -683,6 +683,36 @@ class TaskController extends Controller
         ]);
     }
 
+    public function upTask(Task $task)
+    {
+        if ((int) $task->paid === 1) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Task da dong tien, khong the sua.'
+            ], 422);
+        }
+
+        $actualCosts = (int) round((float) ($task->actual_costs ?? 0));
+
+        if ($actualCosts <= 0) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Task chua co chi phi thuc te, khong the up.'
+            ], 422);
+        }
+
+        $task->update([
+            'expected_costs' => $actualCosts,
+            'days' => 1,
+            'rate' => 100,
+        ]);
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Da up task thanh cong.'
+        ]);
+    }
+
 
     public function actualcosts(Request $request)
     {

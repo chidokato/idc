@@ -597,6 +597,77 @@ $(function () {
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   document.addEventListener('click', function (event) {
+    const upBtn = event.target.closest('.btn-up-task');
+
+    if (!upBtn) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    const url = upBtn.getAttribute('data-url');
+    const paid = parseInt(upBtn.getAttribute('data-paid') || '0', 10);
+    const actualCosts = parseFloat(upBtn.getAttribute('data-actual-costs') || '0');
+
+    if (!url) {
+      return;
+    }
+
+    if (paid === 1) {
+      if (typeof showToast === 'function') {
+        showToast('warning', 'Task da dong tien, khong the sua.');
+      } else {
+        alert('Task da dong tien, khong the sua.');
+      }
+      return;
+    }
+
+    if (actualCosts <= 0) {
+      if (typeof showToast === 'function') {
+        showToast('warning', 'Task chua co chi phi thuc te, khong the up.');
+      } else {
+        alert('Task chua co chi phi thuc te, khong the up.');
+      }
+      return;
+    }
+
+    $.ajax({
+      url: url,
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      success: function (res) {
+        if (!res?.ok) {
+          if (typeof showToast === 'function') {
+            showToast('error', res?.message || 'Up task that bai.');
+          } else {
+            alert(res?.message || 'Up task that bai.');
+          }
+          return;
+        }
+
+        if (typeof showToast === 'function') {
+          showToast('success', res?.message || 'Da up task thanh cong.');
+        }
+
+        setTimeout(function () {
+          window.location.reload();
+        }, 900);
+      },
+      error: function (xhr) {
+        if (typeof showToast === 'function') {
+          showToast('error', xhr.responseJSON?.message || 'Co loi khi up task, vui long thu lai.');
+        } else {
+          alert(xhr.responseJSON?.message || 'Co loi khi up task, vui long thu lai.');
+        }
+      }
+    });
+  }, true);
+
+  document.addEventListener('click', function (event) {
     const editBtn = event.target.closest('.btn-edit-task');
 
     if (!editBtn) {
