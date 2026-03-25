@@ -129,7 +129,7 @@
                 <th>Thời gian</th>
                 <th>Loại</th>
                 <th>Số tiền</th>
-                <th></th>
+                <th>Biến động số dư</th>
                 <th>Thu hồi</th>
                 
                 <th>Ghi chú</th>
@@ -171,6 +171,36 @@
 
                         $t = $typeMap[$item->type] ?? ['Khác', 'bg-dark', '', 'text-dark'];
                     @endphp
+
+                    @php
+                        $balanceBefore = isset($item->balance_before) ? (float) $item->balance_before : null;
+                        $balanceAfter = isset($item->balance_after) ? (float) $item->balance_after : null;
+                        $balanceDelta = null;
+
+                        if ($balanceBefore !== null && $balanceAfter !== null) {
+                            $balanceDelta = $balanceAfter - $balanceBefore;
+                        } else {
+                            $signMap = [
+                                'deposit' => 1,
+                                'withdraw' => -1,
+                                'rollback' => 1,
+                                'hold' => 0,
+                                'release' => 0,
+                                'capture' => 0,
+                                'refund' => 1,
+                            ];
+
+                            $balanceDelta = ((float) ($signMap[$item->type] ?? 0)) * (float) $item->amount;
+                        }
+
+                        $deltaClass = $balanceDelta > 0
+                            ? 'text-success'
+                            : ($balanceDelta < 0 ? 'text-danger' : 'text-muted');
+
+                        $deltaSign = $balanceDelta > 0
+                            ? '+'
+                            : ($balanceDelta < 0 ? '-' : '');
+                    @endphp
                     <td>
                         <span class="badge {{ $t[1] }}">{{ $t[0] }}</span>
                     </td>
@@ -198,6 +228,14 @@
 
                     <td class="{{ $cls }}">
                         {{ $sign }} {{ number_format($item->amount) }} đ
+                    </td>
+                    <td class="{{ $deltaClass }}">
+                        {{ $deltaSign }} {{ number_format(abs($balanceDelta), 0, ',', '.') }} đ
+                        @if($balanceBefore !== null && $balanceAfter !== null)
+                          <div class="small text-muted">
+                            {{ number_format($balanceBefore, 0, ',', '.') }} → {{ number_format($balanceAfter, 0, ',', '.') }}
+                          </div>
+                        @endif
                     </td>
                     <td>
                         @if($item->type === 'withdraw' && $item->ref_type === 'BulkTransfer' && !empty($meta['to_user_id']))
