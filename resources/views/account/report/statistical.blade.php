@@ -108,10 +108,9 @@
     <div class="col-xl-5 mb-3">
       <div class="card">
         <div class="card-header">
-          <div class="d-flex justify-content-between align-items-center">
+          <div class="row justify-content-between align-items-center flex-grow-1">
             <h4 class="card-header-title mb-0">Chi phí theo dự án</h4>
             <div class="text-right">
-              <small class="text-muted d-block">Tổng tiền</small>
               <strong>{{ number_format((float) ($projectTotalActualCosts ?? 0), 0, ',', '.') }}</strong>
             </div>
           </div>
