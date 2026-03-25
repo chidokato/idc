@@ -1,81 +1,110 @@
 <?php
 
 namespace App\Http\Controllers\Account;
-use App\Http\Controllers\Controller;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Models\Department;
-use Illuminate\Support\Facades\DB;
-use App\Models\TaskCostPeriod;
+use App\Models\Report;
 use App\Models\Task;
-use App\Models\Report; // nếu bạn có model Report
+use App\Models\TaskCostPeriod;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class TaskCostPeriodController extends Controller
 {
     public function index(Request $request)
     {
-        $duan_idc = TaskCostPeriod::get();
-        // Lấy danh sách report để dropdown
-        // Nếu table report tên khác, bạn sửa lại model/logic ở đây.
         $reports = Report::orderByDesc('id')->get();
-
         $departments = Department::where('parent', 0)->get();
 
-        $reportId = $request->filled('report_id')
-            ? (string) $request->report_id
-            : ($reports->first() ? (string) $reports->first()->id : null);
+        $selectedReportIds = collect((array) $request->input('report_ids', []))
+            ->filter(fn ($id) => filled($id))
+            ->map(fn ($id) => (int) $id)
+            ->filter(fn ($id) => $id > 0)
+            ->unique()
+            ->values();
 
-        $groupBy = $request->get('group_by', 'full'); // san|san_phong|san_phong_nhom|user|channel|full
-
-        $groupCols = $this->groupCols($groupBy);
-
-        $rows = collect();
-        if ($reportId) {
-            $rows = TaskCostPeriod::query()
-                ->where('report_id', $reportId)
-                ->select($groupCols)
-                ->selectRaw('SUM(sum_actual) as total_actual')
-                ->groupBy($groupCols)
-                ->orderByDesc('total_actual')
-                ->paginate(50)
-                ->withQueryString();
+        if ($selectedReportIds->isEmpty() && $reports->isNotEmpty()) {
+            $selectedReportIds = collect([(int) $reports->first()->id]);
         }
 
+        $baseTaskQuery = Task::query()
+            ->leftJoin('reports', 'reports.id', '=', 'tasks.report_id')
+            ->leftJoin('posts', 'posts.id', '=', 'tasks.post_id')
+            ->when(
+                $selectedReportIds->isNotEmpty(),
+                fn ($query) => $query->whereIn('tasks.report_id', $selectedReportIds->all())
+            );
+
+        $summary = (clone $baseTaskQuery)
+            ->selectRaw('COUNT(tasks.id) as total_tasks')
+            ->selectRaw('COUNT(DISTINCT tasks.post_id) as total_projects')
+            ->selectRaw('COALESCE(SUM(tasks.actual_costs), 0) as total_actual_costs')
+            ->selectRaw('COALESCE(SUM(tasks.extra_money), 0) as total_extra_money')
+            ->selectRaw('COALESCE(SUM(tasks.refund_money), 0) as total_refund_money')
+            ->first();
+
+        $reportSummaries = (clone $baseTaskQuery)
+            ->selectRaw('tasks.report_id')
+            ->selectRaw('reports.name as report_name')
+            ->selectRaw('reports.time_start as report_time_start')
+            ->selectRaw('reports.time_end as report_time_end')
+            ->selectRaw('COUNT(tasks.id) as total_tasks')
+            ->selectRaw('COUNT(DISTINCT tasks.post_id) as total_projects')
+            ->selectRaw('COALESCE(SUM(tasks.actual_costs), 0) as total_actual_costs')
+            ->selectRaw('COALESCE(SUM(tasks.extra_money), 0) as total_extra_money')
+            ->selectRaw('COALESCE(SUM(tasks.refund_money), 0) as total_refund_money')
+            ->groupBy('tasks.report_id', 'reports.name', 'reports.time_start', 'reports.time_end')
+            ->orderByDesc('tasks.report_id')
+            ->get();
+
+        $projectSummaries = (clone $baseTaskQuery)
+            ->selectRaw('tasks.post_id')
+            ->selectRaw('COALESCE(posts.name, "Khong xac dinh") as post_name')
+            ->selectRaw('COUNT(tasks.id) as total_tasks')
+            ->selectRaw('COUNT(DISTINCT tasks.report_id) as total_reports')
+            ->selectRaw('COALESCE(SUM(tasks.actual_costs), 0) as total_actual_costs')
+            ->selectRaw('COALESCE(SUM(tasks.extra_money), 0) as total_extra_money')
+            ->selectRaw('COALESCE(SUM(tasks.refund_money), 0) as total_refund_money')
+            ->groupBy('tasks.post_id', 'posts.name')
+            ->orderByDesc('total_actual_costs')
+            ->get();
+
+        $duan_idc = TaskCostPeriod::with('Post')->orderByDesc('total_cost')->get();
+
         return view('account.report.statistical', [
-            'reports'  => $reports,
-            'reportId' => $reportId,
-            'groupBy'  => $groupBy,
-            'rows'     => $rows,
-            'departments'     => $departments,
-            'duan_idc'     => $duan_idc,
+            'reports' => $reports,
+            'departments' => $departments,
+            'duan_idc' => $duan_idc,
+            'selectedReportIds' => $selectedReportIds,
+            'summary' => $summary,
+            'reportSummaries' => $reportSummaries,
+            'projectSummaries' => $projectSummaries,
         ]);
     }
 
-    /**
-     * Rebuild tổng hợp cho 1 report_id từ bảng tasks.
-     * - UPSERT vào task_cost_period
-     * - sum_actual = SUM(COALESCE(actual_costs,0))
-     *   (Nếu bạn muốn net: actual + extra - refund, nói mình sửa)
-     */
-    
-
     public function updateMonthly(Request $request)
     {
-        $departmentId = $request->department_id;
-        $reportIds    = $request->report_id; // mảng
-        
-        $rows = Task::query()
-        ->where('actual_costs', '>', 0)
-        ->when($departmentId, fn($q) => $q->where('department_lv1', $departmentId))
-        ->when($reportIds, fn($q) => $q->whereIn('report_id', $reportIds))
-        ->selectRaw('post_id, SUM(actual_costs) as total_cost')
-        ->groupBy('post_id')
-        ->get();
+        $data = $request->validate([
+            'department_id' => ['nullable', 'integer'],
+            'report_id' => ['nullable', 'array'],
+            'report_id.*' => ['integer'],
+        ]);
 
-        // Chuẩn bị data để upsert
+        $departmentId = $data['department_id'] ?? null;
+        $reportIds = $data['report_id'] ?? [];
+
+        $rows = Task::query()
+            ->where('actual_costs', '>', 0)
+            ->when($departmentId, fn ($q) => $q->where('department_lv1', $departmentId))
+            ->when($reportIds, fn ($q) => $q->whereIn('report_id', $reportIds))
+            ->selectRaw('post_id, SUM(actual_costs) as total_cost')
+            ->groupBy('post_id')
+            ->get();
+
         $now = now();
-        $upsertData = $rows->map(function ($r) use ($now, $departmentId, $reportIds) {
+        $upsertData = $rows->map(function ($r) use ($now, $departmentId) {
             return [
                 'post_id' => (int) $r->post_id,
                 'total_cost' => (float) $r->total_cost,
@@ -87,31 +116,30 @@ class TaskCostPeriodController extends Controller
 
         DB::table('task_cost_period')->upsert(
             $upsertData,
-            ['post_id'],                 // key chống trùng
-            ['total_cost'] // fields update khi đã tồn tại
+            ['post_id'],
+            ['total_cost']
         );
 
+        return redirect()
+            ->route('task_cost_period.index', [
+                'report_ids' => $reportIds,
+            ])
+            ->with('success', 'Đã cập nhật dữ liệu thống kê thành công.');
     }
 
-    /**
-     * Trả về 2 kỳ trong tháng:
-     * - period_no=1: 01-15
-     * - period_no=2: 16-lastday
-     */
     protected function buildPeriods(int $year, int $month): array
     {
         $start1 = Carbon::create($year, $month, 1)->toDateString();
-        $end1   = Carbon::create($year, $month, 15)->toDateString();
+        $end1 = Carbon::create($year, $month, 15)->toDateString();
 
         $start2 = Carbon::create($year, $month, 16)->toDateString();
-        $end2   = Carbon::create($year, $month, 1)->endOfMonth()->toDateString();
+        $end2 = Carbon::create($year, $month, 1)->endOfMonth()->toDateString();
 
         return [
             ['period_no' => 1, 'start' => $start1, 'end' => $end1],
             ['period_no' => 2, 'start' => $start2, 'end' => $end2],
         ];
     }
-
 
     private function groupCols($groupBy)
     {
