@@ -142,6 +142,8 @@
         data-task-id="{{ $task->id }}"
         data-last="{{ (int)($task->actual_costs ?? 0) }}"
         data-url="{{ route('tasks.ajaxUpdateActualCosts', $task) }}"
+        {{ (int)($task->settled ?? 0) === 1 ? 'disabled' : '' }}
+        title="{{ (int)($task->settled ?? 0) === 1 ? 'Task da tat toan, khong the sua chi phi thuc te' : '' }}"
         placeholder="Nhập..."
       >
       @else

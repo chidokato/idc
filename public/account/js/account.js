@@ -303,39 +303,110 @@ $(document).on('change', '.js-toggle-settled', function () {
 
 function doToggleSettled(cb, url, settled, oldState) {
   cb.prop('disabled', true);
+  syncActualCostsBeforeSettled(cb.closest('tr'))
+    .done(function () {
+      $.post(url, { settled })
+        .done(function (res) {
+          if (res && (res.ok === true || res.success === true)) {
+            const $row = cb.closest('tr');
 
-  $.post(url, { settled })
-    .done(function (res) {
-      if (res && (res.ok === true || res.success === true)) {
-        const $row = cb.closest('tr');
+            if (res.task) {
+              if (res.task.refund_money_formatted !== undefined) {
+                $row.find('.js-refund-money').text(res.task.refund_money_formatted);
+              } else if (res.task.refund_money !== undefined) {
+                $row.find('.js-refund-money').text(Number(res.task.refund_money || 0).toLocaleString('vi-VN'));
+              }
 
-        if (res.task) {
-          if (res.task.refund_money_formatted !== undefined) {
-            $row.find('.js-refund-money').text(res.task.refund_money_formatted);
+              if (res.task.extra_money_formatted !== undefined) {
+                $row.find('.js-extra-money').text(res.task.extra_money_formatted);
+              } else if (res.task.extra_money !== undefined) {
+                $row.find('.js-extra-money').text(Number(res.task.extra_money || 0).toLocaleString('vi-VN'));
+              }
+            }
+
+            if (typeof showToast === 'function') {
+              showToast('success', res.message || (settled ? 'Đã tất toán' : 'Đã hủy tất toán'));
+            }
+          } else {
+            cb.prop('checked', oldState); // revert
+            if (typeof showToast === 'function') {
+              showToast('error', (res && res.message) || 'Thất bại');
+            }
           }
-          if (res.task.extra_money_formatted !== undefined) {
-            $row.find('.js-extra-money').text(res.task.extra_money_formatted);
-          }
-        }
-
-        if (typeof showToast === 'function') {
-          showToast('success', res.message || (settled ? 'Đã tất toán' : 'Đã hủy tất toán'));
-        }
-      } else {
-        cb.prop('checked', oldState); // revert
-        if (typeof showToast === 'function') {
-          showToast('error', (res && res.message) || 'Thất bại');
-        }
-      }
+        })
+        .fail(function (xhr) {
+          cb.prop('checked', oldState); // revert
+          const msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Thất bại';
+          if (typeof showToast === 'function') showToast('error', msg);
+        })
+        .always(function () {
+          cb.prop('disabled', false);
+        });
     })
-    .fail(function (xhr) {
-      cb.prop('checked', oldState); // revert
-      const msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Thất bại';
-      if (typeof showToast === 'function') showToast('error', msg);
-    })
-    .always(function () {
+    .fail(function (message) {
+      cb.prop('checked', oldState);
       cb.prop('disabled', false);
+
+      if (typeof showToast === 'function') {
+        showToast('error', message || 'Không thể cập nhật chi phí thực tế');
+      }
     });
+}
+
+function syncActualCostsBeforeSettled($row) {
+  const deferred = $.Deferred();
+  const $input = $row.find('.actual-cost-input');
+
+  if (!$input.length) {
+    deferred.resolve();
+    return deferred.promise();
+  }
+
+  const url = $input.data('url');
+  const currentDigits = parseInt(($input[0].dataset.raw || vnMoneyToDigits($input.val()) || '0'), 10) || 0;
+  const last = parseInt($input.data('last') || 0, 10);
+
+  if (!url || currentDigits === last) {
+    deferred.resolve();
+    return deferred.promise();
+  }
+
+  $input.prop('disabled', true).addClass('is-loading');
+
+  $.ajax({
+    url: url,
+    type: 'POST',
+    data: { actual_costs: currentDigits },
+    success: function (res) {
+      if (!res || !res.ok) {
+        deferred.reject(res?.message || 'Không thể cập nhật chi phí thực tế');
+        return;
+      }
+
+      const actual = parseInt(res.task?.actual_costs || 0, 10);
+      $input.val(formatVnMoneyDigits(String(actual)));
+      $input[0].dataset.raw = String(actual);
+      $input.data('last', actual);
+
+      if (res.task?.refund_money_formatted !== undefined) {
+        $row.find('.js-refund-money').text(res.task.refund_money_formatted);
+      }
+
+      if (res.task?.extra_money_formatted !== undefined) {
+        $row.find('.js-extra-money').text(res.task.extra_money_formatted);
+      }
+
+      deferred.resolve();
+    },
+    error: function (xhr) {
+      deferred.reject(xhr?.responseJSON?.message || 'Không thể cập nhật chi phí thực tế');
+    },
+    complete: function () {
+      $input.prop('disabled', false).removeClass('is-loading');
+    }
+  });
+
+  return deferred.promise();
 }
 
 /*=========== DUYỆT đóng tiền marketing ================*/

@@ -225,6 +225,12 @@ class ExpenseController extends Controller
 
     public function ajaxUpdateActualCosts(Request $request, Task $task)
     {
+        if ((int) ($task->settled ?? 0) === 1) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Task da tat toan, khong the sua chi phi thuc te.'
+            ], 422);
+        }
         // input có thể là "1.200.000" hoặc "1,200,000" => sanitize
         $raw   = (string) $request->input('actual_costs', '');
         $clean = preg_replace('/[^\d\-]/', '', $raw); // giữ số và dấu -
