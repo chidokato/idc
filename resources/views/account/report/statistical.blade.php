@@ -21,7 +21,7 @@
     <div class="card-body">
       <form method="GET" action="{{ route('task_cost_period.index') }}">
         <div class="row align-items-end">
-          <div class="col-lg-8 mb-3">
+          <div class="col-lg-5 mb-3">
             <label class="input-label">Chọn kỳ report</label>
             <select name="report_ids[]" class="form-control js-report-select" multiple>
               @foreach($reports as $rep)
@@ -30,6 +30,17 @@
                   @if($rep->time_start || $rep->time_end)
                     ({{ $rep->time_start }} - {{ $rep->time_end }})
                   @endif
+                </option>
+              @endforeach
+            </select>
+          </div>
+          <div class="col-lg-3 mb-3">
+            <label class="input-label">Công ty</label>
+            <select name="company_id" class="form-control js-company-select">
+              <option value="">Tất cả công ty</option>
+              @foreach($departments as $department)
+                <option value="{{ $department->id }}" {{ (int) ($selectedCompanyId ?? 0) === (int) $department->id ? 'selected' : '' }}>
+                  {{ $department->name }}
                 </option>
               @endforeach
             </select>
@@ -236,6 +247,12 @@ $(document).ready(function () {
   $('.js-report-select').select2({
     width: '100%',
     placeholder: 'Chọn một hoặc nhiều kỳ report'
+  });
+
+  $('.js-company-select').select2({
+    width: '100%',
+    placeholder: 'Chọn công ty',
+    allowClear: true
   });
 });
 </script>

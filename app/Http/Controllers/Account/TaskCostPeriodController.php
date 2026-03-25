@@ -13,7 +13,8 @@ class TaskCostPeriodController extends Controller
     public function index(Request $request)
     {
         $reports = Report::orderByDesc('id')->get();
-        $departments = Department::where('parent', 0)->get();
+        $departments = Department::where('parent', 0)->orderBy('name')->get();
+        $selectedCompanyId = (int) $request->input('company_id', 0);
 
         $selectedReportIds = collect((array) $request->input('report_ids', []))
             ->filter(fn ($id) => filled($id))
@@ -30,6 +31,10 @@ class TaskCostPeriodController extends Controller
             ->leftJoin('reports', 'reports.id', '=', 'tasks.report_id')
             ->leftJoin('posts', 'posts.id', '=', 'tasks.post_id')
             ->when(
+                $selectedCompanyId > 0,
+                fn ($query) => $query->where('tasks.department_lv1', $selectedCompanyId)
+            )
+            ->when(
                 $selectedReportIds->isNotEmpty(),
                 fn ($query) => $query->whereIn('tasks.report_id', $selectedReportIds->all())
             );
@@ -38,6 +43,10 @@ class TaskCostPeriodController extends Controller
             ->leftJoin('departments as current_department', 'current_department.id', '=', 'tasks.department_id')
             ->leftJoin('departments as parent_department', 'parent_department.id', '=', 'current_department.parent')
             ->when(
+                $selectedCompanyId > 0,
+                fn ($query) => $query->where('tasks.department_lv1', $selectedCompanyId)
+            )
+            ->when(
                 $selectedReportIds->isNotEmpty(),
                 fn ($query) => $query->whereIn('tasks.report_id', $selectedReportIds->all())
             );
@@ -45,12 +54,20 @@ class TaskCostPeriodController extends Controller
         $baseCompanyQuery = Task::query()
             ->leftJoin('departments as company_department', 'company_department.id', '=', 'tasks.department_lv1')
             ->when(
+                $selectedCompanyId > 0,
+                fn ($query) => $query->where('tasks.department_lv1', $selectedCompanyId)
+            )
+            ->when(
                 $selectedReportIds->isNotEmpty(),
                 fn ($query) => $query->whereIn('tasks.report_id', $selectedReportIds->all())
             );
 
         $baseFloorQuery = Task::query()
             ->leftJoin('departments as floor_department', 'floor_department.id', '=', 'tasks.department_lv2')
+            ->when(
+                $selectedCompanyId > 0,
+                fn ($query) => $query->where('tasks.department_lv1', $selectedCompanyId)
+            )
             ->when(
                 $selectedReportIds->isNotEmpty(),
                 fn ($query) => $query->whereIn('tasks.report_id', $selectedReportIds->all())
@@ -123,6 +140,7 @@ class TaskCostPeriodController extends Controller
             'reports' => $reports,
             'departments' => $departments,
             'selectedReportIds' => $selectedReportIds,
+            'selectedCompanyId' => $selectedCompanyId,
             'summary' => $summary,
             'projectSummaries' => $projectSummaries,
             'projectTotalActualCosts' => $projectTotalActualCosts,
