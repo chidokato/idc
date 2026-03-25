@@ -228,7 +228,9 @@
            @endif
            data-paid="{{ (int)($task->paid ?? 0) }}"
            data-actual-costs="{{ (float)($task->actual_costs ?? 0) }}"
-           title="Up">
+           style="{{ $editLocked ? 'pointer-events:none;opacity:.5;cursor:not-allowed;' : '' }}"
+           title="{{ $editLocked ? 'Task đã đóng tiền, không thể up' : 'Up' }}"
+           aria-disabled="{{ $editLocked ? 'true' : 'false' }}">
           <i class="tio-arrow-upward"></i>
         </a>
       </div>
