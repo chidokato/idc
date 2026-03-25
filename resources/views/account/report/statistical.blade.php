@@ -21,7 +21,7 @@
     <div class="card-body">
       <form method="GET" action="{{ route('task_cost_period.index') }}">
         <div class="row align-items-end">
-          <div class="col-lg-4 mb-3">
+          <div class="col-lg-12 mb-3">
             <label class="input-label">Chọn kỳ report</label>
             <select name="report_ids[]" class="form-control js-report-select" multiple>
               @foreach($reports as $rep)
@@ -87,7 +87,7 @@
   </div>
 
   <div class="row">
-    <div class="col-xl-6 mb-3">
+    <div class="col-xl-4 mb-3">
       <div class="card">
         <div class="card-header">
           <div class="d-flex justify-content-between align-items-center flex-grow-1">
@@ -102,8 +102,6 @@
             <thead class="thead-light">
               <tr>
                 <th>Dự án</th>
-                <th class="text-center">Task</th>
-                <th class="text-center">Kỳ</th>
                 <th class="text-right">Chi phí thực tế</th>
               </tr>
             </thead>
@@ -111,8 +109,6 @@
               @forelse($projectSummaries as $row)
                 <tr>
                   <td>{{ $row->post_name }}</td>
-                  <td class="text-center">{{ $row->total_tasks }}</td>
-                  <td class="text-center">{{ $row->total_reports }}</td>
                   <td class="text-right">{{ number_format((float) $row->total_actual_costs, 0, ',', '.') }}</td>
                 </tr>
               @empty
@@ -126,7 +122,7 @@
       </div>
     </div>
 
-    <div class="col-xl-6 mb-3">
+    <div class="col-xl-4 mb-3">
       <div class="card">
         <div class="card-header">
           <div class="d-flex justify-content-between align-items-center flex-grow-1">
@@ -141,8 +137,6 @@
             <thead class="thead-light">
               <tr>
                 <th>Nhóm / Phòng</th>
-                <th class="text-center">Task</th>
-                <th class="text-center">Kỳ</th>
                 <th class="text-right">Chi phí thực tế</th>
               </tr>
             </thead>
@@ -155,8 +149,6 @@
                       <small class="text-muted">{{ $row->parent_department_name }}</small>
                     @endif
                   </td>
-                  <td class="text-center">{{ $row->total_tasks }}</td>
-                  <td class="text-center">{{ $row->total_reports }}</td>
                   <td class="text-right">{{ number_format((float) $row->total_actual_costs, 0, ',', '.') }}</td>
                 </tr>
               @empty
@@ -170,8 +162,8 @@
       </div>
     </div>
 
-    <div class="col-xl-6 mb-3">
-      <div class="card">
+    <div class="col-xl-4 mb-3">
+      <div class="card mb-3">
         <div class="card-header">
           <div class="d-flex justify-content-between align-items-center flex-grow-1">
             <h4 class="card-header-title mb-0">Chi phí Công ty</h4>
@@ -185,8 +177,6 @@
             <thead class="thead-light">
               <tr>
                 <th>Công ty</th>
-                <th class="text-center">Task</th>
-                <th class="text-center">Kỳ</th>
                 <th class="text-right">Chi phí thực tế</th>
               </tr>
             </thead>
@@ -194,8 +184,6 @@
               @forelse($companySummaries as $row)
                 <tr>
                   <td>{{ $row->company_name }}</td>
-                  <td class="text-center">{{ $row->total_tasks }}</td>
-                  <td class="text-center">{{ $row->total_reports }}</td>
                   <td class="text-right">{{ number_format((float) $row->total_actual_costs, 0, ',', '.') }}</td>
                 </tr>
               @empty
@@ -207,9 +195,7 @@
           </table>
         </div>
       </div>
-    </div>
-
-    <div class="col-xl-6 mb-3">
+    
       <div class="card">
         <div class="card-header">
           <div class="d-flex justify-content-between align-items-center flex-grow-1">
@@ -224,8 +210,6 @@
             <thead class="thead-light">
               <tr>
                 <th>Sàn</th>
-                <th class="text-center">Task</th>
-                <th class="text-center">Kỳ</th>
                 <th class="text-right">Chi phí thực tế</th>
               </tr>
             </thead>
@@ -233,8 +217,6 @@
               @forelse($floorSummaries as $row)
                 <tr>
                   <td>{{ $row->floor_name }}</td>
-                  <td class="text-center">{{ $row->total_tasks }}</td>
-                  <td class="text-center">{{ $row->total_reports }}</td>
                   <td class="text-right">{{ number_format((float) $row->total_actual_costs, 0, ',', '.') }}</td>
                 </tr>
               @empty
