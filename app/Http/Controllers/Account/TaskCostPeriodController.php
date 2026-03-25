@@ -42,6 +42,13 @@ class TaskCostPeriodController extends Controller
                 fn ($query) => $query->whereIn('tasks.report_id', $selectedReportIds->all())
             );
 
+        $baseFloorQuery = Task::query()
+            ->leftJoin('departments as floor_department', 'floor_department.id', '=', 'tasks.department_lv1')
+            ->when(
+                $selectedReportIds->isNotEmpty(),
+                fn ($query) => $query->whereIn('tasks.report_id', $selectedReportIds->all())
+            );
+
         $summary = (clone $baseTaskQuery)
             ->selectRaw('COUNT(tasks.id) as total_tasks')
             ->selectRaw('COUNT(DISTINCT tasks.post_id) as total_projects')
@@ -79,6 +86,19 @@ class TaskCostPeriodController extends Controller
 
         $departmentTotalActualCosts = (float) $departmentSummaries->sum('total_actual_costs');
 
+        $floorSummaries = (clone $baseFloorQuery)
+            ->selectRaw('tasks.department_lv1')
+            ->selectRaw('COALESCE(floor_department.name, "Khong xac dinh") as floor_name')
+            ->selectRaw('COUNT(tasks.id) as total_tasks')
+            ->selectRaw('COUNT(DISTINCT tasks.report_id) as total_reports')
+            ->selectRaw('COALESCE(SUM(tasks.actual_costs), 0) as total_actual_costs')
+            ->groupBy('tasks.department_lv1', 'floor_department.name')
+            ->havingRaw('COALESCE(SUM(tasks.actual_costs), 0) > 0')
+            ->orderByDesc('total_actual_costs')
+            ->get();
+
+        $floorTotalActualCosts = (float) $floorSummaries->sum('total_actual_costs');
+
         return view('account.report.statistical', [
             'reports' => $reports,
             'departments' => $departments,
@@ -88,6 +108,8 @@ class TaskCostPeriodController extends Controller
             'projectTotalActualCosts' => $projectTotalActualCosts,
             'departmentSummaries' => $departmentSummaries,
             'departmentTotalActualCosts' => $departmentTotalActualCosts,
+            'floorSummaries' => $floorSummaries,
+            'floorTotalActualCosts' => $floorTotalActualCosts,
         ]);
     }
 }
