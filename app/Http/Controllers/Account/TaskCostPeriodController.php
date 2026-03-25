@@ -71,12 +71,9 @@ class TaskCostPeriodController extends Controller
             ->orderByDesc('total_actual_costs')
             ->get();
 
-        $duan_idc = TaskCostPeriod::with('Post')->orderByDesc('total_cost')->get();
-
         return view('account.report.statistical', [
             'reports' => $reports,
             'departments' => $departments,
-            'duan_idc' => $duan_idc,
             'selectedReportIds' => $selectedReportIds,
             'summary' => $summary,
             'reportSummaries' => $reportSummaries,

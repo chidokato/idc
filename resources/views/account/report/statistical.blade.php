@@ -164,29 +164,6 @@
       </div>
     </div>
 
-    <div class="col-xl-5 mb-3">
-      <div class="card">
-        <div class="card-header">
-          <h4 class="card-header-title">Tổng hợp cũ theo dự án</h4>
-        </div>
-        <div class="table-responsive">
-          <table class="table table-lg table-thead-bordered table-align-middle card-table">
-            <tbody>
-              @forelse($duan_idc as $val)
-                <tr>
-                  <td>{{ $val->Post->name ?? 'Không xác định' }}</td>
-                  <td class="text-right">{{ number_format((float) ($val->total_cost ?? 0), 0, ',', '.') }}</td>
-                </tr>
-              @empty
-                <tr>
-                  <td colspan="2" class="text-center text-muted">Chưa có dữ liệu từ bảng tổng hợp cũ.</td>
-                </tr>
-              @endforelse
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 @endsection
