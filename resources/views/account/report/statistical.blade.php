@@ -3,6 +3,21 @@
 @section('title') Thống kê chi phí @endsection
 
 @section('css')
+<link rel="stylesheet" href="admin_asset/select2/css/select2.min.css">
+<link rel="stylesheet" href="admin_asset/datatables/dataTables.bootstrap4.min.css">
+<style>
+  .dataTables_wrapper .row:first-child {
+    align-items: center;
+  }
+
+  .dataTables_wrapper .dataTables_filter input {
+    margin-left: .5rem;
+  }
+
+  .dataTables_wrapper .dataTables_length select {
+    min-width: 72px;
+  }
+</style>
 @endsection
 
 @section('body') @endsection
@@ -76,7 +91,7 @@
           </div>
         </div>
         <div class="table-responsive">
-          <table class="table table-lg table-thead-bordered table-align-middle card-table">
+          <table id="project-cost-table" class="table table-lg table-thead-bordered table-align-middle card-table js-statistical-table">
             <thead class="thead-light">
               <tr>
                 <th>Dự án</th>
@@ -115,7 +130,7 @@
           </div>
         </div>
         <div class="table-responsive">
-          <table class="table table-lg table-thead-bordered table-align-middle card-table">
+          <table id="department-cost-table" class="table table-lg table-thead-bordered table-align-middle card-table js-statistical-table">
             <thead class="thead-light">
               <tr>
                 <th>Nhóm / Phòng</th>
@@ -128,9 +143,9 @@
               @forelse($departmentSummaries as $row)
                 <tr>
                   <td>
-                    {{ $row->department_name }} / 
+                    {{ $row->department_name }}
                     @if(!empty($row->parent_department_name))
-                      <small class="text-muted">{{ $row->parent_department_name }}</small>
+                      <small class="text-muted">/ {{ $row->parent_department_name }}</small>
                     @endif
                   </td>
                   <td class="text-center">{{ $row->total_tasks }}</td>
@@ -159,7 +174,7 @@
           </div>
         </div>
         <div class="table-responsive">
-          <table class="table table-lg table-thead-bordered table-align-middle card-table">
+          <table id="company-cost-table" class="table table-lg table-thead-bordered table-align-middle card-table js-statistical-table">
             <thead class="thead-light">
               <tr>
                 <th>Công ty</th>
@@ -198,7 +213,7 @@
           </div>
         </div>
         <div class="table-responsive">
-          <table class="table table-lg table-thead-bordered table-align-middle card-table">
+          <table id="floor-cost-table" class="table table-lg table-thead-bordered table-align-middle card-table js-statistical-table">
             <thead class="thead-light">
               <tr>
                 <th>Sàn</th>
@@ -231,11 +246,38 @@
 
 @section('js')
 <script src="admin_asset/select2/js/select2.min.js"></script>
+<script src="admin_asset/datatables/jquery.dataTables.min.js"></script>
+<script src="admin_asset/datatables/dataTables.bootstrap4.min.js"></script>
 <script>
 $(document).ready(function () {
   $('.js-report-select').select2({
     width: '100%',
     placeholder: 'Chọn một hoặc nhiều kỳ report'
+  });
+
+  $('.js-statistical-table').each(function () {
+    $(this).DataTable({
+      pageLength: 10,
+      lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'Tất cả']],
+      order: [[3, 'desc']],
+      language: {
+        search: 'Tìm kiếm:',
+        lengthMenu: 'Hiển thị _MENU_ dòng',
+        info: 'Hiển thị _START_ đến _END_ của _TOTAL_ dòng',
+        infoEmpty: 'Không có dữ liệu',
+        zeroRecords: 'Không tìm thấy dữ liệu phù hợp',
+        emptyTable: 'Không có dữ liệu',
+        paginate: {
+          first: 'Đầu',
+          last: 'Cuối',
+          next: 'Sau',
+          previous: 'Trước'
+        }
+      },
+      columnDefs: [
+        { targets: [1, 2], searchable: false }
+      ]
+    });
   });
 });
 </script>
