@@ -175,7 +175,6 @@
                     @php
                         $balanceBefore = isset($item->balance_before) ? (float) $item->balance_before : null;
                         $balanceAfter = isset($item->balance_after) ? (float) $item->balance_after : null;
-                        $balanceDelta = null;
 
                         if ($balanceBefore !== null && $balanceAfter !== null) {
                             $balanceDelta = $balanceAfter - $balanceBefore;
@@ -201,6 +200,7 @@
                             ? '+'
                             : ($balanceDelta < 0 ? '-' : '');
                     @endphp
+
                     <td>
                         <span class="badge {{ $t[1] }}">{{ $t[0] }}</span>
                     </td>
@@ -210,25 +210,6 @@
                         {{ number_format($item->amount) }} đ
                     </td>
 
-                                                   @php
-                        $amountUi = [
-                            'deposit'  => ['text-success', '+'],
-                            'withdraw' => ['text-danger',  '-'],
-                            'rollback' => ['text-warning', '+'],
-
-                            // NEW
-                            'hold'     => ['text-info',    '-'], // giữ tiền: giảm available
-                            'release'  => ['text-secondary','+'],// nhả giữ: tăng available
-                            'capture'  => ['text-primary', '-'], // nghiệm thu: trừ thật từ held
-                            'refund'   => ['text-warning', '+'], // hoàn tiền
-                        ];
-
-                        [$cls, $sign] = $amountUi[$item->type] ?? ['text-dark', ''];
-                    @endphp
-
-                    <td class="{{ $cls }}">
-                        {{ $sign }} {{ number_format($item->amount) }} đ
-                    </td>
                     <td class="{{ $deltaClass }}">
                         {{ $deltaSign }} {{ number_format(abs($balanceDelta), 0, ',', '.') }} đ
                         @if($balanceBefore !== null && $balanceAfter !== null)
@@ -259,7 +240,7 @@
                     </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center text-muted">
+                            <td colspan="8" class="text-center text-muted">
                                 Chưa có giao dịch
                             </td>
                         </tr>
