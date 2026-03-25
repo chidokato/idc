@@ -21,7 +21,7 @@
     <div class="card-body">
       <form method="GET" action="{{ route('task_cost_period.index') }}">
         <div class="row align-items-end">
-          <div class="col-lg-5 mb-3">
+          <div class="col-lg-4 mb-3">
             <label class="input-label">Chọn kỳ report</label>
             <select name="report_ids[]" class="form-control js-report-select" multiple>
               @foreach($reports as $rep)
@@ -45,7 +45,18 @@
               @endforeach
             </select>
           </div>
-          <div class="col-lg-4 mb-3 d-flex">
+          <div class="col-lg-2 mb-3">
+            <label class="input-label">Kênh</label>
+            <select name="channel_id" class="form-control js-channel-select">
+              <option value="">Tất cả kênh</option>
+              @foreach($channels as $channel)
+                <option value="{{ $channel->id }}" {{ (int) ($selectedChannelId ?? 0) === (int) $channel->id ? 'selected' : '' }}>
+                  {{ $channel->name }}
+                </option>
+              @endforeach
+            </select>
+          </div>
+          <div class="col-lg-3 mb-3 d-flex">
             <button type="submit" class="btn btn-primary mr-2">Xem thống kê</button>
             <a href="{{ route('task_cost_period.index') }}" class="btn btn-white">Làm mới</a>
           </div>
@@ -252,6 +263,12 @@ $(document).ready(function () {
   $('.js-company-select').select2({
     width: '100%',
     placeholder: 'Chọn công ty',
+    allowClear: true
+  });
+
+  $('.js-channel-select').select2({
+    width: '100%',
+    placeholder: 'Chọn kênh',
     allowClear: true
   });
 });

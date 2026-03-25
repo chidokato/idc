@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Account;
 
 use App\Http\Controllers\Controller;
+use App\Models\Channel;
 use App\Models\Department;
 use App\Models\Report;
 use App\Models\Task;
@@ -14,7 +15,9 @@ class TaskCostPeriodController extends Controller
     {
         $reports = Report::orderByDesc('id')->get();
         $departments = Department::where('parent', 0)->orderBy('name')->get();
+        $channels = Channel::orderBy('name')->get();
         $selectedCompanyId = (int) $request->input('company_id', 0);
+        $selectedChannelId = (int) $request->input('channel_id', 0);
 
         $selectedReportIds = collect((array) $request->input('report_ids', []))
             ->filter(fn ($id) => filled($id))
@@ -35,6 +38,10 @@ class TaskCostPeriodController extends Controller
                 fn ($query) => $query->where('tasks.department_lv1', $selectedCompanyId)
             )
             ->when(
+                $selectedChannelId > 0,
+                fn ($query) => $query->where('tasks.channel_id', $selectedChannelId)
+            )
+            ->when(
                 $selectedReportIds->isNotEmpty(),
                 fn ($query) => $query->whereIn('tasks.report_id', $selectedReportIds->all())
             );
@@ -45,6 +52,10 @@ class TaskCostPeriodController extends Controller
             ->when(
                 $selectedCompanyId > 0,
                 fn ($query) => $query->where('tasks.department_lv1', $selectedCompanyId)
+            )
+            ->when(
+                $selectedChannelId > 0,
+                fn ($query) => $query->where('tasks.channel_id', $selectedChannelId)
             )
             ->when(
                 $selectedReportIds->isNotEmpty(),
@@ -58,6 +69,10 @@ class TaskCostPeriodController extends Controller
                 fn ($query) => $query->where('tasks.department_lv1', $selectedCompanyId)
             )
             ->when(
+                $selectedChannelId > 0,
+                fn ($query) => $query->where('tasks.channel_id', $selectedChannelId)
+            )
+            ->when(
                 $selectedReportIds->isNotEmpty(),
                 fn ($query) => $query->whereIn('tasks.report_id', $selectedReportIds->all())
             );
@@ -67,6 +82,10 @@ class TaskCostPeriodController extends Controller
             ->when(
                 $selectedCompanyId > 0,
                 fn ($query) => $query->where('tasks.department_lv1', $selectedCompanyId)
+            )
+            ->when(
+                $selectedChannelId > 0,
+                fn ($query) => $query->where('tasks.channel_id', $selectedChannelId)
             )
             ->when(
                 $selectedReportIds->isNotEmpty(),
@@ -139,8 +158,10 @@ class TaskCostPeriodController extends Controller
         return view('account.report.statistical', [
             'reports' => $reports,
             'departments' => $departments,
+            'channels' => $channels,
             'selectedReportIds' => $selectedReportIds,
             'selectedCompanyId' => $selectedCompanyId,
+            'selectedChannelId' => $selectedChannelId,
             'summary' => $summary,
             'projectSummaries' => $projectSummaries,
             'projectTotalActualCosts' => $projectTotalActualCosts,
