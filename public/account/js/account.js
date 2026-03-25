@@ -698,12 +698,15 @@ $(document).on('click', '.btn-edit-task', function () {
     const taskId = $btn.data('id') || '';
     const postId = $btn.data('post-id') || '';
     const postName = $btn.data('post-name') || '';
+    const expectedCosts = $btn.data('expected-costs') || 0;
     const days = $btn.data('days') || 0;
     const rate = $btn.data('rate') || 0;
     const createdAt = $btn.data('created-at') || '';
 
     $('#editUserModalTitle').text(taskId ? ('Chi tiết task #' + taskId) : 'Chi tiết');
     $('#modal_task_id').val(taskId);
+    $('#modal_expected_costs').val(formatVnMoneyDigits(String(expectedCosts)));
+    $('#modal_expected_costs').attr('data-raw', expectedCosts);
     $('#modal_days').val(days);
     $('#modal_rate').val(rate);
     $('#modal_date').val(createdAt);

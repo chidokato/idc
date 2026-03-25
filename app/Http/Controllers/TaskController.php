@@ -644,7 +644,7 @@ class TaskController extends Controller
         }
 
         $data = $request->validate([
-            // 'expected_costs' => ['nullable', 'integer', 'min:0'],
+            'expected_costs' => ['nullable', 'integer', 'min:0'],
             'days'           => ['nullable', 'integer', 'min:0'],
             'rate'           => ['nullable', 'integer', 'min:0', 'max:100'],
             // 'kpi'            => ['nullable', 'string', 'max:255'],
@@ -655,6 +655,7 @@ class TaskController extends Controller
         $rate = (int) $request->input('rate', $task->rate);
 
         $task->update([
+            'expected_costs' => $data['expected_costs'] ?? $task->expected_costs,
             'days'           => $data['days'] ?? $task->days,
             'rate'           => $rate,
             'post_id' => $data['post_id'] ?? $task->post_id,

@@ -266,10 +266,10 @@
       <div class="modal-body">
         <input type="hidden" id="modal_task_id">
 
-        <!-- <div class="form-group">
-          <label>Expected costs</label>
-          <input type="text" class="form-control" id="modal_expected_costs">
-        </div>  -->
+        <div class="form-group">
+          <label>Số tiền</label>
+          <input type="text" class="form-control actual-cost-input" id="modal_expected_costs" placeholder="Số tiền">
+        </div>
 
         <div class="form-group">
           <label>Days</label>
@@ -528,6 +528,7 @@ $('#btnSaveTaskModal').on('click', function () {
 $(function () {
   $('#btnSaveTaskModal').off('click').on('click', function () {
     const id = $('#modal_task_id').val();
+    const expectedCosts = parseInt((typeof vnMoneyToDigits === 'function' ? vnMoneyToDigits($('#modal_expected_costs').val()) : ($('#modal_expected_costs').val() || '').replace(/[^\d]/g, '')), 10) || 0;
     const days = parseInt($('#modal_days').val(), 10) || 0;
     const rate = parseInt($('#modal_rate').val(), 10) || 0;
     const postIdRaw = $('#duan').val();
@@ -540,6 +541,7 @@ $(function () {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       },
       data: {
+        expected_costs: expectedCosts,
         days: days,
         rate: rate,
         post_id: postId
@@ -620,6 +622,7 @@ document.addEventListener('DOMContentLoaded', function () {
     event.stopImmediatePropagation();
 
     const id = $('#modal_task_id').val();
+    const expectedCosts = parseInt((typeof vnMoneyToDigits === 'function' ? vnMoneyToDigits($('#modal_expected_costs').val()) : ($('#modal_expected_costs').val() || '').replace(/[^\d]/g, '')), 10) || 0;
     const days = parseInt($('#modal_days').val(), 10) || 0;
     const rate = parseInt($('#modal_rate').val(), 10) || 0;
     const postIdRaw = $('#duan').val();
@@ -638,6 +641,7 @@ document.addEventListener('DOMContentLoaded', function () {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       },
       data: {
+        expected_costs: expectedCosts,
         days: days,
         rate: rate,
         post_id: postId
