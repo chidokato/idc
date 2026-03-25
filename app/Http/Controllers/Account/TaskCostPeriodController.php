@@ -6,10 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Department;
 use App\Models\Report;
 use App\Models\Task;
-use App\Models\TaskCostPeriod;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class TaskCostPeriodController extends Controller
 {
@@ -68,8 +65,11 @@ class TaskCostPeriodController extends Controller
             ->selectRaw('COALESCE(SUM(tasks.extra_money), 0) as total_extra_money')
             ->selectRaw('COALESCE(SUM(tasks.refund_money), 0) as total_refund_money')
             ->groupBy('tasks.post_id', 'posts.name')
+            ->havingRaw('COALESCE(SUM(tasks.actual_costs), 0) > 0')
             ->orderByDesc('total_actual_costs')
             ->get();
+
+        $projectTotalActualCosts = (float) $projectSummaries->sum('total_actual_costs');
 
         return view('account.report.statistical', [
             'reports' => $reports,
@@ -78,82 +78,7 @@ class TaskCostPeriodController extends Controller
             'summary' => $summary,
             'reportSummaries' => $reportSummaries,
             'projectSummaries' => $projectSummaries,
+            'projectTotalActualCosts' => $projectTotalActualCosts,
         ]);
-    }
-
-    public function updateMonthly(Request $request)
-    {
-        $data = $request->validate([
-            'department_id' => ['nullable', 'integer'],
-            'report_id' => ['nullable', 'array'],
-            'report_id.*' => ['integer'],
-        ]);
-
-        $departmentId = $data['department_id'] ?? null;
-        $reportIds = $data['report_id'] ?? [];
-
-        $rows = Task::query()
-            ->where('actual_costs', '>', 0)
-            ->when($departmentId, fn ($q) => $q->where('department_lv1', $departmentId))
-            ->when($reportIds, fn ($q) => $q->whereIn('report_id', $reportIds))
-            ->selectRaw('post_id, SUM(actual_costs) as total_cost')
-            ->groupBy('post_id')
-            ->get();
-
-        $now = now();
-        $upsertData = $rows->map(function ($r) use ($now, $departmentId) {
-            return [
-                'post_id' => (int) $r->post_id,
-                'total_cost' => (float) $r->total_cost,
-                'department_lv1' => $departmentId,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ];
-        })->all();
-
-        DB::table('task_cost_period')->upsert(
-            $upsertData,
-            ['post_id'],
-            ['total_cost']
-        );
-
-        return redirect()
-            ->route('task_cost_period.index', [
-                'report_ids' => $reportIds,
-            ])
-            ->with('success', 'Đã cập nhật dữ liệu thống kê thành công.');
-    }
-
-    protected function buildPeriods(int $year, int $month): array
-    {
-        $start1 = Carbon::create($year, $month, 1)->toDateString();
-        $end1 = Carbon::create($year, $month, 15)->toDateString();
-
-        $start2 = Carbon::create($year, $month, 16)->toDateString();
-        $end2 = Carbon::create($year, $month, 1)->endOfMonth()->toDateString();
-
-        return [
-            ['period_no' => 1, 'start' => $start1, 'end' => $end1],
-            ['period_no' => 2, 'start' => $start2, 'end' => $end2],
-        ];
-    }
-
-    private function groupCols($groupBy)
-    {
-        switch ($groupBy) {
-            case 'san':
-                return ['department_id'];
-            case 'san_phong':
-                return ['department_id', 'department_lv1'];
-            case 'san_phong_nhom':
-                return ['department_id', 'department_lv1', 'department_lv2'];
-            case 'user':
-                return ['user_id'];
-            case 'channel':
-                return ['channel_id'];
-            case 'full':
-            default:
-                return ['department_id', 'department_lv1', 'department_lv2', 'user_id', 'channel_id'];
-        }
     }
 }

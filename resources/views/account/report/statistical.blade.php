@@ -64,31 +64,6 @@
     </div>
   </div>
 
-  <div class="mb-3">
-    <form method="POST" action="{{ route('task_cost_post.update') }}">
-      <div class="row align-items-center flex-grow-1">
-        @csrf
-        <div class="col-sm-auto">
-          <select name="department_id" class="custom-select">
-            @foreach($departments as $dep)
-              <option value="{{ $dep->id }}">{{ $dep->name }}</option>
-            @endforeach
-          </select>
-        </div>
-        <div class="col-sm-auto">
-          <select name="report_id[]" class="custom-select js-report-select" multiple>
-            @foreach($reports as $rep)
-              <option value="{{ $rep->id }}">{{ $rep->name }}</option>
-            @endforeach
-          </select>
-        </div>
-        <div class="col-sm-auto">
-          <button type="submit" class="btn btn-primary">Cập nhật dữ liệu cũ</button>
-        </div>
-      </div>
-    </form>
-  </div>
-
   <div class="row">
     <div class="col-xl-7 mb-3">
       <div class="card">
@@ -133,7 +108,13 @@
     <div class="col-xl-5 mb-3">
       <div class="card">
         <div class="card-header">
-          <h4 class="card-header-title">Chi phí theo dự án</h4>
+          <div class="d-flex justify-content-between align-items-center">
+            <h4 class="card-header-title mb-0">Chi phí theo dự án</h4>
+            <div class="text-right">
+              <small class="text-muted d-block">Tổng tiền</small>
+              <strong>{{ number_format((float) ($projectTotalActualCosts ?? 0), 0, ',', '.') }}</strong>
+            </div>
+          </div>
         </div>
         <div class="table-responsive">
           <table class="table table-lg table-thead-bordered table-align-middle card-table">
@@ -163,7 +144,6 @@
         </div>
       </div>
     </div>
-
   </div>
 </div>
 @endsection
