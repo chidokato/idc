@@ -152,7 +152,46 @@
       <div class="card">
         <div class="card-header">
           <div class="d-flex justify-content-between align-items-center flex-grow-1">
-            <h4 class="card-header-title mb-0">Chi phí theo sàn</h4>
+            <h4 class="card-header-title mb-0">Chi phí Công ty</h4>
+            <h4 class="text-right mb-0">
+              <strong>{{ number_format((float) ($companyTotalActualCosts ?? 0), 0, ',', '.') }}</strong>
+            </h4>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-lg table-thead-bordered table-align-middle card-table">
+            <thead class="thead-light">
+              <tr>
+                <th>Công ty</th>
+                <th class="text-center">Task</th>
+                <th class="text-center">Kỳ</th>
+                <th class="text-right">Chi phí thực tế</th>
+              </tr>
+            </thead>
+            <tbody>
+              @forelse($companySummaries as $row)
+                <tr>
+                  <td>{{ $row->company_name }}</td>
+                  <td class="text-center">{{ $row->total_tasks }}</td>
+                  <td class="text-center">{{ $row->total_reports }}</td>
+                  <td class="text-right">{{ number_format((float) $row->total_actual_costs, 0, ',', '.') }}</td>
+                </tr>
+              @empty
+                <tr>
+                  <td colspan="4" class="text-center text-muted">Chưa có dữ liệu theo Công ty.</td>
+                </tr>
+              @endforelse
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-6 mb-3">
+      <div class="card">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center flex-grow-1">
+            <h4 class="card-header-title mb-0">Chi phí theo sàn / chi nhánh</h4>
             <h4 class="text-right mb-0">
               <strong>{{ number_format((float) ($floorTotalActualCosts ?? 0), 0, ',', '.') }}</strong>
             </h4>
