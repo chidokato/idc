@@ -31,11 +31,7 @@ class WithdrawalController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'amount' => ['required', 'integer', 'min:1000', function ($attr, $value, $fail) {
-                if ($value % 1000 !== 0) {
-                    $fail('Số tiền phải là bội số của 1.000');
-                }
-            }],
+            'amount' => ['required', 'integer', 'min:1'],
             'bank_name' => 'required|string|max:255',
             'bank_account_name' => 'required|string|max:255',
             'bank_account_number' => 'required|string|max:50',

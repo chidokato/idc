@@ -148,8 +148,7 @@
 
   function validate(n) {
     if (!n) return 'Vui lòng nhập số tiền';
-    if (n < 1000) return 'Số tiền tối thiểu là 1.000 đ';
-    if (n % 1000 !== 0) return 'Số tiền phải là bội số của 1.000 đ';
+    if (n < 1) return 'Số tiền phải lớn hơn 0';
     if (n > max) return 'Số tiền rút không được vượt quá số dư ví';
     return '';
   }
