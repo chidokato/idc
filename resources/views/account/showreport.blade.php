@@ -120,11 +120,14 @@
                         </tr>
                     </thead>
                     @if($canBulkEdit)
-                    <!-- <div class="d-flex gap-2 align-items-center mb-2">
-                        <button type="button" class="btn btn-primary btn-sm" id="btn-open-bulk-modal" disabled>
+                    <div class="d-flex align-items-center mb-3">
+                        <button type="button" class="btn btn-primary btn-sm mr-2" id="btn-open-bulk-modal" disabled>
                             Sửa hàng loạt (<span id="bulk-count">0</span>)
                         </button>
-                    </div> -->
+                        <button type="button" class="btn btn-white btn-sm" id="btn-clear-selected" disabled>
+                            Bỏ chọn
+                        </button>
+                    </div>
 
                     <!-- Modal -->
                   <div class="modal fade" id="bulkEditModal" tabindex="-1" aria-hidden="true">
@@ -149,6 +152,14 @@
                               </div>
                               <input type="text" class="form-control form-control-sm" id="bulk_expected" placeholder="VD: 1.500.000" disabled>
                             </div>
+                            <div class="border rounded p-2 mb-3">
+                              <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="apply_days">
+                                <label class="form-check-label" for="apply_days">Ap dung So ngay (days)</label>
+                              </div>
+                              <input type="number" class="form-control form-control-sm" id="bulk_days" min="0" placeholder="VD: 15" disabled>
+                            </div>
+
 
                             {{-- Rate --}}
                             <div class="border rounded p-2 mb-3">
@@ -157,13 +168,9 @@
                                 <label class="form-check-label" for="apply_rate">Áp dụng Hỗ trợ (rate)</label>
                               </div>
 
-                              <select class="form-select form-select-sm" id="bulk_rate" disabled>
-                                @foreach(config('datas.rates') as $value => $label)
-                                  <option value="{{ $value }}">{{ $label }}</option>
-                                @endforeach
-                              </select>
-                            </div>
+                              <input type="number" class="form-control form-control-sm" id="bulk_rate" min="0" max="100" step="1" placeholder="0-100" disabled>
 
+                            </div>
                             {{-- Approved --}}
                             <div class="border rounded p-2">
                               <div class="form-check mb-2">
@@ -286,17 +293,32 @@
                                   {{ $val->approved ? 'Đã duyệt' : 'Chờ duyệt' }}
                                 </span>
 
-                                @if($val->paid !=1 )
+                                @php
+                                  $editLocked = (int)($val->paid ?? 0) === 1;
+                                @endphp
                                 <div class="edit-button">
                                   <a class="btn btn-sm btn-white btn-edit-task"
-                                       href="javascript:;"
+                                       href="{{ $editLocked ? 'javascript:void(0);' : 'javascript:;' }}"
                                        data-id="{{ $val->id }}"
+                                       data-post-id="{{ $val->post_id ?? '' }}"
+                                       data-post-name="{{ $val->Post?->name ?? '' }}"
+                                       data-expected-costs="{{ (float)($val->expected_costs ?? 0) }}"
+                                       data-days="{{ (int)($val->days ?? 0) }}"
+                                       data-rate="{{ (float)($val->rate ?? 0) }}"
+                                       data-content="{{ $val->content ?? '' }}"
+                                       data-approved="{{ (int)($val->approved ?? 0) }}"
+                                       data-paid="{{ (int)($val->paid ?? 0) }}"
+                                       data-created-at="{{ optional($val->created_at)->format('d/m/Y H:i') ?? '' }}"
+                                       @if(!$editLocked)
                                        data-toggle="modal"
-                                       data-target="#invoiceReceiptModal">
+                                       data-target="#invoiceReceiptModal"
+                                       @endif
+                                       style="{{ $editLocked ? 'pointer-events:none;opacity:.5;cursor:not-allowed;' : '' }}"
+                                       title="{{ $editLocked ? 'Task Ä‘Ã£ Ä‘Ã³ng tiá»n, khÃ´ng thá»ƒ sá»­a' : '' }}"
+                                       aria-disabled="{{ $editLocked ? 'true' : 'false' }}">
                                       <i class="tio-edit"></i>
                                     </a>
                                 </div>
-                                @endif
                             </td>
                         </tr>
                         
@@ -324,10 +346,10 @@
       <div class="modal-body">
         <input type="hidden" id="modal_task_id">
 
-        <!-- <div class="form-group">
-          <label>Expected costs</label>
-          <input type="text" class="form-control" id="modal_expected_costs">
-        </div>  -->
+        <div class="form-group">
+          <label>Số tiền</label>
+          <input type="text" class="form-control actual-cost-input" id="modal_expected_costs" placeholder="Số tiền">
+        </div>
 
         <div class="form-group">
           <label>Days</label>
@@ -621,15 +643,17 @@ $(function () {
 
     // modal enable/disable fields
     $('#apply_expected').on('change', function(){ $('#bulk_expected').prop('disabled', !this.checked); });
+    $('#apply_days').on('change', function(){ $('#bulk_days').prop('disabled', !this.checked); });
     $('#apply_rate').on('change', function(){ $('#bulk_rate').prop('disabled', !this.checked); });
     $('#apply_approved').on('change', function(){ $('#bulk_approved_action').prop('disabled', !this.checked); });
 
     // open modal
     $('#btn-open-bulk-modal').on('click', function(){
         // reset modal state
-        $('#apply_expected, #apply_rate, #apply_approved').prop('checked', false);
+        $('#apply_expected, #apply_days, #apply_rate, #apply_approved').prop('checked', false);
         $('#bulk_expected').val('').prop('disabled', true);
-        $('#bulk_rate').prop('disabled', true);
+        $('#bulk_days').val('').prop('disabled', true);
+        $('#bulk_rate').val('').prop('disabled', true);
         $('#bulk_approved_action').prop('disabled', true);
 
         const modalEl = document.getElementById('bulkEditModal');
@@ -648,6 +672,8 @@ $(function () {
         const payload = {
             ids: ids,
             apply_expected: $('#apply_expected').is(':checked') ? 1 : 0,
+            apply_days: $('#apply_days').is(':checked') ? 1 : 0,
+            days: parseInt($('#bulk_days').val(), 10) || 0,
             expected_costs: parseVnMoney($('#bulk_expected').val()),
 
             apply_rate: $('#apply_rate').is(':checked') ? 1 : 0,
@@ -658,7 +684,7 @@ $(function () {
         };
 
         // ít nhất phải tick 1 mục áp dụng
-        if(!payload.apply_expected && !payload.apply_rate && !payload.apply_approved){
+        if(!payload.apply_expected && !payload.apply_days && !payload.apply_rate && !payload.apply_approved){
             showCenterError("Hãy chọn ít nhất 1 mục để áp dụng!");
             return;
         }
@@ -668,7 +694,11 @@ $(function () {
             method: "POST",
             data: payload,
             success: function(res){
-                showToast('success', res.message ?? "Đã thực hiện thành công");
+                showToast('success', res.message ?? 'Thao tac thanh cong');
+                setTimeout(function () {
+                    window.location.reload();
+                }, 250);
+                return;
 
                 // Update UI từng row
                 (res.rows || []).forEach(function(r){
@@ -678,6 +708,8 @@ $(function () {
                     if(payload.apply_expected){
                         row.find('.expected-cost-input').val(formatVn(r.expected_costs));
                         row.find('.total-cost-text').text(formatVn(r.total_costs));
+                        row.find('.total-cost-text').attr('title', formatVn(r.expected_costs) + 'đ * ' + row.find('.total-cost-cell').data('days') + ' ngày');
+                        row.find('.btn-edit-task').attr('data-expected-costs', r.expected_costs);
                         // cập nhật tooltip ghi chú nhân ngày nếu bạn muốn:
                         row.find('.total-cost-cell .note')
                           .attr('title', formatVn(r.expected_costs) + 'đ * ' + row.find('.total-cost-cell').data('days') + ' ngày');
@@ -685,12 +717,14 @@ $(function () {
 
                     // rate select
                     if(payload.apply_rate){
-                        row.find('.rate-select').val(r.rate);
+                        row.find('.rate-input').val(r.rate);
+                        row.find('.total-cost-cell').data('rate', r.rate).attr('data-rate', r.rate);
+                        row.find('.btn-edit-task').attr('data-rate', r.rate);
                     }
 
                     // approved switch + badge
                     if(payload.apply_approved){
-                        row.find('.active-toggle').prop('checked', r.approved == 1);
+                        row.find('.active-toggle-approved').prop('checked', r.approved == 1);
                         const badgeCell = row.find('td').last(); // cột badge đang là td cuối
                         if(r.approved == 1){
                             badgeCell.html('<span class="badge btn-success">Đã duyệt</span>');
@@ -756,18 +790,24 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     $(document).on('click', '.btn-edit-task', function () {
-      const id = $(this).data('id');
+      const $btn = $(this);
+      const id = $btn.data('id');
+
+      if (parseInt($btn.attr('data-paid') || '0', 10) === 1) {
+        return;
+      }
+
       const $row = $('#row-' + id);
 
       // lấy từ input trong row
       const expected = $row.find('.expected-cost-input').val(); // ví dụ "1.000.000"
-      const rate = $row.find('.rate-input').val();
+      const rate = $btn.data('rate') ?? $row.find('.rate-input').val();
       const kpi = $row.find('.task-kpi').val();
 
-      const date = $row.find('.date').val();
+      const date = $btn.data('created-at') || $row.find('.date').val();
       // alert(date);
       // lấy từ data-attribute trong cell total-cost (bạn có sẵn)
-      const days = $row.find('.total-cost-cell').data('days');
+      const days = $btn.data('days') ?? $row.find('.total-cost-cell').data('days');
 
       const duan = $row.find('.duan').data('duan'); // lấy id dự án
 
@@ -775,15 +815,16 @@ document.addEventListener('DOMContentLoaded', function () {
       const content = $row.find('td.ghichu').attr('title') || $row.find('td.ghichu').text().trim();
 
       // đổ vào modal
-      $('#duan').val(duan);
+      const modalDuan = $btn.data('post-id') ?? duan;
+      $('#duan').val(modalDuan);
       $('#modal_task_id').val(id);
-      // $('#modal_expected_costs').val(expected);
+      $('#modal_expected_costs').val(expected);
       $('#modal_days').val(days);
       $('#modal_rate').val(rate);
       // $('#modal_kpi').val(kpi);
       // $('#modal_content').val(content);
       $('#modal_date').val(date);
-      $('#duan').val(duan).trigger('change'); 
+      $('#duan').val(modalDuan).trigger('change'); 
     });
 
 </script>
@@ -792,7 +833,9 @@ document.addEventListener('DOMContentLoaded', function () {
 $('#btnSaveTaskModal').on('click', function () {
   const id = $('#modal_task_id').val();
 
-  // const expectedNum = toNumber($('#modal_expected_costs').val());
+  const expectedNum = parseInt((typeof vnMoneyToDigits === 'function'
+    ? vnMoneyToDigits($('#modal_expected_costs').val())
+    : ($('#modal_expected_costs').val() || '').replace(/[^\d]/g, '')), 10) || 0;
   const days = parseInt($('#modal_days').val(), 10) || 0;
   const rate = parseInt($('#modal_rate').val(), 10) || 0;
   // const kpi = $('#modal_kpi').val() || '';
@@ -806,7 +849,7 @@ $('#btnSaveTaskModal').on('click', function () {
       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     },
     data: {
-      // expected_costs: expectedNum,
+      expected_costs: expectedNum,
       days: days,
       rate: rate,
       post_id: post_id
@@ -823,7 +866,7 @@ $('#btnSaveTaskModal').on('click', function () {
       const t = res.task;
       const $row = $('#row-' + t.id);
 
-      // $row.find('.expected-cost-input').val(formatVn(t.expected_costs));
+      $row.find('.expected-cost-input').val(formatVn(t.expected_costs));
       $row.find('.rate-input').val(parseInt(t.rate, 10) || 0);
       // $row.find('.task-kpi').val(t.kpi ?? '');
 
@@ -842,6 +885,13 @@ $('#btnSaveTaskModal').on('click', function () {
           .attr('data-duan', t.post_id)
           .text(t.post_name || '');
       }
+
+      $row.find('.btn-edit-task')
+        .attr('data-post-id', t.post_id || '')
+        .attr('data-post-name', t.post_name || '')
+        .attr('data-expected-costs', t.expected_costs || 0)
+        .attr('data-days', t.days || 0)
+        .attr('data-rate', parseInt(t.rate, 10) || 0);
 
 
       $('#invoiceReceiptModal').modal('hide');
@@ -917,3 +967,5 @@ $('#btnSaveTaskModal').on('click', function () {
 </script>
 
 @endsection
+
+
