@@ -27,7 +27,7 @@
                     <i class="tio-swap-horizontal mr-1"></i> Chuyển tiền
                 </a>
                 <a class="btn btn-primary" href="account/wallet/withdraw">
-                    <i class="tio-upload-to mr-1"></i> Rút tiền
+                    <i class="tio-money-vs mr-1"></i> Rút tiền
                 </a>
                 <a class="btn btn-primary" href="account/wallet/deposit">
                     <i class="tio-money mr-1"></i> Nạp tiền
