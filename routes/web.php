@@ -42,6 +42,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\DepositController;
+use App\Http\Controllers\WithdrawalController;
 
 use Illuminate\Support\Facades\Mail;
 
@@ -232,6 +233,8 @@ Route::middleware(['user'])->group(function () {
         Route::post('wallet/deposit/create', [DepositController::class, 'depositCreate'])->name('wallet.deposit.create');
         Route::post('wallet/deposit/{deposit}/upload', [DepositController::class, 'depositUploadProof'])->name('wallet.deposit.upload');
         Route::post('wallet/deposit/{deposit}/expire', [DepositController::class, 'depositExpire'])->name('wallet.deposit.expire');
+        Route::get('wallet/withdraw', [WithdrawalController::class, 'form'])->name('wallet.withdraw.form');
+        Route::post('wallet/withdraw', [WithdrawalController::class, 'store'])->name('wallet.withdraw.store');
 
 
         Route::get('wallet/deposits', [WalletController::class, 'myDeposits'])->name('wallet.deposits');
@@ -247,6 +250,8 @@ Route::middleware(['user'])->group(function () {
         Route::get('deposits', [DepositController::class, 'index'])->name('deposits.index');
         Route::post('deposits/{deposit}/update-status', [DepositController::class, 'updateStatus'])->name('deposits.updateStatus');
         Route::post('deposits/{deposit}/bank-name', [DepositController::class, 'updateBankName'])->name('deposits.updateBankName');
+        Route::get('withdrawals', [WithdrawalController::class, 'index'])->name('withdrawals.index');
+        Route::post('withdrawals/{withdrawal}/process', [WithdrawalController::class, 'process'])->name('withdrawals.process');
 
         // Task Cost Period
         Route::get('statistical', [TaskCostPeriodController::class, 'index'])->name('task_cost_period.index');

@@ -76,6 +76,12 @@
             </a>
           </li>
           <li class="nav-item ">
+            <a class="js-nav-tooltip-link nav-link " href="account/withdrawals" title="Duyệt rút tiền" data-placement="left">
+              <i class="tio-money-vs nav-icon"></i>
+              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Duyệt rút tiền</span>
+            </a>
+          </li>
+          <li class="nav-item ">
             <a class="js-nav-tooltip-link nav-link " href="account/wallets" title="Quản lý ví tiền" data-placement="left">
               <i class="tio-dashboard nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Quản lý ví tiền</span>
@@ -110,6 +116,12 @@
             <a class="js-nav-tooltip-link nav-link " href="account/wallet/deposit" title="Nạp tiền" data-placement="left">
               <i class="tio-download-to nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Nạp tiền</span>
+            </a>
+          </li>
+          <li class="nav-item ">
+            <a class="js-nav-tooltip-link nav-link " href="account/wallet/withdraw" title="Rút tiền" data-placement="left">
+              <i class="tio-upload-to nav-icon"></i>
+              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Rút tiền</span>
             </a>
           </li>
 

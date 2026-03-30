@@ -26,6 +26,9 @@
                 <a class="btn btn-primary" href="account/wallet/transfer">
                     <i class="tio-swap-horizontal mr-1"></i> Chuyển tiền
                 </a>
+                <a class="btn btn-primary" href="account/wallet/withdraw">
+                    <i class="tio-upload-to mr-1"></i> Rút tiền
+                </a>
                 <a class="btn btn-primary" href="account/wallet/deposit">
                     <i class="tio-money mr-1"></i> Nạp tiền
                 </a>
@@ -78,7 +81,7 @@
 
         <div class="row align-items-center gx-2">
         <div class="col">
-        <span class="js-counter display-4 text-dark" data-value="0">0</span>
+        <span class="js-counter display-4 text-dark" data-value="{{ number_format($wallet->balance) }}">{{ number_format($wallet->balance) }}</span>
         <span class="text-body font-size-sm ml-1">VNĐ</span>
         </div>
         </div>

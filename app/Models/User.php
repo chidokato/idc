@@ -101,6 +101,11 @@ class User extends Authenticatable
         return $this->hasMany(Deposit::class);
     }
 
+    public function withdrawals()
+    {
+        return $this->hasMany(Withdrawal::class);
+    }
+
     public function tasks()
     {
         return $this->hasMany(Task::class, 'user');
