@@ -247,6 +247,33 @@
             <h5 class="card-header-title">T&#7845;t c&#7843; t&#225;c v&#7909; c&#7911;a ng&#432;&#7901;i d&#249;ng</h5>
         </div>
 
+        @php
+            $taskTotalActual = $tasks->sum(fn($task) => (float) ($task->actual_costs ?? 0));
+            $taskTotalSpent = $tasks->sum(function ($task) {
+                $rate = (float) ($task->rate ?? 0);
+                $actual = (float) ($task->actual_costs ?? 0);
+                return $actual * (100 - $rate) / 100;
+            });
+            $taskTotalRefund = $tasks->sum(fn($task) => (float) ($task->refund_money ?? 0));
+        @endphp
+
+        <div class="card-body border-bottom">
+            <div class="row gx-2 gx-lg-3">
+                <div class="col-sm-4 mb-2 mb-sm-0">
+                    <div class="font-size-sm text-muted">T&#7893;ng ti&#7873;n th&#7921;c t&#7871;</div>
+                    <div class="h4 mb-0">{{ number_format($taskTotalActual, 0, ',', '.') }} &#8363;</div>
+                </div>
+                <div class="col-sm-4 mb-2 mb-sm-0">
+                    <div class="font-size-sm text-muted">T&#7893;ng s&#7889; ti&#7873;n &#273;&#227; chi</div>
+                    <div class="h4 mb-0 text-danger">{{ number_format($taskTotalSpent, 0, ',', '.') }} &#8363;</div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="font-size-sm text-muted">T&#7893;ng tr&#7843; l&#7841;i</div>
+                    <div class="h4 mb-0 text-success">{{ number_format($taskTotalRefund, 0, ',', '.') }} &#8363;</div>
+                </div>
+            </div>
+        </div>
+
         <div class="table-responsive datatable-custom">
             <table class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
                 <thead class="thead-light">
