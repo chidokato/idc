@@ -209,23 +209,9 @@
                             </td>
                             <td class="{{ $deltaClass }}">
                                 {{ $delta > 0 ? '+' : ($delta < 0 ? '-' : '') }} {{ number_format(abs($delta), 0, ',', '.') }} &#8363;
-                                @if($item->balance_before !== null && $item->balance_after !== null)
-                                    <div class="small text-muted">
-                                        {{ number_format($item->balance_before, 0, ',', '.') }} &rarr; {{ number_format($item->balance_after, 0, ',', '.') }}
-                                    </div>
-                                @endif
                             </td>
                             <td>
                                 <div>{{ $item->description ?? '---' }}</div>
-                                @if(!empty($meta['note']))
-                                    <div class="small text-muted">Ghi ch&#250;: {{ $meta['note'] }}</div>
-                                @endif
-                                @if(!empty($meta['from_name']))
-                                    <div class="small text-muted">T&#7915;: {{ $meta['from_name'] }}</div>
-                                @endif
-                                @if(!empty($meta['to_name']))
-                                    <div class="small text-muted">&#272;&#7871;n: {{ $meta['to_name'] }}</div>
-                                @endif
                             </td>
                         </tr>
                     @empty
