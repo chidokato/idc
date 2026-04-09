@@ -241,6 +241,69 @@
             {{ $transactions->links() }}
         </div>
     </div>
+
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="card-header-title">T&#7845;t c&#7843; t&#225;c v&#7909; c&#7911;a ng&#432;&#7901;i d&#249;ng</h5>
+        </div>
+
+        <div class="table-responsive datatable-custom">
+            <table class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
+                <thead class="thead-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Ng&#224;y t&#7841;o</th>
+                        <th>Ph&#242;ng ban</th>
+                        <th>D&#7921; &#225;n</th>
+                        <th>K&#234;nh</th>
+                        <th>Ng&#224;y ch&#7841;y</th>
+                        <th>D&#7921; chi</th>
+                        <th>Hold</th>
+                        <th>Th&#7921;c chi</th>
+                        <th>Tr&#7841;ng th&#225;i</th>
+                        <th>N&#7897;i dung</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($tasks as $task)
+                        @php
+                            $statusLabel = $task->status ?: ((int) ($task->paid ?? 0) === 1 ? 'held' : 'new');
+                            $statusClass = match ($statusLabel) {
+                                'accepted' => 'bg-success',
+                                'held' => 'bg-warning',
+                                'registered' => 'bg-soft-info text-info',
+                                'new' => 'bg-secondary',
+                                default => 'bg-primary',
+                            };
+                        @endphp
+                        <tr>
+                            <td>{{ $task->id }}</td>
+                            <td>{{ optional($task->created_at)->format('d/m/Y H:i') }}</td>
+                            <td>{{ $task->department?->name ?? '---' }}</td>
+                            <td>{{ $task->Post?->name ?? '---' }}</td>
+                            <td>{{ $task->Channel?->name ?? '---' }}</td>
+                            <td class="text-center">{{ $task->days ?? 0 }}</td>
+                            <td>{{ number_format($task->expected_costs ?? 0) }} &#8363;</td>
+                            <td>{{ number_format($task->price_expected ?? 0) }} &#8363;</td>
+                            <td>{{ number_format($task->actual_costs ?? 0) }} &#8363;</td>
+                            <td>
+                                <span class="badge {{ $statusClass }}">{{ $statusLabel }}</span>
+                            </td>
+                            <td style="white-space: normal; min-width: 240px;">{{ $task->content ?? '---' }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="11" class="text-center text-muted">Ng&#432;&#7901;i d&#249;ng n&#224;y ch&#432;a c&#243; t&#225;c v&#7909;.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-footer">
+            {{ $tasks->links() }}
+        </div>
+    </div>
 </div>
 @endsection
 

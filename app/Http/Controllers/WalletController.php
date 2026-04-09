@@ -13,6 +13,7 @@ use App\Models\WalletTransaction;
 use App\Models\Deposit;
 use App\Models\User;
 use App\Models\Wallet;
+use App\Models\Task;
 
 use App\Models\Department;
 use App\Helpers\TreeHelper;
@@ -79,7 +80,7 @@ class WalletController extends Controller
 
         $transactions = $query
             ->orderByDesc('id')
-            ->paginate(50)
+            ->paginate(50, ['*'], 'tx_page')
             ->withQueryString();
 
         $transactions->getCollection()->transform(function (WalletTransaction $transaction) {
@@ -129,7 +130,13 @@ class WalletController extends Controller
             }
         }
 
-        return view('account.wallet.detail', compact('wallet', 'transactions', 'summary'));
+        $tasks = Task::with(['Post', 'Channel', 'department'])
+            ->where('user', $wallet->user_id)
+            ->orderByDesc('id')
+            ->paginate(30, ['*'], 'task_page')
+            ->withQueryString();
+
+        return view('account.wallet.detail', compact('wallet', 'transactions', 'summary', 'tasks'));
     }
 
     public function index(Request $request)
