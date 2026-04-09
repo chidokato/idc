@@ -59,6 +59,79 @@ class WalletController extends Controller
         return view('account.wallet.wallets', compact('wallets', 'departmentOptions'));
     }
 
+    public function detail(Request $request, Wallet $wallet)
+    {
+        $wallet->load(['user.department']);
+
+        $query = WalletTransaction::where('wallet_id', $wallet->id);
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        $transactions = $query
+            ->orderByDesc('id')
+            ->paginate(50)
+            ->withQueryString();
+
+        $transactions->getCollection()->transform(function (WalletTransaction $transaction) {
+            $transaction->display_meta = $this->resolveTransactionDisplay($transaction);
+            $transaction->display_delta = $this->resolveBalanceDelta($transaction);
+            $transaction->display_meta_data = $this->resolveTransactionMeta($transaction);
+
+            return $transaction;
+        });
+
+        $summary = [
+            'total_in' => 0,
+            'deposit_total' => 0,
+            'transfer_in_total' => 0,
+            'transfer_out_total' => 0,
+            'spend_total' => 0,
+            'withdraw_total' => 0,
+        ];
+
+        foreach ($wallet->transactions as $transaction) {
+            $category = $this->resolveTransactionCategory($transaction);
+            $amount = (float) ($transaction->amount ?? 0);
+            $delta = $this->resolveBalanceDelta($transaction);
+
+            if ($delta > 0) {
+                $summary['total_in'] += $delta;
+            }
+
+            if ($category === 'deposit_money') {
+                $summary['deposit_total'] += $amount;
+            }
+
+            if ($category === 'transfer_in') {
+                $summary['transfer_in_total'] += $amount;
+            }
+
+            if ($category === 'transfer_out') {
+                $summary['transfer_out_total'] += $amount;
+            }
+
+            if ($category === 'spend_money') {
+                $summary['spend_total'] += $amount;
+            }
+
+            if ($category === 'withdraw_money') {
+                $summary['withdraw_total'] += $amount;
+            }
+        }
+
+        return view('account.wallet.detail', compact('wallet', 'transactions', 'summary'));
+    }
+
     public function index(Request $request)
     {
         $user = auth()->user();
@@ -523,18 +596,129 @@ class WalletController extends Controller
         }
     }
 
+    private function resolveTransactionMeta(WalletTransaction $transaction): array
+    {
+        $meta = $transaction->meta ?? [];
 
-  public function histories(\App\Models\Wallet $wallet)
-{
-    $transactions = $wallet->transactions()->latest()->limit(200)->get();
+        if (is_string($meta)) {
+            $meta = json_decode($meta, true) ?: [];
+        }
 
-    $html = view('account.wallet._history_rows', compact('transactions'))->render();
+        return is_array($meta) ? $meta : [];
+    }
 
-    return response()->json([
-        'ok' => true,
-        'html' => $html,
-    ]);
-}
+    private function resolveTransactionCategory(WalletTransaction $transaction): string
+    {
+        $meta = $this->resolveTransactionMeta($transaction);
+        $description = mb_strtolower((string) ($transaction->description ?? ''), 'UTF-8');
+        $refType = (string) ($transaction->ref_type ?? '');
+
+        if ($transaction->type === 'deposit') {
+            if ($refType === 'BulkTransfer' || !empty($meta['from_user_id'])) {
+                return 'transfer_in';
+            }
+
+            if (str_contains($description, 'nạp tiền')) {
+                return 'deposit_money';
+            }
+
+            return 'other_in';
+        }
+
+        if ($transaction->type === 'withdraw') {
+            if ($refType === 'BulkTransfer' || !empty($meta['to_user_id'])) {
+                return 'transfer_out';
+            }
+
+            if ($refType === 'Withdrawal' || str_contains($description, 'rút tiền')) {
+                return 'withdraw_money';
+            }
+
+            return 'spend_money';
+        }
+
+        if ($transaction->type === 'capture') {
+            return 'spend_money';
+        }
+
+        if ($transaction->type === 'rollback' || $transaction->type === 'release') {
+            return 'other_in';
+        }
+
+        return 'other';
+    }
+
+    private function resolveTransactionDisplay(WalletTransaction $transaction): array
+    {
+        $meta = $this->resolveTransactionMeta($transaction);
+        $category = $this->resolveTransactionCategory($transaction);
+
+        $map = [
+            'deposit_money' => ['Nạp tiền', 'bg-success', 'text-success', '+'],
+            'transfer_in' => ['Nhận tiền', 'bg-soft-success text-success', 'text-success', '+'],
+            'transfer_out' => ['Chuyển tiền', 'bg-soft-warning text-warning', 'text-warning', '-'],
+            'spend_money' => ['Chi tiêu', 'bg-danger', 'text-danger', '-'],
+            'withdraw_money' => ['Rút tiền', 'bg-dark', 'text-dark', '-'],
+            'other_in' => ['Tiền vào', 'bg-info', 'text-info', '+'],
+            'other' => ['Khác', 'bg-secondary', 'text-muted', ''],
+        ];
+
+        $display = $map[$category] ?? $map['other'];
+
+        if ($transaction->type === 'hold') {
+            return ['Tạm giữ', 'bg-primary', 'text-primary', ''];
+        }
+
+        if ($transaction->type === 'release') {
+            return ['Hoàn hold', 'bg-info', 'text-info', '+'];
+        }
+
+        if ($transaction->type === 'rollback' && $transaction->ref_type === 'RecallTransfer') {
+            return ['Thu hồi hoàn tiền', 'bg-warning', 'text-warning', '+'];
+        }
+
+        if ($transaction->type === 'withdraw' && $transaction->ref_type === 'RecallTransfer') {
+            return ['Thu hồi trừ ví', 'bg-warning', 'text-warning', '-'];
+        }
+
+        if ($category === 'transfer_in' && !empty($meta['from_name'])) {
+            $display[0] = 'Nhận từ ' . $meta['from_name'];
+        }
+
+        if ($category === 'transfer_out' && !empty($meta['to_name'])) {
+            $display[0] = 'Chuyển cho ' . $meta['to_name'];
+        }
+
+        return $display;
+    }
+
+    private function resolveBalanceDelta(WalletTransaction $transaction): float
+    {
+        if ($transaction->balance_before !== null && $transaction->balance_after !== null) {
+            return (float) $transaction->balance_after - (float) $transaction->balance_before;
+        }
+
+        $amount = (float) ($transaction->amount ?? 0);
+        $category = $this->resolveTransactionCategory($transaction);
+
+        return match ($category) {
+            'deposit_money', 'transfer_in', 'other_in' => $amount,
+            'transfer_out', 'spend_money', 'withdraw_money' => -$amount,
+            default => 0,
+        };
+    }
+
+    public function histories(\App\Models\Wallet $wallet)
+    {
+        $transactions = $wallet->transactions()->latest()->limit(200)->get();
+
+        $html = view('account.wallet._history_rows', compact('transactions'))->render();
+
+        return response()->json([
+            'ok' => true,
+            'html' => $html,
+        ]);
+    }
 
 
 }

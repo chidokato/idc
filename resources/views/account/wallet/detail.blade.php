@@ -1,0 +1,248 @@
+@extends('account.layout.index')
+
+@section('title') Cong Ty Co Phan Bat Dong San Indochine @endsection
+
+@section('css')
+@endsection
+
+@section('body') @endsection
+
+@section('content')
+@php
+    $labelMap = [
+        'deposit_money' => 'N&#7841;p ti&#7873;n',
+        'transfer_in' => 'Nh&#7853;n ti&#7873;n',
+        'transfer_out' => 'Chuy&#7875;n ti&#7873;n',
+        'spend_money' => 'Chi ti&#234;u',
+        'withdraw_money' => 'R&#250;t ti&#7873;n',
+        'other_in' => 'Ti&#7873;n v&#224;o',
+        'hold_money' => 'T&#7841;m gi&#7919;',
+        'release_money' => 'Ho&#224;n hold',
+        'recall_credit' => 'Thu h&#7891;i ho&#224;n ti&#7873;n',
+        'recall_debit' => 'Thu h&#7891;i tr&#7915; v&#237;',
+        'other' => 'Kh&#225;c',
+    ];
+@endphp
+
+<div class="content container-fluid">
+    <div class="page-header">
+        <div class="row align-items-end">
+            <div class="col-sm mb-2 mb-sm-0">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-no-gutter">
+                        <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('account.wallets') }}">Danh s&#225;ch v&#237;</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Chi ti&#7871;t giao d&#7883;ch</li>
+                    </ol>
+                </nav>
+                <h1 class="page-header-title">Chi ti&#7871;t giao d&#7883;ch v&#237;</h1>
+                <div class="mt-2 text-muted">
+                    {{ $wallet->user?->yourname ?? '---' }} |
+                    {{ $wallet->user?->employee_code ?? '---' }} |
+                    {{ $wallet->user?->department?->name ?? '---' }}
+                </div>
+            </div>
+            <div class="col-sm-auto">
+                <a href="{{ route('account.wallets') }}" class="btn btn-white">
+                    <i class="tio-chevron-left mr-1"></i> Quay l&#7841;i
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row gx-2 gx-lg-3">
+        <div class="col-sm-6 col-lg-3 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2">S&#7889; d&#432; hi&#7879;n t&#7841;i</h6>
+                    <span class="display-5 text-dark">{{ number_format($wallet->balance ?? 0) }}</span>
+                    <span class="text-body font-size-sm ml-1">&#8363;</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2">T&#7893;ng ti&#7873;n v&#224;o</h6>
+                    <span class="display-5 text-success">{{ number_format($summary['total_in']) }}</span>
+                    <span class="text-body font-size-sm ml-1">&#8363;</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2">Ti&#7873;n n&#7841;p</h6>
+                    <span class="display-5 text-primary">{{ number_format($summary['deposit_total']) }}</span>
+                    <span class="text-body font-size-sm ml-1">&#8363;</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2">Ti&#7873;n nh&#7853;n chuy&#7875;n</h6>
+                    <span class="display-5 text-info">{{ number_format($summary['transfer_in_total']) }}</span>
+                    <span class="text-body font-size-sm ml-1">&#8363;</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2">Ti&#7873;n chuy&#7875;n &#273;i</h6>
+                    <span class="display-5 text-warning">{{ number_format($summary['transfer_out_total']) }}</span>
+                    <span class="text-body font-size-sm ml-1">&#8363;</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2">Ti&#7873;n &#273;&#227; chi</h6>
+                    <span class="display-5 text-danger">{{ number_format($summary['spend_total']) }}</span>
+                    <span class="text-body font-size-sm ml-1">&#8363;</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2">Ti&#7873;n r&#250;t</h6>
+                    <span class="display-5 text-dark">{{ number_format($summary['withdraw_total']) }}</span>
+                    <span class="text-body font-size-sm ml-1">&#8363;</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <h5 class="card-header-title">B&#7897; l&#7885;c</h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="{{ route('wallets.detail', $wallet->id) }}">
+                <div class="row g-2">
+                    <div class="col-md-3">
+                        <select name="type" class="form-control">
+                            <option value="">-- T&#7845;t c&#7843; lo&#7841;i --</option>
+                            <option value="deposit" {{ request('type') === 'deposit' ? 'selected' : '' }}>Deposit</option>
+                            <option value="withdraw" {{ request('type') === 'withdraw' ? 'selected' : '' }}>Withdraw</option>
+                            <option value="hold" {{ request('type') === 'hold' ? 'selected' : '' }}>Hold</option>
+                            <option value="release" {{ request('type') === 'release' ? 'selected' : '' }}>Release</option>
+                            <option value="capture" {{ request('type') === 'capture' ? 'selected' : '' }}>Capture</option>
+                            <option value="rollback" {{ request('type') === 'rollback' ? 'selected' : '' }}>Rollback</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="date" name="from_date" value="{{ request('from_date') }}" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="date" name="to_date" value="{{ request('to_date') }}" class="form-control">
+                    </div>
+                    <div class="col-md-3 d-flex gap-2">
+                        <button class="btn btn-primary">L&#7885;c</button>
+                        <a href="{{ route('wallets.detail', $wallet->id) }}" class="btn btn-white">Reset</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-header-title">Danh s&#225;ch giao d&#7883;ch</h5>
+        </div>
+
+        <div class="table-responsive datatable-custom">
+            <table class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
+                <thead class="thead-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Th&#7901;i gian</th>
+                        <th>Ph&#226;n lo&#7841;i</th>
+                        <th>S&#7889; ti&#7873;n</th>
+                        <th>Bi&#7871;n &#273;&#7897;ng s&#7889; d&#432;</th>
+                        <th>Ghi ch&#250;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($transactions as $item)
+                        @php
+                            $display = $item->display_meta ?? ['other', 'bg-secondary', 'text-muted', ''];
+                            $delta = (float) ($item->display_delta ?? 0);
+                            $deltaClass = $delta > 0 ? 'text-success' : ($delta < 0 ? 'text-danger' : 'text-muted');
+                            $meta = $item->display_meta_data ?? [];
+                            $labelKey = 'other';
+
+                            if ($item->type === 'hold') {
+                                $labelKey = 'hold_money';
+                            } elseif ($item->type === 'release') {
+                                $labelKey = 'release_money';
+                            } elseif ($item->type === 'rollback' && $item->ref_type === 'RecallTransfer') {
+                                $labelKey = 'recall_credit';
+                            } elseif ($item->type === 'withdraw' && $item->ref_type === 'RecallTransfer') {
+                                $labelKey = 'recall_debit';
+                            } elseif ($item->type === 'deposit' && ($item->ref_type === 'BulkTransfer' || !empty($meta['from_user_id']))) {
+                                $labelKey = 'transfer_in';
+                            } elseif ($item->type === 'deposit') {
+                                $labelKey = 'deposit_money';
+                            } elseif ($item->type === 'withdraw' && ($item->ref_type === 'BulkTransfer' || !empty($meta['to_user_id']))) {
+                                $labelKey = 'transfer_out';
+                            } elseif ($item->type === 'withdraw' && $item->ref_type === 'Withdrawal') {
+                                $labelKey = 'withdraw_money';
+                            } elseif ($item->type === 'withdraw' || $item->type === 'capture') {
+                                $labelKey = 'spend_money';
+                            } elseif ($item->type === 'rollback' || $item->type === 'release') {
+                                $labelKey = 'other_in';
+                            }
+
+                            $label = $labelMap[$labelKey] ?? $labelMap['other'];
+                        @endphp
+                        <tr>
+                            <td>{{ $item->id }}</td>
+                            <td>{{ optional($item->created_at)->format('d/m/Y H:i') }}</td>
+                            <td>
+                                <span class="badge {{ $display[1] }}">{!! $label !!}</span>
+                            </td>
+                            <td class="{{ $display[2] }}">
+                                {{ $display[3] }} {{ number_format($item->amount ?? 0) }} &#8363;
+                            </td>
+                            <td class="{{ $deltaClass }}">
+                                {{ $delta > 0 ? '+' : ($delta < 0 ? '-' : '') }} {{ number_format(abs($delta), 0, ',', '.') }} &#8363;
+                                @if($item->balance_before !== null && $item->balance_after !== null)
+                                    <div class="small text-muted">
+                                        {{ number_format($item->balance_before, 0, ',', '.') }} &rarr; {{ number_format($item->balance_after, 0, ',', '.') }}
+                                    </div>
+                                @endif
+                            </td>
+                            <td>
+                                <div>{{ $item->description ?? '---' }}</div>
+                                @if(!empty($meta['note']))
+                                    <div class="small text-muted">Ghi ch&#250;: {{ $meta['note'] }}</div>
+                                @endif
+                                @if(!empty($meta['from_name']))
+                                    <div class="small text-muted">T&#7915;: {{ $meta['from_name'] }}</div>
+                                @endif
+                                @if(!empty($meta['to_name']))
+                                    <div class="small text-muted">&#272;&#7871;n: {{ $meta['to_name'] }}</div>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">Ch&#432;a c&#243; giao d&#7883;ch</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-footer">
+            {{ $transactions->links() }}
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('js')
+@endsection
