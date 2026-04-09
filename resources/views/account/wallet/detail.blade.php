@@ -251,49 +251,44 @@
             <table class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
                 <thead class="thead-light">
                     <tr>
-                        <th>#</th>
-                        <th>Ng&#224;y t&#7841;o</th>
-                        <th>Ph&#242;ng ban</th>
+                        <th>ID</th>
+                        <th>Name report</th>
                         <th>D&#7921; &#225;n</th>
                         <th>K&#234;nh</th>
-                        <th>Ng&#224;y ch&#7841;y</th>
-                        <th>D&#7921; chi</th>
-                        <th>Hold</th>
-                        <th>Th&#7921;c chi</th>
-                        <th>Tr&#7841;ng th&#225;i</th>
-                        <th>N&#7897;i dung</th>
+                        <th>T&#7927; l&#7879; h&#7895; tr&#7907;</th>
+                        <th>Ti&#7873;n th&#7921;c t&#7871;</th>
+                        <th>S&#7889; ti&#7873;n &#273;&#227; chi</th>
+                        <th>Tr&#7843; l&#7841;i</th>
+                        <th>T&#7845;t to&#225;n</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($tasks as $task)
                         @php
-                            $statusLabel = $task->status ?: ((int) ($task->paid ?? 0) === 1 ? 'held' : 'new');
-                            $statusClass = match ($statusLabel) {
-                                'accepted' => 'bg-success',
-                                'held' => 'bg-warning',
-                                'registered' => 'bg-soft-info text-info',
-                                'new' => 'bg-secondary',
-                                default => 'bg-primary',
-                            };
+                            $rate = (float) ($task->rate ?? 0);
+                            $actualCosts = (float) ($task->actual_costs ?? 0);
+                            $spentMoney = $actualCosts * (100 - $rate) / 100;
+                            $refundMoney = (float) ($task->refund_money ?? 0);
+                            $settled = (int) ($task->settled ?? 0);
                         @endphp
                         <tr>
                             <td>{{ $task->id }}</td>
-                            <td>{{ optional($task->created_at)->format('d/m/Y H:i') }}</td>
-                            <td>{{ $task->department?->name ?? '---' }}</td>
+                            <td>{{ $task->Report?->name ?? '---' }}</td>
                             <td>{{ $task->Post?->name ?? '---' }}</td>
                             <td>{{ $task->Channel?->name ?? '---' }}</td>
-                            <td class="text-center">{{ $task->days ?? 0 }}</td>
-                            <td>{{ number_format($task->expected_costs ?? 0) }} &#8363;</td>
-                            <td>{{ number_format($task->price_expected ?? 0) }} &#8363;</td>
-                            <td>{{ number_format($task->actual_costs ?? 0) }} &#8363;</td>
+                            <td>{{ number_format($rate, 0, ',', '.') }}%</td>
+                            <td>{{ number_format($actualCosts, 0, ',', '.') }} &#8363;</td>
+                            <td>{{ number_format($spentMoney, 0, ',', '.') }} &#8363;</td>
+                            <td>{{ number_format($refundMoney, 0, ',', '.') }} &#8363;</td>
                             <td>
-                                <span class="badge {{ $statusClass }}">{{ $statusLabel }}</span>
+                                <span class="badge {{ $settled === 1 ? 'bg-success' : 'bg-secondary' }}">
+                                    {{ $settled === 1 ? 'Da tat toan' : 'Chua tat toan' }}
+                                </span>
                             </td>
-                            <td style="white-space: normal; min-width: 240px;">{{ $task->content ?? '---' }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="11" class="text-center text-muted">Ng&#432;&#7901;i d&#249;ng n&#224;y ch&#432;a c&#243; t&#225;c v&#7909;.</td>
+                            <td colspan="9" class="text-center text-muted">Ng&#432;&#7901;i d&#249;ng n&#224;y ch&#432;a c&#243; t&#225;c v&#7909;.</td>
                         </tr>
                     @endforelse
                 </tbody>

@@ -130,7 +130,7 @@ class WalletController extends Controller
             }
         }
 
-        $tasks = Task::with(['Post', 'Channel', 'department'])
+        $tasks = Task::with(['Report', 'Post', 'Channel'])
             ->where('user', $wallet->user_id)
             ->orderByDesc('id')
             ->paginate(30, ['*'], 'task_page')
