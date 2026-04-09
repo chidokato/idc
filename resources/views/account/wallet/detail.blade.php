@@ -49,67 +49,50 @@
         </div>
     </div>
 
-    <div class="row gx-2 gx-lg-3">
+    <div class="border-bottom my-4"></div>
+
+    <div class="row gx-2 gx-lg-3 mb-3">
         <div class="col-sm-6 col-lg-3 mb-3">
             <div class="card h-100">
                 <div class="card-body">
-                    <h6 class="card-subtitle mb-2">S&#7889; d&#432; hi&#7879;n t&#7841;i</h6>
-                    <span class="display-5 text-dark">{{ number_format($wallet->balance ?? 0) }}</span>
-                    <span class="text-body font-size-sm ml-1">&#8363;</span>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-lg-3 mb-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h6 class="card-subtitle mb-2">T&#7893;ng ti&#7873;n v&#224;o</h6>
-                    <span class="display-5 text-success">{{ number_format($summary['total_in']) }}</span>
-                    <span class="text-body font-size-sm ml-1">&#8363;</span>
+                    <div class="text-uppercase small text-muted mb-2">S&#7888; D&#431; HI&#7878;N T&#7840;I</div>
+                    <div class="h3 mb-0 text-dark">
+                        {{ number_format($wallet->balance ?? 0) }}
+                        <span class="text-body font-size-sm ml-1">&#273;</span>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-sm-6 col-lg-3 mb-3">
             <div class="card h-100">
                 <div class="card-body">
-                    <h6 class="card-subtitle mb-2">Ti&#7873;n n&#7841;p</h6>
-                    <span class="display-5 text-primary">{{ number_format($summary['deposit_total']) }}</span>
-                    <span class="text-body font-size-sm ml-1">&#8363;</span>
+                    <div class="text-uppercase small text-muted mb-2">TI&#7872;N N&#7840;P</div>
+                    <div class="h3 mb-0 text-primary">
+                        {{ number_format($summary['deposit_total'] ?? 0) }}
+                        <span class="text-body font-size-sm ml-1">&#273;</span>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-sm-6 col-lg-3 mb-3">
             <div class="card h-100">
                 <div class="card-body">
-                    <h6 class="card-subtitle mb-2">Ti&#7873;n nh&#7853;n chuy&#7875;n</h6>
-                    <span class="display-5 text-info">{{ number_format($summary['transfer_in_total']) }}</span>
-                    <span class="text-body font-size-sm ml-1">&#8363;</span>
+                    <div class="text-uppercase small text-muted mb-2">TI&#7872;N NH&#7852;N CHUY&#7874;N</div>
+                    <div class="h3 mb-0 text-info">
+                        {{ number_format($summary['transfer_in_total'] ?? 0) }}
+                        <span class="text-body font-size-sm ml-1">&#273;</span>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-sm-6 col-lg-4 mb-3">
+        <div class="col-sm-6 col-lg-3 mb-3">
             <div class="card h-100">
                 <div class="card-body">
-                    <h6 class="card-subtitle mb-2">Ti&#7873;n chuy&#7875;n &#273;i</h6>
-                    <span class="display-5 text-warning">{{ number_format($summary['transfer_out_total']) }}</span>
-                    <span class="text-body font-size-sm ml-1">&#8363;</span>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-lg-4 mb-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h6 class="card-subtitle mb-2">Ti&#7873;n &#273;&#227; chi</h6>
-                    <span class="display-5 text-danger">{{ number_format($summary['spend_total']) }}</span>
-                    <span class="text-body font-size-sm ml-1">&#8363;</span>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-lg-4 mb-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h6 class="card-subtitle mb-2">Ti&#7873;n r&#250;t</h6>
-                    <span class="display-5 text-dark">{{ number_format($summary['withdraw_total']) }}</span>
-                    <span class="text-body font-size-sm ml-1">&#8363;</span>
+                    <div class="text-uppercase small text-muted mb-2">TI&#7872;N CHUY&#7874;N &#272;I</div>
+                    <div class="h3 mb-0 text-warning">
+                        {{ number_format($summary['transfer_out_total'] ?? 0) }}
+                        <span class="text-body font-size-sm ml-1">&#273;</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -121,8 +104,8 @@
         </div>
         <div class="card-body">
             <form method="GET" action="{{ route('wallets.detail', $wallet->id) }}">
-                <div class="row g-2">
-                    <div class="col-md-3">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-6 col-lg-3">
                         <select name="type" class="form-control">
                             <option value="">-- T&#7845;t c&#7843; lo&#7841;i --</option>
                             <option value="deposit" {{ request('type') === 'deposit' ? 'selected' : '' }}>Deposit</option>
@@ -133,13 +116,13 @@
                             <option value="rollback" {{ request('type') === 'rollback' ? 'selected' : '' }}>Rollback</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 col-lg-3">
                         <input type="date" name="from_date" value="{{ request('from_date') }}" class="form-control">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 col-lg-3">
                         <input type="date" name="to_date" value="{{ request('to_date') }}" class="form-control">
                     </div>
-                    <div class="col-md-3 d-flex gap-2">
+                    <div class="col-md-6 col-lg-3 d-flex gap-2">
                         <button class="btn btn-primary">L&#7885;c</button>
                         <a href="{{ route('wallets.detail', $wallet->id) }}" class="btn btn-white">Reset</a>
                     </div>
@@ -158,11 +141,10 @@
                 <thead class="thead-light">
                     <tr>
                         <th>#</th>
-                        <th>Th&#7901;i gian</th>
-                        <th>Ph&#226;n lo&#7841;i</th>
-                        <th>S&#7889; ti&#7873;n</th>
-                        <th>Bi&#7871;n &#273;&#7897;ng s&#7889; d&#432;</th>
-                        <th>Ghi ch&#250;</th>
+                        <th>TH&#7900;I GIAN</th>
+                        <th>PH&#194;N LO&#7840;I</th>
+                        <th>S&#7888; TI&#7872;N</th>
+                        <th>GHI CH&#218;</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -204,19 +186,19 @@
                             <td>
                                 <span class="badge {{ $display[1] }}">{!! $label !!}</span>
                             </td>
-                            <td class="{{ $display[2] }}">
-                                {{ $display[3] }} {{ number_format($item->amount ?? 0) }} &#8363;
-                            </td>
                             <td class="{{ $deltaClass }}">
-                                {{ $delta > 0 ? '+' : ($delta < 0 ? '-' : '') }} {{ number_format(abs($delta), 0, ',', '.') }} &#8363;
+                                {{ $delta > 0 ? '+' : ($delta < 0 ? '-' : '') }}
+                                {{ number_format(abs((float) ($item->amount ?? 0)), 0, ',', '.') }}
+                                &#273;
                             </td>
+                            
                             <td>
                                 <div>{{ $item->description ?? '---' }}</div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center text-muted">Ch&#432;a c&#243; giao d&#7883;ch</td>
+                            <td colspan="5" class="text-center text-muted">Ch&#432;a c&#243; giao d&#7883;ch</td>
                         </tr>
                     @endforelse
                 </tbody>
