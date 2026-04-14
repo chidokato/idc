@@ -17,22 +17,48 @@
     </div>
   </div>
 
+  <div class="card mb-3">
+    <div class="card-body">
+      <form method="GET" action="{{ route('account.main') }}">
+        <div class="row align-items-end">
+          <div class="col-md-3 mb-3">
+            <label class="input-label">Tháng thống kê</label>
+            <select name="month" class="form-control" onchange="this.form.submit()">
+              <option value="" {{ $selectedMonth === null ? 'selected' : '' }}>Tất cả các tháng</option>
+              @foreach($monthOptions as $monthValue => $monthLabel)
+                <option value="{{ $monthValue }}" {{ (int) $selectedMonth === (int) $monthValue ? 'selected' : '' }}>
+                  {{ $monthLabel }}/{{ $statisticalYear }}
+                </option>
+              @endforeach
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="row mb-3">
     <div class="col-md-4 mb-3">
       <div class="card card-body">
-        <span class="text-muted text-uppercase font-size-xs">Tổng chi phí thực tế năm {{ $statisticalYear }}</span>
+        <span class="text-muted text-uppercase font-size-xs">
+          {{ $selectedMonth === null ? 'Tổng chi phí thực tế từ tháng 1 đến tháng ' . count($monthOptions) . '/' . $statisticalYear : 'Tổng chi phí thực tế tháng ' . $selectedMonth . '/' . $statisticalYear }}
+        </span>
         <h3 class="mb-0">{{ number_format((float) ($summary->total_actual_costs ?? 0), 0, ',', '.') }}</h3>
       </div>
     </div>
     <div class="col-md-4 mb-3">
       <div class="card card-body">
-        <span class="text-muted text-uppercase font-size-xs">Tổng bù thêm năm {{ $statisticalYear }}</span>
+        <span class="text-muted text-uppercase font-size-xs">
+          {{ $selectedMonth === null ? 'Tổng bù thêm từ tháng 1 đến tháng ' . count($monthOptions) . '/' . $statisticalYear : 'Tổng bù thêm tháng ' . $selectedMonth . '/' . $statisticalYear }}
+        </span>
         <h3 class="mb-0 text-danger">{{ number_format((float) ($summary->total_extra_money ?? 0), 0, ',', '.') }}</h3>
       </div>
     </div>
     <div class="col-md-4 mb-3">
       <div class="card card-body">
-        <span class="text-muted text-uppercase font-size-xs">Tổng hoàn lại năm {{ $statisticalYear }}</span>
+        <span class="text-muted text-uppercase font-size-xs">
+          {{ $selectedMonth === null ? 'Tổng hoàn lại từ tháng 1 đến tháng ' . count($monthOptions) . '/' . $statisticalYear : 'Tổng hoàn lại tháng ' . $selectedMonth . '/' . $statisticalYear }}
+        </span>
         <h3 class="mb-0 text-success">{{ number_format((float) ($summary->total_refund_money ?? 0), 0, ',', '.') }}</h3>
       </div>
     </div>

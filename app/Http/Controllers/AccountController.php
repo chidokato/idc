@@ -24,8 +24,34 @@ class AccountController extends HomeController
     {
         $user = User::findOrFail(Auth::id());
         $statisticalYear = 2026;
-        $yearStart = sprintf('%d-01-01', $statisticalYear);
-        $yearEnd = sprintf('%d-12-31', $statisticalYear);
+        $currentMonth = 4;
+        $selectedMonthInput = request()->input('month');
+        $selectedMonth = is_numeric($selectedMonthInput) ? (int) $selectedMonthInput : null;
+
+        if ($selectedMonth !== null && ($selectedMonth < 1 || $selectedMonth > $currentMonth)) {
+            $selectedMonth = null;
+        }
+
+        $monthStart = $selectedMonth === null
+            ? sprintf('%d-01-01', $statisticalYear)
+            : sprintf('%d-%02d-01', $statisticalYear, $selectedMonth);
+        $monthEnd = $selectedMonth === null
+            ? date('Y-m-t', strtotime(sprintf('%d-%02d-01', $statisticalYear, $currentMonth)))
+            : date('Y-m-t', strtotime($monthStart));
+        $monthOptions = array_reverse(array_slice([
+            1 => 'Tháng 1',
+            2 => 'Tháng 2',
+            3 => 'Tháng 3',
+            4 => 'Tháng 4',
+            5 => 'Tháng 5',
+            6 => 'Tháng 6',
+            7 => 'Tháng 7',
+            8 => 'Tháng 8',
+            9 => 'Tháng 9',
+            10 => 'Tháng 10',
+            11 => 'Tháng 11',
+            12 => 'Tháng 12',
+        ], 0, $currentMonth, true), true);
 
         // biá»ƒu Ä‘á»“ theo dá»± Ã¡n
         $projects = Task::query()
@@ -56,8 +82,8 @@ class AccountController extends HomeController
         $dataActual   = $projects->pluck('total_actual')->map(fn($v) => (float)$v)->values()->all();
 
         $reportIdsInYear = Report::query()
-            ->whereDate('time_start', '<=', $yearEnd)
-            ->whereDate('time_end', '>=', $yearStart)
+            ->whereDate('time_start', '<=', $monthEnd)
+            ->whereDate('time_end', '>=', $monthStart)
             ->pluck('id');
 
         $baseTaskQuery = Task::query()
@@ -134,6 +160,8 @@ class AccountController extends HomeController
             'user',
             'chartLabels', 'dataExpected', 'dataActual',
             'statisticalYear',
+            'selectedMonth',
+            'monthOptions',
             'summary',
             'projectSummaries',
             'projectTotalActualCosts',
