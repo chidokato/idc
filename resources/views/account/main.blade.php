@@ -14,27 +14,21 @@
       <div class="col-sm mb-2 mb-sm-0">
         <h1 class="page-header-title">Trang chủ</h1>
       </div>
-    </div>
-  </div>
-
-  <div class="card mb-3">
-    <div class="card-body">
-      <form method="GET" action="{{ route('account.main') }}">
-        <div class="row align-items-end">
-          <div class="col-md-3 mb-3">
-            <label class="input-label">Tháng thống kê</label>
-            <select name="month" class="form-control" onchange="this.form.submit()">
-              <option value="" {{ $selectedMonth === null ? 'selected' : '' }}>Tất cả các tháng</option>
-              @foreach($monthOptions as $monthValue => $monthLabel)
-                <option value="{{ $monthValue }}" {{ (int) $selectedMonth === (int) $monthValue ? 'selected' : '' }}>
-                  {{ $monthLabel }}/{{ $statisticalYear }}
-                </option>
-              @endforeach
-            </select>
-          </div>
-        </div>
+      <div class="col-sm-auto d-none d-sm-block">
+        <form method="GET" action="{{ route('account.main') }}">
+          <select name="month" class="form-control" onchange="this.form.submit()">
+            <option value="" {{ $selectedMonth === null ? 'selected' : '' }}>Tất cả các tháng</option>
+            @foreach($monthOptions as $monthValue => $monthLabel)
+              <option value="{{ $monthValue }}" {{ (int) $selectedMonth === (int) $monthValue ? 'selected' : '' }}>
+                {{ $monthLabel }}/{{ $statisticalYear }}
+              </option>
+            @endforeach
+          </select>
       </form>
+      </div>
+      
     </div>
+
   </div>
 
   <div class="row mb-3">
