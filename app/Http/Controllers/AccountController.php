@@ -23,10 +23,13 @@ class AccountController extends HomeController
     public function index()
     {
         $user = User::findOrFail(Auth::id());
+        $statisticalYear = 2026;
+        $yearStart = sprintf('%d-01-01', $statisticalYear);
+        $yearEnd = sprintf('%d-12-31', $statisticalYear);
 
-        // biểu đồ theo dự án
+        // biá»ƒu Ä‘á»“ theo dá»± Ã¡n
         $projects = Task::query()
-            ->leftJoin('posts', 'posts.id', '=', 'tasks.post_id') // lấy tên dự án
+            ->leftJoin('posts', 'posts.id', '=', 'tasks.post_id') // láº¥y tÃªn dá»± Ã¡n
             ->selectRaw("
                 tasks.post_id,
                 COALESCE(posts.name, tasks.post_id) AS project_name,
@@ -52,9 +55,94 @@ class AccountController extends HomeController
         $dataExpected = $projects->pluck('total_expected')->map(fn($v) => (float)$v)->values()->all();
         $dataActual   = $projects->pluck('total_actual')->map(fn($v) => (float)$v)->values()->all();
 
+        $reportIdsInYear = Report::query()
+            ->whereDate('time_start', '<=', $yearEnd)
+            ->whereDate('time_end', '>=', $yearStart)
+            ->pluck('id');
+
+        $baseTaskQuery = Task::query()
+            ->leftJoin('posts', 'posts.id', '=', 'tasks.post_id')
+            ->whereIn('tasks.report_id', $reportIdsInYear);
+
+        $baseDepartmentQuery = Task::query()
+            ->leftJoin('departments as current_department', 'current_department.id', '=', 'tasks.department_id')
+            ->leftJoin('departments as parent_department', 'parent_department.id', '=', 'current_department.parent')
+            ->whereIn('tasks.report_id', $reportIdsInYear);
+
+        $baseCompanyQuery = Task::query()
+            ->leftJoin('departments as company_department', 'company_department.id', '=', 'tasks.department_lv1')
+            ->whereIn('tasks.report_id', $reportIdsInYear);
+
+        $baseFloorQuery = Task::query()
+            ->leftJoin('departments as floor_department', 'floor_department.id', '=', 'tasks.department_lv2')
+            ->whereIn('tasks.report_id', $reportIdsInYear);
+
+        $summary = (clone $baseTaskQuery)
+            ->selectRaw('COUNT(tasks.id) as total_tasks')
+            ->selectRaw('COUNT(DISTINCT tasks.post_id) as total_projects')
+            ->selectRaw('COALESCE(SUM(tasks.actual_costs), 0) as total_actual_costs')
+            ->selectRaw('COALESCE(SUM(tasks.extra_money), 0) as total_extra_money')
+            ->selectRaw('COALESCE(SUM(tasks.refund_money), 0) as total_refund_money')
+            ->first();
+
+        $projectSummaries = (clone $baseTaskQuery)
+            ->selectRaw('tasks.post_id')
+            ->selectRaw('COALESCE(posts.name, "Khong xac dinh") as post_name')
+            ->selectRaw('COALESCE(SUM(tasks.actual_costs), 0) as total_actual_costs')
+            ->groupBy('tasks.post_id', 'posts.name')
+            ->havingRaw('COALESCE(SUM(tasks.actual_costs), 0) > 0')
+            ->orderByDesc('total_actual_costs')
+            ->get();
+
+        $projectTotalActualCosts = (float) $projectSummaries->sum('total_actual_costs');
+
+        $departmentSummaries = (clone $baseDepartmentQuery)
+            ->selectRaw('tasks.department_id')
+            ->selectRaw('COALESCE(current_department.name, "Khong xac dinh") as department_name')
+            ->selectRaw('COALESCE(parent_department.name, "") as parent_department_name')
+            ->selectRaw('COALESCE(SUM(tasks.actual_costs), 0) as total_actual_costs')
+            ->groupBy('tasks.department_id', 'current_department.name', 'parent_department.name')
+            ->havingRaw('COALESCE(SUM(tasks.actual_costs), 0) > 0')
+            ->orderByDesc('total_actual_costs')
+            ->get();
+
+        $departmentTotalActualCosts = (float) $departmentSummaries->sum('total_actual_costs');
+
+        $companySummaries = (clone $baseCompanyQuery)
+            ->selectRaw('tasks.department_lv1')
+            ->selectRaw('COALESCE(company_department.name, "Khong xac dinh") as company_name')
+            ->selectRaw('COALESCE(SUM(tasks.actual_costs), 0) as total_actual_costs')
+            ->groupBy('tasks.department_lv1', 'company_department.name')
+            ->havingRaw('COALESCE(SUM(tasks.actual_costs), 0) > 0')
+            ->orderByDesc('total_actual_costs')
+            ->get();
+
+        $companyTotalActualCosts = (float) $companySummaries->sum('total_actual_costs');
+
+        $floorSummaries = (clone $baseFloorQuery)
+            ->selectRaw('tasks.department_lv2')
+            ->selectRaw('COALESCE(floor_department.name, "Khong xac dinh") as floor_name')
+            ->selectRaw('COALESCE(SUM(tasks.actual_costs), 0) as total_actual_costs')
+            ->groupBy('tasks.department_lv2', 'floor_department.name')
+            ->havingRaw('COALESCE(SUM(tasks.actual_costs), 0) > 0')
+            ->orderByDesc('total_actual_costs')
+            ->get();
+
+        $floorTotalActualCosts = (float) $floorSummaries->sum('total_actual_costs');
+
         return view('account.main', compact(
             'user',
             'chartLabels', 'dataExpected', 'dataActual',
+            'statisticalYear',
+            'summary',
+            'projectSummaries',
+            'projectTotalActualCosts',
+            'departmentSummaries',
+            'departmentTotalActualCosts',
+            'companySummaries',
+            'companyTotalActualCosts',
+            'floorSummaries',
+            'floorTotalActualCosts',
         ));
     }
 
@@ -89,12 +177,12 @@ class AccountController extends HomeController
 
         $user = User::find(Auth::id());
         if (isset($data['department_id'])) {
-            // Lấy department theo form gửi lên (KHÔNG phải theo user cũ)
+            // Láº¥y department theo form gá»­i lÃªn (KHÃ”NG pháº£i theo user cÅ©)
             $deptLv3 = Department::find($data['department_id']);
             $deptLv2 = $deptLv3?->parentDepartment;
             $deptLv1 = $deptLv2?->parentDepartment;
 
-            // Cập nhật user
+            // Cáº­p nháº­t user
             $user->update([
                 'yourname'        => $data['yourname'],
                 'phone'           => $data['phone'],
@@ -105,7 +193,7 @@ class AccountController extends HomeController
                 'department_lv2'  => $deptLv2?->id,               // ID
             ]);
         }else{
-            // Cập nhật user
+            // Cáº­p nháº­t user
             $user->update([
                 'yourname'        => $data['yourname'],
                 'phone'           => $data['phone'],
@@ -115,7 +203,7 @@ class AccountController extends HomeController
         }
         
 
-        return redirect()->back()->with('success', 'Thành công!');
+        return redirect()->back()->with('success', 'ThÃ nh cÃ´ng!');
     }
 
 
@@ -125,7 +213,7 @@ class AccountController extends HomeController
         $sumPrice = Task::where('extra_money', '>', 0)->where('user', Auth::id())->where('settled', 0)->sum('extra_money');
 
         if (Auth::User()->department_id == null) {
-            return redirect()->route('account.edit')->with('center_warning','Cần cập nhật thông tin cá nhân trước khi đăng ký marketing');
+            return redirect()->route('account.edit')->with('center_warning','Cáº§n cáº­p nháº­t thÃ´ng tin cÃ¡ nhÃ¢n trÆ°á»›c khi Ä‘Äƒng kÃ½ marketing');
         }else{
             $groupIds = Department::where('parent', Auth::user()->Department->parent)->pluck('id')->toArray();
             $r = Report::where('active', 1)->count();
@@ -142,7 +230,7 @@ class AccountController extends HomeController
                     'groupIds',
                 ));
             }else{
-                return redirect()->route('tasks.actualcosts')->with('center_warning','Không có kỳ đăng ký nào đang MỞ hoặc Bạn đang NỢ tiền MKT');
+                return redirect()->route('tasks.actualcosts')->with('center_warning','KhÃ´ng cÃ³ ká»³ Ä‘Äƒng kÃ½ nÃ o Ä‘ang Má»ž hoáº·c Báº¡n Ä‘ang Ná»¢ tiá»n MKT');
             }
         }
         
@@ -152,7 +240,7 @@ class AccountController extends HomeController
     {
         $data = $request->all();
 
-        // Lặp qua từng dòng trong form
+        // Láº·p qua tá»«ng dÃ²ng trong form
         foreach ($data['post_id'] as $key => $postId) {
             
             $deptLv3 = Department::find($data['department_id'][$key]);
@@ -176,19 +264,19 @@ class AccountController extends HomeController
 
                 'content' => $data['content'][$key] ?? null,
                 'expected_costs' => isset($data['expected_costs'][$key]) 
-                    ? str_replace(['.', ' đ'], '', $data['expected_costs'][$key]) 
+                    ? str_replace(['.', ' Ä‘'], '', $data['expected_costs'][$key]) 
                     : 0,
                 'report_id' => $data['report_id'][$key] ?? null,
             ]);
         }
 
-        return redirect()->back()->with('success', 'Đã lưu tác vụ thành công!');
+        return redirect()->back()->with('success', 'ÄÃ£ lÆ°u tÃ¡c vá»¥ thÃ nh cÃ´ng!');
     }
 
     public function mktlist()
     {
         if (Auth::User()->department_id == null) {
-            return redirect()->route('account.edit')->with('center_warning','Cần cập nhật thông tin cá nhân trước khi đăng ký marketing');
+            return redirect()->route('account.edit')->with('center_warning','Cáº§n cáº­p nháº­t thÃ´ng tin cÃ¡ nhÃ¢n trÆ°á»›c khi Ä‘Äƒng kÃ½ marketing');
         }else{
             $posts = Post::where('sort_by', 'Product')->orderBy('name', 'asc')->get();
             $channels = Channel::all();
@@ -222,15 +310,15 @@ class AccountController extends HomeController
         $task = Task::find($id);
 
         if (!$task) {
-            return response()->json(['status' => false, 'message' => 'Task không tồn tại']);
+            return response()->json(['status' => false, 'message' => 'Task khÃ´ng tá»“n táº¡i']);
         }
 
         $task->delete();
 
         $user = Auth::user();
 
-        // Lấy report đang xem
-        $report = Report::find($task->report_id); // hoặc theo cách bạn đang lấy
+        // Láº¥y report Ä‘ang xem
+        $report = Report::find($task->report_id); // hoáº·c theo cÃ¡ch báº¡n Ä‘ang láº¥y
 
         // $tasks = Task::where('department_id', $user->department_id)->where('report_id', $report->id)->get();
         $tasks = $report->Task()->where('user', Auth::id())->get();
@@ -250,7 +338,7 @@ class AccountController extends HomeController
 
         return response()->json([
             'status' => true,
-            'message' => 'Xóa thành công',
+            'message' => 'XÃ³a thÃ nh cÃ´ng',
             'stats' => [
                 'total_project' => $total_project,
                 'total_expected' => number_format($total_expected, 0, ',', '.'),
