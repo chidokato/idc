@@ -231,7 +231,7 @@ class AccountController extends HomeController
         }
         
 
-        return redirect()->back()->with('success', 'ThÃ nh cÃ´ng!');
+        return redirect()->back()->with('success', 'Thành công!');
     }
 
 
@@ -241,7 +241,7 @@ class AccountController extends HomeController
         $sumPrice = Task::where('extra_money', '>', 0)->where('user', Auth::id())->where('settled', 0)->sum('extra_money');
 
         if (Auth::User()->department_id == null) {
-            return redirect()->route('account.edit')->with('center_warning','Cáº§n cáº­p nháº­t thÃ´ng tin cÃ¡ nhÃ¢n trÆ°á»›c khi Ä‘Äƒng kÃ½ marketing');
+            return redirect()->route('account.edit')->with('center_warning', 'Cần cập nhật thông tin cá nhân trước khi đăng ký marketing');
         }else{
             $groupIds = Department::where('parent', Auth::user()->Department->parent)->pluck('id')->toArray();
             $r = Report::where('active', 1)->count();
@@ -258,7 +258,7 @@ class AccountController extends HomeController
                     'groupIds',
                 ));
             }else{
-                return redirect()->route('tasks.actualcosts')->with('center_warning','KhÃ´ng cÃ³ ká»³ Ä‘Äƒng kÃ½ nÃ o Ä‘ang Má»ž hoáº·c Báº¡n Ä‘ang Ná»¢ tiá»n MKT');
+                return redirect()->route('tasks.actualcosts')->with('center_warning', 'Không có kỳ đăng ký nào đang mở hoặc bạn đang nợ tiền MKT');
             }
         }
         
@@ -298,13 +298,13 @@ class AccountController extends HomeController
             ]);
         }
 
-        return redirect()->back()->with('success', 'ÄÃ£ lÆ°u tÃ¡c vá»¥ thÃ nh cÃ´ng!');
+        return redirect()->back()->with('success', 'Đã lưu tác vụ thành công!');
     }
 
     public function mktlist()
     {
         if (Auth::User()->department_id == null) {
-            return redirect()->route('account.edit')->with('center_warning','Cáº§n cáº­p nháº­t thÃ´ng tin cÃ¡ nhÃ¢n trÆ°á»›c khi Ä‘Äƒng kÃ½ marketing');
+            return redirect()->route('account.edit')->with('center_warning', 'Cần cập nhật thông tin cá nhân trước khi đăng ký marketing');
         }else{
             $posts = Post::where('sort_by', 'Product')->orderBy('name', 'asc')->get();
             $channels = Channel::all();
@@ -338,7 +338,7 @@ class AccountController extends HomeController
         $task = Task::find($id);
 
         if (!$task) {
-            return response()->json(['status' => false, 'message' => 'Task khÃ´ng tá»“n táº¡i']);
+            return response()->json(['status' => false, 'message' => 'Task không tồn tại']);
         }
 
         $task->delete();
@@ -366,7 +366,7 @@ class AccountController extends HomeController
 
         return response()->json([
             'status' => true,
-            'message' => 'XÃ³a thÃ nh cÃ´ng',
+            'message' => 'Xóa thành công',
             'stats' => [
                 'total_project' => $total_project,
                 'total_expected' => number_format($total_expected, 0, ',', '.'),
