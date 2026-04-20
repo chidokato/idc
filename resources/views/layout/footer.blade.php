@@ -15,7 +15,7 @@
                     <div class="ft-contact-item">
                         <div class="ft-contact-item-text">
                             <h6>Trụ sở chính</h6>
-                            <span>Tầng 5 tòa nhà Vạn Gia Phát, Số 1 Trần Khánh Dư, Phường Tân Định, Thành Phố Hồ Chí Minh, Việt Nam</span>
+                            <span>Số 45, Thạch Thị Thanh, phường Tân Định, TP Hồ Chí Minh</span>
                         </div>
                         <span class="ft-contact-item-ico"><i class="icon-building-filled"></i></span>
                     </div>
