@@ -64,12 +64,6 @@
             </a>
           </li>
           <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/actualcosts" title="Chi phí thực tế" data-placement="left">
-              <i class="tio-receipt nav-icon"></i>
-              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Chi phí thực tế</span>
-            </a>
-          </li>
-          <li class="nav-item ">
             <a class="js-nav-tooltip-link nav-link " href="account/deposits" title="Duyệt đóng tiền" data-placement="left">
               <i class="tio-credit-card-outlined nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Duyệt đóng tiền</span>

@@ -9,8 +9,10 @@ use Illuminate\Http\Request;
 use App\Models\Department;
 use App\Helpers\TreeHelper;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use App\Mail\BulkPersonalMail;
 
 class DepositController extends Controller
 {
@@ -99,7 +101,9 @@ public function index(Request $request)
             'note'   => 'nullable|string|max:1000',
         ]);
 
-        DB::transaction(function () use ($request, $deposit) {
+        $mailPayload = null;
+
+        DB::transaction(function () use ($request, $deposit, &$mailPayload) {
 
             // Reload & lock
             $deposit = Deposit::where('id', $deposit->id)
@@ -160,7 +164,42 @@ public function index(Request $request)
                 'action' => $request->action,
                 'note' => $request->note,
             ]);
+
+            $user = $deposit->user()->select('id', 'yourname', 'name', 'email')->first();
+            if ($user && !empty($user->email)) {
+                $statusText = $request->action === 'approve' ? 'ĐƯỢC DUYỆT' : 'BỊ TỪ CHỐI';
+                $subject = $request->action === 'approve'
+                    ? 'Thông báo: Lệnh nạp tiền đã được duyệt'
+                    : 'Thông báo: Lệnh nạp tiền đã bị từ chối';
+
+                $noteText = trim((string) $request->note);
+                $content = "Lệnh nạp tiền của bạn vừa được cập nhật.\n"
+                    . "Mã lệnh: " . ($deposit->transaction_code ?: ('#' . $deposit->id)) . "\n"
+                    . "Số tiền: " . number_format((float) $deposit->amount, 0, ',', '.') . " VND\n"
+                    . "Trạng thái: " . $statusText;
+
+                if ($noteText !== '') {
+                    $content .= "\nGhi chú: " . $noteText;
+                }
+
+                $mailPayload = [
+                    'to' => $user->email,
+                    'name' => $user->yourname ?: ($user->name ?: 'Bạn'),
+                    'subject' => $subject,
+                    'content' => $content,
+                ];
+            }
         });
+
+        if ($mailPayload) {
+            Mail::to($mailPayload['to'])->send(
+                new BulkPersonalMail(
+                    $mailPayload['name'],
+                    $mailPayload['content'],
+                    $mailPayload['subject']
+                )
+            );
+        }
 
         return back()->with('success', 'Cập nhật trạng thái thành công');
     }

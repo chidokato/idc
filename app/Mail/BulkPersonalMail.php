@@ -3,11 +3,10 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class BulkPersonalMail extends Mailable implements ShouldQueue
+class BulkPersonalMail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -25,7 +24,7 @@ class BulkPersonalMail extends Mailable implements ShouldQueue
     public function build()
     {
         return $this->subject($this->subjectLine)
-            ->markdown('emails.bulk.personal', [
+            ->view('emails.bulk.personal', [
                 'name' => $this->name,
                 'content' => $this->content,
             ]);
