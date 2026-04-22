@@ -30,7 +30,7 @@ class SendPersonalEmailJob implements ShouldQueue
 
     public function handle(): void
     {
-        $user = User::select('id','name','email')
+        $user = User::select('id','name','yourname','email')
             ->where('id', $this->userId)
             ->whereNotNull('email')
             ->where('email','!=','')
@@ -38,11 +38,12 @@ class SendPersonalEmailJob implements ShouldQueue
 
         if (!$user) return;
 
-        $content = str_replace(['{name}','{email}'], [$user->name ?? '', $user->email ?? ''], $this->contentTemplate);
+        $displayName = $user->yourname ?: ($user->name ?: '');
+        $content = str_replace(['{name}','{email}'], [$displayName, $user->email ?? ''], $this->contentTemplate);
 
         try {
             Mail::to($user->email)->send(
-                new \App\Mail\BulkPersonalMail($user->name ?? 'Bạn', $content, $this->subject)
+                new \App\Mail\BulkPersonalMail($displayName ?: 'Ban', $content, $this->subject)
             );
 
             \App\Models\MailLog::where('batch_id', $this->batchId)
@@ -76,3 +77,5 @@ class SendPersonalEmailJob implements ShouldQueue
         ]);
     }
 }
+
+
