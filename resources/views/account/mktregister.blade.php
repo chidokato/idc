@@ -92,7 +92,7 @@
                             </td>
 
                             <td>
-                                <select name="rate[]" required class="form-control rate-select">
+                                <select disabled class="form-control rate-select">
                                     <option value="">-</option>
                                     @foreach(config('datas.rates') as $key => $label)
                                         <option value="{{ $key }}">
@@ -100,6 +100,7 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                <input type="hidden" name="rate[]" class="rate-input" value="">
                             </td>
 
                             <td>
@@ -410,12 +411,14 @@ $(document).on('click', '.del-db', function (e) {
 
     $(document).on('change', '.post-select', function() {
         let rate = $(this).find(':selected').data('rate'); // Lấy rate từ post
-        let rateSelect = $(this).closest('tr').find('.rate-select');
+        let row = $(this).closest('tr');
+        let rateSelect = row.find('.rate-select');
+        let rateInput = row.find('.rate-input');
         rateSelect.val(rate); // Set selected option phù hợp
+        rateInput.val(rate ?? '');
     }); // Gán tỷ lệ hỗ trợ theo dự án
 
 </script>
-
 
 <script>
 $(document).on('change', '.channel_id', function () {
@@ -441,3 +444,5 @@ $(document).on('change', '.channel_id', function () {
 
 
 @endsection
+
+

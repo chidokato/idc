@@ -270,7 +270,9 @@ class AccountController extends HomeController
 
         // Láº·p qua tá»«ng dÃ²ng trong form
         foreach ($data['post_id'] as $key => $postId) {
-            
+            $post = Post::find($postId);
+            if (!$post) continue;
+
             $deptLv3 = Department::find($data['department_id'][$key]);
             if (!$deptLv3) continue;
 
@@ -282,7 +284,7 @@ class AccountController extends HomeController
                 'user' => $data['user_id'][$key] ?? null,
                 'post_id' => $postId,
                 'channel_id' => $data['channel_id'][$key] ?? null,
-                'rate' => $data['rate'][$key] ?? null,
+                'rate' => $post->rate ?? null,
                 'days' => $data['days'][$key] ?? null,
                 'approved' => 0,
                 
