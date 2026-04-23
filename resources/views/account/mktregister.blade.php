@@ -45,7 +45,6 @@
                             <th>Nhân viên</th>
                             @endif
                             <th>Dự án <span class="required">(*)</span></th>
-                            <th>Hỗ trợ</th>
                             <th>Kênh <span class="required">(*)</span></th>
                             <th>Ngân sách/ngày <span class="required">(*)</span></th>
                             <th>Ghi chú</th>
@@ -89,18 +88,6 @@
                                     </option>
                                     @endforeach
                                 </select>
-                            </td>
-
-                            <td>
-                                <select disabled class="form-control rate-select">
-                                    <option value="">-</option>
-                                    @foreach(config('datas.rates') as $key => $label)
-                                        <option value="{{ $key }}">
-                                            {{ $label }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <input type="hidden" name="rate[]" class="rate-input" value="">
                             </td>
 
                             <td>
@@ -403,20 +390,11 @@ $(document).on('click', '.del-db', function (e) {
 
 
 
-<script> 
+<script>
     $(document).on('change', '.user-select', function() {
-        let departmentId = $(this).find(':selected').data('department'); 
+        let departmentId = $(this).find(':selected').data('department');
         $(this).closest('td').find('.department-id').val(departmentId);
-    }); // gán id phòng thuộc người dùng
-
-    $(document).on('change', '.post-select', function() {
-        let rate = $(this).find(':selected').data('rate'); // Lấy rate từ post
-        let row = $(this).closest('tr');
-        let rateSelect = row.find('.rate-select');
-        let rateInput = row.find('.rate-input');
-        rateSelect.val(rate); // Set selected option phù hợp
-        rateInput.val(rate ?? '');
-    }); // Gán tỷ lệ hỗ trợ theo dự án
+    });
 
 </script>
 
@@ -424,9 +402,8 @@ $(document).on('click', '.del-db', function (e) {
 $(document).on('change', '.channel_id', function () {
     const row = $(this).closest('tr');
     const channelId = parseInt($(this).val());
-    let days = 1; // mặc định
+    let days = 1;
 
-    // Nếu channel_id = 2,3,4 -> lấy days theo report_id
     if ([2, 3, 4].includes(channelId)) {
         const selectedReport = row.find('.report_id').find(':selected');
         const reportDays = parseInt(selectedReport.data('days'));
@@ -439,10 +416,6 @@ $(document).on('change', '.channel_id', function () {
     row.find('.days').val(days);
 });
 
-
 </script>
 
-
 @endsection
-
-
