@@ -30,21 +30,13 @@
 
 <body class=" @yield('body') ">
 
-
 <!-- JS Preview mode only -->
 <div id="headerMain" class="d-none">
-
 @include('account.layout.header')
-
 </div>
 
-<div id="headerFluid" class="d-none">
-
-</div>
-
-<div id="headerDouble" class="d-none">
-
-</div>
+<div id="headerFluid" class="d-none"></div>
+<div id="headerDouble" class="d-none"></div>
 
 @include('account.layout.menu')
 
@@ -54,9 +46,7 @@
 
 <script src="account/js/demo.js"></script>
 
-
 <main id="content" role="main" class="main pointer-event bg-light">
-
 @if($sumPrice > 0)
 <div class="row-alert">
 	<div>
@@ -73,9 +63,7 @@
 
 @yield('content')
 
-
 @include('account.layout.footer')
-
 </main>
 
 @include('account.layout.popup')
@@ -91,10 +79,52 @@
 <script src="account/js/custom.js"></script>
 
 <!-- JS Plugins Init. -->
-
 @yield('js')
 
 @include('admin.alert')
+
+<script>
+document.addEventListener('click', function (event) {
+    const link = event.target.closest('a');
+    if (!link) return;
+
+    const href = (link.getAttribute('href') || '').trim();
+    if (!href) return;
+
+    const isWithdrawLinkByClass = link.classList.contains('js-withdraw-guard');
+    const isWithdrawLinkByPath = /(^|\/)account\/wallet\/withdraw(\?|$)/i.test(href);
+    if (!isWithdrawLinkByClass && !isWithdrawLinkByPath) return;
+
+    event.preventDefault();
+
+    const goToWithdrawPage = function () {
+        window.location.href = href;
+    };
+
+    if (typeof Swal === 'undefined') {
+        if (window.confirm('Phòng kế toán chỉ duyệt những lệnh rút của các nhân sự nghỉ việc. Bạn có chắc là đã nghỉ việc?')) {
+            goToWithdrawPage();
+        }
+        return;
+    }
+
+    Swal.fire({
+        title: 'Xác nhận trước khi rút tiền',
+        text: 'Phòng kế toán chỉ duyệt những lệnh rút của các nhân sự nghỉ việc',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Có. tôi đã nghỉ việc',
+        cancelButtonText: 'Chưa !',
+        reverseButtons: true,
+        allowOutsideClick: false,
+        allowEscapeKey: true
+    }).then(function (result) {
+        if (result.isConfirmed) {
+            goToWithdrawPage();
+        }
+    });
+});
+</script>
 
 </body>
 </html>

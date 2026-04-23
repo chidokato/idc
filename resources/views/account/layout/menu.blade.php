@@ -1,4 +1,4 @@
-<div id="sidebarMain" class="d-none">
+﻿<div id="sidebarMain" class="d-none">
   <aside class="js-navbar-vertical-aside navbar navbar-vertical-aside navbar-vertical navbar-vertical-fixed navbar-expand-xl navbar-bordered default navbar-vertical-aside-initialized ">
   <div class="navbar-vertical-container">
     <div class="navbar-vertical-footer-offset">
@@ -113,7 +113,7 @@
             </a>
           </li>
           <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/wallet/withdraw" title="Rút tiền" data-placement="left">
+            <a class="js-nav-tooltip-link nav-link js-withdraw-guard" href="{{ route('wallet.withdraw.form') }}" title="Rút tiền" data-placement="left">
               <i class="tio-money-vs nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Rút tiền</span>
             </a>
@@ -199,3 +199,4 @@
     </div>
   </div>
 </aside></div>
+

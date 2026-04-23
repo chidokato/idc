@@ -27,6 +27,17 @@ class BulkPersonalMail extends Mailable
             ->view('emails.bulk.personal', [
                 'name' => $this->name,
                 'content' => $this->content,
-            ]);
+            ])
+            ->withSwiftMessage(function ($message) {
+                $headers = $message->getHeaders();
+                $fromAddress = (string) config('mail.from.address');
+
+                if (!empty($fromAddress)) {
+                    $headers->addTextHeader('List-Unsubscribe', "<mailto:{$fromAddress}?subject=unsubscribe>");
+                }
+
+                $headers->addTextHeader('Precedence', 'bulk');
+                $headers->addTextHeader('X-Auto-Response-Suppress', 'All');
+            });
     }
 }

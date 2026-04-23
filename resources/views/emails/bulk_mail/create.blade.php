@@ -35,7 +35,7 @@
 
         <div class="form-group mb-3">
             <label>Nội dung</label>
-            <textarea name="content" rows="10" class="form-control" required>{{ old('content', "Chào {name},\n\nNội dung email của bạn ở đây...\n") }}</textarea>
+            <textarea name="content" rows="10" class="form-control" required>{{ old('content', "Kính gửi Anh/Chị,\n\nPhòng Marketing đã mở link đăng ký cho kỳ 1 tháng 5. Hệ thống sẽ đóng đăng ký vào ngày 30/04.\n\nĐề nghị Anh/Chị vui lòng hoàn tất đăng ký trước thời hạn trên để tránh trường hợp đăng ký muộn và không được phê duyệt.\n\nTrân trọng.") }}</textarea>
             <small class="text-muted">Ví dụ: "Chào {name}" sẽ tự thay theo từng người nhận.</small>
         </div>
 

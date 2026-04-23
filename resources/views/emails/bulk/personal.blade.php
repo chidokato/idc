@@ -12,7 +12,7 @@
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="620" style="max-width:620px;background-color:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;">
                     <tr>
                         <td style="background-color:#0f766e;padding:20px 24px;color:#ffffff;">
-                            <div style="font-size:20px;font-weight:700;line-height:1.3;">Bất động sản INDOCHINE</div>
+                            <div style="font-size:20px;font-weight:700;line-height:1.3;">Bất Động Sản INDOCHINE</div>
                             <div style="font-size:13px;opacity:.9;margin-top:4px;">Thông báo từ hệ thống nội bộ</div>
                         </td>
                     </tr>
