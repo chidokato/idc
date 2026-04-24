@@ -156,9 +156,26 @@ if ((int) $request->get('monopoly', 0) === 1) {
 
     public function post($catslug, $slug)
     {
-        $post = Post::where('slug', $slug)->first();
-        $sections = Section::where('post_id', $post->id)->orderBy('stt', 'asc')->get();
-        $related_post = Post::where('category_id', $post->category_id)->whereNotIn('id', [$post->id])->where('status', 'true')->orderBy('id', 'desc')->take(10)->get();
+        $post = Post::with(['Category', 'Images'])
+            ->where('slug', $slug)
+            ->where('status', 'true')
+            ->whereHas('Category', function ($query) use ($catslug) {
+                $query->where('slug', $catslug);
+            })
+            ->firstOrFail();
+
+        $sections = Section::where('post_id', $post->id)
+            ->orderBy('stt', 'asc')
+            ->get();
+
+        $related_post = Post::with('Category')
+            ->where('category_id', $post->category_id)
+            ->where('status', 'true')
+            ->where('id', '<>', $post->id)
+            ->orderBy('id', 'desc')
+            ->take(10)
+            ->get();
+
         if ($post->sort_by == 'Product') {
             return view('pages.project', compact(
                 'post',

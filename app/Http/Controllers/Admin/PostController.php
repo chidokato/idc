@@ -44,6 +44,17 @@ class PostController extends Controller
         $img->save(public_path($path . $filename));
         return $filename;
     }
+
+    private function normalizeIntegerInput($value)
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $normalized = preg_replace('/\D+/', '', (string) $value);
+
+        return $normalized === '' ? null : (int) $normalized;
+    }
     
     /**
      * Display a listing of the resource.
@@ -109,6 +120,14 @@ class PostController extends Controller
 
     public function store(Request $request)
     {
+        $request->merge([
+            'total_product' => $this->normalizeIntegerInput($request->input('total_product')),
+        ]);
+
+        $request->validate([
+            'total_product' => 'nullable|integer|min:0',
+        ]);
+
         $data = $request->all();
         // dd($request->has('for_sale'));
         $post = new Post();
@@ -128,7 +147,7 @@ class PostController extends Controller
         $post->bedroom_max = $data['bedroom_max'];
         $post->wc = $data['wc'];
         $post->wc_max = $data['wc_max'];
-        $post->total_product = $data['total_product'];
+        $post->total_product = $request->input('total_product');
         
         $post->province_id = $data['province'];
         $post->district_id = $data['district'];
@@ -280,6 +299,14 @@ class PostController extends Controller
 
     public function update(Request $request, $id)
     {
+        $request->merge([
+            'total_product' => $this->normalizeIntegerInput($request->input('total_product')),
+        ]);
+
+        $request->validate([
+            'total_product' => 'nullable|integer|min:0',
+        ]);
+
         $data = $request->all();
         $post = Post::find($id);
         $post->name = $data['name'];
@@ -295,7 +322,7 @@ class PostController extends Controller
         $post->bedroom_max = $data['bedroom_max'];
         $post->wc = $data['wc'];
         $post->wc_max = $data['wc_max'];
-        $post->total_product = $data['total_product'];
+        $post->total_product = $request->input('total_product');
         
         $post->province_id = $data['province'];
         $post->district_id = $data['district'];

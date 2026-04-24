@@ -136,7 +136,7 @@
                                 <div class="input-group-append">
                                     <span class="input-group-text" id="basic-addon2">Căn</span>
                                 </div> 
-                                <input type="text" name="total_product" class="form-control">
+                                <input type="number" name="total_product" class="form-control" min="0" step="1" inputmode="numeric" placeholder="VD: 900">
                             </div>
                         </div>
                     </div>
