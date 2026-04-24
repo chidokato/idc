@@ -115,7 +115,7 @@
         </div>
 
         <div class="alert alert-warning mb-0">
-            <b>Lưu ý:</b> Hệ thống gửi trực tiếp khi bạn bấm gửi. Nếu danh sách lớn, thao tác có thể mất thêm thời gian.
+            <b>Luu y:</b> He thong se xep hang gui nen khi bam gui. Neu danh sach lon, hay dam bao queue worker dang chay.
         </div>
     </form>
 

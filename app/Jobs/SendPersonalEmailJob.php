@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Mail\BulkPersonalMail;
+use App\Models\MailLog;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -12,41 +13,43 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Throwable;
-use App\Models\MailLog;
 
 class SendPersonalEmailJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $tries = 1; // debug: để 1 cho dễ nhìn lỗi
-    public int $timeout = 60;
+    public int $tries = 3;
+    public int $timeout = 120;
 
     public function __construct(
         public int $userId,
         public string $subject,
         public string $contentTemplate,
         public string $batchId
-    ) {}
+    ) {
+    }
 
     public function handle(): void
     {
-        $user = User::select('id','name','yourname','email')
+        $user = User::select('id', 'name', 'yourname', 'email')
             ->where('id', $this->userId)
             ->whereNotNull('email')
-            ->where('email','!=','')
+            ->where('email', '!=', '')
             ->first();
 
-        if (!$user) return;
+        if (! $user) {
+            return;
+        }
 
         $displayName = $user->yourname ?: ($user->name ?: '');
-        $content = str_replace(['{name}','{email}'], [$displayName, $user->email ?? ''], $this->contentTemplate);
+        $content = str_replace(['{name}', '{email}'], [$displayName, $user->email ?? ''], $this->contentTemplate);
 
         try {
             Mail::to($user->email)->send(
-                new \App\Mail\BulkPersonalMail($displayName ?: 'Ban', $content, $this->subject)
+                new BulkPersonalMail($displayName ?: 'Ban', $content, $this->subject)
             );
 
-            \App\Models\MailLog::where('batch_id', $this->batchId)
+            MailLog::where('batch_id', $this->batchId)
                 ->where('user_id', $user->id)
                 ->update([
                     'status' => 'sent',
@@ -55,7 +58,7 @@ class SendPersonalEmailJob implements ShouldQueue
                     'updated_at' => now(),
                 ]);
         } catch (Throwable $e) {
-            \App\Models\MailLog::where('batch_id', $this->batchId)
+            MailLog::where('batch_id', $this->batchId)
                 ->where('user_id', $user->id)
                 ->update([
                     'status' => 'failed',
@@ -67,6 +70,10 @@ class SendPersonalEmailJob implements ShouldQueue
         }
     }
 
+    public function backoff(): array
+    {
+        return [30, 120];
+    }
 
     public function failed(Throwable $e): void
     {
@@ -77,5 +84,3 @@ class SendPersonalEmailJob implements ShouldQueue
         ]);
     }
 }
-
-

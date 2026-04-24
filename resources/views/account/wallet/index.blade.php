@@ -8,6 +8,17 @@
 @section('body') @endsection
 
 @section('content')
+@php
+    $filterTypeOptions = [
+        'deposit' => 'Nạp tiền',
+        'withdraw' => 'Trừ tiền',
+        'rollback' => 'Hoàn/rollback',
+        'hold' => 'Giữ tiền (Hold)',
+        'release' => 'Nhả giữ (Release)',
+        'capture' => 'Nghiệm thu (Trừ)',
+        'refund' => 'Hoàn tiền',
+    ];
+@endphp
 <div class="content container-fluid">
     <div class="page-header">
         <div class="row align-items-end">
@@ -95,6 +106,36 @@
     <div class="card">
         <div class="card-header">
             <h5 class="card-header-title">Lịch sử</h5>
+        </div>
+
+        <div class="card-body border-bottom">
+            <form method="GET" action="{{ route('wallet.index') }}">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-6 col-lg-3">
+                        <label class="form-label d-block">Loại</label>
+                        <select name="type" class="form-control">
+                            <option value="">-- Tất cả loại --</option>
+                            @foreach($filterTypeOptions as $typeKey => $typeLabel)
+                                <option value="{{ $typeKey }}" {{ request('type') === $typeKey ? 'selected' : '' }}>
+                                    {{ $typeLabel }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <label class="form-label d-block">Từ ngày</label>
+                        <input type="date" name="from_date" value="{{ request('from_date') }}" class="form-control">
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <label class="form-label d-block">Đến ngày</label>
+                        <input type="date" name="to_date" value="{{ request('to_date') }}" class="form-control">
+                    </div>
+                    <div class="col-md-6 col-lg-3 d-flex align-items-end">
+                        <button class="btn btn-primary mr-2">Lọc</button>
+                        <a href="{{ route('wallet.index') }}" class="btn btn-white">Reset</a>
+                    </div>
+                </div>
+            </form>
         </div>
 
         <div class="table-responsive datatable-custom">
@@ -210,6 +251,10 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        <div class="card-footer">
+            {{ $transactions->links() }}
         </div>
     </div>
 </div>
