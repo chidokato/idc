@@ -190,7 +190,13 @@
                     <div class="form-group row">
                         <label class="col-sm-2">Tùy chọn khác</label>
                         <div class="col-sm-10">
-                            <div class="form-group">
+                            <div class="d-inline-flex align-items-center mr-4" style="gap:10px; vertical-align:middle;">
+                                <div class="custom-control custom-checkbox mr-sm-2">
+                                    <input {{ $data->status == 'true' ? "checked":"" }} name="post_status" type="checkbox" class="custom-control-input" id="customControlAutosizing4">
+                                    <label class="custom-control-label" for="customControlAutosizing4">Public</label>
+                                </div>
+                            </div>
+                            <div class="form-group d-inline-block mr-4 mb-0 align-middle">
                                 <div class="col-auto my-1">
                                     <div class="custom-control custom-checkbox mr-sm-2">
                                         <input {{ $data->monopoly == '1' ? "checked":"" }} name="monopoly" type="checkbox" class="custom-control-input" id="customControlAutosizing1">
@@ -198,7 +204,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group d-inline-block mr-4 mb-0 align-middle">
                                 <div class="col-auto my-1">
                                     <div class="custom-control custom-checkbox mr-sm-2">
                                         <input {{ $data->for_sale == '1' ? "checked":"" }} name="for_sale" type="checkbox" class="custom-control-input" id="customControlAutosizing2">
@@ -206,7 +212,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group d-inline-block mr-4 mb-0 align-middle">
                                 <div class="col-auto my-1">
                                     <div class="custom-control custom-checkbox mr-sm-2">
                                         <input {{ $data->new_product == '1' ? "checked":"" }} name="new_product" type="checkbox" class="custom-control-input" id="customControlAutosizing3">
@@ -214,7 +220,6 @@
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                     

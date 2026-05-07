@@ -415,6 +415,7 @@ class PostController extends Controller
         $post->monopoly = $request->has('monopoly');
         $post->for_sale = $request->has('for_sale');
         $post->new_product = $request->has('new_product');
+        $post->status = $request->has('post_status') ? 'true' : 'false';
         $post->title = $data['title'];
         $post->description = $data['description'];
 
