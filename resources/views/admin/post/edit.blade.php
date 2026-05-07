@@ -279,12 +279,15 @@
             </div>
         </div>
         @foreach($section as $key => $val)
-        <input type="hidden" value="{{$val->id}}" name="id-edit[]">
-        <div class="linkneo section" id="section-{{$val->id}}">
+        <div class="linkneo section" id="section-{{$val->id}}" data-section-id="{{$val->id}}">
+            <input type="hidden" value="{{$val->id}}" name="id-edit[]">
             <!-- <button class="btn btn-danger remove-section" type="button">Xóa Section</button> -->
             <div class="card shadow mb-4" >
                 <span class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">{{$val->tab}}</h6>
+                    <button class="btn btn-danger btn-sm delete-saved-section" type="button" data-section-id="{{$val->id}}" data-section-target="section-{{$val->id}}">
+                        Xóa section
+                    </button>
                 </span>
                 <div class="card-body">
                     <div class="row">
@@ -410,7 +413,7 @@
                                 <li><a class="scroll-link" href="#section2">Thông tin dự án</a></li>
                                 <li><a class="scroll-link" href="#section3">Hình ảnh</a></li>
                                 @foreach($section as $val)
-                                <li><a class="scroll-link" href="#section-{{$val->id}}">{{$val->tab}}</a></li>
+                                <li id="menu-section-{{$val->id}}"><a class="scroll-link" href="#section-{{$val->id}}">{{$val->tab}}</a></li>
                                 @endforeach
                                 <li><a class="scroll-link" href="#maps">Bản đồ định vị</a></li>
                                 <li><a class="scroll-link" href="#seo">Cấu hình SEO</a></li>
@@ -453,6 +456,47 @@
     function delete_row(e) {
         e.parentElement.remove();
     }
+</script>
+
+<script>
+    document.addEventListener('click', function (event) {
+        const button = event.target.closest('.delete-saved-section');
+
+        if (!button) {
+            return;
+        }
+
+        const sectionId = button.getAttribute('data-section-id');
+        const sectionTarget = button.getAttribute('data-section-target');
+
+        if (!sectionId || !confirm('Bạn có chắc muốn xóa section này không?')) {
+            return;
+        }
+
+        button.disabled = true;
+
+        $.ajax({
+            url: 'ajax/del_section/' + sectionId,
+            type: 'GET',
+            cache: false,
+            success: function () {
+                const sectionElement = document.getElementById(sectionTarget);
+                const menuElement = document.getElementById('menu-section-' + sectionId);
+
+                if (sectionElement) {
+                    sectionElement.remove();
+                }
+
+                if (menuElement) {
+                    menuElement.remove();
+                }
+            },
+            error: function () {
+                button.disabled = false;
+                alert('Không thể xóa section. Vui lòng thử lại.');
+            }
+        });
+    });
 </script>
 
 <script type="text/javascript">

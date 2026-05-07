@@ -12,6 +12,7 @@ use App\Models\Option;
 use App\Models\Menu;
 use App\Models\Post;
 use App\Models\Images;
+use App\Models\Section;
 use App\Models\Province;
 use App\Models\District;
 use App\Models\Ward;
@@ -97,11 +98,28 @@ class AjaxController extends Controller
 
     public function del_section($id)
     {
-        $data = SectionTranslation::where('section_id', $id)->get();
-        foreach ($data as $key => $value) {
-            
-            SectionTranslation::find($value->id)->delete();
+        $section = Section::find($id);
+
+        if (!$section) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Section not found',
+            ], 404);
         }
+
+        foreach ($section->Images as $image) {
+            if (File::exists('data/images/'.$image->img)) {
+                File::delete('data/images/'.$image->img);
+            }
+
+            $image->delete();
+        }
+
+        $section->delete();
+
+        return response()->json([
+            'success' => true,
+        ]);
     }
 
     public function update_status_category($id, $status)
