@@ -2,6 +2,12 @@
 
 @section('css')
 <link href="admin_asset/css/custom.css" rel="stylesheet">
+<style>
+    #post-data td:last-child {
+        position: relative;
+        z-index: 2;
+    }
+</style>
 @endsection
 @section('content')
 @include('admin.layout.header')
@@ -29,7 +35,9 @@
                 </div>
                 <div class="modal-body">
                     <p class="mb-3">Nếu muốn thêm mới một dự án, hãy tìm kiếm xem dự án đó đã có chưa.</p>
-                    <select id="quickCreateProjectSelect" class="form-control" style="width: 100%;">
+                    <input type="text" id="quickCreateProjectKeyword" class="form-control" placeholder="Nhập tên dự án hoặc chọn dự án có sẵn" autocomplete="off">
+                    <div id="quickCreateProjectSuggestions" class="list-group mt-2" style="max-height: 260px; overflow-y: auto;"></div>
+                    <select id="quickCreateProjectSelect" class="form-control d-none" style="width: 100%;">
                         <option value="">Nhập tên dự án hoặc chọn dự án có sẵn</option>
                         @foreach($projectOptions as $projectOption)
                         <option value="{{ $projectOption->id }}" data-name="{{ $projectOption->name }}">{{ $projectOption->name }}</option>
@@ -45,44 +53,6 @@
         </div>
     </div>
 </div>
-
-{{-- <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <form action="{{ route('post.upfile') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Nhập file dữ liệu tác vụ</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="chuy">
-                        <p>Bạn vui lòng kiểm tra và tải lại file mới để tránh sai lệch dữ liệu</p>
-                    </div>
-                    <ul>
-                        <li>File có dung lượng tối đa là 3MB và 5000 dòng</li>
-                    </ul>
-                    <label for="excel-file" id="custom-file-label" class="custom-file-upload">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24" font-size="24" color="#747C87" style="margin-right: 10px;">
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 4a8.003 8.003 0 0 1 7.763 6.058A5.001 5.001 0 0 1 19 20H6a6 6 0 0 1-.975-11.921A7.997 7.997 0 0 1 12 4Zm-6.652 6.053.948-.155.472-.837a6.003 6.003 0 0 1 11.054 1.481l.322 1.291 1.316.202A3.001 3.001 0 0 1 19 18H6a4 4 0 0 1-.652-7.947Z" fill="#747C87"></path>
-                            <path d="M13.45 12H16l-4 4-4-4h2.55V9h2.9v3Z" fill="#747C87"></path>
-                        </svg>
-                        <span id="file-label-text">Kéo thả file vào đây hoặc tải lên từ thiết bị</span>
-                    </label>
-                    <input id="excel-file" type="file" name="excel_file" accept=".xls,.xlsx,.csv" required style="display: none;">
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
-                    <button type="submit" class="btn btn-primary">Upload</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div> --}}
 
 <div class="row">
 <form class="width100" action="{{ url()->current() }}" method="GET">
@@ -118,14 +88,14 @@
                     <div class="search paginate-search">
                         <div>Hiển thị: </div>
                         <select class="form-control paginate" name="per_page" onchange="this.form.submit()">
-                            <option value="10" {{ request()->per_page == 10 ? 'selected' : '' }}>10</option>
-                            <option value="20" {{ request()->per_page == 20 ? 'selected' : '' }}>20</option>
+                            <option value="20" {{ request()->per_page == 20 || !request()->has('per_page') ? 'selected' : '' }}>20</option>
                             <option value="50" {{ request()->per_page == 50 ? 'selected' : '' }}>50</option>
                             <option value="100" {{ request()->per_page == 100 ? 'selected' : '' }}>100</option>
                         </select>
                         <div> Từ {{ $posts->firstItem() }} đến {{ $posts->lastItem() }} trên tổng {{ $posts->total() }} </div>
                         {{ $posts->appends(request()->all())->links() }}
                     </div>
+                    </form>
                     <table class="table">
                         <thead>
                             <tr>
@@ -143,8 +113,7 @@
                         </thead>
                         <tbody id="post-data">
                             @foreach($posts as $val)
-                            <tr id="post">
-                                <input type="hidden" name="id" id="id" value="{{$val->id}}" >
+                            <tr id="post" data-id="{{$val->id}}">
                                 <td class="thumb"><img src="data/images/{{$val->img}}"></td>
                                 <td>
                                     <div class="name"><a href="{{route('post.edit',[$val->id])}}" >{{$val->name}}</a></div>
@@ -183,7 +152,6 @@
         </div>
     </div>
 </div>
-</form>
 
 @endsection
 
@@ -221,19 +189,81 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const addNewLink = document.querySelector('a.add-iteam');
+        const addNewButton = document.querySelector('a.add-iteam button');
+        const quickCreateModal = document.getElementById('quickCreatePostModal');
         const quickCreateProjectId = document.getElementById('quick_create_project_id');
         const quickCreateProjectName = document.getElementById('quick_create_project_name');
         const quickCreateForm = document.getElementById('quickCreatePostForm');
-        const quickCreateSelect = $('#quickCreateProjectSelect');
+        const quickCreateKeyword = document.getElementById('quickCreateProjectKeyword');
+        const quickCreateSuggestions = document.getElementById('quickCreateProjectSuggestions');
+        const projectOptions = @json($projectSelect2Data);
+        let quickCreateBackdrop = null;
+
+        if (!quickCreateModal || !quickCreateProjectId || !quickCreateProjectName || !quickCreateForm) {
+            return;
+        }
+
+        function openQuickCreateModal() {
+            if (!quickCreateModal) {
+                return;
+            }
+
+            quickCreateModal.style.display = 'block';
+            quickCreateModal.classList.add('show');
+            quickCreateModal.setAttribute('aria-modal', 'true');
+            quickCreateModal.removeAttribute('aria-hidden');
+            document.body.classList.add('modal-open');
+
+            if (!quickCreateBackdrop) {
+                quickCreateBackdrop = document.createElement('div');
+                quickCreateBackdrop.className = 'modal-backdrop fade show';
+            }
+
+            document.body.appendChild(quickCreateBackdrop);
+        }
+
+        function closeQuickCreateModal() {
+            if (!quickCreateModal) {
+                return;
+            }
+
+            quickCreateModal.style.display = 'none';
+            quickCreateModal.classList.remove('show');
+            quickCreateModal.setAttribute('aria-hidden', 'true');
+            quickCreateModal.removeAttribute('aria-modal');
+            document.body.classList.remove('modal-open');
+
+            if (quickCreateBackdrop && quickCreateBackdrop.parentNode) {
+                quickCreateBackdrop.parentNode.removeChild(quickCreateBackdrop);
+            }
+        }
 
         if (addNewLink) {
+            addNewLink.setAttribute('href', '#');
+            addNewLink.setAttribute('onclick', "return false;");
             addNewLink.addEventListener('click', function (event) {
                 event.preventDefault();
-                $('#quickCreatePostModal').modal('show');
+                event.stopPropagation();
+                openQuickCreateModal();
             });
         }
 
-        if (quickCreateSelect.length) {
+        if (addNewButton) {
+            addNewButton.setAttribute('onclick', "return false;");
+            addNewButton.addEventListener('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                openQuickCreateModal();
+            });
+        }
+
+        if (false) {
+            const projectSelect2Data = @json($projectSelect2Data);
+            quickCreateSelect.empty();
+            quickCreateSelect.append(new Option('', '', false, false));
+            projectSelect2Data.forEach(function (project) {
+                quickCreateSelect.append(new Option(project.text, project.id, false, false));
+            });
             quickCreateSelect.select2({
                 tags: true,
                 width: '100%',
@@ -251,20 +281,32 @@
                         text: term,
                         newTag: true
                     };
+                },
+                language: {
+                    searching: function () {
+                        return 'Dang tim kiem...';
+                    },
+                    noResults: function () {
+                        return 'Khong co du an phu hop';
+                    },
+                    inputTooShort: function () {
+                        return 'Nhap ten du an de tim';
+                    }
+                },
+                escapeMarkup: function (markup) {
+                    return markup;
                 }
             });
 
             quickCreateSelect.on('change', function () {
                 const selectedValue = $(this).val();
-                const selectedOption = this.options[this.selectedIndex];
-
                 if (!selectedValue) {
                     quickCreateProjectId.value = '';
                     quickCreateProjectName.value = '';
                     return;
                 }
 
-                if (selectedOption && selectedOption.dataset && selectedOption.dataset.name) {
+                if (/^\d+$/.test(String(selectedValue))) {
                     quickCreateProjectId.value = selectedValue;
                     quickCreateProjectName.value = '';
                     return;
@@ -275,8 +317,62 @@
             });
         }
 
+        function renderProjectSuggestions(keyword) {
+            if (!quickCreateSuggestions) {
+                return;
+            }
+
+            const normalizedKeyword = (keyword || '').trim().toLowerCase();
+            quickCreateSuggestions.innerHTML = '';
+
+            const matchedProjects = projectOptions.filter(function (project) {
+                if (normalizedKeyword === '') {
+                    return true;
+                }
+
+                return (project.text || '').toLowerCase().includes(normalizedKeyword);
+            }).slice(0, 20);
+
+            if (!matchedProjects.length) {
+                quickCreateSuggestions.innerHTML = '<div class="list-group-item text-muted">Khong co du an phu hop</div>';
+                return;
+            }
+
+            matchedProjects.forEach(function (project) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'list-group-item list-group-item-action';
+                button.textContent = project.text;
+                button.addEventListener('click', function () {
+                    quickCreateProjectId.value = project.id;
+                    quickCreateProjectName.value = '';
+                    if (quickCreateKeyword) {
+                        quickCreateKeyword.value = project.text;
+                    }
+                    quickCreateSuggestions.innerHTML = '';
+                });
+                quickCreateSuggestions.appendChild(button);
+            });
+        }
+
+        if (quickCreateKeyword) {
+            quickCreateKeyword.addEventListener('focus', function () {
+                renderProjectSuggestions(this.value);
+            });
+
+            quickCreateKeyword.addEventListener('input', function () {
+                quickCreateProjectId.value = '';
+                quickCreateProjectName.value = this.value.trim();
+                renderProjectSuggestions(this.value);
+            });
+        }
+
         if (quickCreateForm) {
             quickCreateForm.addEventListener('submit', function (event) {
+                if (quickCreateKeyword && !quickCreateProjectId.value) {
+                    quickCreateProjectName.value = quickCreateKeyword.value.trim();
+                }
+
                 if (!quickCreateProjectId.value && !quickCreateProjectName.value) {
                     event.preventDefault();
                     alert('Vui lòng chọn hoặc nhập tên dự án');
@@ -284,14 +380,65 @@
             });
         }
 
-        $('#quickCreatePostModal').on('hidden.bs.modal', function () {
-            if (quickCreateSelect.length) {
-                quickCreateSelect.val(null).trigger('change');
-            }
+        quickCreateModal.querySelectorAll('[data-dismiss="modal"], .close').forEach(function (element) {
+            element.addEventListener('click', function (event) {
+                event.preventDefault();
+                closeQuickCreateModal();
+            });
+        });
 
+        quickCreateModal.addEventListener('click', function (event) {
+            if (event.target === quickCreateModal) {
+                closeQuickCreateModal();
+            }
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeQuickCreateModal();
+            }
+        });
+
+        function resetQuickCreateModal() {
             quickCreateProjectId.value = '';
             quickCreateProjectName.value = '';
-        });
+            if (quickCreateKeyword) {
+                quickCreateKeyword.value = '';
+            }
+            if (quickCreateSuggestions) {
+                quickCreateSuggestions.innerHTML = '';
+            }
+        }
+
+        if (quickCreateModal) {
+            const observer = new MutationObserver(function () {
+                if (!quickCreateModal.classList.contains('show')) {
+                    resetQuickCreateModal();
+                }
+            });
+
+            observer.observe(quickCreateModal, { attributes: true, attributeFilter: ['class'] });
+        }
+    });
+</script>
+
+<script>
+    $(document).on('click', 'a.add-iteam, a.add-iteam button', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const quickCreateModal = document.getElementById('quickCreatePostModal');
+        if (quickCreateModal) {
+            quickCreateModal.style.display = 'block';
+            quickCreateModal.classList.add('show');
+            quickCreateModal.setAttribute('aria-modal', 'true');
+            quickCreateModal.removeAttribute('aria-hidden');
+            document.body.classList.add('modal-open');
+            if (!document.querySelector('.modal-backdrop')) {
+                const backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade show';
+                document.body.appendChild(backdrop);
+            }
+        }
     });
 </script>
 

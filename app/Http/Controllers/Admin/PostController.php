@@ -66,7 +66,14 @@ class PostController extends Controller
     {
         $category = Category::where('sort_by', 'Product')->where('parent', '0')->orderBy('view', 'DESC')->get();
         $projectOptions = Post::where('sort_by', 'Product')->orderBy('name', 'ASC')->get(['id', 'name']);
+        $projectSelect2Data = $projectOptions->map(function ($project) {
+            return [
+                'id' => (string) $project->id,
+                'text' => $project->name,
+            ];
+        })->values();
         $perPage = $request->get('per_page', 100); // Mặc định là 20 nếu không có lựa chọn
+        $perPage = $request->get('per_page', 20);
         $key = $request->get('key', '');
         $categoryId = $request->get('category_id', '');
         $statusFilter = $request->get('status_filter', 'public');
@@ -95,7 +102,33 @@ class PostController extends Controller
             'posts',
             'category',
             'projectOptions',
+            'projectSelect2Data',
         ));
+    }
+
+    public function searchProjects(Request $request)
+    {
+        $keyword = trim((string) $request->get('q', ''));
+
+        $query = Post::query()
+            ->where('sort_by', 'Product')
+            ->orderBy('name', 'ASC')
+            ->select('id', 'name');
+
+        if ($keyword !== '') {
+            $query->where('name', 'like', '%' . $keyword . '%');
+        }
+
+        $results = $query->limit(30)->get()->map(function ($project) {
+            return [
+                'id' => (string) $project->id,
+                'text' => $project->name,
+            ];
+        })->values();
+
+        return response()->json([
+            'results' => $results,
+        ]);
     }
 
     public function post_up($id)
