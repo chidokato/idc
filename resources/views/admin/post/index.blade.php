@@ -10,12 +10,43 @@
 <div class="d-sm-flex align-items-center justify-content-between mb-3 flex">
     <h2 class="h3 mb-0 text-gray-800 line-1 size-1-3-rem">Quản lý sản phẩm</h2>
     <div class="flex">
-        <button type="button" class="btn btn-primary mr-2" data-toggle="modal" data-target="#exampleModal"><i class="fa fa-upload" aria-hidden="true"></i> Upload Excel</button>
         <a class="add-iteam" href="{{route('post.create')}}"><button class="btn-success form-control" type="button"><i class="fa fa-plus" aria-hidden="true"></i> Thêm mới</button></a>
     </div>
 </div>
 
-<!-- Modal -->
+<div class="modal fade" id="quickCreatePostModal" tabindex="-1" role="dialog" aria-labelledby="quickCreatePostModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="quickCreatePostForm" action="{{ route('post.quickCreate') }}" method="POST">
+                @csrf
+                <input type="hidden" name="project_id" id="quick_create_project_id">
+                <input type="hidden" name="project_name" id="quick_create_project_name">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="quickCreatePostModalLabel">Thêm mới dự án</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3">Nếu muốn thêm mới một dự án, hãy tìm kiếm xem dự án đó đã có chưa.</p>
+                    <select id="quickCreateProjectSelect" class="form-control" style="width: 100%;">
+                        <option value="">Nhập tên dự án hoặc chọn dự án có sẵn</option>
+                        @foreach($projectOptions as $projectOption)
+                        <option value="{{ $projectOption->id }}" data-name="{{ $projectOption->name }}">{{ $projectOption->name }}</option>
+                        @endforeach
+                    </select>
+                    <small class="form-text text-muted mt-2">Nếu chưa có trong danh sách, chỉ cần nhập tên mới rồi bấm tiếp tục.</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-success">Tiếp tục</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -51,10 +82,11 @@
             </form>
         </div>
     </div>
-</div>
+</div> --}}
 
 <div class="row">
 <form class="width100" action="{{ url()->current() }}" method="GET">
+    <input type="hidden" name="status_filter" value="{{ request('status_filter', 'public') }}">
     <div class="col-xl-12 col-lg-12 search flex-start">
         <input type="text" value="{{ request()->key ?? '' }}" placeholder="Tìm kiếm..." class="form-control" name="key" onchange="this.form.submit()">
         <select class="form-control" name="category_id">
@@ -76,6 +108,8 @@
                     <li><a data-toggle="tab" class="nav-link active" href="#tab1">Tất cả</a></li>
                     <!-- <li><a data-toggle="tab" class="nav-link " href="#tab2">Hiển thị</a></li> -->
                     <!-- <li><a data-toggle="tab" class="nav-link" href="#tab3">Ẩn</a></li> -->
+                    <li><a class="nav-link {{ request('status_filter') === 'public' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['status_filter' => 'public', 'page' => 1]) }}">Public</a></li>
+                    <li><a class="nav-link {{ request('status_filter') === 'hidden' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['status_filter' => 'hidden', 'page' => 1]) }}">Hidden</a></li>
                 </ul>
             </div>
             <div class="tab-content">
@@ -155,9 +189,109 @@
 
 @section('js')
 <script>
-    document.getElementById("excel-file").addEventListener("change", function () {
+    const excelFileInput = document.getElementById("excel-file"); if (excelFileInput) excelFileInput.addEventListener("change", function () {
         let fileLabel = document.getElementById("file-label-text");
         fileLabel.textContent = this.files.length > 0 ? this.files[0].name : "Kéo thả file vào đây hoặc tải lên từ thiết bị";
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const currentUrl = new URL(window.location.href);
+        const statusFilter = currentUrl.searchParams.get('status_filter') || 'public';
+        const navLinks = document.querySelectorAll('.nav.nav-pills .nav-link');
+        const allTab = navLinks[0];
+
+        if (allTab) {
+            currentUrl.searchParams.set('status_filter', 'all');
+            currentUrl.searchParams.set('page', '1');
+            allTab.removeAttribute('data-toggle');
+            allTab.setAttribute('href', currentUrl.toString());
+            allTab.classList.toggle('active', statusFilter === 'all');
+        }
+
+        navLinks.forEach(function (link, index) {
+            if (index > 0) {
+                link.classList.toggle('active', link.textContent.trim().toLowerCase() === statusFilter);
+            }
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addNewLink = document.querySelector('a.add-iteam');
+        const quickCreateProjectId = document.getElementById('quick_create_project_id');
+        const quickCreateProjectName = document.getElementById('quick_create_project_name');
+        const quickCreateForm = document.getElementById('quickCreatePostForm');
+        const quickCreateSelect = $('#quickCreateProjectSelect');
+
+        if (addNewLink) {
+            addNewLink.addEventListener('click', function (event) {
+                event.preventDefault();
+                $('#quickCreatePostModal').modal('show');
+            });
+        }
+
+        if (quickCreateSelect.length) {
+            quickCreateSelect.select2({
+                tags: true,
+                width: '100%',
+                dropdownParent: $('#quickCreatePostModal'),
+                placeholder: 'Nhập tên dự án hoặc chọn dự án có sẵn',
+                createTag: function (params) {
+                    const term = $.trim(params.term);
+
+                    if (term === '') {
+                        return null;
+                    }
+
+                    return {
+                        id: term,
+                        text: term,
+                        newTag: true
+                    };
+                }
+            });
+
+            quickCreateSelect.on('change', function () {
+                const selectedValue = $(this).val();
+                const selectedOption = this.options[this.selectedIndex];
+
+                if (!selectedValue) {
+                    quickCreateProjectId.value = '';
+                    quickCreateProjectName.value = '';
+                    return;
+                }
+
+                if (selectedOption && selectedOption.dataset && selectedOption.dataset.name) {
+                    quickCreateProjectId.value = selectedValue;
+                    quickCreateProjectName.value = '';
+                    return;
+                }
+
+                quickCreateProjectId.value = '';
+                quickCreateProjectName.value = selectedValue;
+            });
+        }
+
+        if (quickCreateForm) {
+            quickCreateForm.addEventListener('submit', function (event) {
+                if (!quickCreateProjectId.value && !quickCreateProjectName.value) {
+                    event.preventDefault();
+                    alert('Vui lòng chọn hoặc nhập tên dự án');
+                }
+            });
+        }
+
+        $('#quickCreatePostModal').on('hidden.bs.modal', function () {
+            if (quickCreateSelect.length) {
+                quickCreateSelect.val(null).trigger('change');
+            }
+
+            quickCreateProjectId.value = '';
+            quickCreateProjectName.value = '';
+        });
     });
 </script>
 

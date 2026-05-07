@@ -168,6 +168,7 @@ Route::prefix('admin')->group(function () {
         Route::get('main', [MainController::class, 'index'])->name('admin');
         // quản lý bài viết
         Route::resource('post',PostController::class);
+        Route::post('post/quick-create', [PostController::class, 'quickCreate'])->name('post.quickCreate');
         Route::post('post/upfile', [PostController::class, 'upfile'])->name('post.upfile');
         
         Route::resource('news',NewsController::class);

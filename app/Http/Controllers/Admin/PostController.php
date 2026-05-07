@@ -65,8 +65,11 @@ class PostController extends Controller
     public function index(Request $request)
     {
         $category = Category::where('sort_by', 'Product')->where('parent', '0')->orderBy('view', 'DESC')->get();
+        $projectOptions = Post::where('sort_by', 'Product')->orderBy('name', 'ASC')->get(['id', 'name']);
         $perPage = $request->get('per_page', 100); // Mặc định là 20 nếu không có lựa chọn
         $key = $request->get('key', '');
+        $categoryId = $request->get('category_id', '');
+        $statusFilter = $request->get('status_filter', 'public');
         $sort = $request->get('sort', 'desc'); // Mặc định là sắp xếp giảm dần
         
         $query = Post::query()->where('sort_by', 'Product')->orderBy('id', 'DESC');
@@ -76,6 +79,14 @@ class PostController extends Controller
         }
 
         // Thêm logic sắp xếp
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+        if ($statusFilter === 'public') {
+            $query->where('status', 'true');
+        } elseif ($statusFilter === 'hidden') {
+            $query->where('status', '!=', 'true');
+        }
         $query->orderBy('status', $sort);
 
         $posts = $query->paginate($perPage);
@@ -83,6 +94,7 @@ class PostController extends Controller
         return view('admin.post.index', compact(
             'posts',
             'category',
+            'projectOptions',
         ));
     }
 
@@ -93,6 +105,42 @@ class PostController extends Controller
         $data->id = $id_max+1;
         $data->save();
         return redirect()->back()->with('success','success');
+    }
+
+    public function quickCreate(Request $request)
+    {
+        $request->validate([
+            'project_id' => 'nullable|integer|exists:posts,id',
+            'project_name' => 'nullable|string|max:255',
+        ]);
+
+        $projectId = $request->input('project_id');
+        $projectName = trim((string) $request->input('project_name', ''));
+
+        if ($projectId) {
+            return redirect()->route('post.edit', [$projectId]);
+        }
+
+        if ($projectName === '') {
+            return redirect()->back()->with('error', 'Vui lòng chọn hoặc nhập tên dự án');
+        }
+
+        $slug = Str::slug($projectName, '-');
+        $existingPost = Post::where('sort_by', 'Product')->where('slug', $slug)->first();
+
+        if ($existingPost) {
+            return redirect()->route('post.edit', [$existingPost->id]);
+        }
+
+        $post = new Post();
+        $post->user_id = Auth::user()->id;
+        $post->status = 'true';
+        $post->sort_by = 'Product';
+        $post->name = $projectName;
+        $post->slug = $slug;
+        $post->save();
+
+        return redirect()->route('post.edit', [$post->id])->with('success', 'Đã tạo dự án mới');
     }
 
     /**
