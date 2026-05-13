@@ -12,11 +12,19 @@ use Illuminate\Http\Request;
 class GoogleController extends Controller
 {
     // Bước 1: redirect user tới Google
-    public function redirectToGoogle()
+    public function redirectToGoogle(Request $request)
     {
         // Nếu muốn request thêm quyền (scope) hoặc offline access để lấy refresh token, có thể thêm ->with() / ->scopes()
         // Ví dụ: ->with(['access_type' => 'offline', 'prompt' => 'consent'])
-        return Socialite::driver('google')->redirect();
+        $google = Socialite::driver('google');
+
+        if ($request->boolean('select_account')) {
+            $google = $google->with([
+                'prompt' => 'select_account',
+            ]);
+        }
+
+        return $google->redirect();
     }
 
     // Bước 2: Google callback trả về thông tin user

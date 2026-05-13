@@ -7,6 +7,25 @@
 
 @section('css')
 <link href="assets/css/account.css" rel="stylesheet">
+<style>
+    .google-login-note {
+        margin-top: 1rem;
+        font-size: .95rem;
+        line-height: 1.6;
+        color: #4b5563;
+        text-align: center;
+    }
+
+    .google-login-note a {
+        color: #dc2626;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    .google-login-note a:hover {
+        color: #b91c1c;
+    }
+</style>
 @endsection
 
 @section('content')
@@ -18,11 +37,6 @@
                 <div class="box-login">
                     <h1>ĐĂNG NHẬP VÀO HỆ THỐNG NỘI BỘ</h1>
 
-                    <div class="login-tabs">
-                        <button type="button" class="login-tab is-active" data-login-tab="google">Google</button>
-                        <button type="button" class="login-tab" data-login-tab="account">Tài khoản</button>
-                    </div>
-
                     <div class="login-tab-panel is-active" data-login-panel="google">
                         <a href="{{ route('google.redirect') }}" class="goole">
                             <button type="button" class="login btn btn-light btn-lg d-flex align-items-center shadow-sm border rounded-pill">
@@ -30,19 +44,11 @@
                                 <span>Đăng nhập bằng GOOGLE</span>
                             </button>
                         </a>
-                    </div>
-
-                    <div class="login-tab-panel" data-login-panel="account">
-                        <form id="validateForm" action="admin" method="post" name="registerform">
-                            @csrf
-                            <div class="form-login">
-                                <label>Địa chỉ email</label>
-                                <input class="form-control" type="email" name="email" placeholder="Nhập địa chỉ email">
-                                <label>Mật khẩu</label>
-                                <input class="form-control" type="password" name="password" placeholder="Nhập mật khẩu">
-                                <input class="form-control" type="submit" value="ĐĂNG NHẬP">
-                            </div>
-                        </form>
+                        <p class="google-login-note">
+                            Dùng mail nội bộ của công ty (@dxmb.vn) để đăng nhập vào hệ thống.
+                            Trường hợp muốn dùng mail khác hãy bấm <a href="{{ route('google.redirect', ['select_account' => 1]) }}">vào đây</a>
+                            để chọn mail khác!
+                        </p>
                     </div>
 
                     <div class="login-alert">
