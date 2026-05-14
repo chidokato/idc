@@ -126,22 +126,6 @@
             </a>
           </li>
 
-          <li class="nav-item">
-            <small class="nav-subtitle" title="Pages">Tiện ích</small>
-            <small class="tio-more-horizontal nav-subtitle-replacer"></small>
-          </li>
-          <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/opened" title="Hướng dẫn sử dụng" data-placement="left">
-              <i class="tio-mail nav-icon"></i>
-              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Hướng dẫn sử dụng</span>
-            </a>
-          </li>
-          <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/invite" title="Hướng dẫn sử dụng" data-placement="left">
-              <i class="tio-book-outlined nav-icon"></i>
-              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Tạo thư mời</span>
-            </a>
-          </li>
         </ul>
       </div>
       <!-- End Content -->

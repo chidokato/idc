@@ -654,6 +654,8 @@ class TaskController extends Controller
             // 'kpi'            => ['nullable', 'string', 'max:255'],
             // 'content'        => ['nullable', 'string'],
             'post_id' => ['nullable', 'integer', 'exists:posts,id'],
+            'channel_id' => ['nullable', 'integer', 'exists:channels,id'],
+            'department_id' => ['nullable', 'integer', 'exists:departments,id'],
         ]);
 
         $rate = (int) $request->input('rate', $task->rate);
@@ -663,9 +665,11 @@ class TaskController extends Controller
             'days'           => $data['days'] ?? $task->days,
             'rate'           => $rate,
             'post_id' => $data['post_id'] ?? $task->post_id,
+            'channel_id' => $data['channel_id'] ?? $task->channel_id,
+            'department_id' => $data['department_id'] ?? $task->department_id,
         ]);
 
-        $task->load('Post'); // để lấy name dự án
+        $task->load(['Post', 'channel', 'department']); // để lấy tên hiển thị
 
         return response()->json([
             'ok' => true,
@@ -683,6 +687,10 @@ class TaskController extends Controller
                 'paid_total' => ($task->days * $task->expected_costs) * (1 - ((float) $task->rate / 100)),
                 'post_id' => $task->post_id,
                 'post_name' => $task->Post?->name,
+                'channel_id' => $task->channel_id,
+                'channel_name' => $task->channel?->name ?? '',
+                'department_id' => $task->department_id,
+                'department_name' => $task->department?->name ?? '',
             ]
         ]);
     }

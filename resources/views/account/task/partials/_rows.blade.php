@@ -89,9 +89,9 @@
         {{ $task->handler?->yourname ?? '' }}
       </div>
     </td>
-    <td class="text-center">{{ $task->department?->name }}</td>
+    <td class="text-center js-department-name">{{ $task->department?->name }}</td>
     <td class="text-center js-post-name">{{ $task->Post?->name }}</td>
-    <td class="text-center">{{ $task->channel?->name ?? $task->channel ?? '' }}</td>
+    <td class="text-center js-channel-name">{{ $task->channel?->name ?? $task->channel ?? '' }}</td>
     <td> <div class="total-cost-cell" data-days="{{ $task->days }}">{{ $task->days }}</div></td>
     <td class="text-right money js-row-total">
         {{ number_format($rowTotal, 0, ',', '.') }}

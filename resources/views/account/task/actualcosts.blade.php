@@ -279,6 +279,7 @@
         <div class="form-group">
           <label>Dự án</label>
           <select id="duan" class="form-control select2">
+              <option value="">-- Dự án --</option>
               @foreach($posts as $p)
                 <option value="{{ $p->id }}" {{ request('post_id') == $p->id ? 'selected' : '' }}>
                     {{ $p->name }}
@@ -286,6 +287,22 @@
             @endforeach
           </select>
           <!-- <input type="text" class="form-control" id="duan" > -->
+        </div>
+
+        <div class="form-group">
+          <label>Hạng mục</label>
+          <select id="modal_channel_id" class="form-control select2">
+            <option value="">-- Hạng mục --</option>
+            {!! $channelsOptions !!}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Nhóm / sàn / công ty</label>
+          <select id="modal_department_id" class="form-control select2">
+            <option value="">-- Nhóm / sàn / công ty --</option>
+            {!! $departmentOptions !!}
+          </select>
         </div>
 
         <div class="form-group">
@@ -698,6 +715,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const rate = parseInt($('#modal_rate').val(), 10) || 0;
     const postIdRaw = $('#duan').val();
     const postId = postIdRaw ? parseInt(postIdRaw, 10) : null;
+    const channelIdRaw = $('#modal_channel_id').val();
+    const channelId = channelIdRaw ? parseInt(channelIdRaw, 10) : null;
+    const departmentIdRaw = $('#modal_department_id').val();
+    const departmentId = departmentIdRaw ? parseInt(departmentIdRaw, 10) : null;
     const activeEditBtn = document.querySelector('.btn-edit-task[data-id="' + id + '"]');
 
     if (activeEditBtn && parseInt(activeEditBtn.getAttribute('data-paid') || '0', 10) === 1) {
@@ -715,7 +736,9 @@ document.addEventListener('DOMContentLoaded', function () {
         expected_costs: expectedCosts,
         days: days,
         rate: rate,
-        post_id: postId
+        post_id: postId,
+        channel_id: channelId,
+        department_id: departmentId
       },
       success: function (res) {
         if (!res?.ok) {

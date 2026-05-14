@@ -814,6 +814,8 @@ $(document).on('click', '.btn-edit-task', function () {
     const taskId = $btn.data('id') || '';
     const postId = $btn.data('post-id') || '';
     const postName = $btn.data('post-name') || '';
+    const channelId = $btn.data('channel-id') || '';
+    const departmentId = $btn.data('department-id') || '';
     const expectedCosts = $btn.data('expected-costs') || 0;
     const days = $btn.data('days') || 0;
     const rate = $btn.data('rate') || 0;
@@ -826,6 +828,8 @@ $(document).on('click', '.btn-edit-task', function () {
     $('#modal_days').val(days);
     $('#modal_rate').val(rate);
     $('#modal_date').val(createdAt);
+    $('#modal_channel_id').val(channelId).trigger('change');
+    $('#modal_department_id').val(departmentId).trigger('change');
 
     if (postId) {
       $('#duan').val(postId).trigger('change');
