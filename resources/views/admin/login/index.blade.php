@@ -49,7 +49,32 @@
                   <h4 class="mt-1 mb-5 pb-1">Đăng nhập vào trang quản trị</h4>
                 </div>
                 @include('admin.alert')
- 
+                
+                <form action="{{ url('admin') }}" method="POST">
+                  @csrf
+                  <p>Vui lòng đăng nhập bằng tài khoản của bạn</p>
+
+                  <div class="form-outline mb-4">
+                    <input type="email" name="email" id="email" class="form-control" placeholder="Địa chỉ email" required />
+                    <label class="form-label" for="email">Tên đăng nhập</label>
+                  </div>
+
+                  <div class="form-outline mb-4">
+                    <input type="password" name="password" id="password" class="form-control" required />
+                    <label class="form-label" for="password">Mật khẩu</label>
+                  </div>
+
+                  <div class="form-check mb-4">
+                      <input class="form-check-input" type="checkbox" name="remember" id="remember" />
+                      <label class="form-check-label" for="remember"> Ghi nhớ đăng nhập </label>
+                  </div>
+
+                  <div class="text-center pt-1 mb-5 pb-1">
+                    <button class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3" type="submit">Đăng nhập</button>
+                    <!-- <a class="text-muted" href="#!">Quên mật khẩu?</a> -->
+                  </div>
+
+                </form>
 
               </div>
             </div>
