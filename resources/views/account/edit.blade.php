@@ -249,20 +249,35 @@
 
               <!-- Body -->
               <div class="card-body">
-                <p>Your current email address is <span class="font-weight-bold">{{ $user->email }}</span></p>
+                <p>Email chính của bạn là <span class="font-weight-bold">{{ $user->email }}</span></p>
 
                 <!-- Form -->
+                <form id="changeEmailForm" action="{{ route('account.update-secondary-email') }}" method="POST">
+                  @csrf
                   <!-- Form Group -->
                   <div class="row form-group">
-                    <label for="newEmailLabel" class="col-sm-3 col-form-label input-label">New email address</label>
+                    <label for="secondaryEmailInput" class="col-sm-3 col-form-label input-label">Email phụ</label>
 
                     <div class="col-sm-9">
-                      <input readonly type="text" name="email" class="form-control" value="{{ $user->email }}" placeholder="Email">
+                      <input type="email" id="secondaryEmailInput" name="secondary_email" class="form-control" value="{{ $user->secondary_email }}" placeholder="Nhập email phụ (có thể dùng để đăng nhập)">
                     </div>
                   </div>
                   <!-- End Form Group -->
 
-                  
+                  <!-- Form Group OTP (Hidden by default) -->
+                  <div class="row form-group" id="otpGroup" style="display: none;">
+                    <label for="otpInput" class="col-sm-3 col-form-label input-label">Mã OTP</label>
+
+                    <div class="col-sm-9">
+                      <input type="text" id="otpInput" name="otp" class="form-control" placeholder="Nhập mã OTP 6 số từ email">
+                    </div>
+                  </div>
+                  <!-- End Form Group -->
+
+                  <div class="d-flex justify-content-end">
+                    <button type="submit" id="btnSubmitEmail" class="btn btn-primary">Lưu Email Phụ</button>
+                  </div>
+                </form>
                 <!-- End Form -->
               </div>
               <!-- End Body -->
@@ -278,23 +293,27 @@
               <!-- Body -->
               <div class="card-body">
                 <!-- Form -->
-                <form id="changePasswordForm">
+                <form id="changePasswordForm" action="{{ route('account.change-password') }}" method="POST">
+                  @csrf
+
+                  @if(Auth::user()->password)
                   <!-- Form Group -->
                   <div class="row form-group">
-                    <label for="currentPasswordLabel" class="col-sm-3 col-form-label input-label">Current password</label>
+                    <label for="currentPasswordLabel" class="col-sm-3 col-form-label input-label">Mật khẩu hiện tại</label>
 
                     <div class="col-sm-9">
-                      <input type="password" class="form-control" name="currentPassword" id="currentPasswordLabel" placeholder="Enter current password" aria-label="Enter current password">
+                      <input type="password" class="form-control" name="currentPassword" id="currentPasswordLabel" placeholder="Nhập mật khẩu hiện tại" aria-label="Nhập mật khẩu hiện tại">
                     </div>
                   </div>
                   <!-- End Form Group -->
+                  @endif
 
                   <!-- Form Group -->
                   <div class="row form-group">
-                    <label for="newPassword" class="col-sm-3 col-form-label input-label">New password</label>
+                    <label for="newPassword" class="col-sm-3 col-form-label input-label">Mật khẩu mới</label>
 
                     <div class="col-sm-9">
-                      <input type="password" class="js-pwstrength form-control" name="newPassword" id="newPassword" placeholder="Enter new password" aria-label="Enter new password" data-hs-pwstrength-options='{
+                      <input type="password" class="js-pwstrength form-control" name="newPassword" id="newPassword" placeholder="Nhập mật khẩu mới" aria-label="Nhập mật khẩu mới" data-hs-pwstrength-options='{
                                "ui": {
                                  "container": "#changePasswordForm",
                                  "viewports": {
@@ -304,7 +323,7 @@
                                }
                              }'>
 
-                      <p id="passwordStrengthVerdict" class="form-text mb-2">
+                      <p id="passwordStrengthVerdict" class="form-text mb-2"></p>
 
                       <div id="passwordStrengthProgress"></div>
                     </div>
@@ -313,30 +332,27 @@
 
                   <!-- Form Group -->
                   <div class="row form-group">
-                    <label for="confirmNewPasswordLabel" class="col-sm-3 col-form-label input-label">Confirm new password</label>
+                    <label for="confirmNewPasswordLabel" class="col-sm-3 col-form-label input-label">Nhập lại mật khẩu mới</label>
 
                     <div class="col-sm-9">
                       <div class="mb-3">
-                        <input type="password" class="form-control" name="confirmNewPassword" id="confirmNewPasswordLabel" placeholder="Confirm your new password" aria-label="Confirm your new password">
+                        <input type="password" class="form-control" name="confirmNewPassword" id="confirmNewPasswordLabel" placeholder="Xác nhận mật khẩu mới" aria-label="Xác nhận mật khẩu mới">
                       </div>
 
-                      <h5>Password requirements:</h5>
+                      <h5>Yêu cầu mật khẩu:</h5>
 
-                      <p class="font-size-sm mb-2">Ensure that these requirements are met:</p>
+                      <p class="font-size-sm mb-2">Đảm bảo mật khẩu đáp ứng các điều kiện sau:</p>
 
                       <ul class="font-size-sm">
-                        <li>Minimum 8 characters long - the more, the better</li>
-                        <li>At least one lowercase character</li>
-                        <li>At least one uppercase character</li>
-                        <li>At least one number, symbol, or whitespace character</li>
+                        <li>Ít nhất 6 ký tự</li>
                       </ul>
                     </div>
                   </div>
                   <!-- End Form Group -->
 
-                  <!-- <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                  </div> -->
+                  <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">Đổi mật khẩu</button>
+                  </div>
                 </form>
                 <!-- End Form -->
               </div>
@@ -420,6 +436,91 @@
           }
         }).init();
       });
+    </script>
+
+    <script>
+    $('#changePasswordForm').on('submit', function(e) {
+        e.preventDefault();
+        var form = $(this);
+        var url = form.attr('action');
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: form.serialize(),
+            success: function(response) {
+                if (response.status) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Thành công',
+                        text: response.message,
+                        position: 'center',
+                        confirmButtonText: 'OK',
+                        backdrop: true
+                    });
+                    form[0].reset();
+                } else {
+                    showCenterError(response.message);
+                }
+            },
+            error: function(xhr) {
+                showCenterError('Có lỗi xảy ra. Vui lòng thử lại.');
+            }
+        });
+    });
+
+    $('#changeEmailForm').on('submit', function(e) {
+        e.preventDefault();
+        var form = $(this);
+        var url = form.attr('action');
+        var btn = $('#btnSubmitEmail');
+        var originalBtnText = btn.text();
+        btn.prop('disabled', true).text('Đang xử lý...');
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: form.serialize(),
+            success: function(response) {
+                btn.prop('disabled', false).text(originalBtnText);
+                if (response.status) {
+                    if (response.step === 'otp') {
+                        form.attr('action', '{{ route("account.verify-secondary-email-otp") }}');
+                        $('#secondaryEmailInput').attr('readonly', true);
+                        $('#otpGroup').show();
+                        $('#btnSubmitEmail').text('Xác nhận OTP');
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Nhập mã OTP',
+                            text: response.message,
+                            position: 'center',
+                            confirmButtonText: 'OK',
+                            backdrop: true
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Thành công',
+                            text: response.message,
+                            position: 'center',
+                            confirmButtonText: 'OK',
+                            backdrop: true
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        });
+                    }
+                } else {
+                    showCenterError(response.message);
+                }
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false).text(originalBtnText);
+                showCenterError('Có lỗi xảy ra. Vui lòng thử lại.');
+            }
+        });
+    });
     </script>
 
 @endsection

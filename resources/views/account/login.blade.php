@@ -25,6 +25,27 @@
     .google-login-note a:hover {
         color: #b91c1c;
     }
+
+    .login-tabs {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+        gap: 15px;
+    }
+    
+    .login-tab {
+        background: none;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s;
+        outline: none;
+    }
+
+    .login-tab:hover {
+        color: #007bff;
+    }
 </style>
 @endsection
 
@@ -37,7 +58,7 @@
                 <div class="box-login">
                     <h1>ĐĂNG NHẬP VÀO HỆ THỐNG NỘI BỘ</h1>
 
-                    <div class="login-tab-panel is-active" data-login-panel="google">
+                    <div class="">
                         <a href="{{ route('google.redirect') }}" class="goole">
                             <button type="button" class="login btn btn-light btn-lg d-flex align-items-center shadow-sm border rounded-pill">
                                 <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google Logo" class="me-2" width="24" height="24">
@@ -45,13 +66,12 @@
                             </button>
                         </a>
                         <p class="google-login-note">
-                            Dùng mail nội bộ của công ty (@dxmb.vn) để đăng nhập vào hệ thống.
-                            Trường hợp muốn dùng mail khác hãy bấm <a href="{{ route('google.redirect', ['select_account' => 1]) }}">vào đây</a>
-                            để chọn mail khác!
+                            Dùng mail khác hãy bấm <a href="{{ route('google.redirect', ['select_account' => 1]) }}">vào đây</a>
                         </p>
+                        
                     </div>
 
-                    <div class="login-alert">
+                    <div class="login-alert mt-3">
                         @include('admin.alert')
                     </div>
                 </div>
@@ -74,13 +94,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
             tabs.forEach(function (item) {
                 item.classList.toggle('is-active', item === tab);
+                if (item === tab) {
+                    item.style.fontWeight = 'bold';
+                    item.style.borderBottom = '2px solid #007bff';
+                } else {
+                    item.style.fontWeight = 'normal';
+                    item.style.borderBottom = 'none';
+                }
             });
 
             panels.forEach(function (panel) {
-                panel.classList.toggle('is-active', panel.getAttribute('data-login-panel') === target);
+                if (panel.getAttribute('data-login-panel') === target) {
+                    panel.style.display = 'block';
+                    panel.classList.add('is-active');
+                } else {
+                    panel.style.display = 'none';
+                    panel.classList.remove('is-active');
+                }
             });
         });
     });
+
+    // Initialize tabs styling
+    document.querySelector('[data-login-tab="google"]').click();
 });
 </script>
 @endsection

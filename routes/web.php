@@ -64,9 +64,7 @@ Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']
  });
 
 Route::get('admin', [LoginController::class, 'index'])->name('login');
-Route::post('admin', [LoginController::class, 'store']);
 Route::get('logout', [LoginController::class, 'logout'])->name('logout');
-Route::post('account/register', [LoginController::class, 'register'])->name('register');
 
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.redirect');
 Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback'])->name('google.callback');
@@ -191,6 +189,9 @@ Route::middleware(['user'])->group(function () {
         Route::get('opened', [AccountController::class, 'opened'])->name('account.opened');
         Route::get('edit', [AccountController::class, 'edit'])->name('account.edit');
         Route::post('update', [AccountController::class, 'update'])->name('account.update');
+        Route::post('change-password', [AccountController::class, 'changePassword'])->name('account.change-password');
+        Route::post('update-secondary-email', [AccountController::class, 'updateSecondaryEmail'])->name('account.update-secondary-email');
+        Route::post('verify-secondary-email-otp', [AccountController::class, 'verifySecondaryEmailOtp'])->name('account.verify-secondary-email-otp');
         // mkt
         Route::get('mkt-register', [AccountController::class, 'mktregister'])->name('account.mktregister');
         Route::post('mkt-tasksstore', [AccountController::class, 'storeTask'])->name('account.tasksstore');

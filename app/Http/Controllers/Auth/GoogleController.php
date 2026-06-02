@@ -41,8 +41,10 @@ class GoogleController extends Controller
         $user = User::where('google_id', $googleUser->getId())->first();
 
         if (!$user) {
-            // Nếu có account cùng email nhưng chưa link google -> link vào
-            $user = User::where('email', $googleUser->getEmail())->first();
+            // Nếu có account cùng email (hoặc email phụ) nhưng chưa link google -> link vào
+            $user = User::where('email', $googleUser->getEmail())
+                        ->orWhere('secondary_email', $googleUser->getEmail())
+                        ->first();
 
             if ($user) {
                 $user->update([

@@ -234,7 +234,110 @@ class AccountController extends HomeController
         return redirect()->back()->with('success', 'Thành công!');
     }
 
+    public function changePassword(Request $request)
+    {
+        $user = User::find(Auth::id());
+        $rules = [
+            'newPassword' => 'required|min:6',
+            'confirmNewPassword' => 'required|same:newPassword',
+        ];
 
+        if ($user->password) {
+            $rules['currentPassword'] = 'required';
+        }
+
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), $rules, [
+            'newPassword.required' => 'Vui lòng nhập mật khẩu mới.',
+            'newPassword.min' => 'Mật khẩu mới phải có ít nhất 6 ký tự.',
+            'confirmNewPassword.required' => 'Vui lòng nhập lại mật khẩu mới.',
+            'confirmNewPassword.same' => 'Mật khẩu nhập lại không khớp.',
+            'currentPassword.required' => 'Vui lòng nhập mật khẩu hiện tại.'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => false, 'message' => $validator->errors()->first()]);
+        }
+
+        if ($user->password && !\Illuminate\Support\Facades\Hash::check($request->currentPassword, $user->password)) {
+            return response()->json(['status' => false, 'message' => 'Mật khẩu hiện tại không đúng.']);
+        }
+
+        $user->password = \Illuminate\Support\Facades\Hash::make($request->newPassword);
+        $user->save();
+
+        return response()->json(['status' => true, 'message' => 'Đổi mật khẩu thành công!']);
+    }
+
+    public function updateSecondaryEmail(Request $request)
+    {
+        $user = User::find(Auth::id());
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'secondary_email' => 'nullable|email|unique:users,secondary_email,' . $user->id,
+        ], [
+            'secondary_email.email' => 'Định dạng email không hợp lệ.',
+            'secondary_email.unique' => 'Email phụ này đã được sử dụng bởi một tài khoản khác.'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => false, 'message' => $validator->errors()->first()]);
+        }
+
+        if ($request->filled('secondary_email')) {
+            if ($request->secondary_email === $user->email) {
+                return response()->json(['status' => false, 'message' => 'Email phụ không được trùng với email chính.']);
+            }
+
+            $existsInPrimary = User::where('email', $request->secondary_email)->exists();
+            if ($existsInPrimary) {
+                return response()->json(['status' => false, 'message' => 'Email này đã tồn tại trong hệ thống.']);
+            }
+
+            // Generate OTP
+            $otp = rand(100000, 999999);
+            Session::put('secondary_email_otp', $otp);
+            Session::put('secondary_email_pending', $request->secondary_email);
+
+            // Send Email
+            \Illuminate\Support\Facades\Mail::raw("Mã OTP xác nhận email phụ của bạn là: $otp", function($message) use ($request) {
+                $message->to($request->secondary_email)->subject('Mã OTP xác nhận Email Phụ');
+            });
+
+            return response()->json([
+                'status' => true, 
+                'step' => 'otp', 
+                'message' => 'Vui lòng kiểm tra email để lấy mã OTP.'
+            ]);
+        }
+
+        // If user is clearing the secondary email (empty string)
+        $user->secondary_email = null;
+        $user->save();
+
+        return response()->json(['status' => true, 'message' => 'Đã xóa email phụ thành công!']);
+    }
+
+    public function verifySecondaryEmailOtp(Request $request)
+    {
+        $user = User::find(Auth::id());
+        $otp = $request->input('otp');
+
+        if (!$otp || Session::get('secondary_email_otp') != $otp) {
+            return response()->json(['status' => false, 'message' => 'Mã OTP không đúng.']);
+        }
+
+        $pendingEmail = Session::get('secondary_email_pending');
+        if (!$pendingEmail) {
+            return response()->json(['status' => false, 'message' => 'Yêu cầu đã hết hạn, vui lòng thử lại.']);
+        }
+
+        $user->secondary_email = $pendingEmail;
+        $user->save();
+
+        Session::forget('secondary_email_otp');
+        Session::forget('secondary_email_pending');
+
+        return response()->json(['status' => true, 'message' => 'Xác nhận và lưu email phụ thành công!']);
+    }
 
     public function mktregister()
     {
