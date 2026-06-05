@@ -5,8 +5,8 @@
   .user-status-switch {
     position: relative;
     display: inline-block;
-    width: 46px;
-    height: 24px;
+    width: 38px;
+    height: 20px;
     margin-bottom: 0;
   }
 
@@ -28,8 +28,8 @@
   .user-status-switch__slider:before {
     position: absolute;
     content: "";
-    height: 18px;
-    width: 18px;
+    height: 14px;
+    width: 14px;
     left: 3px;
     top: 3px;
     background-color: #fff;
@@ -43,14 +43,7 @@
   }
 
   .user-status-switch input:checked + .user-status-switch__slider:before {
-    transform: translateX(22px);
-  }
-
-  .user-status-label {
-    font-size: 12px;
-    margin-top: 4px;
-    color: #6c7a92;
-    white-space: nowrap;
+    transform: translateX(18px);
   }
 
   @media (min-width: 992px) {
@@ -179,7 +172,7 @@
             </td>
             <td>
               @if($type === 'member')
-                <div class="d-inline-flex flex-column align-items-start">
+                <div class="d-inline-flex align-items-center">
                   <label class="user-status-switch">
                     <input
                       type="checkbox"
@@ -189,9 +182,6 @@
                     >
                     <span class="user-status-switch__slider"></span>
                   </label>
-                  <span class="user-status-label">
-                    {{ $item->status === 'active' ? 'Đang hoạt động' : 'Ngừng hoạt động' }}
-                  </span>
                 </div>
               @else
                 <span class="badge badge-soft-{{ $item->status === 'active' ? 'success' : 'secondary' }}">
@@ -243,8 +233,6 @@ document.addEventListener('change', function (event) {
   }
 
   const nextStatus = toggle.checked ? 'active' : 'inactive';
-  const label = toggle.closest('.d-inline-flex')?.querySelector('.user-status-label');
-
   fetch(toggle.dataset.url, {
     method: 'POST',
     headers: {
@@ -259,10 +247,6 @@ document.addEventListener('change', function (event) {
 
       if (!response.ok || !data.status) {
         throw new Error(data.message || 'Không thể cập nhật trạng thái');
-      }
-
-      if (label) {
-        label.textContent = data.user_status === 'active' ? 'Đang hoạt động' : 'Ngừng hoạt động';
       }
 
       if (typeof showToast === 'function') {
