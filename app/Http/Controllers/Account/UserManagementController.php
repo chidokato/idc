@@ -150,6 +150,31 @@ class UserManagementController extends Controller
         return redirect($targetRoute)->with('success', 'Xóa người dùng thành công');
     }
 
+    public function toggleStatus(User $user, Request $request)
+    {
+        $this->authorizeAccess();
+
+        if ((int) $user->permission !== 6) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Chỉ được đổi trạng thái của member.',
+            ], 422);
+        }
+
+        $validated = $request->validate([
+            'status' => 'required|in:active,inactive',
+        ]);
+
+        $user->status = $validated['status'];
+        $user->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Cập nhật trạng thái thành công',
+            'user_status' => $user->status,
+        ]);
+    }
+
     private function authorizeAccess(): void
     {
         abort_unless(Auth::check() && (int) Auth::user()->rank === 1, 403);

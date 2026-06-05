@@ -2,6 +2,57 @@
 
 @section('css')
 <style>
+  .user-status-switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 24px;
+    margin-bottom: 0;
+  }
+
+  .user-status-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .user-status-switch__slider {
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+    background-color: #d9e2ef;
+    transition: .2s ease;
+    border-radius: 999px;
+  }
+
+  .user-status-switch__slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    top: 3px;
+    background-color: #fff;
+    transition: .2s ease;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(18, 38, 63, .18);
+  }
+
+  .user-status-switch input:checked + .user-status-switch__slider {
+    background-color: #00c9a7;
+  }
+
+  .user-status-switch input:checked + .user-status-switch__slider:before {
+    transform: translateX(22px);
+  }
+
+  .user-status-label {
+    font-size: 12px;
+    margin-top: 4px;
+    color: #6c7a92;
+    white-space: nowrap;
+  }
+
   @media (min-width: 992px) {
     .user-filter-row {
       display: grid;
@@ -127,9 +178,26 @@
               @endif
             </td>
             <td>
-              <span class="badge badge-soft-{{ $item->status === 'active' ? 'success' : 'secondary' }}">
-                {{ $item->status === 'active' ? 'Đang hoạt động' : 'Ngừng hoạt động' }}
-              </span>
+              @if($type === 'member')
+                <div class="d-inline-flex flex-column align-items-start">
+                  <label class="user-status-switch">
+                    <input
+                      type="checkbox"
+                      class="js-user-status-toggle"
+                      data-url="{{ route('account.users.toggleStatus', $item) }}"
+                      {{ $item->status === 'active' ? 'checked' : '' }}
+                    >
+                    <span class="user-status-switch__slider"></span>
+                  </label>
+                  <span class="user-status-label">
+                    {{ $item->status === 'active' ? 'Đang hoạt động' : 'Ngừng hoạt động' }}
+                  </span>
+                </div>
+              @else
+                <span class="badge badge-soft-{{ $item->status === 'active' ? 'success' : 'secondary' }}">
+                  {{ $item->status === 'active' ? 'Đang hoạt động' : 'Ngừng hoạt động' }}
+                </span>
+              @endif
             </td>
             <td>{{ $item->created_at }}</td>
             <td class="text-right">
@@ -162,4 +230,55 @@
     </div>
   </div>
 </div>
+@endsection
+
+@section('js')
+@if($type === 'member')
+<script>
+document.addEventListener('change', function (event) {
+  const toggle = event.target.closest('.js-user-status-toggle');
+
+  if (!toggle) {
+    return;
+  }
+
+  const nextStatus = toggle.checked ? 'active' : 'inactive';
+  const label = toggle.closest('.d-inline-flex')?.querySelector('.user-status-label');
+
+  fetch(toggle.dataset.url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({ status: nextStatus })
+  })
+    .then(async (response) => {
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || !data.status) {
+        throw new Error(data.message || 'Không thể cập nhật trạng thái');
+      }
+
+      if (label) {
+        label.textContent = data.user_status === 'active' ? 'Đang hoạt động' : 'Ngừng hoạt động';
+      }
+
+      if (typeof showToast === 'function') {
+        showToast('success', data.message || 'Cập nhật trạng thái thành công');
+      }
+    })
+    .catch((error) => {
+      toggle.checked = !toggle.checked;
+
+      if (typeof showToast === 'function') {
+        showToast('error', error.message || 'Có lỗi xảy ra khi cập nhật');
+      } else {
+        alert(error.message || 'Có lỗi xảy ra khi cập nhật');
+      }
+    });
+});
+</script>
+@endif
 @endsection
