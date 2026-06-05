@@ -49,6 +49,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\Account\ExpenseController;
 use App\Http\Controllers\Account\TaskCostPeriodController;
 use App\Http\Controllers\Account\BulkMailController;
+use App\Http\Controllers\Account\UserManagementController;
 
 // Route::get('/test-mail', function () {
 //     Mail::raw('Hello test', function ($m) {
@@ -266,6 +267,15 @@ Route::middleware(['user'])->group(function () {
         // BulkMailController
         Route::get('bulk-mail', [BulkMailController::class, 'create'])->name('admin.bulk_mail.create');
         Route::post('bulk-mail/send', [BulkMailController::class, 'send'])->name('admin.bulk_mail.send');
+
+        // User management in account UI
+        Route::get('users', [UserManagementController::class, 'index'])->name('account.users.index');
+        Route::get('users/members', [UserManagementController::class, 'members'])->name('account.users.members');
+        Route::get('users/create', [UserManagementController::class, 'create'])->name('account.users.create');
+        Route::post('users', [UserManagementController::class, 'store'])->name('account.users.store');
+        Route::get('users/{user}/edit', [UserManagementController::class, 'edit'])->name('account.users.edit');
+        Route::put('users/{user}', [UserManagementController::class, 'update'])->name('account.users.update');
+        Route::delete('users/{user}', [UserManagementController::class, 'destroy'])->name('account.users.destroy');
 
         // thư mời
         Route::get('invite', [InviteController::class, 'create'])->name('invite.create');

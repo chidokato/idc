@@ -1,0 +1,253 @@
+<?php
+
+namespace App\Http\Controllers\Account;
+
+use App\Helpers\TreeHelper;
+use App\Helpers\TreeHelper_disabled;
+use App\Http\Controllers\Controller;
+use App\Models\Department;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+
+class UserManagementController extends Controller
+{
+    public function index(Request $request)
+    {
+        $this->authorizeAccess();
+
+        $departments = Department::orderBy('name')->get();
+        $departmentOptions = TreeHelper::buildOptions($departments, 0, '', $request->department_id);
+
+        $users = $this->applyUserFilters(
+            User::query()->where('permission', '<', 6),
+            $request
+        )
+            ->with(['department', 'departmentlv1', 'departmentlv2'])
+            ->orderByDesc('id')
+            ->get();
+
+        return view('account.users.index', [
+            'pageTitle' => 'Quản lý người dùng',
+            'users' => $users,
+            'departmentOptions' => $departmentOptions,
+            'type' => 'admin',
+        ]);
+    }
+
+    public function members(Request $request)
+    {
+        $this->authorizeAccess();
+
+        $departments = Department::orderBy('name')->get();
+        $departmentOptions = TreeHelper::buildOptions($departments, 0, '', $request->department_id);
+
+        $users = $this->applyUserFilters(
+            User::query()->where('permission', 6),
+            $request
+        )
+            ->with(['department', 'departmentlv1', 'departmentlv2'])
+            ->orderByDesc('id')
+            ->get();
+
+        return view('account.users.index', [
+            'pageTitle' => 'Quản lý thành viên',
+            'users' => $users,
+            'departmentOptions' => $departmentOptions,
+            'type' => 'member',
+        ]);
+    }
+
+    public function create(Request $request)
+    {
+        $this->authorizeAccess();
+
+        $departments = Department::with('children')->get();
+        $departmentOptions = TreeHelper_disabled::buildDepartmentOptions($departments, 0, '');
+
+        return view('account.users.form', [
+            'pageTitle' => 'Thêm người dùng',
+            'userData' => new User(),
+            'departmentOptions' => $departmentOptions,
+            'formAction' => route('account.users.store'),
+            'formMethod' => 'POST',
+            'backRoute' => $request->query('type') === 'member'
+                ? route('account.users.members')
+                : route('account.users.index'),
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $this->authorizeAccess();
+
+        $validated = $this->validateUser($request);
+        $department = Department::with('parentDepartment.parentDepartment')->findOrFail($validated['department_id']);
+
+        $user = new User();
+        $this->fillUser($user, $validated, $department, true);
+        $user->save();
+
+        return redirect($validated['permission'] == 6 ? route('account.users.members') : route('account.users.index'))
+            ->with('success', 'Thêm người dùng thành công');
+    }
+
+    public function edit(User $user)
+    {
+        $this->authorizeAccess();
+
+        $departments = Department::with('children')->get();
+        $departmentOptions = TreeHelper_disabled::buildDepartmentOptions(
+            $departments,
+            0,
+            '',
+            $user->department_id
+        );
+
+        return view('account.users.form', [
+            'pageTitle' => 'Cập nhật người dùng',
+            'userData' => $user,
+            'departmentOptions' => $departmentOptions,
+            'formAction' => route('account.users.update', $user),
+            'formMethod' => 'PUT',
+            'backRoute' => (int) $user->permission === 6
+                ? route('account.users.members')
+                : route('account.users.index'),
+        ]);
+    }
+
+    public function update(Request $request, User $user)
+    {
+        $this->authorizeAccess();
+
+        $validated = $this->validateUser($request, $user);
+        $department = Department::with('parentDepartment.parentDepartment')->findOrFail($validated['department_id']);
+
+        $this->fillUser($user, $validated, $department, false);
+        $user->save();
+
+        return redirect()->back()->with('success', 'Cập nhật người dùng thành công');
+    }
+
+    public function destroy(User $user)
+    {
+        $this->authorizeAccess();
+
+        if ((int) Auth::id() === (int) $user->id) {
+            return redirect()->back()->with('error', 'Không thể xóa tài khoản đang đăng nhập');
+        }
+
+        $targetRoute = (int) $user->permission === 6
+            ? route('account.users.members')
+            : route('account.users.index');
+
+        $user->delete();
+
+        return redirect($targetRoute)->with('success', 'Xóa người dùng thành công');
+    }
+
+    private function authorizeAccess(): void
+    {
+        abort_unless(Auth::check() && (int) Auth::user()->rank === 1, 403);
+    }
+
+    private function applyUserFilters($query, Request $request)
+    {
+        if ($request->filled('key')) {
+            $key = trim($request->key);
+            $query->where(function ($q) use ($key) {
+                $q->where('yourname', 'like', "%{$key}%")
+                    ->orWhere('email', 'like', "%{$key}%")
+                    ->orWhere('secondary_email', 'like', "%{$key}%")
+                    ->orWhere('employee_code', 'like', "%{$key}%")
+                    ->orWhere('phone', 'like', "%{$key}%");
+            });
+        }
+
+        if ($request->filled('department_id')) {
+            $departmentId = $request->department_id;
+            $query->where(function ($q) use ($departmentId) {
+                $q->where('department_lv1', $departmentId)
+                    ->orWhere('department_lv2', $departmentId)
+                    ->orWhere('department_id', $departmentId);
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        return $query;
+    }
+
+    private function validateUser(Request $request, ?User $user = null): array
+    {
+        $userId = $user?->id;
+
+        return $request->validate(
+            [
+                'employee_code' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('users', 'employee_code')->ignore($userId),
+                ],
+                'yourname' => 'required|string|max:255',
+                'email' => [
+                    'required',
+                    'email',
+                    Rule::unique('users', 'email')->ignore($userId),
+                ],
+                'secondary_email' => [
+                    'nullable',
+                    'email',
+                    Rule::unique('users', 'secondary_email')->ignore($userId),
+                ],
+                'permission' => 'required|integer|in:1,2,3,6',
+                'rank' => 'nullable|integer|in:1,2,3',
+                'status' => 'required|in:active,inactive',
+                'department_id' => 'required|exists:departments,id',
+                'phone' => 'nullable|string|max:20',
+                'address' => 'nullable|string|max:255',
+                'facebook' => 'nullable|string|max:255',
+                'password' => $user ? 'nullable|min:6' : 'required|min:6',
+                'passwordagain' => $user ? 'nullable|same:password' : 'required|same:password',
+            ],
+            [
+                'employee_code.unique' => 'Mã nhân viên đã tồn tại',
+                'email.unique' => 'Email đã tồn tại',
+                'secondary_email.unique' => 'Email phụ đã tồn tại',
+                'passwordagain.same' => 'Mật khẩu nhập lại không khớp',
+            ]
+        );
+    }
+
+    private function fillUser(User $user, array $validated, Department $department, bool $isCreate): void
+    {
+        if (!empty($validated['secondary_email']) && $validated['secondary_email'] === $validated['email']) {
+            throw ValidationException::withMessages([
+                'secondary_email' => 'Email phụ không được trùng với email chính',
+            ]);
+        }
+
+        $user->employee_code = $validated['employee_code'];
+        $user->yourname = $validated['yourname'];
+        $user->email = $validated['email'];
+        $user->secondary_email = !empty($validated['secondary_email']) ? $validated['secondary_email'] : null;
+        $user->permission = $validated['permission'];
+        $user->rank = $validated['rank'] ?? null;
+        $user->status = $validated['status'];
+        $user->phone = $validated['phone'] ?? null;
+        $user->address = $validated['address'] ?? null;
+        $user->facebook = $validated['facebook'] ?? null;
+        $user->department_id = $department->id;
+        $user->department_lv2 = $department->parentDepartment?->id;
+        $user->department_lv1 = $department->parentDepartment?->parentDepartment?->id;
+
+        if ($isCreate || !empty($validated['password'])) {
+            $user->password = bcrypt($validated['password']);
+        }
+    }
+}

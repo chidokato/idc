@@ -76,6 +76,12 @@
             </a>
           </li>
           <li class="nav-item ">
+            <a class="js-nav-tooltip-link nav-link " href="{{ route('account.users.index') }}" title="Quản lý người dùng" data-placement="left">
+              <i class="tio-user-big nav-icon"></i>
+              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Người dùng</span>
+            </a>
+          </li>
+          <li class="nav-item ">
             <a class="js-nav-tooltip-link nav-link " href="account/wallets" title="Quản lý ví tiền" data-placement="left">
               <i class="tio-email-outlined nav-icon"></i>
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Quản lý ví tiền</span>
