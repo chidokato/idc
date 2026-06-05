@@ -27,7 +27,8 @@ class UserManagementController extends Controller
         )
             ->with(['department', 'departmentlv1', 'departmentlv2'])
             ->orderByDesc('id')
-            ->get();
+            ->paginate(30)
+            ->withQueryString();
 
         return view('account.users.index', [
             'pageTitle' => 'Quản lý người dùng',
@@ -50,7 +51,8 @@ class UserManagementController extends Controller
         )
             ->with(['department', 'departmentlv1', 'departmentlv2'])
             ->orderByDesc('id')
-            ->get();
+            ->paginate(30)
+            ->withQueryString();
 
         return view('account.users.index', [
             'pageTitle' => 'Quản lý thành viên',

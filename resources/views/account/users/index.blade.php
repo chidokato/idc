@@ -1,5 +1,33 @@
 @extends('account.layout.index')
 
+@section('css')
+<style>
+  @media (min-width: 992px) {
+    .user-filter-row {
+      display: grid;
+      grid-template-columns: minmax(280px, 2.2fr) minmax(220px, 1.4fr) minmax(190px, 1.2fr) auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .user-filter-row > div {
+      max-width: none;
+      width: 100%;
+      padding-right: 0;
+      padding-left: 0;
+    }
+
+    .user-filter-row .user-filter-actions .d-flex {
+      flex-wrap: nowrap !important;
+    }
+
+    .user-filter-row .mb-2 {
+      margin-bottom: 0 !important;
+    }
+  }
+</style>
+@endsection
+
 @section('content')
 <div class="content container-fluid">
   <div class="page-header">
@@ -31,26 +59,28 @@
   <div class="card mb-3">
     <div class="card-header">
       <form method="GET" action="{{ $type === 'member' ? route('account.users.members') : route('account.users.index') }}">
-        <div class="row">
-          <div class="col-md-4 mb-2">
+        <div class="row align-items-end user-filter-row">
+          <div class="col-12 col-md-6 mb-2 user-filter-key">
             <input type="text" name="key" value="{{ request('key') }}" class="form-control" placeholder="Mã NV / tên / email / email phụ / số điện thoại">
           </div>
-          <div class="col-md-3 mb-2">
+          <div class="col-12 col-md-6 mb-2 user-filter-department">
             <select class="form-control" name="department_id">
               <option value="">Tất cả phòng ban</option>
               {!! $departmentOptions !!}
             </select>
           </div>
-          <div class="col-md-2 mb-2">
+          <div class="col-12 col-md-4 mb-2 user-filter-status">
             <select class="form-control" name="status">
               <option value="">Tất cả trạng thái</option>
               <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Đang hoạt động</option>
               <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Ngừng hoạt động</option>
             </select>
           </div>
-          <div class="col-md-3 mb-2">
-            <button type="submit" class="btn btn-primary">Tìm kiếm</button>
-            <a href="{{ $type === 'member' ? route('account.users.members') : route('account.users.index') }}" class="btn btn-white">Reset</a>
+          <div class="col-12 col-md-8 mb-2 user-filter-actions">
+            <div class="d-flex flex-wrap">
+              <button type="submit" class="btn btn-primary mr-2 mb-2">Tìm kiếm</button>
+              <a href="{{ $type === 'member' ? route('account.users.members') : route('account.users.index') }}" class="btn btn-white mb-2">Reset</a>
+            </div>
           </div>
         </div>
       </form>
@@ -118,6 +148,17 @@
           @endforelse
         </tbody>
       </table>
+    </div>
+
+    <div class="card-footer">
+      <div class="row align-items-center">
+        <div class="col-sm mb-2 mb-sm-0 text-muted">
+          Hiển thị {{ $users->firstItem() ?? 0 }} - {{ $users->lastItem() ?? 0 }} / {{ $users->total() }} bản ghi
+        </div>
+        <div class="col-sm-auto">
+          {{ $users->links() }}
+        </div>
+      </div>
     </div>
   </div>
 </div>
