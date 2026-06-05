@@ -66,6 +66,65 @@
 @include('account.layout.footer')
 </main>
 
+@if(auth()->check() && (int) auth()->user()->rank === 1)
+<button
+  type="button"
+  class="account-builder-trigger"
+  id="accountBuilderTrigger"
+  aria-controls="accountBuilderSidebar"
+  aria-expanded="false"
+>
+  <i class="tio-settings mr-2"></i>
+  <span>Cấu hình hệ thống</span>
+</button>
+
+<div class="account-builder-backdrop" id="accountBuilderBackdrop"></div>
+
+<aside class="account-builder-sidebar" id="accountBuilderSidebar" aria-hidden="true">
+  <div class="account-builder-sidebar__header">
+    <div>
+      <div class="account-builder-sidebar__eyebrow">Sidebar</div>
+      <h4 class="account-builder-sidebar__title">Cấu hình hệ thống</h4>
+    </div>
+    <button type="button" class="account-builder-sidebar__close" id="accountBuilderClose" aria-label="Đóng">
+      <i class="tio-clear"></i>
+    </button>
+  </div>
+  <div class="account-builder-sidebar__body">
+    <div class="list-group list-group-flush">
+      <a href="{{ route('account.users.index') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+        <span>
+          <i class="tio-user-big mr-2"></i>
+          Người dùng
+        </span>
+        <i class="tio-chevron-right"></i>
+      </a>
+      <a href="{{ route('admin.bulk_mail.create') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+        <span>
+          <i class="tio-email-outlined mr-2"></i>
+          Gửi mail
+        </span>
+        <i class="tio-chevron-right"></i>
+      </a>
+      <a href="{{ route('account.wallets') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+        <span>
+          <i class="tio-wallet-outlined mr-2"></i>
+          Quản lý ví tiền
+        </span>
+        <i class="tio-chevron-right"></i>
+      </a>
+      <a href="{{ route('task_cost_period.index') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+        <span>
+          <i class="tio-chart-bar-1 mr-2"></i>
+          Thống kê
+        </span>
+        <i class="tio-chevron-right"></i>
+      </a>
+    </div>
+  </div>
+</aside>
+@endif
+
 @include('account.layout.popup')
 
 <!-- JS Implementing Plugins -->

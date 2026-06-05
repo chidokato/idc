@@ -75,30 +75,6 @@
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Duyệt rút tiền</span>
             </a>
           </li>
-          <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="{{ route('account.users.index') }}" title="Quản lý người dùng" data-placement="left">
-              <i class="tio-user-big nav-icon"></i>
-              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Người dùng</span>
-            </a>
-          </li>
-          <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/wallets" title="Quản lý ví tiền" data-placement="left">
-              <i class="tio-email-outlined nav-icon"></i>
-              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Quản lý ví tiền</span>
-            </a>
-          </li>
-          <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/bulk-mail" title="Gửi mail" data-placement="left">
-              <i class="tio-email-outlined nav-icon"></i>
-              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Gửi mail</span>
-            </a>
-          </li>
-          <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/statistical" title="Quản lý Marketing" data-placement="left">
-               <i class="tio-chart-bar-1 nav-icon"></i>
-              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Thống kê</span>
-            </a>
-          </li>
           @endif
 
           <li class="nav-item">
@@ -118,20 +94,6 @@
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Nạp tiền</span>
             </a>
           </li>
-          <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link js-withdraw-guard" href="{{ route('wallet.withdraw.form') }}" title="Rút tiền" data-placement="left">
-              <i class="tio-money-vs nav-icon"></i>
-              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Rút tiền</span>
-            </a>
-          </li>
-
-          <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/wallet/transfer" title="Chuyển tiền" data-placement="left">
-              <i class="tio-swap-horizontal nav-icon"></i>
-              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Chuyển tiền</span>
-            </a>
-          </li>
-
         </ul>
       </div>
       <!-- End Content -->

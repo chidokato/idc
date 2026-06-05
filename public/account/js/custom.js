@@ -260,3 +260,38 @@ $(document).on('ready', function () {
           var clipboard = $.HSCore.components.HSClipboard.init(this);
         });
       });
+
+document.addEventListener('DOMContentLoaded', function () {
+  var trigger = document.getElementById('accountBuilderTrigger');
+  var sidebar = document.getElementById('accountBuilderSidebar');
+  var backdrop = document.getElementById('accountBuilderBackdrop');
+  var closeButton = document.getElementById('accountBuilderClose');
+
+  if (!trigger || !sidebar || !backdrop || !closeButton) {
+    return;
+  }
+
+  var setOpenState = function (isOpen) {
+    document.body.classList.toggle('account-builder-open', isOpen);
+    trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    sidebar.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+  };
+
+  trigger.addEventListener('click', function () {
+    setOpenState(true);
+  });
+
+  closeButton.addEventListener('click', function () {
+    setOpenState(false);
+  });
+
+  backdrop.addEventListener('click', function () {
+    setOpenState(false);
+  });
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') {
+      setOpenState(false);
+    }
+  });
+});
