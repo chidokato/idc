@@ -3,30 +3,73 @@
 @section('title') Công Ty Cổ Phần Bất Động Sản Indochine @endsection
 
 @section('css')
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap4.min.css" rel="stylesheet" />
 <style>
-  .select2-selection--multiple{ height:41px }
-  .select2-search__field{ height:30px }
-  .s2-user{ display:flex; gap:10px; }
-  .s2-user__name{
+  .ts-wrapper.multi .ts-control {
+    min-height: 40px;
+    padding: 6px 10px 2px;
+    border-radius: .3125rem;
+    border-color: #e7eaf3;
+    box-shadow: none;
+  }
+
+  .ts-wrapper.single .ts-control {
+    min-height: 40px;
+    padding: 8px 36px 8px 12px;
+    border-radius: .3125rem;
+    border-color: #e7eaf3;
+    box-shadow: none;
+  }
+
+  .ts-wrapper.focus .ts-control {
+    border-color: #377dff;
+    box-shadow: 0 0 0 .2rem rgba(55, 125, 255, .15);
+  }
+
+  .ts-dropdown {
+    border-color: #e7eaf3;
+    border-radius: .5rem;
+    box-shadow: 0 10px 30px rgba(18, 38, 63, .12);
+    overflow: hidden;
+  }
+
+  .ts-dropdown .option,
+  .ts-dropdown .create {
+    padding: 10px 12px;
+  }
+
+  .ts-wrapper.multi .ts-control > div {
+    background: #eef4ff;
+    color: #243b64;
+    border: 1px solid #d9e7ff;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 13px;
+  }
+
+  .ts-wrapper.plugin-remove_button .item .remove {
+    border-left: 1px solid rgba(36, 59, 100, .1);
+    color: #6c7a92;
+    padding-left: 8px;
+    margin-left: 8px;
+  }
+
+  .ts-user-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .ts-user-option__name {
     font-weight: 600;
-    line-height: 1.1;
+    color: #243b64;
   }
-  .s2-user__pos{
+
+  .ts-user-option__department {
     font-size: 12px;
-    opacity: .7;
-    margin-top: 2px;
-    line-height: 1.1;
-  }
-
-  .select2-container--default .select2-selection--multiple {
-      min-height: 38px;
-      border: 1px solid #ced4da;
-      border-radius: 4px;
-  }
-
-  .select2-results__option {
-      padding: 8px 12px;
+    color: #8c98a4;
+    white-space: nowrap;
   }
 </style>
 @endsection
@@ -432,10 +475,17 @@
 
 
 @section('js')
-<script src="admin_asset/select2/js/select2.min.js"></script>
-<script src="admin_asset/select2/js/select2-searchInputPlaceholder.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="account/js/account.js?v={{ filemtime(public_path('account/js/account.js')) }}"></script>
+
+<script>
+if (window.jQuery && !jQuery.fn.select2) {
+    jQuery.fn.select2 = function () {
+        return this;
+    };
+}
+</script>
 
 <script>
 $(document).ready(function () {
@@ -465,6 +515,52 @@ $(document).ready(function () {
         }
     });
 
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const initTomSelect = function (selector, options = {}) {
+        document.querySelectorAll(selector).forEach(function (element) {
+            if (element.tomselect) {
+                return;
+            }
+
+            new TomSelect(element, options);
+        });
+    };
+
+    initTomSelect('.yourname2', {
+        plugins: ['remove_button'],
+        create: false,
+        hidePlaceholder: true,
+        closeAfterSelect: false,
+        placeholder: 'Tim theo ten',
+        render: {
+            option: function (data, escape) {
+                const department = data.department || '';
+
+                return `
+                    <div class="ts-user-option">
+                        <span class="ts-user-option__name">${escape(data.text)}</span>
+                        <span class="ts-user-option__department">${escape(department)}</span>
+                    </div>
+                `;
+            }
+        }
+    });
+
+    initTomSelect('select.select2', {
+        create: false,
+        allowEmptyOption: true,
+        hidePlaceholder: false
+    });
+
+    initTomSelect('#filterForm select[name="report_id"]', {
+        create: false,
+        allowEmptyOption: true,
+        hidePlaceholder: false
+    });
 });
 </script>
 
