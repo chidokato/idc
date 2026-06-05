@@ -70,6 +70,8 @@ Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.redirect');
 Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback'])->name('google.callback');
+Route::get('auth/google/complete-profile', [GoogleController::class, 'showCompleteProfileForm'])->name('google.complete.form');
+Route::post('auth/google/complete-profile', [GoogleController::class, 'completeProfile'])->name('google.complete.store');
 
 Route::post('/upload', [UploadController::class, 'upload'])->name('upload');
 

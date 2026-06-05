@@ -78,11 +78,11 @@ class LoginController extends Controller
         return view('account.register', compact('departmentTree'));
     }
 
-    private function buildDepartmentTree($departments, $parentId = null, $prefix = '')
+    private function buildDepartmentTree($departments, $parentId = 0, $prefix = '')
     {
         $tree = [];
         foreach ($departments as $department) {
-            if ($department->parent == $parentId) {
+            if ((int) ($department->parent ?? 0) === (int) $parentId) {
                 $department->name_with_prefix = $prefix . $department->name;
                 $tree[] = $department;
                 $tree = array_merge($tree, $this->buildDepartmentTree($departments, $department->id, $prefix . '-- '));
