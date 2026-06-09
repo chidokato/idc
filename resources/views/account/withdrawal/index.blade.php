@@ -2,6 +2,91 @@
 
 @section('title') Công Ty Cổ Phần Bất Động Sản Indochine @endsection
 
+@section('css')
+<style>
+    .withdrawals-table td {
+        vertical-align: top;
+    }
+
+    .withdrawal-summary-row td {
+        background: #f8fbff;
+        font-weight: 600;
+    }
+
+    .withdrawal-summary-amount {
+        color: #377dff;
+    }
+
+    .withdrawal-bank-info {
+        min-width: 230px;
+        line-height: 1.55;
+    }
+
+    .withdrawal-action-cell {
+        min-width: 420px;
+    }
+
+    .withdrawal-action-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .withdrawal-approve-form,
+    .withdrawal-reject-form {
+        margin: 0;
+    }
+
+    .withdrawal-approve-form {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .withdrawal-file-input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        height: 0;
+    }
+
+    .withdrawal-file-trigger,
+    .withdrawal-action-row .btn {
+        border-radius: 10px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .withdrawal-file-name {
+        font-size: .75rem;
+        color: #677788;
+    }
+
+    .withdrawal-action-status {
+        display: inline-flex;
+        align-items: center;
+        min-height: 38px;
+    }
+
+    .proof-button {
+        white-space: nowrap;
+    }
+
+    @media (max-width: 991.98px) {
+        .withdrawal-bank-info {
+            min-width: 260px;
+        }
+
+        .withdrawal-action-cell {
+            min-width: 320px;
+        }
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="content container-fluid">
     <div class="page-header">
@@ -44,7 +129,7 @@
                 </form>
 
                 <div class="table-responsive">
-                    <table class="table table-lg table-thead-bordered table-nowrap table-align-middle card-table">
+                    <table class="table table-lg table-thead-bordered table-nowrap table-align-middle card-table withdrawals-table">
                         <thead class="thead-light">
                             <tr>
                                 <th>Mã NV</th>
@@ -59,11 +144,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
+                            <tr class="withdrawal-summary-row">
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                                <td>{{ number_format($sumAmount) }}</td>
+                                <td class="withdrawal-summary-amount">{{ number_format($sumAmount) }}</td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
@@ -76,7 +161,7 @@
                                     <td>{{ $item->user->yourname }}</td>
                                     <td>{{ $item->user->department?->name }}</td>
                                     <td>{{ number_format($item->amount) }}</td>
-                                    <td>
+                                    <td class="withdrawal-bank-info">
                                         <div><strong>{{ $item->bank_name }}</strong></div>
                                         <div>{{ $item->bank_account_name }}</div>
                                         <div class="small text-muted">{{ $item->bank_account_number }}</div>
@@ -96,7 +181,7 @@
                                     <td>
                                         @if($item->transfer_proof)
                                             <button type="button"
-                                                class="btn btn-sm btn-outline-primary btn-proof-modal"
+                                                class="btn btn-sm btn-outline-primary btn-proof-modal proof-button"
                                                 data-src="{{ asset('uploads/' . $item->transfer_proof) }}">
                                                 Xem UNC
                                             </button>
@@ -105,28 +190,34 @@
                                         @endif
                                     </td>
                                     <td>{{ $item->created_at->format('d/m/Y H:i') }}</td>
-                                    <td>
+                                    <td class="withdrawal-action-cell">
                                         @if($item->status === 'pending')
-                                            <form method="POST" action="{{ route('withdrawals.process', $item) }}" enctype="multipart/form-data" class="mb-2">
-                                                @csrf
-                                                <input type="hidden" name="action" value="approve">
-                                                <div class="mb-2">
-                                                    <input type="file" name="transfer_proof" class="form-control form-control-sm" accept="image/*" required>
-                                                </div>
-                                                <div class="mb-2">
-                                                    <textarea name="note" rows="2" class="form-control form-control-sm" placeholder="Ghi chú xác nhận chuyển tiền"></textarea>
-                                                </div>
-                                                <button class="btn btn-success btn-sm w-100" onclick="return confirm('Xác nhận đã chuyển tiền và trừ ví chính?')">Xác nhận chuyển tiền</button>
-                                            </form>
+                                            <div class="withdrawal-action-row">
+                                                <form method="POST" action="{{ route('withdrawals.process', $item) }}" enctype="multipart/form-data" class="withdrawal-approve-form">
+                                                    @csrf
+                                                    <input type="hidden" name="action" value="approve">
+                                                    <input
+                                                        type="file"
+                                                        name="transfer_proof"
+                                                        id="transfer_proof_{{ $item->id }}"
+                                                        class="withdrawal-file-input js-withdrawal-file-input"
+                                                        accept="image/*"
+                                                        required>
+                                                    <label for="transfer_proof_{{ $item->id }}" class="btn btn-outline-primary btn-sm withdrawal-file-trigger mb-0">
+                                                        Chọn UNC
+                                                    </label>
+                                                    <span class="withdrawal-file-name js-withdrawal-file-name">Chưa chọn file</span>
+                                                    <button class="btn btn-success btn-sm" onclick="return confirm('Xác nhận đã chuyển tiền và trừ ví chính?')">Xác nhận chuyển tiền</button>
+                                                </form>
 
-                                            <form method="POST" action="{{ route('withdrawals.process', $item) }}">
-                                                @csrf
-                                                <input type="hidden" name="action" value="reject">
-                                                <input type="text" name="note" class="form-control form-control-sm mb-2" placeholder="Lý do từ chối">
-                                                <button class="btn btn-danger btn-sm w-100" onclick="return confirm('Xác nhận từ chối lệnh rút tiền này?')">Từ chối</button>
-                                            </form>
+                                                <form method="POST" action="{{ route('withdrawals.process', $item) }}" class="withdrawal-reject-form">
+                                                    @csrf
+                                                    <input type="hidden" name="action" value="reject">
+                                                    <button class="btn btn-danger btn-sm" onclick="return confirm('Xác nhận từ chối lệnh rút tiền này?')">Từ chối</button>
+                                                </form>
+                                            </div>
                                         @else
-                                            <span class="text-muted">Đã xử lý</span>
+                                            <span class="text-muted withdrawal-action-status">Đã xử lý</span>
                                         @endif
                                     </td>
                                 </tr>
@@ -170,6 +261,11 @@
 
   $('#proofModal').on('hidden.bs.modal', function () {
     $('#proofModalImg').attr('src', '');
+  });
+
+  $(document).on('change', '.js-withdrawal-file-input', function () {
+    const fileName = this.files && this.files.length ? this.files[0].name : 'Chưa chọn file';
+    $(this).siblings('.js-withdrawal-file-name').text(fileName);
   });
 </script>
 @endsection

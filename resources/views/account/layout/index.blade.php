@@ -28,23 +28,11 @@
 
 </head>
 
-<body class=" @yield('body') ">
+<body class="footer-offset has-navbar-vertical-aside navbar-vertical-aside-show-xl @yield('body')">
 
-<!-- JS Preview mode only -->
-<div id="headerMain" class="d-none">
 @include('account.layout.header')
-</div>
-
-<div id="headerFluid" class="d-none"></div>
-<div id="headerDouble" class="d-none"></div>
 
 @include('account.layout.menu')
-
-<div id="sidebarCompact" class="d-none">
-@include('account.layout.menu1')
-</div>
-
-<script src="account/js/demo.js"></script>
 
 <main id="content" role="main" class="main pointer-event bg-light">
 @if($sumPrice > 0)

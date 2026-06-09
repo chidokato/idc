@@ -1,4 +1,4 @@
-﻿<div id="sidebarMain" class="d-none">
+<div id="sidebarMain">
   <aside class="js-navbar-vertical-aside navbar navbar-vertical-aside navbar-vertical navbar-vertical-fixed navbar-expand-xl navbar-bordered default navbar-vertical-aside-initialized ">
   <div class="navbar-vertical-container">
     <div class="navbar-vertical-footer-offset">
@@ -151,4 +151,3 @@
     </div>
   </div>
 </aside></div>
-
