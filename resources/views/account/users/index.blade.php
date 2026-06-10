@@ -102,6 +102,11 @@
 
   <div class="card mb-3">
     <div class="card-header">
+      @if($type === 'member')
+      <form id="bulk-convert-member-codes-form" method="POST" action="{{ route('account.users.members.bulkConvertCodes') }}" class="d-none">
+        @csrf
+      </form>
+      @endif
       <form method="GET" action="{{ $type === 'member' ? route('account.users.members') : route('account.users.index') }}">
         <div class="row align-items-end user-filter-row">
           <div class="col-12 col-md-6 mb-2 user-filter-key">
@@ -122,6 +127,11 @@
           </div>
           <div class="col-12 col-md-8 mb-2 user-filter-actions">
             <div class="d-flex flex-wrap">
+              @if($type === 'member')
+              <button type="submit" form="bulk-convert-member-codes-form" class="btn btn-warning mr-2 mb-2" onclick="return confirm('Doi toan bo ma nhan vien dang IDC1234 sang 990200001234?')">
+                Doi ma NV hang loat
+              </button>
+              @endif
               <button type="submit" class="btn btn-primary mr-2 mb-2">Tìm kiếm</button>
               <a href="{{ $type === 'member' ? route('account.users.members') : route('account.users.index') }}" class="btn btn-white mb-2">Reset</a>
             </div>
