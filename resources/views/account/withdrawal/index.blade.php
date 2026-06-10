@@ -22,6 +22,61 @@
         line-height: 1.55;
     }
 
+    .withdrawal-user-status {
+        min-width: 170px;
+    }
+
+    .withdrawal-user-status-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 38px;
+    }
+
+    .withdrawal-user-switch {
+        position: relative;
+        display: inline-block;
+        width: 38px;
+        height: 20px;
+        margin-bottom: 0;
+    }
+
+    .withdrawal-user-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .withdrawal-user-switch__slider {
+        position: absolute;
+        inset: 0;
+        cursor: pointer;
+        background-color: #d9e2ef;
+        transition: .2s ease;
+        border-radius: 999px;
+    }
+
+    .withdrawal-user-switch__slider:before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 3px;
+        top: 3px;
+        background-color: #fff;
+        transition: .2s ease;
+        border-radius: 50%;
+        box-shadow: 0 2px 6px rgba(18, 38, 63, .18);
+    }
+
+    .withdrawal-user-switch input:checked + .withdrawal-user-switch__slider {
+        background-color: #00c9a7;
+    }
+
+    .withdrawal-user-switch input:checked + .withdrawal-user-switch__slider:before {
+        transform: translateX(18px);
+    }
+
     .withdrawal-action-cell {
         min-width: 420px;
     }
@@ -78,6 +133,10 @@
     @media (max-width: 991.98px) {
         .withdrawal-bank-info {
             min-width: 260px;
+        }
+
+        .withdrawal-user-status {
+            min-width: 150px;
         }
 
         .withdrawal-action-cell {
@@ -137,6 +196,7 @@
                                 <th>Nhóm/Sàn</th>
                                 <th>Số tiền</th>
                                 <th>Thông tin nhận tiền</th>
+                                <th>Trạng thái user</th>
                                 <th>Trạng thái</th>
                                 <th>UNC</th>
                                 <th>Thời gian</th>
@@ -149,6 +209,7 @@
                                 <td></td>
                                 <td></td>
                                 <td class="withdrawal-summary-amount">{{ number_format($sumAmount) }}</td>
+                                <td></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
@@ -168,6 +229,18 @@
                                         @if($item->note)
                                             <div class="small text-muted mt-1">{{ $item->note }}</div>
                                         @endif
+                                    </td>
+                                    <td class="withdrawal-user-status">
+                                        <div class="withdrawal-user-status-box">
+                                            <label class="withdrawal-user-switch">
+                                                <input
+                                                    type="checkbox"
+                                                    class="js-user-status-toggle"
+                                                    data-url="{{ route('account.users.toggleStatus', $item->user) }}"
+                                                    {{ $item->user->status === 'active' ? 'checked' : '' }}>
+                                                <span class="withdrawal-user-switch__slider"></span>
+                                            </label>
+                                        </div>
                                     </td>
                                     <td>
                                         @if($item->status === 'pending')
@@ -266,6 +339,46 @@
   $(document).on('change', '.js-withdrawal-file-input', function () {
     const fileName = this.files && this.files.length ? this.files[0].name : 'Chưa chọn file';
     $(this).siblings('.js-withdrawal-file-name').text(fileName);
+  });
+
+  $(document).on('change', '.js-user-status-toggle', function () {
+    const toggle = $(this);
+    const nextStatus = toggle.is(':checked') ? 'active' : 'inactive';
+
+    toggle.prop('disabled', true);
+
+    fetch(toggle.data('url'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ status: nextStatus })
+    })
+      .then(async (response) => {
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok || !data.status) {
+          throw new Error(data.message || 'Không thể cập nhật trạng thái user');
+        }
+
+        if (typeof showToast === 'function') {
+          showToast('success', data.message || 'Cập nhật trạng thái thành công');
+        }
+      })
+      .catch((error) => {
+        toggle.prop('checked', !toggle.is(':checked'));
+
+        if (typeof showToast === 'function') {
+          showToast('error', error.message || 'Có lỗi xảy ra khi cập nhật');
+        } else {
+          alert(error.message || 'Có lỗi xảy ra khi cập nhật');
+        }
+      })
+      .finally(() => {
+        toggle.prop('disabled', false);
+      });
   });
 </script>
 @endsection

@@ -154,13 +154,6 @@ class UserManagementController extends Controller
     {
         $this->authorizeAccess();
 
-        if ((int) $user->permission !== 6) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Chỉ được đổi trạng thái của member.',
-            ], 422);
-        }
-
         $validated = $request->validate([
             'status' => 'required|in:active,inactive',
         ]);
