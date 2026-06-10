@@ -9,7 +9,6 @@ use App\Models\Department;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -167,65 +166,6 @@ class UserManagementController extends Controller
             'message' => 'Cập nhật trạng thái thành công',
             'user_status' => $user->status,
         ]);
-    }
-
-    public function bulkConvertMemberCodes()
-    {
-        $this->authorizeAccess();
-
-        $members = User::query()
-            ->where('permission', 6)
-            ->where('employee_code', 'like', 'IDC____')
-            ->orderBy('id')
-            ->get(['id', 'employee_code']);
-
-        $updated = 0;
-        $skipped = 0;
-        $existingCodes = User::query()
-            ->pluck('employee_code')
-            ->filter()
-            ->flip();
-
-        DB::transaction(function () use ($members, $existingCodes, &$updated, &$skipped) {
-            foreach ($members as $member) {
-                if (!preg_match('/^IDC(\d{4})$/', $member->employee_code, $matches)) {
-                    $skipped++;
-                    continue;
-                }
-
-                $newCode = '99020000' . $matches[1];
-
-                if (isset($existingCodes[$newCode])) {
-                    $skipped++;
-                    continue;
-                }
-
-                $existingCodes[$newCode] = true;
-                unset($existingCodes[$member->employee_code]);
-
-                $member->employee_code = $newCode;
-                $member->save();
-                $updated++;
-            }
-        });
-
-        if ($updated === 0) {
-            return redirect()
-                ->route('account.users.members')
-                ->with('warning', $skipped > 0
-                    ? 'Khong co ma nhan vien nao duoc doi. Co ' . $skipped . ' truong hop bi bo qua do khong dung mau hoac trung ma.'
-                    : 'Khong co ma nhan vien nao can doi.');
-        }
-
-        $message = 'Da doi ' . $updated . ' ma nhan vien tu IDC**** sang 99020000****.';
-
-        if ($skipped > 0) {
-            $message .= ' Bo qua ' . $skipped . ' truong hop do khong dung mau hoac trung ma.';
-        }
-
-        return redirect()
-            ->route('account.users.members')
-            ->with('success', $message);
     }
 
     private function authorizeAccess(): void
