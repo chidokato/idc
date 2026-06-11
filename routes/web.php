@@ -233,6 +233,7 @@ Route::middleware(['user'])->group(function () {
         Route::post('report-active', [ReportController::class, 'active'])->name('account.report.active');
         Route::post('report/{report}/recalc-expected', [ReportController::class, 'recalcExpected'])->name('account.reports.recalcExpected');
         Route::post('report/{report}/recalc-actual', [ReportController::class, 'recalcActual'])->name('account.reports.recalcActual');
+        Route::post('report/{report}/sync-kpi', [ReportController::class, 'syncKpi'])->name('account.reports.syncKpi');
 
         // wallet
         Route::get('wallet', [WalletController::class, 'index'])->name('wallet.index');

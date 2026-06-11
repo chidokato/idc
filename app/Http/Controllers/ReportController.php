@@ -70,6 +70,24 @@ class ReportController extends HomeController
         ]);
     }
 
+    public function syncKpi(Report $report)
+    {
+        $users = User::whereNotNull('kpi')->get()->pluck('kpi', 'id');
+        $tasks = Task::where('report_id', $report->id)->get();
+        
+        foreach ($tasks as $task) {
+            if (isset($users[$task->user])) {
+                $task->kpi = $users[$task->user];
+                $task->save();
+            }
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Đồng bộ KPI thành công',
+        ]);
+    }
+
     public function store(Request $request)
     {
         $request->validate([

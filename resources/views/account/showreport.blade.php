@@ -82,6 +82,9 @@
             </div>
           </div>
         <button type="button" class="btn btn-success btn-sm js-export-excel" data-table="#walletsTable" data-filename="wallets.xlsx"> Xuất Excel</button>
+        <button type="button" class="btn btn-primary btn-sm ml-2" id="btn-sync-kpi" data-report-id="{{ $report->id }}">
+            <i class="tio-sync mr-1"></i> Đồng bộ KPI
+        </button>
         </div>
         </form>
         <div class="row">
@@ -753,6 +756,35 @@ $(function () {
     });
 
     refreshBulkButtons();
+
+    $(document).on('click', '#btn-sync-kpi', function() {
+        let btn = $(this);
+        let reportId = btn.data('report-id');
+        let originalHtml = btn.html();
+
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang đồng bộ...');
+
+        $.ajax({
+            url: "{{ url('account/report') }}/" + reportId + "/sync-kpi",
+            type: "POST",
+            data: {
+                _token: "{{ csrf_token() }}"
+            },
+            success: function(res) {
+                if (res.status) {
+                    showToast('success', res.message);
+                    setTimeout(() => window.location.reload(), 500);
+                } else {
+                    showToast('error', res.message || 'Có lỗi xảy ra');
+                    btn.prop('disabled', false).html(originalHtml);
+                }
+            },
+            error: function() {
+                showToast('error', 'Lỗi kết nối server');
+                btn.prop('disabled', false).html(originalHtml);
+            }
+        });
+    });
 });
 
 
