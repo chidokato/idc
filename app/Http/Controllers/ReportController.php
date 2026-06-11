@@ -20,7 +20,7 @@ class ReportController extends HomeController
 {
     public function index()
     {
-        $reports = Report::get();
+        $reports = Report::withCount('tasks')->get();
         return view('account.report', compact('reports'));
     }
 
@@ -95,7 +95,7 @@ class ReportController extends HomeController
 
     public function loadReport()
     {
-        $reports = Report::orderBy('created_at','desc')->get();
+        $reports = Report::withCount('tasks')->orderBy('created_at','desc')->get();
         return view('account.layout.load_report', compact('reports'));
     }
 
@@ -203,7 +203,16 @@ class ReportController extends HomeController
 
     public function delete(Request $request)
     {
-        Report::where('id', $request->id)->delete();
+        $report = Report::withCount('tasks')->findOrFail($request->id);
+
+        if ((int) $report->tasks_count > 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bao cao da co tac vu ben trong, khong the xoa.',
+            ], 422);
+        }
+
+        $report->delete();
 
         return response()->json(['success' => true]);
     }

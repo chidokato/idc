@@ -48,7 +48,7 @@
                       <a class="btn btn-sm btn-white edit">
                         <i class="tio-edit"></i> Edit
                       </a>
-                      <a class="btn btn-sm btn-white del" data-id="{{ $r->id }}">
+                      <a class="btn btn-sm btn-white del {{ (int) $r->tasks_count > 0 ? 'disabled' : '' }}" data-id="{{ $r->id }}" data-has-tasks="{{ (int) $r->tasks_count > 0 ? 1 : 0 }}" title="{{ (int) $r->tasks_count > 0 ? 'Bao cao da co tac vu, khong the xoa' : 'Xoa bao cao' }}" aria-disabled="{{ (int) $r->tasks_count > 0 ? 'true' : 'false' }}">
                         <i class="tio-delete"></i>
                       </a>
                     </div>

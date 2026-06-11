@@ -86,6 +86,13 @@
                 <div class="invalid-feedback">{{ $message }}</div>
               @enderror
             </div>
+            <div class="form-group">
+              <label>KPI</label>
+              <input type="text" name="kpi" class="form-control @error('kpi') is-invalid @enderror" value="{{ old('kpi', $userData->kpi) }}">
+              @error('kpi')
+                <div class="invalid-feedback">{{ $message }}</div>
+              @enderror
+            </div>
           </div>
 
           <div class="col-md-6">

@@ -85,7 +85,10 @@
         </nav>
         <h1 class="page-header-title">{{ $pageTitle }}</h1>
       </div>
-      <div class="col-sm-auto">
+      <div class="col-sm-auto d-flex">
+        <button type="button" class="btn btn-success mr-2" data-toggle="modal" data-target="#importKpiModal">
+          <i class="tio-upload-on-cloud mr-1"></i> Upload KPI
+        </button>
         <a class="btn btn-primary" href="{{ route('account.users.create', ['type' => $type]) }}">
           <i class="tio-add mr-1"></i> Thêm người dùng
         </a>
@@ -143,6 +146,7 @@
             <th>Sàn / chi nhánh</th>
             <th>Công ty</th>
             <th>Chức vụ</th>
+            <th>KPI</th>
             <th>Trạng thái</th>
             <th>Ngày tạo</th>
             <th class="text-right"></th>
@@ -170,6 +174,7 @@
                 --
               @endif
             </td>
+            <td>{{ $item->kpi ?: '--' }}</td>
             <td>
               @if($type === 'member')
                 <div class="d-inline-flex align-items-center">
@@ -219,6 +224,34 @@
       </div>
     </div>
   </div>
+  <!-- Modal Import KPI -->
+  <div class="modal fade" id="importKpiModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <form action="{{ route('account.users.importKpi') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Cập nhật KPI hàng loạt</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <i class="tio-clear"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Chọn file Excel (cột 1: Mã NV, cột 2: KPI)</label>
+              <input type="file" name="kpi_file" class="form-control-file" accept=".xls,.xlsx" required>
+            </div>
+            <p class="text-danger mb-0"><small>* Lưu ý: Tất cả KPI hiện tại sẽ bị xóa và cập nhật lại theo file upload mới.</small></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-white" data-dismiss="modal">Đóng</button>
+            <button type="submit" class="btn btn-primary">Tải lên</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
 </div>
 @endsection
 

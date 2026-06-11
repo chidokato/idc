@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class UserManagementController extends Controller
 {
@@ -168,6 +169,42 @@ class UserManagementController extends Controller
         ]);
     }
 
+    public function importKpi(Request $request)
+    {
+        $this->authorizeAccess();
+
+        $request->validate([
+            'kpi_file' => 'required|file|mimes:xlsx,xls'
+        ]);
+
+        try {
+            $spreadsheet = IOFactory::load($request->file('kpi_file')->getRealPath());
+            $worksheet = $spreadsheet->getActiveSheet();
+            $rows = $worksheet->toArray();
+
+            if (count($rows) <= 1) {
+                return redirect()->back()->with('error', 'File dữ liệu trống hoặc không hợp lệ.');
+            }
+
+            // Xóa tất cả KPI cũ
+            User::query()->update(['kpi' => null]);
+
+            // Bỏ qua dòng tiêu đề (index 0)
+            for ($i = 1; $i < count($rows); $i++) {
+                $employeeCode = trim($rows[$i][0]);
+                $kpi = trim($rows[$i][1]);
+
+                if (!empty($employeeCode)) {
+                    User::where('employee_code', $employeeCode)->update(['kpi' => $kpi]);
+                }
+            }
+
+            return redirect()->back()->with('success', 'Cập nhật KPI hàng loạt thành công.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
+    }
+
     private function authorizeAccess(): void
     {
         abort_unless(Auth::check() && (int) Auth::user()->rank === 1, 403);
@@ -232,6 +269,7 @@ class UserManagementController extends Controller
                 'phone' => 'nullable|string|max:20',
                 'address' => 'nullable|string|max:255',
                 'facebook' => 'nullable|string|max:255',
+                'kpi' => 'nullable|string|max:255',
                 'password' => $user ? 'nullable|min:6' : 'required|min:6',
                 'passwordagain' => $user ? 'nullable|same:password' : 'required|same:password',
             ],
@@ -262,6 +300,7 @@ class UserManagementController extends Controller
         $user->phone = $validated['phone'] ?? null;
         $user->address = $validated['address'] ?? null;
         $user->facebook = $validated['facebook'] ?? null;
+        $user->kpi = $validated['kpi'] ?? null;
         $user->department_id = $department->id;
         $user->department_lv2 = $department->parentDepartment?->id;
         $user->department_lv1 = $department->parentDepartment?->parentDepartment?->id;

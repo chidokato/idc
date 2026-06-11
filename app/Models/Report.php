@@ -18,6 +18,11 @@ class Report extends Model
         'status',
     ];
 
+    public function tasks()
+    {
+        return $this->hasMany(Task::class, 'report_id', 'id');
+    }
+
     public function Task()
     {
         return $this->hasMany(Task::class, 'report_id', 'id');

@@ -37,6 +37,7 @@ class User extends Authenticatable
         'department_lv2',
         'rank',
         'employee_code',
+        'kpi',
     ];
 
     /**

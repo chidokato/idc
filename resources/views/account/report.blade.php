@@ -136,6 +136,11 @@ $(document).ready(function () {
 
     // ========================= DELETE =========================
     $(document).on('click', '.del', function () {
+        if ($(this).data('has-tasks')) {
+            showCenterError("Bao cao da co tac vu ben trong, khong the xoa!");
+            return;
+        }
+
         let id = $(this).data('id');
         Swal.fire({
             title: "Dữ liệu quan trong, xóa có thể ảnh hưởng đến dữ liệu khác. Bạn có chắc muốn xóa?",
@@ -160,7 +165,7 @@ $(document).ready(function () {
                         showToast('success', "Đã xóa báo cáo");
                         loadReport();
                     },
-                    error: function () {
+                    error: function (xhr) {
                         showCenterError("Không thể xóa báo cáo, vui lòng thử lại!");
                     }
                 });
