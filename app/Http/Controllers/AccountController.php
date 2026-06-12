@@ -342,10 +342,13 @@ class AccountController extends HomeController
     public function mktregister()
     {
         $sumPrice = Task::where('extra_money', '>', 0)->where('user', Auth::id())->where('settled', 0)->sum('extra_money');
+        $kpi = (float) str_replace('%', '', Auth::user()->kpi ?? '0');
 
         if (Auth::User()->department_id == null) {
             return redirect()->route('account.edit')->with('center_warning', 'Cần cập nhật thông tin cá nhân trước khi đăng ký marketing');
-        }else{
+        } elseif ($kpi < 50) {
+            return redirect()->route('tasks.actualcosts')->with('center_warning', 'KPI của bạn phải đạt từ 50% trở lên để được đăng ký Marketing');
+        } else {
             $groupIds = Department::where('parent', Auth::user()->Department->parent)->pluck('id')->toArray();
             $r = Report::where('active', 1)->count();
             if ($r > 0 && $sumPrice <= 0) {
