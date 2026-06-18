@@ -160,10 +160,12 @@ $(document).ready(function(){
 }); // update status
 
 $(document).ready(function(){
-    $("input#status_post").click(function(){
+    $(document).on('click', 'input#status_post', function(){
         var status = $(this).is(':checked');
-        var id = $(this).parents('#post').find('input[id="id"]').val();
-        // alert(status);
+        var id = $(this).closest('tr[data-id]').data('id');
+        if (!id) {
+            return;
+        }
         $.ajax({
             url:  'ajax/update_status_post/'+id+'/'+status, type: 'GET', cache: false, data: {
             },
@@ -196,10 +198,12 @@ $(document).ready(function(){
 }); // update status
 
 $(document).ready(function(){
-    $("input#hot_post").click(function(){
+    $(document).on('click', 'input#hot_post', function(){
         var hot = $(this).is(':checked');
-        var id = $(this).parents('#post').find('input[id="id"]').val();
-        // alert(status);
+        var id = $(this).closest('tr[data-id]').data('id');
+        if (!id) {
+            return;
+        }
         $.ajax({
             url:  'ajax/update_hot_post/'+id+'/'+hot, type: 'GET', cache: false, data: {
             },
