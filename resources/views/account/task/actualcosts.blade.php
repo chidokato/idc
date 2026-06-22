@@ -201,7 +201,7 @@
 
 @section('content')
 <?php $rank = (int)(auth()->user()->rank ?? 0); ?>
-<div class="content container-fluid">
+<div class="content container-fluid" style="padding: 0;">
   <div class="page-header">
     <div class="row align-items-end">
       <div class="col-sm mb-2 mb-sm-0">
