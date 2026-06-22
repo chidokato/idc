@@ -137,7 +137,77 @@
     color: #1f3f6b !important;
   }
 </style>
+<!-- Modal Thêm hàng loạt -->
+<div class="modal fade" id="bulkImportModal" tabindex="-1" role="dialog" aria-labelledby="bulkImportModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 id="bulkImportModalTitle" class="modal-title">Thêm hàng loạt chi phí thực tế</h4>
+        <button type="button" class="btn btn-icon btn-sm btn-ghost-secondary" data-dismiss="modal" aria-label="Close">
+          <i class="tio-clear tio-lg"></i>
+        </button>
+      </div>
+      <form id="bulkImportForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="input-label">File Excel (.xlsx, .xls) (Cột 1 là Mã nhân viên)</label>
+            <input type="file" class="form-control" name="file" accept=".xlsx, .xls" required>
+          </div>
+          <div class="form-group">
+            <label class="input-label">Dự án</label>
+            <select name="post_id" class="form-control select2" required style="width: 100%;">
+              <option value="">-- Chọn Dự án --</option>
+              @foreach($posts as $p)
+              <option value="{{ $p->id }}">{{ $p->name }}</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="input-label">Số tiền (Expected Costs)</label>
+            <input type="number" class="form-control" name="actual_costs" min="0" required>
+          </div>
+          <div class="form-group">
+            <label class="input-label">Số ngày</label>
+            <input type="number" class="form-control" name="days" min="0" step="0.1" required>
+          </div>
+          <div class="form-group">
+            <label class="input-label">Kênh chạy</label>
+            <select name="channel_id" class="form-control select2" required style="width: 100%;">
+              <option value="">-- Chọn Kênh --</option>
+              {!! $channelsOptions !!}
+            </select>
+          </div>
+          <div class="form-group mt-3 ml-1">
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="bulkImportApproved" name="approved" value="1" checked>
+              <label class="custom-control-label" for="bulkImportApproved">Duyệt</label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-white" data-dismiss="modal">Đóng</button>
+          <button type="submit" class="btn btn-primary" id="btnBulkImport">
+            <i class="tio-save"></i> Tải lên và Lưu
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 @endsection
+
+@section('body') @endsection
+
+@section('content')
+<?php $rank = (int)(auth()->user()->rank ?? 0); ?>
+<div class="content container-fluid">
+  <div class="page-header">
+    <div class="row align-items-end">
+      <div class="col-sm mb-2 mb-sm-0">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb breadcrumb-no-gutter">
+            <li class="breadcrumb-item"><a class="breadcrumb-link" href="account/main">Account</a></li>
 
 @section('body') @endsection
 
@@ -157,6 +227,11 @@
       </div>
       <div class="col-sm-auto d-none d-sm-block">
         <button type="button" class="btn btn-success js-export-excel" data-table="#taskTable" data-filename="tasks_{{ date('Ymd_His') }}.xlsx"> Xuất Excel</button>
+      </div>
+      <div class="col-sm-auto d-none d-sm-block">
+        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#bulkImportModal">
+          <i class="tio-publish"></i> Thêm hàng loạt
+        </button>
       </div>
       <div class="col-sm-auto d-none d-sm-block">
         @if($rank === 1)
@@ -879,6 +954,38 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   }, true);
+
+  // Bulk import form submit
+  $('#bulkImportForm').on('submit', function (e) {
+    e.preventDefault();
+    var formData = new FormData(this);
+    var btn = $('#btnBulkImport');
+    btn.prop('disabled', true).html('<i class="tio-spinner tio-spin"></i> Đang xử lý...');
+
+    $.ajax({
+      url: "{{ route('tasks.bulkImportActualCosts') }}",
+      method: 'POST',
+      data: formData,
+      contentType: false,
+      processData: false,
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      success: function (res) {
+        if (res.ok) {
+          alert(res.message);
+          window.location.reload();
+        } else {
+          alert('Lỗi: ' + res.message);
+          btn.prop('disabled', false).html('<i class="tio-save"></i> Tải lên và Lưu');
+        }
+      },
+      error: function (xhr) {
+        alert('Có lỗi xảy ra: ' + (xhr.responseJSON?.message || xhr.statusText));
+        btn.prop('disabled', false).html('<i class="tio-save"></i> Tải lên và Lưu');
+      }
+    });
+  });
 });
 </script>
 @endsection

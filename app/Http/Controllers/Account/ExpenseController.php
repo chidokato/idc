@@ -456,9 +456,81 @@ class ExpenseController extends Controller
 
     }
 
+    public function bulkImportActualCosts(Request $request)
+    {
+        $request->validate([
+            'file'         => ['required', 'mimes:xlsx,xls'],
+            'post_id'      => ['required', 'integer', 'exists:posts,id'],
+            'channel_id'   => ['required', 'integer', 'exists:channels,id'],
+            'actual_costs' => ['required', 'numeric', 'min:0'],
+            'days'         => ['required', 'numeric', 'min:0'],
+        ]);
 
+        $file = $request->file('file');
+        try {
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getPathname());
+            $worksheet = $spreadsheet->getActiveSheet();
+            $rows = $worksheet->toArray();
+            
+            $successCount = 0;
+            $errorCount = 0;
+            $notFoundCodes = [];
+            
+            $post = Post::find($request->post_id);
+            $maxReportId = Report::max('id');
 
+            foreach ($rows as $index => $row) {
+                if ($index === 0) continue; // Bỏ qua dòng tiêu đề
 
+                $employeeCode = trim($row[0] ?? '');
+                if (empty($employeeCode)) continue;
 
+                $user = User::where('employee_code', $employeeCode)->first();
+                if (!$user) {
+                    $errorCount++;
+                    $notFoundCodes[] = $employeeCode;
+                    continue;
+                }
+                
+                $amount = (float) $request->actual_costs;
+                $days = (float) $request->days;
 
+                Task::create([
+                    'user_id'        => Auth::id() ?? $user->id,
+                    'user'           => $user->id,
+                    'report_id'      => $maxReportId,
+                    'days'           => $days,
+                    'department_lv1' => $user->department_lv1,
+                    'department_lv2' => $user->department_lv2,
+                    'department_id'  => $user->department_id,
+                    'rate'           => $post->rate ?? 0,
+                    'post_id'        => $post->id,
+                    'channel_id'     => $request->channel_id,
+                    'expected_costs' => $amount,
+                    'actual_costs'   => 0,
+                    'active'         => 1,
+                    'approved'       => $request->has('approved') ? 1 : 0,
+                    'extra_money'    => 0,
+                    'refund_money'   => 0
+                ]);
+                $successCount++;
+            }
+
+            $message = "Thêm thành công $successCount dòng.";
+            if ($errorCount > 0) {
+                $message .= " Không tìm thấy $errorCount mã nhân viên: " . implode(', ', $notFoundCodes);
+            }
+
+            return response()->json([
+                'ok' => true,
+                'message' => $message
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Lỗi khi đọc file Excel: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

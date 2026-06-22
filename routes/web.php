@@ -218,6 +218,7 @@ Route::middleware(['user'])->group(function () {
 
         // quản lý chi phí
         Route::get('actualcosts', [ExpenseController::class, 'actualcosts'])->name('tasks.actualcosts');
+        Route::post('tasks/bulk-import-actual-costs', [ExpenseController::class, 'bulkImportActualCosts'])->name('tasks.bulkImportActualCosts');
         Route::post('tasks/{task}/actual-costs', [ExpenseController::class, 'ajaxUpdateActualCosts'])->name('tasks.ajaxUpdateActualCosts');
         Route::post('tasks/store', [ExpenseController::class, 'store'])->name('account.task.store');
         Route::get('tasks/expense', [ExpenseController::class, 'expense'])->name('tasks.expense');
