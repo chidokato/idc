@@ -23,8 +23,8 @@ class AccountController extends HomeController
     public function index()
     {
         $user = User::findOrFail(Auth::id());
-        $statisticalYear = 2026;
-        $currentMonth = 4;
+        $statisticalYear = (int) date('Y');
+        $currentMonth = (int) date('n');
         $selectedMonthInput = request()->input('month');
         $selectedMonth = is_numeric($selectedMonthInput) ? (int) $selectedMonthInput : null;
 
