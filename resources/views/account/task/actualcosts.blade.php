@@ -136,6 +136,66 @@
     background: #eef4ff !important;
     color: #1f3f6b !important;
   }
+
+  /* Mobile Filter Popup Styles */
+  @media (max-width: 991.98px) {
+    #filterCollapse {
+      display: none;
+    }
+    #filterCollapse.show {
+      display: block;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      z-index: 1050;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,.5);
+      padding: 15px;
+    }
+    .filter-backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1040;
+    }
+    .filter-backdrop.show {
+      display: block;
+    }
+    .mobile-filter-header {
+      display: flex !important;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    .card-header.search-mobi {
+      padding: 0 !important;
+      border: none !important;
+    }
+    
+    /* Prevent iOS auto-zoom on focus */
+    .select2-container .select2-selection--single,
+    .select2-container .select2-selection--multiple,
+    .select2-container .select2-search--inline .select2-search__field,
+    .select2-container--default .select2-search--dropdown .select2-search__field,
+    .select2-results__option,
+    select.form-control,
+    input.form-control {
+      font-size: 16px !important;
+    }
+  }
+  @media (min-width: 992px) {
+    .mobile-filter-header, .filter-backdrop {
+      display: none !important;
+    }
+  }
 </style>
 <!-- Modal Thêm hàng loạt -->
 <div class="modal fade" id="bulkImportModal" tabindex="-1" role="dialog" aria-labelledby="bulkImportModalTitle" aria-hidden="true">
@@ -235,10 +295,23 @@
     <!-- End Row -->
   </div>
 
+  <div class="d-flex mb-3 d-lg-none">
+    <button class="btn btn-primary flex-grow-1 mr-2" type="button" data-toggle="collapse" data-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
+      <i class="tio-filter-list mr-1"></i> Lọc thông tin
+    </button>
+    <a href="{{ url()->current() }}" class="btn btn-warning">Reset</a>
+  </div>
+
   <div class="card overflow-hidden mb-3 mb-lg-5">
-    <!-- <button type="button" class="btn-search-mobi" data-search-toggle>Lọc tìm</button> -->
-    <!-- <div class="search-overlay" onclick="toggleSearch()"></div> -->
-    <div class="card-header search-mobi">
+    <div class="filter-backdrop"></div>
+    <div class="collapse d-lg-block" id="filterCollapse">
+      <div class="mobile-filter-header">
+        <h5 class="mb-0">Lọc thông tin</h5>
+        <button type="button" class="close" data-toggle="collapse" data-target="#filterCollapse" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="card-header search-mobi">
       <div class="row align-items-sm-center flex-grow-1">
         <div class="col-sm mb-2 mb-sm-0">
           <form id="filterForm" method="GET" action="{{ url()->current() }}">
@@ -373,7 +446,7 @@
       </div>
       <!-- End Row -->
     </div>
-
+  </div>
 
   <!-- Header -->
 
