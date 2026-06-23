@@ -197,17 +197,6 @@
 
 @endsection
 
-@section('body') @endsection
-
-@section('content')
-<?php $rank = (int)(auth()->user()->rank ?? 0); ?>
-<div class="content container-fluid" style="padding: 0;">
-  <div class="page-header">
-    <div class="row align-items-end">
-      <div class="col-sm mb-2 mb-sm-0">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb breadcrumb-no-gutter">
-            <li class="breadcrumb-item"><a class="breadcrumb-link" href="account/main">Account</a></li>
 
 @section('body') @endsection
 
