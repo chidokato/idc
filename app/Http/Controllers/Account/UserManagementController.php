@@ -169,6 +169,24 @@ class UserManagementController extends Controller
         ]);
     }
 
+    public function toggleMarketing(User $user, Request $request)
+    {
+        $this->authorizeAccess();
+
+        $validated = $request->validate([
+            'allow_marketing' => 'required|boolean',
+        ]);
+
+        $user->allow_marketing = $validated['allow_marketing'];
+        $user->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Cập nhật quyền đăng ký marketing thành công',
+            'allow_marketing' => $user->allow_marketing,
+        ]);
+    }
+
     public function importKpi(Request $request)
     {
         $this->authorizeAccess();

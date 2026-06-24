@@ -38,6 +38,7 @@ class User extends Authenticatable
         'rank',
         'employee_code',
         'kpi',
+        'allow_marketing',
     ];
 
     /**

@@ -281,6 +281,7 @@ Route::middleware(['user'])->group(function () {
         Route::put('users/{user}', [UserManagementController::class, 'update'])->name('account.users.update');
         Route::delete('users/{user}', [UserManagementController::class, 'destroy'])->name('account.users.destroy');
         Route::post('users/{user}/toggle-status', [UserManagementController::class, 'toggleStatus'])->name('account.users.toggleStatus');
+        Route::post('users/{user}/toggle-marketing', [UserManagementController::class, 'toggleMarketing'])->name('account.users.toggleMarketing');
         Route::post('users/import-kpi', [UserManagementController::class, 'importKpi'])->name('account.users.importKpi');
 
         // thư mời

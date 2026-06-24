@@ -148,6 +148,7 @@
             <th>Chức vụ</th>
             <th>KPI</th>
             <th>Trạng thái</th>
+            <th>MKT</th>
             <th>Ngày tạo</th>
             <th class="text-right"></th>
           </tr>
@@ -191,6 +192,25 @@
               @else
                 <span class="badge badge-soft-{{ $item->status === 'active' ? 'success' : 'secondary' }}">
                   {{ $item->status === 'active' ? 'Đang hoạt động' : 'Ngừng hoạt động' }}
+                </span>
+              @endif
+            </td>
+            <td>
+              @if($type === 'member')
+                <div class="d-inline-flex align-items-center">
+                  <label class="user-status-switch">
+                    <input
+                      type="checkbox"
+                      class="js-user-marketing-toggle"
+                      data-url="{{ route('account.users.toggleMarketing', $item) }}"
+                      {{ $item->allow_marketing ? 'checked' : '' }}
+                    >
+                    <span class="user-status-switch__slider"></span>
+                  </label>
+                </div>
+              @else
+                <span class="badge badge-soft-{{ $item->allow_marketing ? 'success' : 'secondary' }}">
+                  {{ $item->allow_marketing ? 'Đã bật' : 'Đã tắt' }}
                 </span>
               @endif
             </td>
@@ -284,6 +304,45 @@ document.addEventListener('change', function (event) {
 
       if (typeof showToast === 'function') {
         showToast('success', data.message || 'Cập nhật trạng thái thành công');
+      }
+    })
+    .catch((error) => {
+      toggle.checked = !toggle.checked;
+
+      if (typeof showToast === 'function') {
+        showToast('error', error.message || 'Có lỗi xảy ra khi cập nhật');
+      } else {
+        alert(error.message || 'Có lỗi xảy ra khi cập nhật');
+      }
+    });
+});
+
+document.addEventListener('change', function (event) {
+  const toggle = event.target.closest('.js-user-marketing-toggle');
+
+  if (!toggle) {
+    return;
+  }
+
+  const nextStatus = toggle.checked ? 1 : 0;
+  fetch(toggle.dataset.url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({ allow_marketing: nextStatus })
+  })
+    .then(async (response) => {
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || !data.status) {
+        throw new Error(data.message || 'Không thể cập nhật quyền đăng ký marketing');
+      }
+
+      if (typeof showToast === 'function') {
+        showToast('success', data.message || 'Cập nhật quyền đăng ký marketing thành công');
       }
     })
     .catch((error) => {

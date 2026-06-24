@@ -181,13 +181,15 @@
     }
     
     /* Prevent iOS auto-zoom on focus */
-    .select2-container .select2-selection--single,
-    .select2-container .select2-selection--multiple,
-    .select2-container .select2-search--inline .select2-search__field,
-    .select2-container--default .select2-search--dropdown .select2-search__field,
-    .select2-results__option,
+    input[type="text"],
+    input[type="number"],
+    input[type="search"],
+    input.form-control,
     select.form-control,
-    input.form-control {
+    .select2-search__field,
+    .select2-selection,
+    .select2-selection__rendered,
+    .select2-results__option {
       font-size: 16px !important;
     }
   }
@@ -197,6 +199,20 @@
     }
   }
 </style>
+<script>
+  // Prevent iOS auto-zoom by enforcing maximum-scale=1
+  if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+    var viewportmeta = document.querySelector('meta[name="viewport"]');
+    if (viewportmeta) {
+      viewportmeta.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
+    } else {
+      var meta = document.createElement('meta');
+      meta.name = 'viewport';
+      meta.content = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no';
+      document.getElementsByTagName('head')[0].appendChild(meta);
+    }
+  }
+</script>
 <!-- Modal Thêm hàng loạt -->
 <div class="modal fade" id="bulkImportModal" tabindex="-1" role="dialog" aria-labelledby="bulkImportModalTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
