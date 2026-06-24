@@ -177,7 +177,6 @@
             </td>
             <td>{{ $item->kpi ?: '--' }}</td>
             <td>
-              @if($type === 'member')
                 <div class="d-inline-flex align-items-center">
                   <label class="user-status-switch">
                     <input
@@ -189,14 +188,8 @@
                     <span class="user-status-switch__slider"></span>
                   </label>
                 </div>
-              @else
-                <span class="badge badge-soft-{{ $item->status === 'active' ? 'success' : 'secondary' }}">
-                  {{ $item->status === 'active' ? 'Đang hoạt động' : 'Ngừng hoạt động' }}
-                </span>
-              @endif
             </td>
             <td>
-              @if($type === 'member')
                 <div class="d-inline-flex align-items-center">
                   <label class="user-status-switch">
                     <input
@@ -208,11 +201,6 @@
                     <span class="user-status-switch__slider"></span>
                   </label>
                 </div>
-              @else
-                <span class="badge badge-soft-{{ $item->allow_marketing ? 'success' : 'secondary' }}">
-                  {{ $item->allow_marketing ? 'Đã bật' : 'Đã tắt' }}
-                </span>
-              @endif
             </td>
             <td>{{ $item->created_at }}</td>
             <td class="text-right">
@@ -276,7 +264,6 @@
 @endsection
 
 @section('js')
-@if($type === 'member')
 <script>
 document.addEventListener('change', function (event) {
   const toggle = event.target.closest('.js-user-status-toggle');
@@ -356,5 +343,4 @@ document.addEventListener('change', function (event) {
     });
 });
 </script>
-@endif
 @endsection
