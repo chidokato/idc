@@ -346,7 +346,7 @@ class AccountController extends HomeController
 
         if (Auth::User()->department_id == null) {
             return redirect()->route('account.edit')->with('center_warning', 'Cần cập nhật thông tin cá nhân trước khi đăng ký marketing');
-        } elseif ($kpi < 50) {
+        } elseif (!Auth::user()->allow_marketing) {
             return redirect()->route('tasks.actualcosts')->with('center_warning', 'KPI của bạn phải đạt từ 50% trở lên để được đăng ký Marketing');
         } else {
             $groupIds = Department::where('parent', Auth::user()->Department->parent)->pluck('id')->toArray();
