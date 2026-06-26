@@ -49,7 +49,7 @@
   @media (min-width: 992px) {
     .user-filter-row {
       display: grid;
-      grid-template-columns: minmax(220px, 2fr) minmax(180px, 1.4fr) minmax(160px, 1fr) minmax(160px, 1fr) auto;
+      grid-template-columns: minmax(180px, 1.8fr) minmax(160px, 1.2fr) minmax(140px, 1fr) minmax(140px, 1fr) minmax(140px, 1fr) auto;
       gap: 12px;
       align-items: end;
     }
@@ -121,6 +121,14 @@
               <option value="">Tất cả trạng thái</option>
               <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Đang hoạt động</option>
               <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Ngừng hoạt động</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-3 mb-2 user-filter-rank">
+            <select class="form-control" name="rank">
+              <option value="">Tất cả chức vụ</option>
+              <option value="1" {{ request('rank') === '1' ? 'selected' : '' }}>Giám đốc</option>
+              <option value="2" {{ request('rank') === '2' ? 'selected' : '' }}>Trưởng phòng</option>
+              <option value="3" {{ request('rank') === '3' ? 'selected' : '' }}>Nhân viên</option>
             </select>
           </div>
           <div class="col-12 col-md-3 mb-2 user-filter-mkt">
