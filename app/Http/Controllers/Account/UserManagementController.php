@@ -204,16 +204,34 @@ class UserManagementController extends Controller
                 return redirect()->back()->with('error', 'File dữ liệu trống hoặc không hợp lệ.');
             }
 
-            // Xóa tất cả KPI cũ
-            User::query()->update(['kpi' => null]);
+            // Xóa tất cả KPI cũ và reset quyền MKT
+            User::query()->update([
+                'kpi' => null,
+                'allow_marketing' => 0
+            ]);
 
             // Bỏ qua dòng tiêu đề (index 0)
             for ($i = 1; $i < count($rows); $i++) {
-                $employeeCode = trim($rows[$i][0]);
-                $kpi = trim($rows[$i][1]);
+                $employeeCode = trim($rows[$i][0] ?? '');
+                $kpi = trim($rows[$i][1] ?? '');
+                
+                // Chuẩn hóa KPI: thay phẩy thành chấm, loại bỏ ký tự không phải số/chấm
+                $cleanKpi = str_replace(',', '.', $kpi);
+                $cleanKpi = preg_replace('/[^0-9.]/', '', $cleanKpi);
+                $kpiValue = (float) $cleanKpi;
+
+                // Nếu file Excel tự động format % thành số thập phân (vd: 0.463 thay vì 46.3%)
+                if ($kpiValue > 0 && $kpiValue <= 1 && strpos($kpi, '%') === false) {
+                    $kpiValue *= 100;
+                }
+
+                $allowMarketing = $kpiValue >= 50 ? 1 : 0;
 
                 if (!empty($employeeCode)) {
-                    User::where('employee_code', $employeeCode)->update(['kpi' => $kpi]);
+                    User::where('employee_code', $employeeCode)->update([
+                        'kpi' => $kpi,
+                        'allow_marketing' => $allowMarketing
+                    ]);
                 }
             }
 
