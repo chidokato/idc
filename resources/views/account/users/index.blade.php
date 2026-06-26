@@ -49,7 +49,7 @@
   @media (min-width: 992px) {
     .user-filter-row {
       display: grid;
-      grid-template-columns: minmax(280px, 2.2fr) minmax(220px, 1.4fr) minmax(190px, 1.2fr) auto;
+      grid-template-columns: minmax(220px, 2fr) minmax(180px, 1.4fr) minmax(160px, 1fr) minmax(160px, 1fr) auto;
       gap: 12px;
       align-items: end;
     }
@@ -116,14 +116,21 @@
               {!! $departmentOptions !!}
             </select>
           </div>
-          <div class="col-12 col-md-4 mb-2 user-filter-status">
+          <div class="col-12 col-md-3 mb-2 user-filter-status">
             <select class="form-control" name="status">
               <option value="">Tất cả trạng thái</option>
               <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Đang hoạt động</option>
               <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Ngừng hoạt động</option>
             </select>
           </div>
-          <div class="col-12 col-md-8 mb-2 user-filter-actions">
+          <div class="col-12 col-md-3 mb-2 user-filter-mkt">
+            <select class="form-control" name="allow_marketing">
+              <option value="">Tất cả trạng thái MKT</option>
+              <option value="1" {{ request('allow_marketing') === '1' ? 'selected' : '' }}>Đã bật MKT</option>
+              <option value="0" {{ request('allow_marketing') === '0' ? 'selected' : '' }}>Chưa bật MKT</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-6 mb-2 user-filter-actions">
             <div class="d-flex flex-wrap">
               <button type="submit" class="btn btn-primary mr-2 mb-2">Tìm kiếm</button>
               <a href="{{ $type === 'member' ? route('account.users.members') : route('account.users.index') }}" class="btn btn-white mb-2">Reset</a>

@@ -272,6 +272,10 @@ class UserManagementController extends Controller
             $query->where('status', $request->status);
         }
 
+        if ($request->filled('allow_marketing')) {
+            $query->where('allow_marketing', $request->allow_marketing);
+        }
+
         return $query;
     }
 
