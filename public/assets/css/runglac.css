@@ -231,4 +231,18 @@
 
 }
 
+.custom-zalo-widget-wrap {
+    position: fixed;
+    bottom: 52px;
+    right: 75px;
+    z-index: 99999;
+    width: 60px;
+    height: 60px;
+}
 
+@media (max-width: 480px) {
+    .custom-zalo-widget-wrap {
+        bottom: 25px;
+        right: 35px;
+    }
+}

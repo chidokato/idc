@@ -95,10 +95,10 @@
 <script src="https://sp.zalo.me/plugins/sdk.js"></script>
 @else
 @if($setting->zalo)
-<div style="position: fixed; bottom: 52px; right: 75px; z-index: 99999; width: 60px; height: 60px;">
+<div class="custom-zalo-widget-wrap">
     <div style="position: absolute; width: 100px; height: 100px; top: -20px; left: -20px; border-radius: 50%; border: 2px solid #0068ff; animation: phonering-alo-circle-anim 1.2s infinite ease-in-out; opacity: 0.5;"></div>
     <div style="position: absolute; width: 80px; height: 80px; top: -10px; left: -10px; border-radius: 50%; background-color: rgba(0, 104, 255, 0.4); animation: phonering-alo-circle-fill-anim 2.3s infinite ease-in-out;"></div>
-    <a href="https://zalo.me/{{$setting->zalo}}" target="_blank" style="position: absolute; width: 60px; height: 60px; background-color: #fff; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; animation: phonering-alo-circle-img-anim 1s infinite ease-in-out; top: 0; left: 0;">
+    <a href="https://zalo.me/{{$setting->zalo}}" target="_blank" class="custom-zalo-btn" style="position: absolute; width: 60px; height: 60px; background-color: #fff; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; animation: phonering-alo-circle-img-anim 1s infinite ease-in-out; top: 0; left: 0;">
         <img src="assets/img/icon/zalo.png" style="width: 35px; height: 35px; border-radius: 50%;" alt="Zalo Chat">
         <span style="color: #0068ff; font-size: 10px; font-weight: bold; margin-top: -2px;">Zalo</span>
     </a>
