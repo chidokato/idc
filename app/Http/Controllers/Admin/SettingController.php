@@ -52,6 +52,7 @@ class SettingController extends Controller
         $setting->email = $data['email'];
         $setting->facebook = $data['facebook'];
         $setting->youtube = $data['youtube'];
+        $setting->zalo = $data['zalo'];
         $setting->maps = $data['maps'];
         $setting->header = $data['header'];
 
