@@ -179,6 +179,42 @@ class AccountController extends HomeController
         return view('account.login');
     }
 
+    public function postDangnhap(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::attempt($credentials, $request->has('remember'))) {
+            $user = Auth::user();
+
+            if ($user->permission < 6) {
+                return redirect()->route('admin');
+            }
+
+            if ((int) $user->permission === 6) {
+                if ($user->status === 'active') {
+                    return redirect()->route('account.edit');
+                }
+
+                Auth::logout();
+
+                return redirect()->route('dangnhap')->with(
+                    'center_warning',
+                    'Bạn đã kết nối vào hệ thống thành công. Do hệ thống chỉ lưu hành nội bộ. Bạn cần liên hệ Admin để cấp quyền truy cập cao hơn ! Admin: 0977572947'
+                );
+            }
+
+            Auth::logout();
+            return redirect()->route('dangnhap')->with('error', 'Tài khoản không hợp lệ');
+        }
+
+        return back()->with('error', 'Email hoặc mật khẩu không đúng');
+    }
+
 
     public function edit()
     {

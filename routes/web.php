@@ -187,6 +187,7 @@ Route::prefix('admin')->group(function () {
 
 // account
 Route::get('dangnhap', [AccountController::class, 'dangnhap'])->name('dangnhap');
+Route::post('dangnhap', [AccountController::class, 'postDangnhap'])->name('post.dangnhap');
 Route::middleware(['user'])->group(function () {
     Route::prefix('account')->group(function () {
         Route::get('main', [AccountController::class, 'index'])->name('account.main');
