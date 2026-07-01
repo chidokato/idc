@@ -247,6 +247,10 @@
             <input type="number" class="form-control" name="days" min="0" step="0.1" required>
           </div>
           <div class="form-group">
+            <label class="input-label">Tỉ lệ hỗ trợ (%)</label>
+            <input type="number" class="form-control" name="rate" min="0" max="100">
+          </div>
+          <div class="form-group">
             <label class="input-label">Kênh chạy</label>
             <select name="channel_id" class="form-control select2" required style="width: 100%;">
               <option value="">-- Chọn Kênh --</option>

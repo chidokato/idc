@@ -464,6 +464,7 @@ class ExpenseController extends Controller
             'channel_id'   => ['required', 'integer', 'exists:channels,id'],
             'actual_costs' => ['required', 'numeric', 'min:0'],
             'days'         => ['required', 'numeric', 'min:0'],
+            'rate'         => ['nullable', 'numeric', 'min:0', 'max:100'],
         ]);
 
         $file = $request->file('file');
@@ -503,7 +504,7 @@ class ExpenseController extends Controller
                     'department_lv1' => $user->department_lv1,
                     'department_lv2' => $user->department_lv2,
                     'department_id'  => $user->department_id,
-                    'rate'           => $post->rate ?? 0,
+                    'rate'           => $request->filled('rate') ? $request->rate : ($post->rate ?? 0),
                     'post_id'        => $post->id,
                     'channel_id'     => $request->channel_id,
                     'expected_costs' => $amount,
