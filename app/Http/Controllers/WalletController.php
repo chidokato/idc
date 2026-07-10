@@ -263,7 +263,6 @@ class WalletController extends Controller
         // Danh sách user để chọn (loại bản thân)
         $users = User::select('id', 'yourname', 'email', 'employee_code')
             ->where('id', '!=', $user->id)
-            ->where('department_lv2', $user->department_lv2)
             ->orderBy('email')
             ->limit(500)
             ->get();

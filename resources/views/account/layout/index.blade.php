@@ -108,6 +108,13 @@
         </span>
         <i class="tio-chevron-right"></i>
       </a>
+      <a href="{{ route('duan.index') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+        <span>
+          <i class="tio-city mr-2"></i>
+          Quản lý dự án
+        </span>
+        <i class="tio-chevron-right"></i>
+      </a>
     </div>
   </div>
 </aside>

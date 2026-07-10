@@ -3,7 +3,128 @@
 @section('title') Công Ty Cổ Phần Bất Động Sản Indochine @endsection
 
 @section('css')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+  .select2-container {
+    width: 100% !important;
+  }
 
+  .select2-container .select2-selection--single,
+  .select2-container .select2-selection--multiple {
+    min-height: 40px;
+    border: 1px solid #dfe7f3 !important;
+    border-radius: 10px !important;
+    background: #fff;
+    box-shadow: none !important;
+    transition: border-color .2s ease, box-shadow .2s ease;
+  }
+
+  .select2-container--default.select2-container--focus .select2-selection--multiple,
+  .select2-container--default.select2-container--open .select2-selection--single,
+  .select2-container--default.select2-container--open .select2-selection--multiple {
+    border-color: #377dff !important;
+    box-shadow: 0 0 0 .2rem rgba(55, 125, 255, .12) !important;
+  }
+
+  .select2-container .select2-selection--single {
+    padding: 4px 38px 4px 14px;
+  }
+
+  .select2-container .select2-selection--single .select2-selection__rendered {
+    line-height: 30px !important;
+    color: #334257;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .select2-container .select2-selection--single .select2-selection__arrow {
+    height: 38px !important;
+    right: 10px !important;
+  }
+
+  .select2-container .select2-selection--multiple {
+    padding: 4px 36px 4px 8px !important;
+  }
+
+  .select2-container .select2-selection--multiple .select2-selection__rendered {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0 !important;
+  }
+
+  .select2-container .select2-selection--multiple .select2-selection__choice {
+    margin-top: 0 !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    padding: 4px 10px 4px 24px !important;
+    border: 1px solid #d4e3ff !important;
+    border-radius: 999px !important;
+    background: #eef4ff !important;
+    color: #31507a !important;
+    font-size: 13px;
+    line-height: 1.2;
+    position: relative;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .select2-container .select2-selection--multiple .select2-selection__choice__remove {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 0 !important;
+    color: #6b7a90 !important;
+    font-size: 14px;
+    margin-right: 0 !important;
+    padding: 0 !important;
+  }
+
+  .select2-container .select2-selection--multiple .select2-selection__choice:hover,
+  .select2-container .select2-selection--multiple .select2-selection__choice:focus {
+    background: #e3eeff !important;
+    color: #1f3f6b !important;
+  }
+
+  .select2-container .select2-selection--multiple .select2-selection__choice__remove:hover {
+    color: #1f3f6b !important;
+    background: transparent !important;
+  }
+
+  .select2-container .select2-search--inline .select2-search__field {
+    height: 30px;
+    margin-top: 0 !important;
+    margin-left: 0 !important;
+    padding-left: 6px !important;
+    color: #334257;
+  }
+
+  .select2-container--default .select2-search--dropdown .select2-search__field {
+    border: 1px solid #dfe7f3 !important;
+    border-radius: 8px;
+    padding: 8px 10px !important;
+  }
+
+  .select2-dropdown {
+    border: 1px solid #dfe7f3 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 14px 32px rgba(18, 38, 63, .12);
+    overflow: hidden;
+  }
+
+  .select2-results__option {
+    padding: 9px 12px;
+    font-size: 14px;
+  }
+
+  .select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background: #eef4ff !important;
+    color: #1f3f6b !important;
+  }
+</style>
 @endsection
 
 @section('body') @endsection
@@ -124,8 +245,8 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label">Chọn người nhận (nhấn giữ Ctrl để chọn nhiều người)</label>
-          <select name="recipient_ids[]" id="recipient_ids" class="form-control" multiple size="10">
+          <label class="form-label">Chọn người nhận</label>
+          <select name="recipient_ids[]" id="recipient_ids" class="form-control select2" multiple data-placeholder="Chọn người nhận">
             @foreach($users as $u)
               <option value="{{ $u->id }}" @if(collect(old('recipient_ids',[]))->contains($u->id)) selected @endif>
                 {{ $u->email }} | {{ $u->employee_code }} | {{ $u->yourname }}
@@ -180,7 +301,21 @@
 
 
 @section('js')
+<script src="admin_asset/select2/js/select2.min.js"></script>
+<script src="admin_asset/select2/js/select2-searchInputPlaceholder.js"></script>
 <script>
+$(document).ready(function() {
+    $('#recipient_ids').select2({
+        width: '100%',
+        placeholder: "Chọn người nhận",
+        allowClear: true,
+        language: {
+            noResults: function() {
+                return "Không tìm thấy người dùng";
+            }
+        }
+    });
+});
 (function(){
   const modeEl = document.getElementById('mode');
   const recipientsEl = document.getElementById('recipient_ids');
@@ -313,7 +448,7 @@
   }
 
   modeEl.addEventListener('change', toggle);
-  recipientsEl.addEventListener('change', () => { if(modeEl.value==='custom') renderCustom(); });
+  $('#recipient_ids').on('change', () => { if(modeEl.value==='custom') renderCustom(); });
 
   toggle();
 })();
