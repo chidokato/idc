@@ -55,6 +55,7 @@
               <div class="col-lg-2">
                 <select name="bank" class="form-control">
                   <option value="">Ngân hàng ??</option>
+                  <option value="Phạm Thị Thu Hằng"  {{ request('bank')=='Phạm Thị Thu Hằng'  ? 'selected':'' }}>Phạm Thị Thu Hằng</option>
                   <option value="Phan Thị Hằng"  {{ request('bank')=='Phan Thị Hằng'  ? 'selected':'' }}>Phan Thị Hằng</option>
                   <option value="Nguyễn Văn Tuấn"  {{ request('bank')=='Nguyễn Văn Tuấn'  ? 'selected':'' }}>Nguyễn Văn Tuấn</option>
                 </select>
@@ -124,6 +125,9 @@
                                 data-id="{{ $d->id }}"
                             >
                             <option value="">...</option>
+                              <option value="Phạm Thị Thu Hằng" {{ $d->bank_name === 'Phạm Thị Thu Hằng' ? 'selected' : '' }}>
+                                Phạm Thị Thu Hằng
+                              </option>
                               <option value="Phan Thị Hằng" {{ $d->bank_name === 'Phan Thị Hằng' ? 'selected' : '' }}>
                                 Phan Thị Hằng
                               </option>
