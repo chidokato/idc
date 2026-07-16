@@ -897,15 +897,6 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    if (paid === 1) {
-      if (typeof showToast === 'function') {
-        showToast('warning', 'Task da dong tien, khong the sua.');
-      } else {
-        alert('Task da dong tien, khong the sua.');
-      }
-      return;
-    }
-
     if (actualCosts <= 0) {
       if (typeof showToast === 'function') {
         showToast('warning', 'Task chua co chi phi thuc te, khong the up.');
@@ -949,20 +940,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }, true);
 
-  document.addEventListener('click', function (event) {
-    const editBtn = event.target.closest('.btn-edit-task');
-
-    if (!editBtn) {
-      return;
-    }
-
-    if (parseInt(editBtn.getAttribute('data-paid') || '0', 10) === 1) {
-      event.preventDefault();
-      event.stopPropagation();
-      event.stopImmediatePropagation();
-      alert('Task da dong tien, khong the sua.');
-    }
-  }, true);
+  // Removed edit button interceptor
 
   const saveBtn = document.getElementById('btnSaveTaskModal');
 
@@ -985,11 +963,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const departmentIdRaw = $('#modal_department_id').val();
     const departmentId = departmentIdRaw ? parseInt(departmentIdRaw, 10) : null;
     const activeEditBtn = document.querySelector('.btn-edit-task[data-id="' + id + '"]');
-
-    if (activeEditBtn && parseInt(activeEditBtn.getAttribute('data-paid') || '0', 10) === 1) {
-      alert('Task da dong tien, khong the sua.');
-      return;
-    }
 
     $.ajax({
       url: "{{ url('account/tasks') }}/" + id,

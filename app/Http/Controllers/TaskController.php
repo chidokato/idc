@@ -640,11 +640,11 @@ class TaskController extends Controller
 
     public function updateall(Request $request, Task $task)
     {
-        if ((int) $task->paid === 1) {
+        if (auth()->check() && auth()->user()->rank !== 1) {
             return response()->json([
                 'ok' => false,
-                'message' => 'Task da dong tien, khong the sua.'
-            ], 422);
+                'message' => 'Chỉ cấp cao nhất mới có quyền sửa.'
+            ], 403);
         }
 
         $data = $request->validate([
@@ -697,11 +697,11 @@ class TaskController extends Controller
 
     public function upTask(Task $task)
     {
-        if ((int) $task->paid === 1) {
+        if (auth()->check() && auth()->user()->rank !== 1) {
             return response()->json([
                 'ok' => false,
-                'message' => 'Task da dong tien, khong the sua.'
-            ], 422);
+                'message' => 'Chỉ cấp cao nhất mới có quyền sửa.'
+            ], 403);
         }
 
         $actualCosts = (int) round((float) ($task->actual_costs ?? 0));

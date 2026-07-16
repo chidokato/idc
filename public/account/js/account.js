@@ -656,11 +656,6 @@ $(document).on('click', '.btn-up-task', function (e) {
 
     if (!url) return;
 
-    if (paid === 1) {
-        showCenterWarning?.('Task da dong tien, khong the sua');
-        return;
-    }
-
     if (actualCosts <= 0) {
         showCenterWarning?.('Task chua co chi phi thuc te, khong the up');
         return;
