@@ -640,7 +640,7 @@ class TaskController extends Controller
 
     public function updateall(Request $request, Task $task)
     {
-        if (auth()->check() && auth()->user()->rank !== 1) {
+        if (auth()->check() && (int) auth()->user()->rank !== 1) {
             return response()->json([
                 'ok' => false,
                 'message' => 'Chỉ cấp cao nhất mới có quyền sửa.'
@@ -697,7 +697,7 @@ class TaskController extends Controller
 
     public function upTask(Task $task)
     {
-        if (auth()->check() && auth()->user()->rank !== 1) {
+        if (auth()->check() && (int) auth()->user()->rank !== 1) {
             return response()->json([
                 'ok' => false,
                 'message' => 'Chỉ cấp cao nhất mới có quyền sửa.'
