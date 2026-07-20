@@ -55,26 +55,21 @@
                             </div>
                         </div>
                         <div class="bankname">
-                            <form method="POST" action="{{ route('wallet.deposit.upload', $activeDeposit->id) }}" enctype="multipart/form-data">
-                                @csrf
-                                <div class="form-group">
-                                    <label>Ngan hang:</label>
-                                    <input disabled type="text" class="form-control" value="VP BANK (Viet Nam Thinh Vuong)">
-                                </div>
-                                <div class="form-group">
-                                    <label>Tai khoan:</label>
-                                    <input disabled type="text" class="form-control" value="PHAM THI THU HANG">
-                                </div>
-                                <div class="form-group">
-                                    <label>Ten tai khoan:</label>
-                                    <input disabled type="text" class="form-control" value="20825092002">
-                                </div>
-                                <div class="form-group">
-                                    <label>Anh UNC</label>
-                                    <input type="file" name="proof_image" class="form-control" accept="image/*" required>
-                                </div>
-                                <button class="btn btn-primary w-100">Gui yeu cau nap tien !!</button>
-                            </form>
+                            <div class="form-group">
+                                <label>Ngan hang:</label>
+                                <input disabled type="text" class="form-control" value="VP BANK (Viet Nam Thinh Vuong)">
+                            </div>
+                            <div class="form-group">
+                                <label>Tai khoan:</label>
+                                <input disabled type="text" class="form-control" value="PHAM THI THU HANG">
+                            </div>
+                            <div class="form-group">
+                                <label>Ten tai khoan:</label>
+                                <input disabled type="text" class="form-control" value="20825092002">
+                            </div>
+                            <div class="alert alert-info mt-3 text-center">
+                                Vui lòng chuyển khoản đúng số tiền. Lệnh nạp sẽ được duyệt tự động.
+                            </div>
                         </div>
                     @else
                         <form method="POST" action="{{ route('wallet.deposit.create') }}">
@@ -138,17 +133,8 @@
                                                     data-src="{{ asset('uploads/' . ltrim($d->proof_image, '/')) }}">
                                                     Xem anh
                                                 </button>
-                                            @elseif(in_array($d->status, ['pending_upload', 'rejected', 'expired']))
-                                                <label for="upload_proof_{{ $d->id }}" class="btn btn-sm btn-outline-success mb-0" style="cursor: pointer;">
-                                                    Bổ sung UNC
-                                                </label>
-                                                <input type="file"
-                                                    id="upload_proof_{{ $d->id }}"
-                                                    class="d-none js-ajax-upload-proof"
-                                                    data-url="{{ route('wallet.deposit.upload', $d->id) }}"
-                                                    accept="image/*">
                                             @else
-                                                <span class="text-muted">Chua co</span>
+                                                <span class="text-muted">Chưa có</span>
                                             @endif
                                         </td>
                                         <td>
