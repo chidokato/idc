@@ -146,8 +146,8 @@
                                     Images
                                 </button>
                             @else
-                                <label for="upload_proof_{{ $d->id }}" class="btn btn-sm btn-outline-success mb-0" style="cursor: pointer;">
-                                    Upload
+                                <label for="upload_proof_{{ $d->id }}" class="btn btn-sm btn-outline-success mb-0" style="cursor: pointer;" title="Bổ sung UNC">
+                                    <i class="tio-upload"></i>
                                 </label>
                                 <input type="file"
                                     id="upload_proof_{{ $d->id }}"
