@@ -123,16 +123,28 @@
         <hr>
         <h5>Trạng thái gửi (Batch: <code>{{ $batchId }}</code>)</h5>
 
-        @if($stats)
             <div class="mb-3">
-                <span class="badge bg-secondary">Queued: {{ $stats['queued'] }}</span>
-                <span class="badge bg-success">Sent: {{ $stats['sent'] }}</span>
-                <span class="badge bg-danger">Failed: {{ $stats['failed'] }}</span>
+                <span class="badge bg-secondary">Queued: <span id="stat-queued">{{ $stats['queued'] }}</span></span>
+                <span class="badge bg-success">Sent: <span id="stat-sent">{{ $stats['sent'] }}</span></span>
+                <span class="badge bg-danger">Failed: <span id="stat-failed">{{ $stats['failed'] }}</span></span>
                 <a class="btn btn-sm btn-outline-primary ms-2" href="{{ route('admin.bulk_mail.create', ['batch_id' => $batchId]) }}">
                     Refresh
                 </a>
             </div>
-        @endif
+
+            @if($stats['queued'] > 0)
+            <div class="progress mb-3" style="height: 25px;">
+                @php
+                    $total = $stats['queued'] + $stats['sent'] + $stats['failed'];
+                    $percent = $total > 0 ? floor((($stats['sent'] + $stats['failed']) / $total) * 100) : 0;
+                @endphp
+                <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: {{ $percent }}%;" aria-valuenow="{{ $percent }}" aria-valuemin="0" aria-valuemax="100">{{ $percent }}%</div>
+            </div>
+            <div class="alert alert-info" id="processing-alert">
+                <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                Đang tiến hành gửi ngầm... Vui lòng <b>KHÔNG</b> đóng tab này cho đến khi hoàn thành (Queued = 0).
+            </div>
+            @endif
 
         <div class="table-responsive">
             <table class="table table-bordered table-hover align-middle">
@@ -196,5 +208,71 @@
         sendAll.addEventListener('change', toggleRecipientSelectors);
         toggleRecipientSelectors();
     })();
+
+    @if(!empty($batchId) && $stats && $stats['queued'] > 0)
+    (function () {
+        let batchId = '{{ $batchId }}';
+        let processing = false;
+        let limit = 10;
+        
+        function processNextChunk() {
+            if (processing) return;
+            processing = true;
+            
+            fetch('{{ route('admin.bulk_mail.process_chunk') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    batch_id: batchId,
+                    limit: limit
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                processing = false;
+                if (data.error) {
+                    alert('Lỗi: ' + data.error);
+                    return;
+                }
+                
+                let stats = data.stats;
+                let total = stats.queued + stats.sent + stats.failed;
+                let percent = total > 0 ? Math.floor(((stats.sent + stats.failed) / total) * 100) : 0;
+                
+                document.getElementById('stat-queued').innerText = stats.queued;
+                document.getElementById('stat-sent').innerText = stats.sent;
+                document.getElementById('stat-failed').innerText = stats.failed;
+                
+                let pb = document.getElementById('progress-bar');
+                if (pb) {
+                    pb.style.width = percent + '%';
+                    pb.innerText = percent + '%';
+                }
+                
+                if (stats.queued > 0) {
+                    // Nghỉ 1 giây giữa các chunk để tránh bị block IP hoặc quá tải CPU
+                    setTimeout(processNextChunk, 1000);
+                } else {
+                    document.getElementById('processing-alert').className = 'alert alert-success';
+                    document.getElementById('processing-alert').innerHTML = '<b>Hoàn thành!</b> Đã gửi xong toàn bộ email trong batch này.';
+                    setTimeout(() => window.location.reload(), 2000);
+                }
+            })
+            .catch(e => {
+                processing = false;
+                console.error(e);
+                // Nếu lỗi mạng, thử lại sau 5 giây
+                setTimeout(processNextChunk, 5000);
+            });
+        }
+        
+        // Bắt đầu xử lý sau 1 giây
+        setTimeout(processNextChunk, 1000);
+    })();
+    @endif
 </script>
 @endsection

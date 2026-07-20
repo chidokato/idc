@@ -155,68 +155,81 @@ class BulkMailController extends Controller
         $rows = [];
         $failedQueueingCount = 0;
         $activeTotal = $users->count();
-        $nextDelaySeconds = 0;
         $now = now();
 
         foreach ($users as $i => $u) {
-            $status = 'queued';
-            $error = null;
-
-            try {
-                $pendingDispatch = SendPersonalEmailJob::dispatch(
-                    (int) $u->id,
-                    $subject,
-                    $contentTemplate,
-                    $batchId
-                );
-
-                if ($nextDelaySeconds > 0) {
-                    $pendingDispatch->delay($now->copy()->addSeconds($nextDelaySeconds));
-                }
-            } catch (Throwable $e) {
-                $status = 'failed';
-                $error = $e->getMessage();
-                $failedQueueingCount++;
-            }
-
             $rows[] = [
                 'batch_id' => $batchId,
                 'user_id' => $u->id,
                 'email' => $u->email,
                 'subject' => $subject,
-                'status' => $status,
+                'status' => 'queued',
                 'sent_at' => null,
-                'error' => $error,
+                'error' => null,
                 'created_at' => $now,
                 'updated_at' => $now,
             ];
-
-            if ($i < ($activeTotal - 1)) {
-                $seconds = $baseDelay + ($jitterMax > 0 ? random_int(0, $jitterMax) : 0);
-                $nextDelaySeconds += max(0, $seconds);
-
-                if ((($i + 1) % $chunkSize) === 0 && $chunkCooldown > 0) {
-                    $nextDelaySeconds += $chunkCooldown;
-                }
-            }
         }
 
         if (! empty($rows)) {
-            MailLog::insert($rows);
+            // Store the content template in cache for 1 day
+            \Illuminate\Support\Facades\Cache::put("bulk_mail_{$batchId}_content", $contentTemplate, now()->addDay());
+            
+            // Chunk inserts to avoid query size limits
+            foreach (array_chunk($rows, 500) as $chunk) {
+                MailLog::insert($chunk);
+            }
         }
 
-        $queuedCount = max(0, $activeTotal - $failedQueueingCount);
-        $message = "Da xep hang {$queuedCount}/{$activeTotal} email. Batch: {$batchId}";
+        $queuedCount = $activeTotal;
+        $message = "Đã xếp hàng {$queuedCount}/{$totalRecipients} email. Batch: {$batchId}";
         if ($truncated) {
-            $message .= " Gioi han an toan moi lan gui: {$maxPerRun}.";
+            $message .= " (Đã giới hạn tối đa {$maxPerRun} email mỗi lần).";
         }
-        if ($failedQueueingCount > 0) {
-            $message .= " Co {$failedQueueingCount} email khong xep hang duoc, vui long xem log.";
-        }
-        $message .= ' Can chay queue worker de gui nen (php artisan queue:work).';
+        $message .= ' Hệ thống sẽ tự động gửi ngầm trên trình duyệt, vui lòng KHÔNG đóng tab này cho đến khi hoàn thành.';
 
         return redirect()
             ->route('admin.bulk_mail.create', ['batch_id' => $batchId])
             ->with('status', $message);
+    }
+
+    public function processChunk(Request $request)
+    {
+        $batchId = $request->input('batch_id');
+        $limit = (int) $request->input('limit', 10);
+        
+        $contentTemplate = \Illuminate\Support\Facades\Cache::get("bulk_mail_{$batchId}_content");
+        if (!$contentTemplate) {
+            return response()->json(['error' => 'Không tìm thấy nội dung email trong bộ nhớ tạm.'], 400);
+        }
+
+        $logs = MailLog::where('batch_id', $batchId)
+            ->where('status', 'queued')
+            ->limit($limit)
+            ->get();
+
+        $processed = 0;
+        foreach ($logs as $log) {
+            try {
+                // Execute job synchronously
+                $job = new SendPersonalEmailJob($log->user_id, $log->subject, $contentTemplate, $batchId);
+                $job->handle();
+                $processed++;
+            } catch (\Throwable $e) {
+                // Error is already handled and logged by the Job
+                $processed++;
+            }
+        }
+
+        $stats = [
+            'queued' => MailLog::where('batch_id', $batchId)->where('status', 'queued')->count(),
+            'sent' => MailLog::where('batch_id', $batchId)->where('status', 'sent')->count(),
+            'failed' => MailLog::where('batch_id', $batchId)->where('status', 'failed')->count(),
+        ];
+
+        return response()->json([
+            'success' => true,
+            'stats' => $stats,
+        ]);
     }
 }

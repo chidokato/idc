@@ -227,7 +227,9 @@
                                         <div>{{ $item->bank_account_name }}</div>
                                         <div class="small text-muted">{{ $item->bank_account_number }}</div>
                                         @if($item->note)
-                                            <div class="small text-muted mt-1">{{ $item->note }}</div>
+                                            <div class="small text-muted mt-1" title="{{ $item->note }}">
+                                                {{ \Illuminate\Support\Str::limit($item->note, 50) }}
+                                            </div>
                                         @endif
                                     </td>
                                     <td class="withdrawal-user-status">

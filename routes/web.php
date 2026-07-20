@@ -272,6 +272,7 @@ Route::middleware(['user'])->group(function () {
         // BulkMailController
         Route::get('bulk-mail', [BulkMailController::class, 'create'])->name('admin.bulk_mail.create');
         Route::post('bulk-mail/send', [BulkMailController::class, 'send'])->name('admin.bulk_mail.send');
+        Route::post('bulk-mail/process-chunk', [BulkMailController::class, 'processChunk'])->name('admin.bulk_mail.process_chunk');
 
         // User management in account UI
         Route::get('users', [UserManagementController::class, 'index'])->name('account.users.index');
