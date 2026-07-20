@@ -138,7 +138,7 @@
                                                     data-src="{{ asset('uploads/' . ltrim($d->proof_image, '/')) }}">
                                                     Xem anh
                                                 </button>
-                                            @elseif($d->status === 'pending_upload')
+                                            @elseif(in_array($d->status, ['pending_upload', 'rejected', 'expired']))
                                                 <label for="upload_proof_{{ $d->id }}" class="btn btn-sm btn-outline-success mb-0" style="cursor: pointer;">
                                                     Bổ sung UNC
                                                 </label>

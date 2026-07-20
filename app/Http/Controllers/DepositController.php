@@ -257,11 +257,11 @@ class DepositController extends Controller
 
 
 
-        if ($deposit->status !== 'pending_upload') {
+        if (!in_array($deposit->status, ['pending_upload', 'rejected', 'expired'])) {
             if ($request->expectsJson()) {
-                return response()->json(['status' => false, 'message' => 'Lệnh nạp không còn ở trạng thái chờ upload.']);
+                return response()->json(['status' => false, 'message' => 'Lệnh nạp ở trạng thái không cho phép upload thêm ảnh.']);
             }
-            return back()->withErrors(['proof_image' => 'Lệnh nạp không còn ở trạng thái chờ upload.']);
+            return back()->withErrors(['proof_image' => 'Lệnh nạp ở trạng thái không cho phép upload thêm ảnh.']);
         }
 
         $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
