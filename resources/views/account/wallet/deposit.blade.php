@@ -135,9 +135,18 @@
                                             @if($d->proof_image)
                                                 <button type="button"
                                                     class="btn btn-sm btn-outline-primary btn-proof-modal"
-                                                    data-src="{{ asset('storage/' . ltrim($d->proof_image, '/')) }}">
+                                                    data-src="{{ asset('uploads/' . ltrim($d->proof_image, '/')) }}">
                                                     Xem anh
                                                 </button>
+                                            @elseif($d->status === 'pending_upload')
+                                                <label for="upload_proof_{{ $d->id }}" class="btn btn-sm btn-outline-success mb-0" style="cursor: pointer;">
+                                                    Bổ sung UNC
+                                                </label>
+                                                <input type="file"
+                                                    id="upload_proof_{{ $d->id }}"
+                                                    class="d-none js-ajax-upload-proof"
+                                                    data-url="{{ route('wallet.deposit.upload', $d->id) }}"
+                                                    accept="image/*">
                                             @else
                                                 <span class="text-muted">Chua co</span>
                                             @endif
@@ -278,7 +287,6 @@
   function tick(){
     if (remain <= 0) {
       el.textContent = "00:00";
-      expireNow();
       return;
     }
     const m = Math.floor(remain / 60);
@@ -390,5 +398,57 @@
 
   setInvalid('Vui long nhap so tien');
 })();
+</script>
+
+<script>
+$(document).on('change', '.js-ajax-upload-proof', async function() {
+    const file = this.files[0];
+    if (!file) return;
+
+    const url = this.dataset.url;
+    const formData = new FormData();
+    formData.append('proof_image', file);
+    formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+
+    // Disable the input during upload to prevent multiple uploads
+    this.disabled = true;
+    const label = $(this).prev('label');
+    const originalText = label.text();
+    label.text('Đang tải...');
+
+    try {
+        const res = await fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.status) {
+            throw new Error(data.message || 'Có lỗi xảy ra khi tải lên ảnh UNC');
+        }
+
+        if (typeof showToast === 'function') {
+            showToast('success', data.message || 'Tải lên thành công');
+        } else {
+            alert(data.message || 'Tải lên thành công');
+        }
+        
+        // Reload to show the updated status
+        location.reload();
+    } catch (e) {
+        if (typeof showToast === 'function') {
+            showToast('error', e.message);
+        } else {
+            alert(e.message);
+        }
+        this.value = ''; // Reset input
+        this.disabled = false;
+        label.text(originalText);
+    }
+});
 </script>
 @endsection
