@@ -51,8 +51,7 @@
                     <table class="table table-lg table-thead-bordered table-nowrap table-align-middle card-table withdrawals-table">
                         <thead class="thead-light">
                             <tr>
-                                <th>Mã NV</th>
-                                <th>Họ tên</th>
+                                <th>Mã NV/Họ tên</th>
                                 <th>Nhóm/Sàn</th>
                                 <th>Số tiền</th>
                                 <th>Thông tin nhận tiền</th>
@@ -78,8 +77,7 @@
                             </tr>
                             @foreach($withdrawals as $item)
                                 <tr>
-                                    <td>{{ $item->user->employee_code }}</td>
-                                    <td>{{ $item->user->yourname }}</td>
+                                    <td>{{ $item->user->employee_code }} <br> {{ $item->user->yourname }}</td>
                                     <td>{{ $item->user->department?->name }}</td>
                                     <td>{{ number_format($item->amount) }}</td>
                                     <td class="withdrawal-bank-info">
