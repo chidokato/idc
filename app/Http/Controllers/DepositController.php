@@ -295,6 +295,40 @@ class DepositController extends Controller
             ->with('success', 'Đã upload UNC. Vui lòng chờ admin duyệt.');
     }
 
+    public function depositUploadProofAdmin(Request $request, Deposit $deposit)
+    {
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'proof_image' => 'required|image|mimes:jpg,jpeg,png,webp|max:20480',
+        ]);
+
+        if ($validator->fails()) {
+            if ($request->expectsJson()) {
+                return response()->json(['status' => false, 'message' => $validator->errors()->first()]);
+            }
+            return back()->withErrors($validator);
+        }
+
+        $file = $request->file('proof_image');
+        $filename = ($deposit->code ?? 'deposit') . '_' . time() . '.' . $file->getClientOriginalExtension();
+
+        $path = $file->storeAs('deposits', $filename, 'public');
+
+        $deposit->update([
+            'proof_image' => $path,
+            'proof_uploaded_at' => now(),
+            // Don't change status to pending automatically if admin is doing it on a rejected deposit, 
+            // but normally they would want it to be reviewed or just set it.
+            // Let's just keep the status as is, or if it's pending_upload, we can change to pending.
+            'status' => $deposit->status === 'pending_upload' ? 'pending' : $deposit->status,
+        ]);
+
+        if ($request->expectsJson()) {
+            return response()->json(['status' => true, 'message' => 'Đã upload UNC thành công.']);
+        }
+
+        return back()->with('success', 'Đã upload UNC thành công.');
+    }
+
     public function depositExpire(Request $request, Deposit $deposit)
     {
         abort_unless($deposit->user_id === auth()->id(), 403);

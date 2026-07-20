@@ -145,6 +145,15 @@
                                         data-src="{{ asset('uploads/'.$d->proof_image) }}">
                                     Images
                                 </button>
+                            @else
+                                <label for="upload_proof_{{ $d->id }}" class="btn btn-sm btn-outline-success mb-0" style="cursor: pointer;">
+                                    Upload
+                                </label>
+                                <input type="file"
+                                    id="upload_proof_{{ $d->id }}"
+                                    class="d-none js-ajax-upload-proof"
+                                    data-url="{{ route('deposits.upload', $d->id) }}"
+                                    accept="image/*">
                             @endif
                         </td>
                         
@@ -470,8 +479,53 @@ $(function () {
       }
     });
   });
+
+  $(document).on('change', '.js-ajax-upload-proof', async function() {
+      const file = this.files[0];
+      if (!file) return;
+
+      const url = this.dataset.url;
+      const formData = new FormData();
+      formData.append('proof_image', file);
+      formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+
+      this.disabled = true;
+      const label = $(this).prev('label');
+      const originalText = label.text();
+      label.text('Đang tải...');
+
+      try {
+          const res = await fetch(url, {
+              method: 'POST',
+              body: formData,
+              headers: {
+                  'Accept': 'application/json'
+              }
+          });
+          
+          const data = await res.json().catch(() => ({}));
+
+          if (!res.ok || !data.status) {
+              throw new Error(data.message || 'Có lỗi xảy ra khi tải lên ảnh UNC');
+          }
+
+          if (typeof showToast === 'function') {
+              showToast('success', data.message || 'Tải lên thành công');
+          } else {
+              alert(data.message || 'Tải lên thành công');
+          }
+          
+          location.reload();
+      } catch (e) {
+          if (typeof showToast === 'function') {
+              showToast('error', e.message);
+          } else {
+              alert(e.message);
+          }
+          this.value = '';
+          this.disabled = false;
+          label.text(originalText);
+      }
+  });
 </script>
-
-
-
 @endsection

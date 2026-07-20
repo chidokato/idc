@@ -261,6 +261,7 @@ Route::middleware(['user'])->group(function () {
         Route::get('deposits', [DepositController::class, 'index'])->name('deposits.index');
         Route::post('deposits/{deposit}/update-status', [DepositController::class, 'updateStatus'])->name('deposits.updateStatus');
         Route::post('deposits/{deposit}/bank-name', [DepositController::class, 'updateBankName'])->name('deposits.updateBankName');
+        Route::post('deposits/{deposit}/upload', [DepositController::class, 'depositUploadProofAdmin'])->name('deposits.upload');
         Route::get('withdrawals', [WithdrawalController::class, 'index'])->name('withdrawals.index');
         Route::post('withdrawals/{withdrawal}/process', [WithdrawalController::class, 'process'])->name('withdrawals.process');
 
