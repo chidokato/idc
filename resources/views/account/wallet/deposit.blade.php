@@ -55,21 +55,26 @@
                             </div>
                         </div>
                         <div class="bankname">
-                            <div class="form-group">
-                                <label>Ngan hang:</label>
-                                <input disabled type="text" class="form-control" value="VP BANK (Viet Nam Thinh Vuong)">
-                            </div>
-                            <div class="form-group">
-                                <label>Tai khoan:</label>
-                                <input disabled type="text" class="form-control" value="PHAM THI THU HANG">
-                            </div>
-                            <div class="form-group">
-                                <label>Ten tai khoan:</label>
-                                <input disabled type="text" class="form-control" value="20825092002">
-                            </div>
-                            <div class="alert alert-info mt-3 text-center">
-                                Vui lòng chuyển khoản đúng số tiền. Lệnh nạp sẽ được duyệt tự động.
-                            </div>
+                            <form method="POST" action="{{ route('wallet.deposit.upload', $activeDeposit->id) }}" enctype="multipart/form-data">
+                                @csrf
+                                <div class="form-group">
+                                    <label>Ngan hang:</label>
+                                    <input disabled type="text" class="form-control" value="VP BANK (Viet Nam Thinh Vuong)">
+                                </div>
+                                <div class="form-group">
+                                    <label>Tai khoan:</label>
+                                    <input disabled type="text" class="form-control" value="PHAM THI THU HANG">
+                                </div>
+                                <div class="form-group">
+                                    <label>Ten tai khoan:</label>
+                                    <input disabled type="text" class="form-control" value="20825092002">
+                                </div>
+                                <div class="form-group">
+                                    <label>Anh UNC</label>
+                                    <input type="file" name="proof_image" class="form-control" accept="image/*" required>
+                                </div>
+                                <button class="btn btn-primary w-100">Gui yeu cau nap tien !!</button>
+                            </form>
                         </div>
                     @else
                         <form method="POST" action="{{ route('wallet.deposit.create') }}">
@@ -197,7 +202,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Anh UNC</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn btn-icon btn-sm btn-ghost-secondary" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="tio-clear tio-lg" aria-hidden="true"></i>
+                </button>
             </div>
             <div class="modal-body text-center">
                 <img id="proofModalImg" src="" alt="Anh UNC" class="img-fluid rounded" style="max-height: 75vh;">
