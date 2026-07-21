@@ -63,7 +63,7 @@
                             <select class="form-control" name="department_id" id="department_id" required>
                                 <option value="">-- Chọn phòng ban --</option>
                                 @foreach($departmentTree as $dept)
-                                    <option value="{{ $dept->id }}" {{ old('department_id') == $dept->id ? 'selected' : '' }}>
+                                    <option value="{{ $dept->id }}" {{ old('department_id') == $dept->id ? 'selected' : '' }} {{ isset($dept->level) && $dept->level < 3 ? 'disabled' : '' }}>
                                         {{ $dept->name_with_prefix }}
                                     </option>
                                 @endforeach

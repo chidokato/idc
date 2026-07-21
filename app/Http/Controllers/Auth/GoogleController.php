@@ -202,15 +202,16 @@ class GoogleController extends Controller
         }
     }
 
-    private function buildDepartmentTree($departments, $parentId = 0, $prefix = '')
+    private function buildDepartmentTree($departments, $parentId = 0, $prefix = '', $level = 1)
     {
         $tree = [];
 
         foreach ($departments as $department) {
             if ((int) ($department->parent ?? 0) === (int) $parentId) {
                 $department->name_with_prefix = $prefix . $department->name;
+                $department->level = $level;
                 $tree[] = $department;
-                $tree = array_merge($tree, $this->buildDepartmentTree($departments, $department->id, $prefix . '-- '));
+                $tree = array_merge($tree, $this->buildDepartmentTree($departments, $department->id, $prefix . '-- ', $level + 1));
             }
         }
 
