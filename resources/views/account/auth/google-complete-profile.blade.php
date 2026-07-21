@@ -60,6 +60,7 @@
                         <div class="form-group mb-3">
                             <label for="employee_code">Mã nhân viên</label>
                             <input type="text" class="form-control @error('employee_code') is-invalid @enderror" name="employee_code" id="employee_code" value="{{ old('employee_code') }}" placeholder="Nhập mã nhân viên" required>
+                            <small class="text-danger" style="font-size: 13px; font-style: italic; margin-top: 5px; display: block;">* Lưu ý: Mã nhân viên phải dùng mã 99020000****</small>
                             @error('employee_code')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -68,6 +69,7 @@
                         <div class="form-group mb-3">
                             <label for="yourname">Họ và tên</label>
                             <input type="text" class="form-control @error('yourname') is-invalid @enderror" name="yourname" id="yourname" value="{{ old('yourname', $pendingGoogle['yourname']) }}" placeholder="Nhập họ và tên" required>
+                            <small class="text-danger" style="font-size: 13px; font-style: italic; margin-top: 5px; display: block;">* Lưu ý: Viết đúng và đầy đủ họ tên</small>
                             @error('yourname')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
