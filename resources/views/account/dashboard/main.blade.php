@@ -15,7 +15,7 @@
         <h1 class="page-header-title">Trang chủ</h1>
       </div>
       <div class="col-sm-auto d-none d-sm-block">
-        <form method="GET" action="{{ route('account.main') }}">
+        <form method="GET" action="{{ route('account.dashboard.main') }}">
           <select name="month" class="form-control" onchange="this.form.submit()">
             <option value="" {{ $selectedMonth === null ? 'selected' : '' }}>Tất cả các tháng</option>
             @foreach($monthOptions as $monthValue => $monthLabel)

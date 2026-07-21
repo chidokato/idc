@@ -156,7 +156,7 @@ class AccountController extends HomeController
 
         $floorTotalActualCosts = (float) $floorSummaries->sum('total_actual_costs');
 
-        return view('account.main', compact(
+        return view('account.dashboard.main', compact(
             'user',
             'chartLabels', 'dataExpected', 'dataActual',
             'statisticalYear',
@@ -176,7 +176,7 @@ class AccountController extends HomeController
 
     public function dangnhap()
     {
-        return view('account.login');
+        return view('account.auth.login');
     }
 
     public function postDangnhap(Request $request)
@@ -197,7 +197,7 @@ class AccountController extends HomeController
 
             if ((int) $user->permission === 6) {
                 if ($user->status === 'active') {
-                    return redirect()->route('account.edit');
+                    return redirect()->route('account.profile.edit');
                 }
 
                 Auth::logout();
@@ -226,7 +226,7 @@ class AccountController extends HomeController
             prefix: '',
             selectedId: $user->department_id
         );
-        return view('account.edit', compact('user', 'departmentOptions'));
+        return view('account.profile.edit', compact('user', 'departmentOptions'));
     }
 
     public function update(Request $request)
@@ -381,7 +381,7 @@ class AccountController extends HomeController
         $kpi = (float) str_replace('%', '', Auth::user()->kpi ?? '0');
 
         if (Auth::User()->department_id == null) {
-            return redirect()->route('account.edit')->with('center_warning', 'Cần cập nhật thông tin cá nhân trước khi đăng ký marketing');
+            return redirect()->route('account.profile.edit')->with('center_warning', 'Cần cập nhật thông tin cá nhân trước khi đăng ký marketing');
         } elseif (!Auth::user()->allow_marketing) {
             return redirect()->route('tasks.actualcosts')->with('center_warning', 'KPI của bạn phải đạt từ 50% trở lên để được đăng ký Marketing');
         } else {
@@ -392,7 +392,7 @@ class AccountController extends HomeController
                 $posts = Post::where('sort_by', 'Product')->where('rate', '!=', null)->orderBy('name', 'asc')->get();
                 $channels = Channel::where('parent', '!=', 0)->get();
                 $reports = Report::where('active', 1)->orderBy('id', 'desc')->get();
-                return view('account.mktregister', compact(
+                return view('account.marketing.register', compact(
                     'users',
                     'channels',
                     'posts',
@@ -448,11 +448,11 @@ class AccountController extends HomeController
     public function mktlist()
     {
         if (Auth::User()->department_id == null) {
-            return redirect()->route('account.edit')->with('center_warning', 'Cần cập nhật thông tin cá nhân trước khi đăng ký marketing');
+            return redirect()->route('account.profile.edit')->with('center_warning', 'Cần cập nhật thông tin cá nhân trước khi đăng ký marketing');
         }else{
             $posts = Post::where('sort_by', 'Product')->orderBy('name', 'asc')->get();
             $channels = Channel::all();
-            return view('account.mktlist', compact(
+            return view('account.marketing.list', compact(
                 'channels',
                 'posts'
             ));
@@ -523,7 +523,7 @@ class AccountController extends HomeController
     {
         $user = User::find(Auth::id());
         
-        return view('account.opened', compact('user'));
+        return view('account.guide.index', compact('user'));
     }
 
 

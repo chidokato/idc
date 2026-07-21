@@ -5,7 +5,7 @@
         <p class="text-truncate-set text-truncate-set-1">{{ Auth::user()->email }}</p>
         <p>{{Auth::user()->phone}}</p>
     </div>
-    <button class="edit" onclick="window.location.href='{{ route('account.edit') }}'">sửa</button>
+    <button class="edit" onclick="window.location.href='{{ route('account.profile.edit') }}'">sửa</button>
 </div>
 <div class="blance widget-list mb-3">
     <h4>Số dự tài khoản</h4>
@@ -27,7 +27,7 @@
 
 
 <div class="row-btn">
-    <button class="btn btn-dangky" onclick="window.location.href='{{route('account.mktregister')}}'">
+    <button class="btn btn-dangky" onclick="window.location.href='{{route('account.marketing.register')}}'">
         <i class="bi bi-megaphone-fill"></i> ĐĂNG KÝ MARKETING
     </button>
 

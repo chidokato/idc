@@ -190,15 +190,15 @@ Route::get('dangnhap', [AccountController::class, 'dangnhap'])->name('dangnhap')
 Route::post('dangnhap', [AccountController::class, 'postDangnhap'])->name('post.dangnhap');
 Route::middleware(['user'])->group(function () {
     Route::prefix('account')->group(function () {
-        Route::get('main', [AccountController::class, 'index'])->name('account.main');
-        Route::get('opened', [AccountController::class, 'opened'])->name('account.opened');
-        Route::get('edit', [AccountController::class, 'edit'])->name('account.edit');
+        Route::get('main', [AccountController::class, 'index'])->name('account.dashboard.main');
+        Route::get('opened', [AccountController::class, 'opened'])->name('account.guide.index');
+        Route::get('edit', [AccountController::class, 'edit'])->name('account.profile.edit');
         Route::post('update', [AccountController::class, 'update'])->name('account.update');
         Route::post('change-password', [AccountController::class, 'changePassword'])->name('account.change-password');
         Route::post('update-secondary-email', [AccountController::class, 'updateSecondaryEmail'])->name('account.update-secondary-email');
         Route::post('verify-secondary-email-otp', [AccountController::class, 'verifySecondaryEmailOtp'])->name('account.verify-secondary-email-otp');
         // mkt
-        Route::get('mkt-register', [AccountController::class, 'mktregister'])->name('account.mktregister');
+        Route::get('mkt-register', [AccountController::class, 'mktregister'])->name('account.marketing.register');
         Route::post('mkt-tasksstore', [AccountController::class, 'storeTask'])->name('account.tasksstore');
         Route::get('tasks-stats', [AccountController::class, 'stats'])->name('account.tasks.stats');
         
@@ -303,7 +303,7 @@ Route::middleware(['user'])->group(function () {
 
 // home view
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('sitemap.xml', [HomeController::class, 'sitemap'])->name('sitemap');
+Route::get('sitemap.xml', [HomeController::class, 'sitemap'])->name('pages.sitemap');
 // Route::get('search', [HomeController::class, 'search'])->name('search');
 
 // home system

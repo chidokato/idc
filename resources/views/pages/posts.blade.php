@@ -9,7 +9,7 @@
       
 <div class="container mt-5" style="max-width: 750px">
     <div id="data-wrapper">
-        @include('data')
+        @include('pages.data')
     </div>
     <div class="text-center">
         <button class="btn btn-success load-more-data"><i class="fa fa-refresh"></i> Load More Data...</button>

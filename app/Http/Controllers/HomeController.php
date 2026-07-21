@@ -196,7 +196,7 @@ if ((int) $request->get('monopoly', 0) === 1) {
     {
         $category = Category::all();
         $Post = Post::all();
-        return response()->view('sitemap', [
+        return response()->view('pages.sitemap', [
             'category' => $category,
             'Post' => $Post,
             ])->header('Content-Type', 'text/xml');

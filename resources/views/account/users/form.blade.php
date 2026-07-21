@@ -7,7 +7,7 @@
       <div class="col-sm mb-2 mb-sm-0">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb breadcrumb-no-gutter">
-            <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('account.main') }}">Account</a></li>
+            <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('account.dashboard.main') }}">Account</a></li>
             <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ $backRoute }}">Quản lý người dùng</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ $pageTitle }}</li>
           </ol>

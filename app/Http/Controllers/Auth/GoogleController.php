@@ -75,7 +75,7 @@ class GoogleController extends Controller
         $departments = Department::all();
         $departmentTree = $this->buildDepartmentTree($departments);
 
-        return view('account.google-complete-profile', [
+        return view('account.auth.google-complete-profile', [
             'pendingGoogle' => $pending,
             'departmentTree' => $departmentTree,
         ]);
@@ -160,7 +160,7 @@ class GoogleController extends Controller
 
         if ((int) $user->permission === 6) {
             if ($user->status === 'active') {
-                return redirect()->route('account.edit');
+                return redirect()->route('account.profile.edit');
             }
 
             Auth::logout();

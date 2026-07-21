@@ -322,7 +322,7 @@ class TaskController extends Controller
             return $lv1;
         });
 
-        return view('account.tasks', compact(
+        return view('account.task.index', compact(
             'user',
             'reports',
             'selectedReportId',

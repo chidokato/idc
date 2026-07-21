@@ -63,7 +63,7 @@ class LoginController extends Controller
         }
 
         // permission = 6 => ra trang người dùng
-        return redirect()->route('account.main'); // đổi route theo trang user của bạn
+        return redirect()->route('account.dashboard.main'); // đổi route theo trang user của bạn
     }
 
     Session::flash('error', 'Email hoặc Password không đúng');
@@ -75,7 +75,7 @@ class LoginController extends Controller
     {
         $departments = \App\Models\Department::all();
         $departmentTree = $this->buildDepartmentTree($departments);
-        return view('account.register', compact('departmentTree'));
+        return view('account.auth.register', compact('departmentTree'));
     }
 
     private function buildDepartmentTree($departments, $parentId = 0, $prefix = '')
@@ -187,7 +187,7 @@ class LoginController extends Controller
 
     public function showForgetPasswordForm()
     {
-        return view('account.forgot-password');
+        return view('account.auth.forgot-password');
     }
 
     public function sendOtp(Request $request)

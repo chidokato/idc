@@ -21,7 +21,7 @@ class ReportController extends HomeController
     public function index()
     {
         $reports = Report::withCount('tasks')->get();
-        return view('account.report', compact('reports'));
+        return view('account.report.index', compact('reports'));
     }
 
     private function onlyDigitsToInt($value): int
@@ -183,7 +183,7 @@ class ReportController extends HomeController
             return $val->total_costs ?? ($val->days * $val->expected_costs);
         });
 
-        return view('account.showreport', compact(
+        return view('account.report.show', compact(
             'users',
             'report',
             'task',
@@ -368,7 +368,7 @@ class ReportController extends HomeController
             return $lv1;
         });
 
-        return view('account.tasks', compact(
+        return view('account.task.index', compact(
             'user',
             'reports',
             'selectedReportId',
