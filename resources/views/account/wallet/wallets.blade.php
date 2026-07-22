@@ -70,7 +70,12 @@
                                     <td>{{ $w->user?->yourname ?? '---' }}</td>
                                     <td>{{ $w->user?->department?->name ?? '---' }}</td>
                                     <td>{{ rtrim(rtrim(number_format($w->balance ?? 0, 2, '.', ','), '0'), '.') ?: '0' }} &#8363;</td>
-                                    <td>{{ rtrim(rtrim(number_format($w->held_balance ?? 0, 2, '.', ','), '0'), '.') ?: '0' }} &#8363;</td>
+                                    <td>
+                                        <span id="held-balance-{{ $w->id }}">{{ rtrim(rtrim(number_format($w->held_balance ?? 0, 2, '.', ','), '0'), '.') ?: '0' }}</span> &#8363;
+                                        <a href="javascript:;" class="text-primary ml-1 btn-edit-held" data-id="{{ $w->id }}" data-val="{{ floatval($w->held_balance ?? 0) }}" title="Sửa Tiền Hold">
+                                            <i class="tio-edit"></i>
+                                        </a>
+                                    </td>
                                     <td>
                                         <a class="btn btn-xs btn-white mr-2 btn-wallet-history"
                                            href="javascript:;"
@@ -137,6 +142,30 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="editHoldModal" tabindex="-1" role="dialog" aria-labelledby="editHoldModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="editHoldModalTitle" class="modal-title">Cập nhật Tiền Hold</h4>
+                <button type="button" class="btn btn-icon btn-sm btn-ghost-secondary" data-dismiss="modal" aria-label="Close">
+                    <i class="tio-clear tio-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Số tiền Hold mới</label>
+                    <input type="number" id="input-held-balance" class="form-control" placeholder="Nhập số tiền...">
+                    <input type="hidden" id="input-held-wallet-id">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="btn-save-held">Lưu lại</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('js')
@@ -169,6 +198,51 @@
 
         console.log('Status:', xhr.status);
         console.log('Response:', xhr.responseText);
+      }
+    });
+  });
+
+  $(document).on('click', '.btn-edit-held', function () {
+    const walletId = $(this).data('id');
+    const currentVal = $(this).data('val');
+    
+    $('#input-held-wallet-id').val(walletId);
+    $('#input-held-balance').val(currentVal);
+    $('#editHoldModal').modal('show');
+  });
+
+  $('#btn-save-held').on('click', function () {
+    const walletId = $('#input-held-wallet-id').val();
+    const newVal = $('#input-held-balance').val();
+    
+    if (isNaN(newVal) || newVal === '') {
+      showToast && showToast('error', 'Số tiền không hợp lệ.');
+      return;
+    }
+    
+    let url = @json(route('wallets.updateHeldBalance', ['wallet' => 0]));
+    url = url.replace('/0/', '/' + walletId + '/');
+    
+    $(this).prop('disabled', true).text('Đang lưu...');
+    
+    $.ajax({
+      url: url,
+      method: 'POST',
+      data: {
+        held_balance: newVal,
+        _token: '{{ csrf_token() }}'
+      },
+      success: function(res) {
+         if(res.ok) {
+            $('#editHoldModal').modal('hide');
+            showToast && showToast('success', res.message);
+            setTimeout(() => location.reload(), 500);
+         }
+      },
+      error: function(xhr) {
+         $('#btn-save-held').prop('disabled', false).text('Lưu lại');
+         showToast && showToast('error', 'Có lỗi xảy ra.');
+         console.log(xhr.responseText);
       }
     });
   });
