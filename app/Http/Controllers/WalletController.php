@@ -740,4 +740,19 @@ class WalletController extends Controller
             'message' => 'Cập nhật tiền Hold thành công!',
         ]);
     }
+
+    public function updateBalance(Request $request, Wallet $wallet)
+    {
+        $request->validate([
+            'balance' => 'required|numeric|min:0',
+        ]);
+
+        $wallet->balance = $request->balance;
+        $wallet->save();
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Cập nhật Số dư thành công!',
+        ]);
+    }
 }

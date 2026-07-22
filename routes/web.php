@@ -256,6 +256,7 @@ Route::middleware(['user'])->group(function () {
         Route::get('wallets/{wallet}/histories', [WalletController::class, 'histories'])->name('wallets.histories');
         Route::get('wallets/{wallet}/detail', [WalletController::class, 'detail'])->name('wallets.detail');
         Route::post('wallets/{wallet}/update-held-balance', [WalletController::class, 'updateHeldBalance'])->name('wallets.updateHeldBalance');
+        Route::post('wallets/{wallet}/update-balance', [WalletController::class, 'updateBalance'])->name('wallets.updateBalance');
 
         
         // quản lý deposit

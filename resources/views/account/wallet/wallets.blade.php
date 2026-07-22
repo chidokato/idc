@@ -69,7 +69,12 @@
                                     <td>{{ $w->user?->email ?? '---' }}</td>
                                     <td>{{ $w->user?->yourname ?? '---' }}</td>
                                     <td>{{ $w->user?->department?->name ?? '---' }}</td>
-                                    <td>{{ rtrim(rtrim(number_format($w->balance ?? 0, 2, '.', ','), '0'), '.') ?: '0' }} &#8363;</td>
+                                    <td>
+                                        <span id="balance-{{ $w->id }}">{{ rtrim(rtrim(number_format($w->balance ?? 0, 2, '.', ','), '0'), '.') ?: '0' }}</span> &#8363;
+                                        <a href="javascript:;" class="text-primary ml-1 btn-edit-balance" data-id="{{ $w->id }}" data-val="{{ floatval($w->balance ?? 0) }}" title="Sửa Số Dư">
+                                            <i class="tio-edit"></i>
+                                        </a>
+                                    </td>
                                     <td>
                                         <span id="held-balance-{{ $w->id }}">{{ rtrim(rtrim(number_format($w->held_balance ?? 0, 2, '.', ','), '0'), '.') ?: '0' }}</span> &#8363;
                                         <a href="javascript:;" class="text-primary ml-1 btn-edit-held" data-id="{{ $w->id }}" data-val="{{ floatval($w->held_balance ?? 0) }}" title="Sửa Tiền Hold">
@@ -166,6 +171,30 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="editBalanceModal" tabindex="-1" role="dialog" aria-labelledby="editBalanceModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="editBalanceModalTitle" class="modal-title">Cập nhật Số dư</h4>
+                <button type="button" class="btn btn-icon btn-sm btn-ghost-secondary" data-dismiss="modal" aria-label="Close">
+                    <i class="tio-clear tio-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Số dư mới</label>
+                    <input type="number" id="input-balance" class="form-control" placeholder="Nhập số tiền...">
+                    <input type="hidden" id="input-balance-wallet-id">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="btn-save-balance">Lưu lại</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('js')
@@ -241,6 +270,51 @@
       },
       error: function(xhr) {
          $('#btn-save-held').prop('disabled', false).text('Lưu lại');
+         showToast && showToast('error', 'Có lỗi xảy ra.');
+         console.log(xhr.responseText);
+      }
+    });
+  });
+
+  $(document).on('click', '.btn-edit-balance', function () {
+    const walletId = $(this).data('id');
+    const currentVal = $(this).data('val');
+    
+    $('#input-balance-wallet-id').val(walletId);
+    $('#input-balance').val(currentVal);
+    $('#editBalanceModal').modal('show');
+  });
+
+  $('#btn-save-balance').on('click', function () {
+    const walletId = $('#input-balance-wallet-id').val();
+    const newVal = $('#input-balance').val();
+    
+    if (isNaN(newVal) || newVal === '') {
+      showToast && showToast('error', 'Số tiền không hợp lệ.');
+      return;
+    }
+    
+    let url = @json(route('wallets.updateBalance', ['wallet' => 0]));
+    url = url.replace('/0/', '/' + walletId + '/');
+    
+    $(this).prop('disabled', true).text('Đang lưu...');
+    
+    $.ajax({
+      url: url,
+      method: 'POST',
+      data: {
+        balance: newVal,
+        _token: '{{ csrf_token() }}'
+      },
+      success: function(res) {
+         if(res.ok) {
+            $('#editBalanceModal').modal('hide');
+            showToast && showToast('success', res.message);
+            setTimeout(() => location.reload(), 500);
+         }
+      },
+      error: function(xhr) {
+         $('#btn-save-balance').prop('disabled', false).text('Lưu lại');
          showToast && showToast('error', 'Có lỗi xảy ra.');
          console.log(xhr.responseText);
       }
