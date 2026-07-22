@@ -69,8 +69,8 @@
                                     <td>{{ $w->user?->email ?? '---' }}</td>
                                     <td>{{ $w->user?->yourname ?? '---' }}</td>
                                     <td>{{ $w->user?->department?->name ?? '---' }}</td>
-                                    <td>{{ number_format($w->balance ?? 0) }} &#8363;</td>
-                                    <td>{{ number_format($w->held_balance ?? 0) }} &#8363;</td>
+                                    <td>{{ rtrim(rtrim(number_format($w->balance ?? 0, 2, '.', ','), '0'), '.') ?: '0' }} &#8363;</td>
+                                    <td>{{ rtrim(rtrim(number_format($w->held_balance ?? 0, 2, '.', ','), '0'), '.') ?: '0' }} &#8363;</td>
                                     <td>
                                         <a class="btn btn-xs btn-white mr-2 btn-wallet-history"
                                            href="javascript:;"
