@@ -185,7 +185,7 @@ class ExpenseController extends Controller
         // Render filter options
         $reports = Report::orderByDesc('id')->get();
         $users = User::get();
-        $posts = Post::where('sort_by', 'Product')->where('rate', '!=', Null)->get();
+        $posts = Post::where('sort_by', 'Product')->get();
         $channels = Channel::all();
         $channelsOptions = TreeHelper::buildOptions($channels,0,'',$request->channel_id);
 

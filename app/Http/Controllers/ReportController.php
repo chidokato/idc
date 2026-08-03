@@ -175,7 +175,7 @@ class ReportController extends HomeController
         $departments = Department::all();
         $departmentOptions = TreeHelper::buildOptions($departments,0,'',$request->department_id);
 
-        $posts       = Post::where('sort_by', 'Product')->where('rate', '!=', Null)->get();
+        $posts       = Post::where('sort_by', 'Product')->get();
         $channels    = Channel::all();
         $channelsOptions = TreeHelper::buildOptions($channels,0,'',$request->channel_id);
 
