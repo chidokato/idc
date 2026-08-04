@@ -244,8 +244,12 @@ class ExpenseController extends Controller
             : null; // hoặc 0
 
         $q = Task::query()
-            ->with(['handler', 'department', 'Post', 'channel'])
+            ->with(['handler', 'department', 'Post', 'channel', 'Report'])
             ->where('extra_money', '>', 0)
+            ->where(function ($query) {
+                $query->where('settled', 0)->orWhereNull('settled');
+            })
+            ->orderByDesc('report_id')       // sắp xếp report từ lớn đến bé
             ->orderBy('department_lv1')   // ưu tiên 1
             ->orderBy('department_lv2')   // ưu tiên 1
             ->orderBy('department_id')       // ưu tiên 2
