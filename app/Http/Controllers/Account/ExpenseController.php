@@ -204,6 +204,10 @@ class ExpenseController extends Controller
             'name'
         );
 
+        $pageTitle = 'Danh sách link đăng ký MKT';
+        $excelFilename = 'tasks_' . date('Ymd_His') . '.xlsx';
+        $isNsDebt = false;
+
         return view('account.task.actualcosts', compact(
             'reports',
             'departmentOptions',
@@ -219,6 +223,123 @@ class ExpenseController extends Controller
             'sum_actual_costs',
             'sum_refund_money',
             'sum_extra_money',
+            'pageTitle',
+            'excelFilename',
+            'isNsDebt',
+        ));
+    }
+
+    public function nsDebt(Request $request)
+    {
+        $user = auth()->user();
+        $selectedReportId = null;
+        // Load departments 1 lần để build options + lọc đệ quy
+        $departments = Department::select('id', 'parent', 'name')
+            ->orderBy('name')
+            ->get();
+
+        // selected department: ưu tiên request, không có thì lấy department_id của user
+        $selectedDeptId = $request->filled('department_id')
+            ? (int) $request->department_id
+            : null; // hoặc 0
+
+        $q = Task::query()
+            ->with(['handler', 'department', 'Post', 'channel'])
+            ->where('extra_money', '>', 0)
+            ->orderBy('department_lv1')   // ưu tiên 1
+            ->orderBy('department_lv2')   // ưu tiên 1
+            ->orderBy('department_id')       // ưu tiên 2
+            ->orderBy('user')          // ưu tiên 3 (hoặc user_id)
+            ->orderBy('post_id')       // ưu tiên 2
+            ->orderByDesc('id');             // phụ: cho ổn định
+
+        // Tìm theo mã NV / tên NV
+        if ($request->filled('handler_ids')) {
+            $handlerIds = array_values(array_filter(array_map('intval', (array)$request->handler_ids)));
+            if (!empty($handlerIds)) {
+                $q->whereIn('user', $handlerIds); // nếu cột là user_id thì đổi thành user_id
+            }
+        }
+
+        // Lọc phòng/nhóm (đệ quy: gồm cả con cháu)
+        if ($request->filled('department_id')) {
+            $deptId = (int) $request->department_id;
+
+            // lấy danh sách id con cháu + chính nó
+            $deptIds = TreeHelper::descendantIds($departments, $deptId, true);
+
+            $q->whereIn('department_id', $deptIds);
+        }
+
+        $tasks = $q->get();
+
+        // Tổng theo trang hiện tại
+        $sumTotal = $tasks->sum(function ($t) {
+            return (float)($t->expected_costs ?? 0) * (float)($t->days ?? 0);
+        });
+
+        $sumActual = $tasks->sum(function ($t) {
+            return (float)($t->actual_costs ?? 0);
+        });
+
+        $sumPaid = $tasks->sum(function ($t) {
+            $total = (float)($t->expected_costs ?? 0) * (float)($t->days ?? 0);
+            $rate  = (float)($t->rate ?? 0);
+            return $total * (1 - $rate/100);
+        });
+
+        $sum_expected = $tasks->sum(function ($t) {
+            return (float)($t->price_expected ?? 0);
+        });
+        $sum_actual_costs = $tasks->sum(function ($t) {
+            return (float)($t->actual_costs ?? 0);
+        });
+        $sum_refund_money = $tasks->sum(function ($t) {
+            return (float)($t->refund_money ?? 0);
+        });
+        $sum_extra_money = $tasks->sum(function ($t) {
+            return (float)($t->extra_money ?? 0);
+        });
+
+        // Render filter options
+        $reports = Report::orderByDesc('id')->get();
+        $users = User::get();
+        $posts = Post::where('sort_by', 'Product')->get();
+        $channels = Channel::all();
+        $channelsOptions = TreeHelper::buildOptions($channels,0,'',$request->channel_id);
+
+        $departmentOptions = TreeHelper::buildOptions(
+            $departments,
+            0,
+            '',
+            $selectedDeptId,
+            'id',
+            'parent',
+            'name'
+        );
+
+        $pageTitle = 'Danh sách NS nợ tiền';
+        $excelFilename = 'danh_sach_ns_no_tien_' . date('Ymd_His') . '.xlsx';
+        $isNsDebt = true;
+
+        return view('account.task.ns_debt', compact(
+            'reports',
+            'departmentOptions',
+            'tasks',
+            'sumTotal',
+            'sumActual',
+            'sumPaid',
+            'selectedReportId',
+            'users',
+            'posts',
+            'channelsOptions',
+            'sum_expected',
+            'sum_actual_costs',
+            'sum_refund_money',
+            'sum_extra_money',
+            'pageTitle',
+            'excelFilename',
+            'isNsDebt',
         ));
     }
 

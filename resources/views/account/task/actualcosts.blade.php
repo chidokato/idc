@@ -1,6 +1,6 @@
 @extends('account.layout.index')
 
-@section('title') Công Ty Cổ Phần Bất Động Sản Indochine @endsection
+@section('title') {{ $pageTitle ?? 'Công Ty Cổ Phần Bất Động Sản Indochine' }} @endsection
 
 @section('css')
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -289,13 +289,13 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb breadcrumb-no-gutter">
             <li class="breadcrumb-item"><a class="breadcrumb-link" href="account/main">Account</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Danh sách link đăng ký MKT</li>
+            <li class="breadcrumb-item active" aria-current="page">{{ $pageTitle ?? 'Danh sách link đăng ký MKT' }}</li>
           </ol>
         </nav>
-        <h1 class="page-header-title">Danh sách link đăng ký MKT</h1>
+        <h1 class="page-header-title">{{ $pageTitle ?? 'Danh sách link đăng ký MKT' }}</h1>
       </div>
       <div class="col-sm-auto d-none d-sm-block">
-        <button type="button" class="btn btn-success js-export-excel" data-table="#taskTable" data-filename="tasks_{{ date('Ymd_His') }}.xlsx"> Xuất Excel</button>
+        <button type="button" class="btn btn-success js-export-excel" data-table="#taskTable" data-filename="{{ $excelFilename ?? 'tasks_'.date('Ymd_His').'.xlsx' }}"> Xuất Excel</button>
       </div>
       <div class="col-sm-auto d-none d-sm-block">
         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#bulkImportModal">

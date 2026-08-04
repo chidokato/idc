@@ -28,15 +28,12 @@
     $isHeld = ((int)($task->paid ?? 0) === 1);
     $isExtra = ((float)($task->extra_money ?? 0) > 0);
     $isSettled = ((int)$task->settled === 1);
-    $isApproved = ((int)($task->approved ?? 0) === 1);
-    $editLocked = $isHeld;
-    $deleteLocked = ($isApproved || $isHeld || $isSettled);
+    $editLocked = ($isHeld || $isSettled);
 
-    $disabledSettled = !auth()->check()
-    || (
-      $rank != 1
-      && (
-        !$isExtra
+    $disabledSettled = (
+      ($rank !== 1) &&
+      (
+        !$sameDept
         || !$isMine
         || $isSettled
       )
@@ -60,27 +57,11 @@
   @endphp
 
   <tr id="row-{{ $task->id }}">
-    <td data-toggle="tooltip" data-placement="right"
-           data-original-title="{{ $task->id ?? '' }}">
-      @if($rank === 1)
-        <label class="row toggle-switch-sm switch mg-0" for="avail111{{ $task->id }}">
-          <span class="col-4 col-sm-3">
-            <input type="checkbox" class="toggle-switch-input active-toggle-approved" 
-              id="avail111{{ $task->id }}"
-              data-id="{{ $task->id }}" 
-              data-url="{{ route('task.toggleApproved', ['task' => $task->id]) }}"
-              {{ $task->approved ? 'checked' : '' }}>
-            <span class="toggle-switch-label ml-auto">
-              <span class="toggle-switch-indicator"></span>
-            </span>
-          </span>
-        </label>
-      @else
-      @if($task->approved == 1)
-          <span class="badge btn-success">Duyệt</span>
-      @else
-          <span class="badge btn-warning">Không</span>
-      @endif
+    <td class="text-center">
+      @if($task->Report && $task->Report->time_start && $task->Report->time_end)
+        <span><strong>{{ \Carbon\Carbon::parse($task->Report->time_start)->format('d') }} - {{ \Carbon\Carbon::parse($task->Report->time_end)->format('d') }}/{{ \Carbon\Carbon::parse($task->Report->time_start)->format('m/Y') }}</strong></span>
+      @elseif($task->Report)
+        <span><strong>{{ $task->Report->name }}</strong></span>
       @endif
     </td>
     <td class="text-center">
@@ -149,14 +130,11 @@
       @else
       {{ number_format((float)$task->actual_costs, 0, ',', '.') }}
       @endif
-
-      
     </td>
     <td class="text-right money">
       <span class="js-refund-money text-success">
         {{ number_format((float)$task->refund_money, 0, ',', '.') }}
       </span>
-
     </td>
 
     <td class="text-right money">
@@ -184,75 +162,10 @@
         {{ $task->content ?? '' }}
       </div>
     </td>
-
-    <td class="cell-actions d-flex">
-      @if($rank ===1 )
-      <div class="edit">
-        <a class="btn btn-sm btn-white btn-edit-task"
-           href="javascript:;"
-           data-id="{{ $task->id }}"
-           data-user-id="{{ $task->user ?? '' }}"
-           data-user-name="{{ $task->handler?->yourname ?? '' }}"
-           data-department-id="{{ $task->department_id ?? '' }}"
-           data-department-name="{{ $task->department?->name ?? '' }}"
-           data-post-id="{{ $task->post_id ?? '' }}"
-           data-post-name="{{ $task->Post?->name ?? '' }}"
-           data-channel-id="{{ $task->channel_id ?? '' }}"
-           data-channel-name="{{ $task->channel?->name ?? $task->channel ?? '' }}"
-           data-report-id="{{ $task->report_id ?? '' }}"
-           data-expected-costs="{{ (float)($task->expected_costs ?? 0) }}"
-           data-actual-costs="{{ (float)($task->actual_costs ?? 0) }}"
-           data-days="{{ (int)($task->days ?? 0) }}"
-           data-rate="{{ (float)($task->rate ?? 0) }}"
-           data-extra-money="{{ (float)($task->extra_money ?? 0) }}"
-           data-refund-money="{{ (float)($task->refund_money ?? 0) }}"
-           data-content="{{ $task->content ?? '' }}"
-           data-approved="{{ (int)($task->approved ?? 0) }}"
-           data-paid="{{ (int)($task->paid ?? 0) }}"
-           data-settled="{{ (int)($task->settled ?? 0) }}"
-           data-created-at="{{ optional($task->created_at)->format('d/m/Y H:i') ?? '' }}"
-           data-toggle="modal"
-           data-target="#invoiceReceiptModal">
-          <i class="tio-edit"></i>
-        </a>
-      </div>
-      <div class="ml-1">
-        <a class="btn btn-sm btn-white btn-up-task"
-           href="{{ $editLocked ? 'javascript:void(0);' : 'javascript:;' }}"
-           data-id="{{ $task->id }}"
-           @if(!$editLocked)
-           data-url="{{ route('tasks.up', $task) }}"
-           @endif
-           data-paid="{{ (int)($task->paid ?? 0) }}"
-           data-actual-costs="{{ (float)($task->actual_costs ?? 0) }}"
-           style="{{ $editLocked ? 'pointer-events:none;opacity:.5;cursor:not-allowed;' : '' }}"
-           title="{{ $editLocked ? 'Task đã đóng tiền, không thể up' : 'Up' }}"
-           aria-disabled="{{ $editLocked ? 'true' : 'false' }}">
-          <i class="tio-arrow-upward"></i>
-        </a>
-      </div>
-      <div class="delete-button ml-1">
-        <a class="btn btn-sm btn-white js-delete-task"
-           href="{{ $deleteLocked ? 'javascript:void(0);' : 'javascript:;' }}"
-           @if(!$deleteLocked)
-           data-url="{{ route('task.destroy', $task) }}"
-           @endif
-           data-id="{{ $task->id }}"
-           data-approved="{{ (int)($task->approved ?? 0) }}"
-           data-paid="{{ (int)($task->paid ?? 0) }}"
-           data-settled="{{ (int)($task->settled ?? 0) }}"
-           style="{{ $deleteLocked ? 'pointer-events:none;opacity:.5;cursor:not-allowed;' : '' }}"
-           title="{{ $deleteLocked ? 'Task đã duyệt, đóng tiền hoặc tất toán nên không thể xóa' : '' }}"
-           aria-disabled="{{ $deleteLocked ? 'true' : 'false' }}">
-          <i class="tio-delete-outlined"></i>
-        </a>
-      </div>
-      @endif
-    </td>
   </tr>
 
 @empty
   <tr>
-    <td colspan="16" class="text-center text-muted py-4">Không có dữ liệu phù hợp</td>
+    <td colspan="14" class="text-center text-muted py-4">Không có dữ liệu phù hợp</td>
   </tr>
 @endforelse

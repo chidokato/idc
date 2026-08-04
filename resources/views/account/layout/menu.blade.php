@@ -51,6 +51,13 @@
             </a>
           </li>
 
+          <li class="nav-item ">
+            <a class="js-nav-tooltip-link nav-link " href="account/ns-debt" title="Danh sách NS nợ tiền" data-placement="left">
+               <i class="tio-user-outlined nav-icon"></i>
+              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Danh sách NS nợ tiền</span>
+            </a>
+          </li>
+
           
           @if(auth()->check() && in_array((int)auth()->user()->rank, [1], true))
           <li class="nav-item">
