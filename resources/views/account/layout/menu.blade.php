@@ -52,9 +52,9 @@
           </li>
 
           <li class="nav-item ">
-            <a class="js-nav-tooltip-link nav-link " href="account/ns-debt" title="Danh sách NS nợ tiền" data-placement="left">
+            <a class="js-nav-tooltip-link nav-link " href="account/ns-debt" title="Danh sách nợ tiền" data-placement="left">
                <i class="tio-user-outlined nav-icon"></i>
-              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Danh sách NS nợ tiền</span>
+              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Danh sách nợ tiền</span>
             </a>
           </li>
 
