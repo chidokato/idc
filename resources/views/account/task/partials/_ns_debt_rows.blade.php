@@ -64,6 +64,29 @@
         <span><strong>{{ $task->Report->name }}</strong></span>
       @endif
     </td>
+    <td data-toggle="tooltip" data-placement="right"
+           data-original-title="{{ $task->id ?? '' }}">
+      @if($rank === 1)
+        <label class="row toggle-switch-sm switch mg-0" for="avail111{{ $task->id }}">
+          <span class="col-4 col-sm-3">
+            <input type="checkbox" class="toggle-switch-input active-toggle-approved" 
+              id="avail111{{ $task->id }}"
+              data-id="{{ $task->id }}" 
+              data-url="{{ route('task.toggleApproved', ['task' => $task->id]) }}"
+              {{ $task->approved ? 'checked' : '' }}>
+            <span class="toggle-switch-label ml-auto">
+              <span class="toggle-switch-indicator"></span>
+            </span>
+          </span>
+        </label>
+      @else
+      @if($task->approved == 1)
+          <span class="badge btn-success">Duyệt</span>
+      @else
+          <span class="badge btn-warning">Không</span>
+      @endif
+      @endif
+    </td>
     <td class="text-center">
       <div data-toggle="tooltip" data-placement="right"
            data-original-title="{{ $task->handler?->employee_code ?? '' }}">
@@ -166,6 +189,6 @@
 
 @empty
   <tr>
-    <td colspan="14" class="text-center text-muted py-4">Không có dữ liệu phù hợp</td>
+    <td colspan="15" class="text-center text-muted py-4">Không có dữ liệu phù hợp</td>
   </tr>
 @endforelse
