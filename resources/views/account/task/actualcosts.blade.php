@@ -298,9 +298,11 @@
         <button type="button" class="btn btn-success js-export-excel" data-table="#taskTable" data-filename="{{ $excelFilename ?? 'tasks_'.date('Ymd_His').'.xlsx' }}"> Xuất Excel</button>
       </div>
       <div class="col-sm-auto d-none d-sm-block">
+        @if($rank === 1)
         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#bulkImportModal">
           <i class="tio-publish"></i> Thêm hàng loạt
         </button>
+        @endif
       </div>
       <div class="col-sm-auto d-none d-sm-block">
         @if($rank === 1)
