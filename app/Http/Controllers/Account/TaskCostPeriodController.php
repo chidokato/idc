@@ -17,7 +17,12 @@ class TaskCostPeriodController extends Controller
         $departments = Department::where('parent', 0)->orderBy('name')->get();
         $channels = Channel::orderBy('name')->get();
         $selectedCompanyId = (int) $request->input('company_id', 0);
+        $selectedFloorId = (int) $request->input('floor_id', 0);
         $selectedChannelId = (int) $request->input('channel_id', 0);
+
+        $floors = Department::whereIn('parent', function($query) {
+            $query->select('id')->from('departments')->where('parent', 0);
+        })->orderBy('name')->get();
 
         $selectedReportIds = collect((array) $request->input('report_ids', []))
             ->filter(fn ($id) => filled($id))
@@ -38,6 +43,10 @@ class TaskCostPeriodController extends Controller
                 fn ($query) => $query->where('tasks.department_lv1', $selectedCompanyId)
             )
             ->when(
+                $selectedFloorId > 0,
+                fn ($query) => $query->where('tasks.department_lv2', $selectedFloorId)
+            )
+            ->when(
                 $selectedChannelId > 0,
                 fn ($query) => $query->where('tasks.channel_id', $selectedChannelId)
             )
@@ -52,6 +61,10 @@ class TaskCostPeriodController extends Controller
             ->when(
                 $selectedCompanyId > 0,
                 fn ($query) => $query->where('tasks.department_lv1', $selectedCompanyId)
+            )
+            ->when(
+                $selectedFloorId > 0,
+                fn ($query) => $query->where('tasks.department_lv2', $selectedFloorId)
             )
             ->when(
                 $selectedChannelId > 0,
@@ -69,6 +82,10 @@ class TaskCostPeriodController extends Controller
                 fn ($query) => $query->where('tasks.department_lv1', $selectedCompanyId)
             )
             ->when(
+                $selectedFloorId > 0,
+                fn ($query) => $query->where('tasks.department_lv2', $selectedFloorId)
+            )
+            ->when(
                 $selectedChannelId > 0,
                 fn ($query) => $query->where('tasks.channel_id', $selectedChannelId)
             )
@@ -82,6 +99,10 @@ class TaskCostPeriodController extends Controller
             ->when(
                 $selectedCompanyId > 0,
                 fn ($query) => $query->where('tasks.department_lv1', $selectedCompanyId)
+            )
+            ->when(
+                $selectedFloorId > 0,
+                fn ($query) => $query->where('tasks.department_lv2', $selectedFloorId)
             )
             ->when(
                 $selectedChannelId > 0,
@@ -158,9 +179,11 @@ class TaskCostPeriodController extends Controller
         return view('account.report.statistical', [
             'reports' => $reports,
             'departments' => $departments,
+            'floors' => $floors,
             'channels' => $channels,
             'selectedReportIds' => $selectedReportIds,
             'selectedCompanyId' => $selectedCompanyId,
+            'selectedFloorId' => $selectedFloorId,
             'selectedChannelId' => $selectedChannelId,
             'summary' => $summary,
             'projectSummaries' => $projectSummaries,

@@ -34,13 +34,24 @@
               @endforeach
             </select>
           </div>
-          <div class="col-lg-3 mb-3">
+          <div class="col-lg-2 mb-3">
             <label class="input-label">Công ty</label>
             <select name="company_id" class="form-control js-company-select">
               <option value="">Tất cả công ty</option>
               @foreach($departments as $department)
                 <option value="{{ $department->id }}" {{ (int) ($selectedCompanyId ?? 0) === (int) $department->id ? 'selected' : '' }}>
                   {{ $department->name }}
+                </option>
+              @endforeach
+            </select>
+          </div>
+          <div class="col-lg-2 mb-3">
+            <label class="input-label">Sàn</label>
+            <select name="floor_id" class="form-control js-floor-select">
+              <option value="">Tất cả sàn</option>
+              @foreach($floors as $floor)
+                <option value="{{ $floor->id }}" {{ (int) ($selectedFloorId ?? 0) === (int) $floor->id ? 'selected' : '' }}>
+                  {{ $floor->name }}
                 </option>
               @endforeach
             </select>
@@ -245,6 +256,12 @@ $(document).ready(function () {
   $('.js-company-select').select2({
     width: '100%',
     placeholder: 'Chọn công ty',
+    allowClear: true
+  });
+
+  $('.js-floor-select').select2({
+    width: '100%',
+    placeholder: 'Chọn sàn',
     allowClear: true
   });
 
