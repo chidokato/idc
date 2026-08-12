@@ -526,5 +526,26 @@ class AccountController extends HomeController
         return view('account.guide.index', compact('user'));
     }
 
-
+    public function ssoLearning()
+    {
+        $user = Auth::user();
+        
+        $payload = [
+            'id' => $user->id,
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'name' => $user->name ?? $user->yourname,
+            'avatar' => $user->avatar,
+            'timestamp' => time(),
+        ];
+        
+        // Generate a secure token containing the user data
+        $token = \Illuminate\Support\Facades\Crypt::encryptString(json_encode($payload));
+        
+        // Target URL to redirect to
+        $setting = \App\Models\Setting::first();
+        $targetUrl = $setting->learning_url ?: env('LEARNING_SSO_URL', 'https://learning.indochinerealestate.vn/sso-login');
+        
+        return redirect()->away($targetUrl . '?token=' . urlencode($token));
+    }
 }

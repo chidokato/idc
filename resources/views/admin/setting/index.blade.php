@@ -177,6 +177,12 @@
                             <input value="{{$data->zalo}}" name="zalo" placeholder="..." type="text" class="form-control">
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Link web học tập</label>
+                            <input value="{{$data->learning_url}}" name="learning_url" placeholder="..." type="text" class="form-control">
+                        </div>
+                    </div>
                     <div class="col-md-12">
                       <label>maps</label>
                         <div class="form-group">

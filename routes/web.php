@@ -197,6 +197,10 @@ Route::middleware(['user'])->group(function () {
         Route::post('change-password', [AccountController::class, 'changePassword'])->name('account.change-password');
         Route::post('update-secondary-email', [AccountController::class, 'updateSecondaryEmail'])->name('account.update-secondary-email');
         Route::post('verify-secondary-email-otp', [AccountController::class, 'verifySecondaryEmailOtp'])->name('account.verify-secondary-email-otp');
+        
+        // learning sso
+        Route::get('learning', [AccountController::class, 'ssoLearning'])->name('account.learning');
+
         // mkt
         Route::get('mkt-register', [AccountController::class, 'mktregister'])->name('account.marketing.register');
         Route::post('mkt-tasksstore', [AccountController::class, 'storeTask'])->name('account.tasksstore');

@@ -101,6 +101,18 @@
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Nạp tiền</span>
             </a>
           </li>
+
+          <li class="nav-item">
+            <small class="nav-subtitle" title="Nội bộ">Nội bộ</small>
+            <small class="tio-more-horizontal nav-subtitle-replacer"></small>
+          </li>
+
+          <li class="nav-item ">
+            <a class="js-nav-tooltip-link nav-link " href="{{ route('account.learning') }}" target="_blank" title="Học tập" data-placement="left">
+              <i class="tio-book-opened nav-icon"></i>
+              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Học tập</span>
+            </a>
+          </li>
         </ul>
       </div>
       <!-- End Content -->
