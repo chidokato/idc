@@ -69,7 +69,7 @@
                         </div>
                         <div class="news-item-captain-body">
                             <h5>{{$val->name}}</h5>
-                            <p class="mb-0  text-truncate-set text-truncate-set-2">Chính chủ cần chuyển nhượng gấp căn 2 ngủ diện tích thông thủy 78m2 full đồ, khách mua chỉ cần dọn quần áo đến có thể ở ngay</p>
+                            <p class="mb-0 text-truncate-set text-truncate-set-3">{{ $val->description ?: strip_tags($val->detail) }}</p>
                         </div>
                     </a>
                     @else
