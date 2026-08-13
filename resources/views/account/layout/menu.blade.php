@@ -110,7 +110,7 @@
           <li class="nav-item ">
             <a class="js-nav-tooltip-link nav-link " href="{{ route('account.learning') }}" target="_blank" title="Học tập" data-placement="left">
               <i class="tio-book-opened nav-icon"></i>
-              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Học tập</span>
+              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Học tập </span>
             </a>
           </li>
         </ul>
