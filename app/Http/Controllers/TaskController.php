@@ -466,6 +466,40 @@ class TaskController extends Controller
         ]);
     }
 
+    public function updateVideo(Request $request)
+    {
+        $request->validate([
+            'task_id' => 'required|exists:tasks,id',
+            'video' => 'nullable|string|max:255',
+        ]);
+
+        $task = Task::find($request->task_id);
+        $task->video = $request->video;
+        $task->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Cập nhật Video thành công'
+        ]);
+    }
+
+    public function updateLivestream(Request $request)
+    {
+        $request->validate([
+            'task_id' => 'required|exists:tasks,id',
+            'livestream' => 'nullable|string|max:255',
+        ]);
+
+        $task = Task::find($request->task_id);
+        $task->livestream = $request->livestream;
+        $task->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Cập nhật Livestream thành công'
+        ]);
+    }
+
     public function updateExpectedCost(Request $request)
     {
         $request->validate([

@@ -107,7 +107,7 @@
                                 @endif
                             </th>
                             <th>Họ Tên</th>
-                            <th>Sàn</th>
+                            <th class="d-none">Sàn</th>
                             <th>Nhóm</th>
                             <th>Dự án</th>
                             <th class="text-center">Kênh</th>
@@ -117,6 +117,8 @@
                             <th>Hỗ trợ</th>
                             <th>Ghi chú</th>
                             <th>KPI</th>
+                            <th>Video</th>
+                            <th>Livestream</th>
                             <!-- <th></th> -->
                             <th>Duyệt</th>
                             <th></th>
@@ -203,12 +205,14 @@
                         <tr>
                             <td></td>
                             <td></td>
-                            <td></td>
+                            <td class="d-none"></td>
                             <td></td>
                             <td></td>
                             <td></td>
                             <td></td>
                             <td class="text-end">{{ number_format($tongTien, 0, ',', ',') }}</td>
+                            <td></td>
+                            <td></td>
                             <td></td>
                             <td></td>
                             <td></td>
@@ -229,7 +233,7 @@
                             </td>
                             <td>
                                 <a class="media align-items-center text-dark" >
-                                  <div class="avatar avatar-xs avatar-circle mr-2">
+                                  <div class="avatar avatar-xs avatar-circle mr-2 d-none">
                                     <img class="avatar-img" src="{{ $val->handler?->avatar ?? '' }}" alt="Image Description">
                                   </div>
                                   <div class="media-body ">
@@ -237,7 +241,7 @@
                                   </div>
                                 </a>
                               </td>
-                            <td>{{ $val->Department_lv2?->name }}</td>
+                            <td class="d-none">{{ $val->Department_lv2?->name }}</td>
                             <td>{{ $val->department?->name }}</td>
                             <td class="duan" data-duan="{{ $val->Post?->id }}">{{ $val->Post?->name }} </td>
                             <td class="text-center">{{ $val->Channel?->name }} </td>
@@ -275,6 +279,12 @@
                                 </td>
                             <td>
                                 <input style="max-width:120px;" type="text" @if($val->paid ==1) disabled @endif class="task-kpi form-control form-select-sm" value="{{ $val->kpi ?? '' }}" data-id="{{ $val->id }}" placeholder="..." >
+                            </td>
+                            <td>
+                                <input style="max-width:120px;" type="text" @if($val->paid ==1) disabled @endif class="task-video form-control form-select-sm" value="{{ $val->video ?? '' }}" data-id="{{ $val->id }}" placeholder="..." >
+                            </td>
+                            <td>
+                                <input style="max-width:120px;" type="text" @if($val->paid ==1) disabled @endif class="task-livestream form-control form-select-sm" value="{{ $val->livestream ?? '' }}" data-id="{{ $val->id }}" placeholder="..." >
                             </td>
                             <td>
                                 <label class="row toggle-switch-sm switch mg-0" for="avail111{{ $val->id }}">
@@ -533,6 +543,56 @@ $(document).on('change', '.task-kpi', function () {
         },
         error: function () {
             alert('Lỗi khi lưu KPI');
+            input.css('border', '1px solid red');
+        }
+    });
+});
+
+$(document).on('change', '.task-video', function () {
+    let input = $(this);
+    let video = input.val();
+    let taskId = input.data('id');
+
+    $.ajax({
+        url: "{{ route('task.updateVideo') }}",
+        method: "POST",
+        data: {
+            _token: "{{ csrf_token() }}",
+            task_id: taskId,
+            video: video
+        },
+        success: function (res) {
+            if (res.status) {
+                input.css('border', '1px solid #28a745');
+            }
+        },
+        error: function () {
+            alert('Lỗi khi lưu Video');
+            input.css('border', '1px solid red');
+        }
+    });
+});
+
+$(document).on('change', '.task-livestream', function () {
+    let input = $(this);
+    let livestream = input.val();
+    let taskId = input.data('id');
+
+    $.ajax({
+        url: "{{ route('task.updateLivestream') }}",
+        method: "POST",
+        data: {
+            _token: "{{ csrf_token() }}",
+            task_id: taskId,
+            livestream: livestream
+        },
+        success: function (res) {
+            if (res.status) {
+                input.css('border', '1px solid #28a745');
+            }
+        },
+        error: function () {
+            alert('Lỗi khi lưu Livestream');
             input.css('border', '1px solid red');
         }
     });
