@@ -477,6 +477,7 @@ class ExpenseController extends Controller
             'expected_costs' => ['required', 'integer', 'min:0'],
             'redirect_url'   => ['nullable', 'string'],
             'addreport_id'   => ['nullable', 'string'],
+            'content'        => ['nullable', 'string'],
         ]);
 
         $user = User::find($data['user_id']);
@@ -496,6 +497,7 @@ class ExpenseController extends Controller
             'post_id'        => $data['post_id'],
             'channel_id'     => $data['channel_id'],
             'expected_costs' => $data['expected_costs'],
+            'content'        => $data['content'] ?? null,
         ]);
 
         $redirect = $data['redirect_url'] ?: url()->previous();

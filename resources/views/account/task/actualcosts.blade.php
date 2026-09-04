@@ -676,7 +676,15 @@
                 </div>
               </div>
             </div>
+          </div>
 
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group">
+                <label for="content" class="input-label">Ghi chú</label>
+                <input type="text" class="form-control" name="content" id="content" placeholder="Nhập ghi chú...">
+              </div>
+            </div>
           </div>
 
           <div class="d-flex align-items-center">
