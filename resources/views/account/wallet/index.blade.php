@@ -32,9 +32,11 @@
                 <h1 class="page-header-title">Ví tiền</h1>
             </div>
             <div class="col-sm-auto">
+                @if(config('wallet.transfers_enabled', false))
                 <a class="btn btn-primary" href="account/wallet/transfer">
                     <i class="tio-swap-horizontal mr-1"></i> Chuyển tiền
                 </a>
+                @endif
                 <a class="btn btn-primary js-withdraw-guard" href="{{ route('wallet.withdraw.form') }}">
                     <i class="tio-money-vs mr-1"></i> Rút tiền
                 </a>

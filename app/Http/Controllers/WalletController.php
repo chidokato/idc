@@ -248,6 +248,8 @@ class WalletController extends Controller
 
     public function bulkTransferForm()
     {
+        abort_unless(config('wallet.transfers_enabled', false), 403, 'Tính năng chuyển tiền đang tạm dừng.');
+
         $user = auth()->user();
 
         // Nếu bạn muốn chỉ rank 1,2 dùng:
@@ -275,6 +277,8 @@ class WalletController extends Controller
 
     public function bulkTransferSubmit(Request $request)
     {
+        abort_unless(config('wallet.transfers_enabled', false), 403, 'Tính năng chuyển tiền đang tạm dừng.');
+
         $user = auth()->user();
 
         // Nếu bạn muốn chỉ rank 1,2 dùng:

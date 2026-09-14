@@ -74,11 +74,13 @@
                     </a>
                   </li>
                 
+                  @if(config('wallet.transfers_enabled', false))
                   <li class="nav-item">
                     <a class="nav-link" href="#deleteAccountSection">
                       - Chuyển tiền
                     </a>
                   </li>
+                  @endif
                 </ul>
                 <!-- End Navbar Nav -->
               </div>
@@ -135,6 +137,7 @@
 
 
             <!-- Card -->
+            @if(config('wallet.transfers_enabled', false))
             <div id="deleteAccountSection" class="card mb-3 mb-lg-5">
               <div class="card-header">
                 <h4 class="card-title">Chuyển tiền (dành cho quản lý)</h4>
@@ -146,6 +149,7 @@
               </div>
               <!-- End Body -->
             </div>
+            @endif
             <!-- End Card -->
 
             <!-- Sticky Block End Point -->
