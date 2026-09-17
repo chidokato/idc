@@ -9,6 +9,7 @@ class WalletTransfersPausedTest extends TestCase
 {
     public function test_transfer_form_is_blocked_without_accessing_the_database()
     {
+        config(['wallet.transfers_enabled' => false]);
         $this->withoutMiddleware();
         DB::shouldReceive('connection')->never();
 
@@ -17,6 +18,7 @@ class WalletTransfersPausedTest extends TestCase
 
     public function test_transfer_submission_is_blocked_without_accessing_the_database()
     {
+        config(['wallet.transfers_enabled' => false]);
         $this->withoutMiddleware();
         DB::shouldReceive('connection')->never();
 

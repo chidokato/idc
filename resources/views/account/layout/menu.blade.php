@@ -101,6 +101,14 @@
               <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Nạp tiền</span>
             </a>
           </li>
+          @if(auth()->check() && in_array((int)auth()->user()->rank, [1], true))
+          <li class="nav-item ">
+            <a class="js-nav-tooltip-link nav-link " href="account/wallet/transfer" title="Chuyển tiền" data-placement="left">
+              <i class="tio-swap-horizontal nav-icon"></i>
+              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Chuyển tiền</span>
+            </a>
+          </li>
+          @endif
 
           <li class="nav-item">
             <small class="nav-subtitle" title="Nội bộ">Nội bộ</small>

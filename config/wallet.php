@@ -1,6 +1,6 @@
 <?php
 
 return [
-    // Temporarily pause new wallet transfers; set to true to resume.
-    'transfers_enabled' => false,
+    // Set to false to temporarily pause new wallet transfers.
+    'transfers_enabled' => true,
 ];
