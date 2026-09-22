@@ -528,24 +528,42 @@ class AccountController extends HomeController
 
     public function ssoLearning()
     {
+        return $this->redirectToSso($this->getSsoPayload(), 'learning_url', 'LEARNING_SSO_URL', 'https://learning.indochinerealestate.vn/sso-login');
+    }
+
+    public function ssoIzi()
+    {
+        $setting = Setting::find(1);
+        abort_unless($setting && $setting->izi_url, 404, 'Tính năng đang được hoàn thiện. Vui lòng quay lại sau.');
+
+        return $this->redirectToSso($this->getSsoPayload(), 'izi_url', 'IZI_SSO_URL');
+    }
+
+    private function getSsoPayload()
+    {
         $user = Auth::user();
-        
-        $payload = [
+
+        return [
             'id' => $user->id,
             'email' => $user->email,
             'phone' => $user->phone,
             'name' => $user->name ?? $user->yourname,
             'avatar' => $user->avatar,
+            'employee_code' => $user->employee_code,
             'timestamp' => time(),
         ];
-        
-        // Generate a secure token containing the user data
+    }
+
+    private function redirectToSso(array $payload, string $settingField, string $environmentField, ?string $defaultUrl = null)
+    {
         $token = \Illuminate\Support\Facades\Crypt::encryptString(json_encode($payload));
-        
-        // Target URL to redirect to
-        $setting = \App\Models\Setting::first();
-        $targetUrl = $setting->learning_url ?: env('LEARNING_SSO_URL', 'https://learning.indochinerealestate.vn/sso-login');
-        
-        return redirect()->away($targetUrl . '?token=' . urlencode($token));
+        $setting = Setting::find(1);
+        $targetUrl = trim((string) ($setting->{$settingField} ?? '')) ?: env($environmentField, $defaultUrl);
+
+        abort_unless($targetUrl, 404, 'Chưa cấu hình liên kết IZI.');
+
+        $separator = strpos($targetUrl, '?') === false ? '?' : '&';
+
+        return redirect()->away($targetUrl . $separator . 'token=' . urlencode($token));
     }
 }

@@ -200,6 +200,7 @@ Route::middleware(['user'])->group(function () {
         
         // learning sso
         Route::get('learning', [AccountController::class, 'ssoLearning'])->name('account.learning');
+        Route::get('izi', [AccountController::class, 'ssoIzi'])->name('account.izi');
 
         // mkt
         Route::get('mkt-register', [AccountController::class, 'mktregister'])->name('account.marketing.register');

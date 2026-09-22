@@ -54,6 +54,7 @@ class SettingController extends Controller
         $setting->youtube = $data['youtube'];
         $setting->zalo = $data['zalo'];
         $setting->learning_url = $data['learning_url'] ?? null;
+        $setting->izi_url = $data['izi_url'] ?? null;
         $setting->maps = $data['maps'];
         $setting->header = $data['header'];
 
