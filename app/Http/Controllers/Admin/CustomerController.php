@@ -37,4 +37,14 @@ class CustomerController extends Controller
         Customer::find($id)->delete();
         return redirect()->back();
     }
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->ids;
+        if ($ids && is_array($ids)) {
+            Customer::whereIn('id', $ids)->delete();
+            return redirect()->back()->with('success', 'Đã xóa các mục đã chọn.');
+        }
+        return redirect()->back()->with('error', 'Vui lòng chọn ít nhất một mục để xóa.');
+    }
 }

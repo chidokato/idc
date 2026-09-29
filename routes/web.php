@@ -116,6 +116,7 @@ Route::prefix('admin')->group(function () {
         
         // khách hàng
         Route::resource('customer',CustomerController::class);
+        Route::post('customer/bulk-delete', [CustomerController::class, 'bulkDelete'])->name('customer.bulkDelete');
 
     });
 
