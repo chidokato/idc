@@ -68,6 +68,9 @@
             <label>
                 <input type="text" name="email" placeholder="Địa chỉ email">
             </label>
+            <label>
+                <input type="text" name="content" placeholder="Dự án quan tâm">
+            </label>
             <p class="sub">(*) Bằng việc nhấn vào "nhận báo giá". Quý khách đồng ý với <a target="_blank" href="https://indochinerealestate.vn/tin-noi-bo/chinh-sach-bao-mat-thong-tin-indochine-real-estate">Chính sách bảo mật thông tin </a> của chúng tôi.</p>
             <button class="btn btn-circle" type="submit">Nhận báo giá</button>
         </form>

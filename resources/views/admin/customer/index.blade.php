@@ -27,6 +27,7 @@
                                         <th>Name</th>
                                         <th>Phone</th>
                                         <th>Email</th>
+                                        <th>Dự án quan tâm</th>
                                         <th>Link</th>
                                         <th>date</th>
                                         <th></th>
@@ -39,6 +40,7 @@
                                         <td>{{$val->name}}</td>
                                         <td>{{$val->phone}}</td>
                                         <td>{{$val->email}}</td>
+                                        <td>{{$val->content}}</td>
                                         <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{$val->title}}">{{$val->title}}</td>
                                         <td>{{$val->created_at}}</td>
                                         <td style="display: flex;">
