@@ -185,7 +185,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label>Link web IZI</label>
+                            <label>Link web HCC</label>
                             <input value="{{$data->izi_url}}" name="izi_url" placeholder="..." type="text" class="form-control">
                         </div>
                     </div>

@@ -125,9 +125,9 @@
             <a class="js-nav-tooltip-link nav-link "
                href="{{ route('account.izi') }}"
                @if(optional($setting)->izi_url) target="_blank" @else onclick="event.preventDefault(); if (typeof Swal !== 'undefined') { Swal.fire({ icon: 'info', title: 'Tính năng đang được hoàn thiện', text: 'Vui lòng quay lại sau.' }); } else { alert('Tính năng đang được hoàn thiện. Vui lòng quay lại sau.'); }" @endif
-               title="IZI" data-placement="left">
+               title="HCC" data-placement="left">
               <i class="tio-book-opened nav-icon"></i>
-              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">IZI</span>
+              <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">HCC</span>
             </a>
           </li>
         </ul>
