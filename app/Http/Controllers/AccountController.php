@@ -81,6 +81,58 @@ class AccountController extends HomeController
         $dataExpected = $projects->pluck('total_expected')->map(fn($v) => (float)$v)->values()->all();
         $dataActual   = $projects->pluck('total_actual')->map(fn($v) => (float)$v)->values()->all();
 
+        // Biểu đồ chi phí các tháng trong năm (chia 2 loại: Chi phí Sale trả & Chi phí Công ty chi)
+        $monthlyTaskCosts = Task::query()
+            ->join('reports', 'reports.id', '=', 'tasks.report_id')
+            ->whereYear('reports.time_start', $statisticalYear)
+            ->selectRaw('
+                MONTH(reports.time_start) as month,
+                COALESCE(SUM(tasks.actual_costs), 0) as total_actual,
+                COALESCE(SUM(
+                    CAST(REPLACE(REPLACE(COALESCE(tasks.expected_costs, "0"), ".", ""), ",", "") AS DECIMAL(15,2))
+                    * COALESCE(tasks.days, 0)
+                    * (1 - COALESCE(tasks.rate, 0) / 100)
+                ), 0) as total_paid,
+                COALESCE(SUM(tasks.extra_money), 0) as total_extra,
+                COALESCE(SUM(tasks.refund_money), 0) as total_refund
+            ')
+            ->groupByRaw('MONTH(reports.time_start)')
+            ->get()
+            ->keyBy('month');
+
+        $chartMonthlyLabels = [];
+        $chartMonthlyActual = [];
+        $chartMonthlySale = [];
+        $chartMonthlyCompany = [];
+
+        for ($m = 1; $m <= 12; $m++) {
+            $chartMonthlyLabels[] = 'Tháng ' . $m;
+            $row = $monthlyTaskCosts->get($m);
+            if ($row) {
+                $actual = (float) $row->total_actual;
+                $rawSale = (float) $row->total_paid + (float) $row->total_extra - (float) $row->total_refund;
+                if ($actual > 0) {
+                    if ($actual >= $rawSale) {
+                        $sale = max(0, $rawSale);
+                        $company = $actual - $sale;
+                    } else {
+                        $sale = $actual;
+                        $company = 0;
+                    }
+                } else {
+                    $sale = 0;
+                    $company = 0;
+                }
+            } else {
+                $actual = 0;
+                $sale = 0;
+                $company = 0;
+            }
+            $chartMonthlyActual[] = $actual;
+            $chartMonthlySale[] = $sale;
+            $chartMonthlyCompany[] = $company;
+        }
+
         $reportIdsInYear = Report::query()
             ->whereDate('time_start', '<=', $monthEnd)
             ->whereDate('time_end', '>=', $monthStart)
@@ -159,6 +211,7 @@ class AccountController extends HomeController
         return view('account.dashboard.main', compact(
             'user',
             'chartLabels', 'dataExpected', 'dataActual',
+            'chartMonthlyLabels', 'chartMonthlyActual', 'chartMonthlySale', 'chartMonthlyCompany',
             'statisticalYear',
             'selectedMonth',
             'monthOptions',
