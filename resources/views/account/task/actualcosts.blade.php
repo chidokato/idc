@@ -470,14 +470,45 @@
     </div>
   </div>
 
-  <!-- Header -->
+  <!-- Bulk Action Toolbar -->
+  @if($rank === 1)
+  <div id="bulkActionToolbar" class="d-none align-items-center justify-content-between flex-wrap p-2 px-3 mb-3 bg-light border rounded shadow-sm">
+    <div class="d-flex align-items-center my-1">
+      <span class="font-weight-bold text-dark mr-2">
+        <i class="tio-checkmark-circle-outlined text-primary mr-1"></i>
+        Đã chọn: <span id="bulkSelectedCount" class="badge badge-primary badge-pill">0</span> mục
+      </span>
+      <button type="button" class="btn btn-xs btn-outline-secondary ml-1" id="btnClearSelection" style="display: none;">
+        <i class="tio-clear"></i> Bỏ chọn
+      </button>
+    </div>
+    <div class="d-flex align-items-center flex-wrap my-1">
+      <button type="button" class="btn btn-sm btn-success mr-2 mb-1" id="btnBulkApprove" disabled>
+        <i class="tio-done mr-1"></i> Duyệt hàng loạt
+      </button>
+      <button type="button" class="btn btn-sm btn-outline-warning mr-2 mb-1" id="btnBulkUnapprove" disabled>
+        <i class="tio-clear mr-1"></i> Bỏ duyệt hàng loạt
+      </button>
+      <button type="button" class="btn btn-sm btn-danger mb-1" id="btnBulkDelete" disabled>
+        <i class="tio-delete-outlined mr-1"></i> Xóa hàng loạt
+      </button>
+    </div>
+  </div>
+  @endif
 
-  <!-- End Header -->
   <!-- Table -->
   <div class="table-responsive datatable-custom">
   <table id="taskTable" class="table table-lg table-thead-bordered table-nowrap table-align-middle card-table">
     <thead class="thead-light">
       <tr>
+        @if($rank === 1)
+        <th style="width: 36px;" class="text-center no-export">
+          <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="checkAllTasks">
+            <label class="custom-control-label" for="checkAllTasks"></label>
+          </div>
+        </th>
+        @endif
         <th>Duyệt</th>
         <th class="text-center">Họ & Tên</th>
         <th class="text-center">Phòng / nhóm</th>
@@ -496,7 +527,7 @@
       </tr>
 
       <tr id="sumRow" class="font-weight-bold bg-light" style="{{ $tasks->count() ? '' : 'display:none' }}">
-        <td colspan="6"></td>
+        <td colspan="{{ $rank === 1 ? 7 : 6 }}"></td>
         <td class="text-right money" id="sumTotalText">{{ number_format($sumTotal, 0, ',', '.') }}</td>
         <td class="text-right money" id="sumPaidText">{{ number_format($sumPaid, 0, ',', '.') }}</td>
         <td class="text-center money" id="">{{ number_format($sum_expected, 0, ',', '.') }}</td>
@@ -1051,6 +1082,268 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   });
+});
+</script>
+
+<script>
+$(function () {
+  const rank = {{ (int)$rank }};
+  if (rank !== 1) return;
+
+  function getSelectedCheckboxes() {
+    return $('.row-task-check:checked');
+  }
+
+  function getSelectedIds() {
+    return getSelectedCheckboxes().map(function () {
+      return $(this).val();
+    }).get();
+  }
+
+  function updateBulkSelectionState() {
+    const total = $('.row-task-check').length;
+    const selected = getSelectedCheckboxes().length;
+
+    $('#bulkSelectedCount').text(selected);
+
+    const hasSelection = selected > 0;
+    $('#btnBulkApprove').prop('disabled', !hasSelection);
+    $('#btnBulkUnapprove').prop('disabled', !hasSelection);
+    $('#btnBulkDelete').prop('disabled', !hasSelection);
+
+    if (hasSelection) {
+      $('#bulkActionToolbar').removeClass('d-none').addClass('d-flex');
+      $('#btnClearSelection').show();
+    } else {
+      $('#bulkActionToolbar').addClass('d-none').removeClass('d-flex');
+      $('#btnClearSelection').hide();
+    }
+
+    if (total > 0 && selected === total) {
+      $('#checkAllTasks').prop('checked', true).prop('indeterminate', false);
+    } else if (selected > 0) {
+      $('#checkAllTasks').prop('checked', false).prop('indeterminate', true);
+    } else {
+      $('#checkAllTasks').prop('checked', false).prop('indeterminate', false);
+    }
+  }
+
+  // Check all / uncheck all
+  $(document).on('change', '#checkAllTasks', function () {
+    const isChecked = $(this).is(':checked');
+    $('.row-task-check').prop('checked', isChecked);
+    updateBulkSelectionState();
+  });
+
+  // Individual checkbox change
+  $(document).on('change', '.row-task-check', function () {
+    updateBulkSelectionState();
+  });
+
+  // Clear selection button
+  $('#btnClearSelection').on('click', function () {
+    $('.row-task-check').prop('checked', false);
+    $('#checkAllTasks').prop('checked', false).prop('indeterminate', false);
+    updateBulkSelectionState();
+  });
+
+  // Handle bulk approve / unapprove
+  function handleBulkApprove(action) {
+    const ids = getSelectedIds();
+    if (!ids.length) {
+      if (typeof showCenterWarning === 'function') {
+        showCenterWarning('Vui lòng chọn ít nhất 1 tác vụ.');
+      } else {
+        alert('Vui lòng chọn ít nhất 1 tác vụ.');
+      }
+      return;
+    }
+
+    const actionText = action === 'approve' ? 'duyệt' : 'bỏ duyệt';
+    const confirmTitle = action === 'approve' ? 'Xác nhận duyệt hàng loạt' : 'Xác nhận bỏ duyệt hàng loạt';
+    const confirmBtnText = action === 'approve' ? 'Duyệt' : 'Bỏ duyệt';
+    const confirmBtnColor = action === 'approve' ? '#28a745' : '#ffc107';
+
+    const doRequest = function () {
+      const $btnApprove = $('#btnBulkApprove');
+      const $btnUnapprove = $('#btnBulkUnapprove');
+      const $btnDelete = $('#btnBulkDelete');
+
+      $btnApprove.prop('disabled', true);
+      $btnUnapprove.prop('disabled', true);
+      $btnDelete.prop('disabled', true);
+
+      $.ajax({
+        url: "{{ route('account.tasks.bulkApprove') }}",
+        type: 'POST',
+        data: {
+          ids: ids,
+          action: action,
+          _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        dataType: 'json',
+        success: function (res) {
+          if (res.ok) {
+            if (typeof showToast === 'function') {
+              showToast('success', res.message || 'Cập nhật trạng thái thành công');
+            } else {
+              alert(res.message || 'Cập nhật trạng thái thành công');
+            }
+
+            if (res.updated_ids && res.updated_ids.length) {
+              res.updated_ids.forEach(function (id) {
+                const isApproved = (action === 'approve');
+                $('#avail111' + id).prop('checked', isApproved);
+                $('#taskCheck' + id).attr('data-approved', isApproved ? 1 : 0);
+              });
+            }
+
+            $('.row-task-check').prop('checked', false);
+            updateBulkSelectionState();
+          } else {
+            if (typeof showCenterError === 'function') {
+              showCenterError(res.message || 'Có lỗi xảy ra');
+            } else {
+              alert(res.message || 'Có lỗi xảy ra');
+            }
+            updateBulkSelectionState();
+          }
+        },
+        error: function (xhr) {
+          const msg = xhr.responseJSON?.message || 'Có lỗi khi xử lý dữ liệu.';
+          if (typeof showCenterError === 'function') {
+            showCenterError(msg);
+          } else {
+            alert(msg);
+          }
+          updateBulkSelectionState();
+        }
+      });
+    };
+
+    if (typeof Swal !== 'undefined') {
+      Swal.fire({
+        title: confirmTitle,
+        text: `Bạn có chắc chắn muốn ${actionText} ${ids.length} tác vụ đã chọn?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: confirmBtnText,
+        cancelButtonText: 'Hủy',
+        confirmButtonColor: confirmBtnColor,
+        reverseButtons: true
+      }).then(function (result) {
+        if (result.isConfirmed) {
+          doRequest();
+        }
+      });
+    } else {
+      if (confirm(`Bạn có chắc chắn muốn ${actionText} ${ids.length} tác vụ đã chọn?`)) {
+        doRequest();
+      }
+    }
+  }
+
+  $('#btnBulkApprove').on('click', function () {
+    handleBulkApprove('approve');
+  });
+
+  $('#btnBulkUnapprove').on('click', function () {
+    handleBulkApprove('unapprove');
+  });
+
+  // Handle bulk delete
+  $('#btnBulkDelete').on('click', function () {
+    const ids = getSelectedIds();
+    if (!ids.length) {
+      if (typeof showCenterWarning === 'function') {
+        showCenterWarning('Vui lòng chọn ít nhất 1 tác vụ cần xóa.');
+      } else {
+        alert('Vui lòng chọn ít nhất 1 tác vụ cần xóa.');
+      }
+      return;
+    }
+
+    const doDelete = function () {
+      const $btnApprove = $('#btnBulkApprove');
+      const $btnUnapprove = $('#btnBulkUnapprove');
+      const $btnDelete = $('#btnBulkDelete');
+
+      $btnApprove.prop('disabled', true);
+      $btnUnapprove.prop('disabled', true);
+      $btnDelete.prop('disabled', true);
+
+      $.ajax({
+        url: "{{ route('account.tasks.bulkDelete') }}",
+        type: 'POST',
+        data: {
+          ids: ids,
+          _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        dataType: 'json',
+        success: function (res) {
+          if (res.ok) {
+            if (typeof showToast === 'function') {
+              showToast('success', res.message || 'Đã xóa các tác vụ thành công');
+            } else {
+              alert(res.message || 'Đã xóa các tác vụ thành công');
+            }
+
+            if (res.deleted_ids && res.deleted_ids.length) {
+              res.deleted_ids.forEach(function (id) {
+                $('#row-' + id).fadeOut(300, function () {
+                  $(this).remove();
+                });
+              });
+            }
+
+            setTimeout(function () {
+              window.location.reload();
+            }, 700);
+          } else {
+            if (typeof showCenterWarning === 'function') {
+              showCenterWarning(res.message || 'Không thể xóa các tác vụ này.');
+            } else {
+              alert(res.message || 'Không thể xóa các tác vụ này.');
+            }
+            updateBulkSelectionState();
+          }
+        },
+        error: function (xhr) {
+          const msg = xhr.responseJSON?.message || 'Có lỗi xảy ra khi xóa tác vụ.';
+          if (typeof showCenterError === 'function') {
+            showCenterError(msg);
+          } else {
+            alert(msg);
+          }
+          updateBulkSelectionState();
+        }
+      });
+    };
+
+    if (typeof Swal !== 'undefined') {
+      Swal.fire({
+        title: 'Xác nhận xóa hàng loạt',
+        text: `Bạn có chắc chắn muốn xóa vĩnh viễn ${ids.length} tác vụ đã chọn?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Xóa ngay',
+        cancelButtonText: 'Hủy',
+        confirmButtonColor: '#ed4c78',
+        reverseButtons: true
+      }).then(function (result) {
+        if (result.isConfirmed) {
+          doDelete();
+        }
+      });
+    } else {
+      if (confirm(`Bạn có chắc chắn muốn xóa ${ids.length} tác vụ đã chọn?`)) {
+        doDelete();
+      }
+    }
+  });
+
+  // Initial state check
+  updateBulkSelectionState();
 });
 </script>
 @endsection

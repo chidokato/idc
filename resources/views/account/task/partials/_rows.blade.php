@@ -14,6 +14,7 @@
   @endphp
 
   @php
+    $rank = isset($rank) ? (int)$rank : (int)(auth()->user()->rank ?? 0);
     $meId = (int)(auth()->id() ?? 0);
 
     // cột user trong task (ID user sử dụng task)
@@ -30,7 +31,7 @@
     $isSettled = ((int)$task->settled === 1);
     $isApproved = ((int)($task->approved ?? 0) === 1);
     $editLocked = $isHeld;
-    $deleteLocked = ($isApproved || $isHeld || $isSettled);
+    $deleteLocked = ($isHeld || $isSettled);
 
     $disabledSettled = !auth()->check()
     || (
@@ -60,6 +61,22 @@
   @endphp
 
   <tr id="row-{{ $task->id }}">
+    @if($rank === 1)
+    <td class="text-center no-export" style="width: 36px;">
+      <div class="custom-control custom-checkbox">
+        <input type="checkbox" class="custom-control-input row-task-check" 
+               id="taskCheck{{ $task->id }}" 
+               value="{{ $task->id }}"
+               data-paid="{{ (int)($task->paid ?? 0) }}"
+               data-settled="{{ (int)($task->settled ?? 0) }}"
+               data-approved="{{ (int)($task->approved ?? 0) }}"
+               data-actual-costs="{{ (float)($task->actual_costs ?? 0) }}"
+               data-extra-money="{{ (float)($task->extra_money ?? 0) }}"
+               data-refund-money="{{ (float)($task->refund_money ?? 0) }}">
+        <label class="custom-control-label" for="taskCheck{{ $task->id }}"></label>
+      </div>
+    </td>
+    @endif
     <td data-toggle="tooltip" data-placement="right"
            data-original-title="{{ $task->id ?? '' }}">
       @if($rank === 1)
@@ -242,7 +259,7 @@
            data-paid="{{ (int)($task->paid ?? 0) }}"
            data-settled="{{ (int)($task->settled ?? 0) }}"
            style="{{ $deleteLocked ? 'pointer-events:none;opacity:.5;cursor:not-allowed;' : '' }}"
-           title="{{ $deleteLocked ? 'Task đã duyệt, đóng tiền hoặc tất toán nên không thể xóa' : '' }}"
+           title="{{ $deleteLocked ? 'Task đã đóng tiền hoặc tất toán nên không thể xóa' : '' }}"
            aria-disabled="{{ $deleteLocked ? 'true' : 'false' }}">
           <i class="tio-delete-outlined"></i>
         </a>
@@ -253,6 +270,6 @@
 
 @empty
   <tr>
-    <td colspan="16" class="text-center text-muted py-4">Không có dữ liệu phù hợp</td>
+    <td colspan="{{ $rank === 1 ? 17 : 16 }}" class="text-center text-muted py-4">Không có dữ liệu phù hợp</td>
   </tr>
 @endforelse

@@ -220,6 +220,8 @@ Route::middleware(['user'])->group(function () {
         
         // Route::post('tasks/{id}/update-paid', [TaskController::class, 'updatePaid'])->name('tasks.updatePaid');
         Route::post('tasks/bulk-update', [TaskController::class, 'bulkUpdateTasks'])->name('account.tasks.bulkUpdate');
+        Route::post('tasks/bulk-approve', [TaskController::class, 'bulkApproveTasks'])->name('account.tasks.bulkApprove');
+        Route::post('tasks/bulk-delete', [TaskController::class, 'bulkDeleteTasks'])->name('account.tasks.bulkDelete');
         Route::post('tasks/{task}/update-paid', [TaskController::class, 'updatePaid'])->name('tasks.updatePaid');
         Route::post('tasks/{task}/up', [TaskController::class, 'upTask'])->name('tasks.up');
         // Route::get('tasks/user', [TaskController::class, 'tasksuser'])->name('tasks.user');

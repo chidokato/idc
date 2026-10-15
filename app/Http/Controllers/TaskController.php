@@ -389,15 +389,22 @@ class TaskController extends Controller
     // Xóa tác vụ
     public function destroy(Task $task)
     {
+        // ====== CHECK QUYỀN ======
+        if (auth()->check() && (int) auth()->user()->rank !== 1) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Bạn không có quyền xóa tác vụ.',
+            ], 403);
+        }
+
         // ====== CHECK TRẠNG THÁI ======
         if (
             (int)$task->paid === 1 ||
-            (int)$task->settled === 1 ||
-            (int)$task->approved === 1
+            (int)$task->settled === 1
         ) {
             return response()->json([
                 'ok' => false,
-                'message' => 'Task đã được duyệt nên không thể xóa.',
+                'message' => 'Task đã đóng tiền hoặc tất toán nên không thể xóa.',
             ], 422);
         }
 
@@ -418,7 +425,7 @@ class TaskController extends Controller
         return response()->json([
             'ok' => true,
             'id' => $task->id,
-            'message' => 'Deleted',
+            'message' => 'Đã xóa tác vụ thành công!',
         ]);
     }
 
@@ -668,6 +675,120 @@ class TaskController extends Controller
         return response()->json([
             'message' => 'Đã cập nhật hàng loạt thành công!',
             'rows' => $updatedRows,
+        ]);
+    }
+
+    public function bulkApproveTasks(Request $request)
+    {
+        if (!auth()->check() || (int)auth()->user()->rank !== 1) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Bạn không có quyền thực hiện thao tác này.'
+            ], 403);
+        }
+
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'distinct', 'exists:tasks,id'],
+            'action' => ['nullable', 'in:approve,unapprove'],
+        ]);
+
+        $action = $data['action'] ?? 'approve';
+        $newStatus = ($action === 'approve') ? 1 : 0;
+        $ids = $data['ids'];
+
+        $updatedIds = [];
+        $skippedCount = 0;
+
+        DB::transaction(function () use ($ids, $newStatus, &$updatedIds, &$skippedCount) {
+            $tasks = Task::whereIn('id', $ids)->get();
+
+            foreach ($tasks as $t) {
+                // Không đổi duyệt nếu đã thanh toán hoặc đã tất toán
+                if ((int)$t->paid === 1 || (int)$t->settled === 1) {
+                    $skippedCount++;
+                    continue;
+                }
+
+                $t->approved = $newStatus;
+                $t->save();
+                $updatedIds[] = $t->id;
+            }
+        });
+
+        $actionLabel = ($action === 'approve') ? 'duyệt' : 'bỏ duyệt';
+        $message = 'Đã ' . $actionLabel . ' thành công ' . count($updatedIds) . ' tác vụ.';
+        if ($skippedCount > 0) {
+            $message .= ' (Bỏ qua ' . $skippedCount . ' tác vụ đã đóng tiền hoặc tất toán)';
+        }
+
+        return response()->json([
+            'ok' => true,
+            'action' => $action,
+            'updated_ids' => $updatedIds,
+            'updated_count' => count($updatedIds),
+            'skipped_count' => $skippedCount,
+            'message' => $message,
+        ]);
+    }
+
+    public function bulkDeleteTasks(Request $request)
+    {
+        if (!auth()->check() || (int)auth()->user()->rank !== 1) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Bạn không có quyền thực hiện thao tác này.'
+            ], 403);
+        }
+
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'distinct', 'exists:tasks,id'],
+        ]);
+
+        $ids = $data['ids'];
+        $deletedIds = [];
+        $skippedCount = 0;
+
+        DB::transaction(function () use ($ids, &$deletedIds, &$skippedCount) {
+            $tasks = Task::whereIn('id', $ids)->get();
+
+            foreach ($tasks as $t) {
+                // Không xóa nếu đã đóng tiền, đã tất toán, hoặc đã có chi phí phát sinh
+                if (
+                    (int)$t->paid === 1 ||
+                    (int)$t->settled === 1 ||
+                    (float)$t->actual_costs > 0 ||
+                    (float)$t->extra_money > 0 ||
+                    (float)$t->refund_money > 0
+                ) {
+                    $skippedCount++;
+                    continue;
+                }
+
+                $deletedIds[] = $t->id;
+                $t->delete();
+            }
+        });
+
+        if (count($deletedIds) === 0) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Không thể xóa các tác vụ đã chọn do đã đóng tiền hoặc phát sinh chi phí.',
+            ], 422);
+        }
+
+        $message = 'Đã xóa thành công ' . count($deletedIds) . ' tác vụ.';
+        if ($skippedCount > 0) {
+            $message .= ' (Bỏ qua ' . $skippedCount . ' tác vụ đã đóng tiền hoặc phát sinh chi phí)';
+        }
+
+        return response()->json([
+            'ok' => true,
+            'deleted_ids' => $deletedIds,
+            'deleted_count' => count($deletedIds),
+            'skipped_count' => $skippedCount,
+            'message' => $message,
         ]);
     }
 
