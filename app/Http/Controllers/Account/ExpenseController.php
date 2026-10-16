@@ -586,20 +586,60 @@ class ExpenseController extends Controller
     public function bulkImportActualCosts(Request $request)
     {
         $request->validate([
-            'file'         => ['required', 'mimes:xlsx,xls'],
-            'post_id'      => ['required', 'integer', 'exists:posts,id'],
-            'channel_id'   => ['required', 'integer', 'exists:channels,id'],
-            'actual_costs' => ['required', 'numeric', 'min:0'],
-            'days'         => ['required', 'numeric', 'min:0'],
-            'rate'         => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'employee_codes' => ['required_without:file', 'nullable', 'string'],
+            'file'           => ['required_without:employee_codes', 'nullable', 'mimes:xlsx,xls'],
+            'post_id'        => ['required', 'integer', 'exists:posts,id'],
+            'channel_id'     => ['required', 'integer', 'exists:channels,id'],
+            'actual_costs'   => ['required', 'numeric', 'min:0'],
+            'days'           => ['required', 'numeric', 'min:0'],
+            'rate'           => ['nullable', 'numeric', 'min:0', 'max:100'],
+        ], [
+            'employee_codes.required_without' => 'Vui lòng nhập danh sách mã nhân viên.',
+            'post_id.required'                => 'Vui lòng chọn dự án.',
+            'channel_id.required'             => 'Vui lòng chọn kênh.',
+            'actual_costs.required'           => 'Vui lòng nhập số tiền.',
+            'days.required'                   => 'Vui lòng nhập số ngày.',
         ]);
 
-        $file = $request->file('file');
+        $employeeCodes = [];
+
+        if ($request->filled('employee_codes')) {
+            $lines = preg_split('/[\r\n]+/', (string) $request->employee_codes);
+            foreach ($lines as $line) {
+                $code = trim(str_replace(["\xc2\xa0", "\u{00A0}"], ' ', $line));
+                if ($code !== '') {
+                    $employeeCodes[] = $code;
+                }
+            }
+        } elseif ($request->hasFile('file')) {
+            $file = $request->file('file');
+            try {
+                $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getPathname());
+                $worksheet = $spreadsheet->getActiveSheet();
+                $rows = $worksheet->toArray();
+                foreach ($rows as $index => $row) {
+                    if ($index === 0) continue; // Bỏ qua dòng tiêu đề
+                    $code = trim(str_replace(["\xc2\xa0", "\u{00A0}"], ' ', $row[0] ?? ''));
+                    if ($code !== '') {
+                        $employeeCodes[] = $code;
+                    }
+                }
+            } catch (\Exception $e) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'Lỗi khi đọc file Excel: ' . $e->getMessage()
+                ], 500);
+            }
+        }
+
+        if (empty($employeeCodes)) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Danh sách mã nhân viên trống. Vui lòng nhập ít nhất một mã nhân viên.'
+            ], 422);
+        }
+
         try {
-            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getPathname());
-            $worksheet = $spreadsheet->getActiveSheet();
-            $rows = $worksheet->toArray();
-            
             $successCount = 0;
             $errorCount = 0;
             $notFoundCodes = [];
@@ -607,12 +647,7 @@ class ExpenseController extends Controller
             $post = Post::find($request->post_id);
             $maxReportId = Report::max('id');
 
-            foreach ($rows as $index => $row) {
-                if ($index === 0) continue; // Bỏ qua dòng tiêu đề
-
-                $employeeCode = trim($row[0] ?? '');
-                if (empty($employeeCode)) continue;
-
+            foreach ($employeeCodes as $employeeCode) {
                 $user = User::where('employee_code', $employeeCode)->first();
                 if (!$user) {
                     $errorCount++;
@@ -646,7 +681,8 @@ class ExpenseController extends Controller
 
             $message = "Thêm thành công $successCount dòng.";
             if ($errorCount > 0) {
-                $message .= " Không tìm thấy $errorCount mã nhân viên: " . implode(', ', $notFoundCodes);
+                $uniqueNotFound = array_values(array_unique($notFoundCodes));
+                $message .= " Không tìm thấy " . count($uniqueNotFound) . " mã nhân viên: " . implode(', ', $uniqueNotFound);
             }
 
             return response()->json([
@@ -657,7 +693,7 @@ class ExpenseController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'ok' => false,
-                'message' => 'Lỗi khi đọc file Excel: ' . $e->getMessage()
+                'message' => 'Lỗi khi lưu dữ liệu: ' . $e->getMessage()
             ], 500);
         }
     }

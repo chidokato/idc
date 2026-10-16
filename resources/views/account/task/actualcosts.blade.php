@@ -215,7 +215,7 @@
 </script>
 <!-- Modal Thêm hàng loạt -->
 <div class="modal fade" id="bulkImportModal" tabindex="-1" role="dialog" aria-labelledby="bulkImportModalTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h4 id="bulkImportModalTitle" class="modal-title">Thêm hàng loạt chi phí thực tế</h4>
@@ -224,50 +224,61 @@
         </button>
       </div>
       <form id="bulkImportForm">
+        @csrf
         <div class="modal-body">
-          <div class="form-group">
-            <label class="input-label">File Excel (.xlsx, .xls) (Cột 1 là Mã nhân viên)</label>
-            <input type="file" class="form-control" name="file" accept=".xlsx, .xls" required>
-          </div>
-          <div class="form-group">
-            <label class="input-label">Dự án</label>
-            <select name="post_id" class="form-control select2" required style="width: 100%;">
-              <option value="">-- Chọn Dự án --</option>
-              @foreach($posts as $p)
-              <option value="{{ $p->id }}">{{ $p->name }}</option>
-              @endforeach
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="input-label">Số tiền (Expected Costs)</label>
-            <input type="number" class="form-control" name="actual_costs" min="0" required>
-          </div>
-          <div class="form-group">
-            <label class="input-label">Số ngày</label>
-            <input type="number" class="form-control" name="days" min="0" step="0.1" required>
-          </div>
-          <div class="form-group">
-            <label class="input-label">Tỉ lệ hỗ trợ (%)</label>
-            <input type="number" class="form-control" name="rate" min="0" max="100">
-          </div>
-          <div class="form-group">
-            <label class="input-label">Kênh chạy</label>
-            <select name="channel_id" class="form-control select2" required style="width: 100%;">
-              <option value="">-- Chọn Kênh --</option>
-              {!! $channelsOptions !!}
-            </select>
-          </div>
-          <div class="form-group mt-3 ml-1">
-            <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" id="bulkImportApproved" name="approved" value="1" checked>
-              <label class="custom-control-label" for="bulkImportApproved">Duyệt</label>
+          <div class="row">
+            <!-- Cột trái: Mã nhân viên -->
+            <div class="col-md-6 d-flex flex-column">
+              <div class="form-group flex-grow-1 d-flex flex-column mb-3 mb-md-0">
+                <label class="input-label">Mã nhân viên (Mỗi mã 1 dòng) <span class="text-danger">*</span></label>
+                <textarea class="form-control flex-grow-1" name="employee_codes" style="min-height: 320px; resize: vertical;" placeholder="Nhập hoặc dán mã nhân viên vào đây, mỗi mã một dòng...&#10;VD:&#10;990200001234&#10;990200005678" required></textarea>
+                <small class="text-muted mt-1">Dán danh sách mã nhân viên từ Excel hoặc văn bản, mỗi mã trên một dòng.</small>
+              </div>
+            </div>
+
+            <!-- Cột phải: Thông tin chi phí & Dự án -->
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="input-label">Dự án</label>
+                <select name="post_id" class="form-control select2" required style="width: 100%;">
+                  <option value="">-- Chọn Dự án --</option>
+                  @foreach($posts as $p)
+                  <option value="{{ $p->id }}">{{ $p->name }}</option>
+                  @endforeach
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="input-label">Số tiền (Expected Costs)</label>
+                <input type="number" class="form-control" name="actual_costs" min="0" required>
+              </div>
+              <div class="form-group">
+                <label class="input-label">Số ngày</label>
+                <input type="number" class="form-control" name="days" min="0" step="0.1" required>
+              </div>
+              <div class="form-group">
+                <label class="input-label">Tỉ lệ hỗ trợ (%)</label>
+                <input type="number" class="form-control" name="rate" min="0" max="100">
+              </div>
+              <div class="form-group">
+                <label class="input-label">Kênh chạy</label>
+                <select name="channel_id" class="form-control select2" required style="width: 100%;">
+                  <option value="">-- Chọn Kênh --</option>
+                  {!! $channelsOptions !!}
+                </select>
+              </div>
+              <div class="form-group mt-3 ml-1">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="bulkImportApproved" name="approved" value="1" checked>
+                  <label class="custom-control-label" for="bulkImportApproved">Duyệt</label>
+                </div>
+              </div>
             </div>
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-white" data-dismiss="modal">Đóng</button>
           <button type="submit" class="btn btn-primary" id="btnBulkImport">
-            <i class="tio-save"></i> Tải lên và Lưu
+            <i class="tio-save"></i> Lưu
           </button>
         </div>
       </form>
@@ -1073,12 +1084,22 @@ document.addEventListener('DOMContentLoaded', function () {
           window.location.reload();
         } else {
           alert('Lỗi: ' + res.message);
-          btn.prop('disabled', false).html('<i class="tio-save"></i> Tải lên và Lưu');
+          btn.prop('disabled', false).html('<i class="tio-save"></i> Lưu');
         }
       },
       error: function (xhr) {
-        alert('Có lỗi xảy ra: ' + (xhr.responseJSON?.message || xhr.statusText));
-        btn.prop('disabled', false).html('<i class="tio-save"></i> Tải lên và Lưu');
+        var msg = 'Có lỗi xảy ra';
+        if (xhr.responseJSON) {
+          if (xhr.responseJSON.errors) {
+            msg = Object.values(xhr.responseJSON.errors).flat().join('\n');
+          } else if (xhr.responseJSON.message) {
+            msg = xhr.responseJSON.message;
+          }
+        } else if (xhr.statusText) {
+          msg = xhr.statusText;
+        }
+        alert(msg);
+        btn.prop('disabled', false).html('<i class="tio-save"></i> Lưu');
       }
     });
   });
