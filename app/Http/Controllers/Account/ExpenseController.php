@@ -593,6 +593,8 @@ class ExpenseController extends Controller
             'actual_costs'   => ['required', 'numeric', 'min:0'],
             'days'           => ['required', 'numeric', 'min:0'],
             'rate'           => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'content'        => ['nullable', 'string'],
+            'note'           => ['nullable', 'string'],
         ], [
             'employee_codes.required_without' => 'Vui lòng nhập danh sách mã nhân viên.',
             'post_id.required'                => 'Vui lòng chọn dự án.',
@@ -602,6 +604,7 @@ class ExpenseController extends Controller
         ]);
 
         $employeeCodes = [];
+        $noteContent = $request->input('content', $request->input('note'));
 
         if ($request->filled('employee_codes')) {
             $lines = preg_split('/[\r\n]+/', (string) $request->employee_codes);
@@ -639,40 +642,71 @@ class ExpenseController extends Controller
             ], 422);
         }
 
+        // Phân loại mã nhân viên hợp lệ và không tìm thấy
+        $validItems = [];
+        $notFoundCodes = [];
+
+        foreach ($employeeCodes as $employeeCode) {
+            $user = User::where('employee_code', $employeeCode)->first();
+            if (!$user) {
+                $notFoundCodes[] = $employeeCode;
+            } else {
+                $validItems[] = [
+                    'user' => $user,
+                    'code' => $employeeCode,
+                ];
+            }
+        }
+
+        $uniqueNotFound = array_values(array_unique($notFoundCodes));
+
+        // Nếu chưa bấm xác nhận (bước kiểm tra trước khi thêm)
+        if (!$request->boolean('confirmed')) {
+            return response()->json([
+                'ok'              => true,
+                'preview'         => true,
+                'total'           => count($employeeCodes),
+                'found_count'     => count($validItems),
+                'error_count'     => count($uniqueNotFound),
+                'not_found_codes' => $uniqueNotFound,
+            ]);
+        }
+
+        if (empty($validItems)) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Không tìm thấy mã nhân viên nào hợp lệ để thêm.'
+            ], 422);
+        }
+
         try {
             $successCount = 0;
-            $errorCount = 0;
-            $notFoundCodes = [];
-            
             $post = Post::find($request->post_id);
             $maxReportId = Report::max('id');
+            $amount = (float) $request->actual_costs;
+            $days = (float) $request->days;
+            $rate = $request->filled('rate') ? $request->rate : ($post->rate ?? 0);
+            $approved = $request->has('approved') ? 1 : 0;
+            $authId = Auth::id();
 
-            foreach ($employeeCodes as $employeeCode) {
-                $user = User::where('employee_code', $employeeCode)->first();
-                if (!$user) {
-                    $errorCount++;
-                    $notFoundCodes[] = $employeeCode;
-                    continue;
-                }
-                
-                $amount = (float) $request->actual_costs;
-                $days = (float) $request->days;
-
+            foreach ($validItems as $item) {
+                $user = $item['user'];
                 Task::create([
-                    'user_id'        => Auth::id() ?? $user->id,
+                    'user_id'        => $authId ?? $user->id,
                     'user'           => $user->id,
                     'report_id'      => $maxReportId,
                     'days'           => $days,
                     'department_lv1' => $user->department_lv1,
                     'department_lv2' => $user->department_lv2,
                     'department_id'  => $user->department_id,
-                    'rate'           => $request->filled('rate') ? $request->rate : ($post->rate ?? 0),
+                    'rate'           => $rate,
                     'post_id'        => $post->id,
                     'channel_id'     => $request->channel_id,
                     'expected_costs' => $amount,
                     'actual_costs'   => 0,
+                    'content'        => $noteContent,
                     'active'         => 1,
-                    'approved'       => $request->has('approved') ? 1 : 0,
+                    'approved'       => $approved,
                     'extra_money'    => 0,
                     'refund_money'   => 0
                 ]);
@@ -680,14 +714,15 @@ class ExpenseController extends Controller
             }
 
             $message = "Thêm thành công $successCount dòng.";
-            if ($errorCount > 0) {
-                $uniqueNotFound = array_values(array_unique($notFoundCodes));
+            if (count($uniqueNotFound) > 0) {
                 $message .= " Không tìm thấy " . count($uniqueNotFound) . " mã nhân viên: " . implode(', ', $uniqueNotFound);
             }
 
             return response()->json([
                 'ok' => true,
-                'message' => $message
+                'message' => $message,
+                'success_count' => $successCount,
+                'not_found_codes' => $uniqueNotFound
             ]);
 
         } catch (\Exception $e) {

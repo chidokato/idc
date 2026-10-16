@@ -198,6 +198,15 @@
       display: none !important;
     }
   }
+  .swal2-container {
+    z-index: 200000 !important;
+  }
+  .swal2-container, .swal2-popup, .swal2-html-container, .swal2-html-container * {
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    user-select: text !important;
+  }
 </style>
 <script>
   // Prevent iOS auto-zoom by enforcing maximum-scale=1
@@ -231,7 +240,7 @@
             <div class="col-md-6 d-flex flex-column">
               <div class="form-group flex-grow-1 d-flex flex-column mb-3 mb-md-0">
                 <label class="input-label">Mã nhân viên (Mỗi mã 1 dòng) <span class="text-danger">*</span></label>
-                <textarea class="form-control flex-grow-1" name="employee_codes" style="min-height: 320px; resize: vertical;" placeholder="Nhập hoặc dán mã nhân viên vào đây, mỗi mã một dòng...&#10;VD:&#10;990200001234&#10;990200005678" required></textarea>
+                <textarea class="form-control flex-grow-1" name="employee_codes" style="min-height: 380px; resize: vertical;" placeholder="Nhập hoặc dán mã nhân viên vào đây, mỗi mã một dòng...&#10;VD:&#10;990200001234&#10;990200005678" required></textarea>
                 <small class="text-muted mt-1">Dán danh sách mã nhân viên từ Excel hoặc văn bản, mỗi mã trên một dòng.</small>
               </div>
             </div>
@@ -265,6 +274,10 @@
                   <option value="">-- Chọn Kênh --</option>
                   {!! $channelsOptions !!}
                 </select>
+              </div>
+              <div class="form-group">
+                <label class="input-label">Ghi chú (Note)</label>
+                <input type="text" class="form-control" name="content" placeholder="Nhập ghi chú...">
               </div>
               <div class="form-group mt-3 ml-1">
                 <div class="custom-control custom-checkbox">
@@ -1065,10 +1078,12 @@ document.addEventListener('DOMContentLoaded', function () {
   // Bulk import form submit
   $('#bulkImportForm').on('submit', function (e) {
     e.preventDefault();
-    var formData = new FormData(this);
+    var form = this;
+    var formData = new FormData(form);
     var btn = $('#btnBulkImport');
-    btn.prop('disabled', true).html('<i class="tio-spinner tio-spin"></i> Đang xử lý...');
+    btn.prop('disabled', true).html('<i class="tio-spinner tio-spin"></i> Đang kiểm tra...');
 
+    // Bước 1: Gửi kiểm tra dữ liệu trước khi thêm
     $.ajax({
       url: "{{ route('tasks.bulkImportActualCosts') }}",
       method: 'POST',
@@ -1079,15 +1094,154 @@ document.addEventListener('DOMContentLoaded', function () {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       },
       success: function (res) {
-        if (res.ok) {
-          alert(res.message);
-          window.location.reload();
-        } else {
-          alert('Lỗi: ' + res.message);
+        if (!res.ok) {
           btn.prop('disabled', false).html('<i class="tio-save"></i> Lưu');
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              icon: 'error',
+              title: 'Lỗi',
+              text: res.message || 'Có lỗi xảy ra',
+              confirmButtonText: 'Đóng'
+            });
+          } else {
+            alert(res.message);
+          }
+          return;
+        }
+
+        // Nếu là kết quả preview / kiểm tra
+        if (res.preview) {
+          if (res.found_count === 0) {
+            btn.prop('disabled', false).html('<i class="tio-save"></i> Lưu');
+            var notFoundHtml = '<p class="text-danger mb-2">Không tìm thấy bất kỳ mã nhân viên nào trong hệ thống!</p>';
+            if (res.not_found_codes && res.not_found_codes.length) {
+              var codesLine = res.not_found_codes.join('\n');
+              notFoundHtml += '<div class="mb-1 text-right"><button type="button" class="btn btn-xs btn-outline-secondary py-0 px-2 btn-copy-notfound" data-codes="' + codesLine.replace(/"/g, '&quot;') + '" style="font-size: 11px;"><i class="tio-copy"></i> Sao chép</button></div>';
+              notFoundHtml += '<p class="text-danger font-weight-bold text-left mb-2" style="user-select: text !important; -webkit-user-select: text !important; cursor: text; word-break: break-all; font-size: 14px; line-height: 1.6;">' + res.not_found_codes.join(', ') + '</p>';
+            }
+            if (typeof Swal !== 'undefined') {
+              Swal.fire({
+                icon: 'error',
+                title: 'Không tìm thấy nhân viên',
+                html: notFoundHtml,
+                confirmButtonText: 'Đóng'
+              });
+            } else {
+              alert('Không tìm thấy mã nhân viên nào trong hệ thống.');
+            }
+            return;
+          }
+
+          // Xây dựng nội dung xác nhận hiển thị ở giữa màn hình
+          var confirmHtml = '<div class="text-left" style="font-size: 14px; user-select: text !important;">';
+          confirmHtml += '<p class="text-success mb-2" style="user-select: text !important;"><i class="tio-checkmark-circle"></i> Tìm thấy <b>' + res.found_count + '</b> dòng hợp lệ.</p>';
+
+          if (res.error_count > 0) {
+            var codesLine = res.not_found_codes.join('\n');
+            confirmHtml += '<div class="mb-1 d-flex align-items-center justify-content-between">';
+            confirmHtml += '  <span class="text-danger font-weight-bold"><i class="tio-warning"></i> Không tìm thấy ' + res.error_count + ' mã nhân viên:</span>';
+            confirmHtml += '  <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-2 btn-copy-notfound" data-codes="' + codesLine.replace(/"/g, '&quot;') + '" style="font-size: 11px;"><i class="tio-copy"></i> Sao chép</button>';
+            confirmHtml += '</div>';
+            confirmHtml += '<p class="text-danger mb-3 font-weight-bold" style="user-select: text !important; -webkit-user-select: text !important; cursor: text; word-break: break-all; line-height: 1.6; font-size: 14px;">' + res.not_found_codes.join(', ') + '</p>';
+            confirmHtml += '<p class="font-weight-bold text-dark mb-0">Bạn có muốn tiếp tục thêm <b>' + res.found_count + '</b> dòng này không?</p>';
+          } else {
+            confirmHtml += '<p class="font-weight-bold text-dark mb-0">Bạn có chắc chắn muốn thêm <b>' + res.found_count + '</b> dòng này không?</p>';
+          }
+          confirmHtml += '</div>';
+
+          var confirmAction = function () {
+            btn.prop('disabled', true).html('<i class="tio-spinner tio-spin"></i> Đang lưu...');
+            var submitData = new FormData(form);
+            submitData.append('confirmed', '1');
+
+            $.ajax({
+              url: "{{ route('tasks.bulkImportActualCosts') }}",
+              method: 'POST',
+              data: submitData,
+              contentType: false,
+              processData: false,
+              headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+              },
+              success: function (saveRes) {
+                if (saveRes.ok) {
+                  if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                      icon: 'success',
+                      title: 'Thành công',
+                      text: saveRes.message,
+                      confirmButtonText: 'Đóng',
+                      confirmButtonColor: '#377dff'
+                    }).then(function () {
+                      window.location.reload();
+                    });
+                  } else {
+                    alert(saveRes.message);
+                    window.location.reload();
+                  }
+                } else {
+                  btn.prop('disabled', false).html('<i class="tio-save"></i> Lưu');
+                  if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                      icon: 'error',
+                      title: 'Lỗi',
+                      text: saveRes.message || 'Lỗi khi lưu dữ liệu',
+                      confirmButtonText: 'Đóng'
+                    });
+                  } else {
+                    alert(saveRes.message);
+                  }
+                }
+              },
+              error: function (xhr) {
+                btn.prop('disabled', false).html('<i class="tio-save"></i> Lưu');
+                var msg = 'Có lỗi xảy ra khi lưu dữ liệu';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                  msg = xhr.responseJSON.message;
+                }
+                if (typeof Swal !== 'undefined') {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi',
+                    text: msg,
+                    confirmButtonText: 'Đóng'
+                  });
+                } else {
+                  alert(msg);
+                }
+              }
+            });
+          };
+
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              title: 'Xác nhận thêm chi phí',
+              html: confirmHtml,
+              icon: res.error_count > 0 ? 'warning' : 'question',
+              showCancelButton: true,
+              confirmButtonText: '<i class="tio-checkmark"></i> Thêm ngay',
+              cancelButtonText: 'Hủy để kiểm tra',
+              confirmButtonColor: '#377dff',
+              cancelButtonColor: '#6c757d',
+              reverseButtons: true
+            }).then(function (result) {
+              if (result.isConfirmed) {
+                confirmAction();
+              } else {
+                btn.prop('disabled', false).html('<i class="tio-save"></i> Lưu');
+              }
+            });
+          } else {
+            if (confirm('Tìm thấy ' + res.found_count + ' dòng hợp lệ. Bạn có chắc chắn muốn thêm không?')) {
+              confirmAction();
+            } else {
+              btn.prop('disabled', false).html('<i class="tio-save"></i> Lưu');
+            }
+          }
         }
       },
       error: function (xhr) {
+        btn.prop('disabled', false).html('<i class="tio-save"></i> Lưu');
         var msg = 'Có lỗi xảy ra';
         if (xhr.responseJSON) {
           if (xhr.responseJSON.errors) {
@@ -1098,11 +1252,57 @@ document.addEventListener('DOMContentLoaded', function () {
         } else if (xhr.statusText) {
           msg = xhr.statusText;
         }
-        alert(msg);
-        btn.prop('disabled', false).html('<i class="tio-save"></i> Lưu');
+
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({
+            icon: 'error',
+            title: 'Lỗi nhập liệu',
+            text: msg,
+            confirmButtonText: 'Đóng'
+          });
+        } else {
+          alert(msg);
+        }
       }
     });
   });
+
+  // Copy missing codes helper
+  $(document).on('click', '.btn-copy-notfound', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var btn = $(this);
+    var codes = btn.attr('data-codes') || '';
+    var setCopied = function () {
+      btn.html('<i class="tio-checkmark text-success"></i> Đã sao chép');
+      setTimeout(function () {
+        btn.html('<i class="tio-copy"></i> Sao chép');
+      }, 2000);
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(codes).then(setCopied).catch(function () {
+        copyFallback(codes, setCopied);
+      });
+    } else {
+      copyFallback(codes, setCopied);
+    }
+  });
+
+  function copyFallback(text, callback) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try {
+      document.execCommand('copy');
+      if (typeof callback === 'function') callback();
+    } catch (err) {}
+    document.body.removeChild(ta);
+  }
 });
 </script>
 
