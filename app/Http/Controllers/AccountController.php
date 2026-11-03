@@ -196,6 +196,9 @@ class AccountController extends HomeController
             ->get();
 
         $companyTotalActualCosts = (float) $companySummaries->sum('total_actual_costs');
+        $companyChartLabels = $companySummaries->pluck('company_name')->values()->all();
+        $companyChartData = $companySummaries->pluck('total_actual_costs')->map(fn($v) => (float)$v)->values()->all();
+        $companyColors = ['#377dff', '#00c9a7', '#fd7e14', '#de4437', '#8c57ff', '#00d2d3', '#20c997'];
 
         $floorSummaries = (clone $baseFloorQuery)
             ->selectRaw('tasks.department_lv2')
@@ -207,11 +210,21 @@ class AccountController extends HomeController
             ->get();
 
         $floorTotalActualCosts = (float) $floorSummaries->sum('total_actual_costs');
+        $floorChartLabels = $floorSummaries->pluck('floor_name')->values()->all();
+        $floorChartData = $floorSummaries->pluck('total_actual_costs')->map(fn($v) => (float)$v)->values()->all();
+        $floorColors = [
+            '#377dff', '#00c9a7', '#fd7e14', '#de4437', '#8c57ff',
+            '#00d2d3', '#ffc107', '#20c997', '#e83e8c', '#6c757d',
+            '#4b6584', '#10ac84', '#ee5253', '#0abde3', '#ff9f43',
+            '#5f27cd', '#54a0ff', '#1dd1a1', '#f368e0', '#222f3e'
+        ];
 
         return view('account.dashboard.main', compact(
             'user',
             'chartLabels', 'dataExpected', 'dataActual',
             'chartMonthlyLabels', 'chartMonthlyActual', 'chartMonthlySale', 'chartMonthlyCompany',
+            'companyChartLabels', 'companyChartData',
+            'companyColors',
             'statisticalYear',
             'selectedMonth',
             'monthOptions',
@@ -224,6 +237,9 @@ class AccountController extends HomeController
             'companyTotalActualCosts',
             'floorSummaries',
             'floorTotalActualCosts',
+            'floorChartLabels',
+            'floorChartData',
+            'floorColors',
         ));
     }
 
