@@ -107,7 +107,7 @@
     </div>
   </div>
 
-  {{-- Hàng 1: 3 Box chỉ số tổng quan ở TRÊN CÙNG (đã ẩn)
+  <!-- Hàng 1: 3 Box chỉ số tổng quan ở TRÊN CÙNG -->
   <div class="row mb-3">
     <!-- Box 1: Tổng chi phí thực tế -->
     <div class="col-md-4 mb-2 mb-md-0">
@@ -175,7 +175,6 @@
       </div>
     </div>
   </div>
-  --}}
 
   <!-- Hàng 2: Biểu đồ chi phí các tháng (trái) & Biểu đồ chi phí 3 công ty (phải) -->
   <div class="row mb-3">
