@@ -117,8 +117,16 @@ class WalletController extends Controller
                 $summary['transfer_in_total'] += $amount;
             }
 
+            if ($category === 'recall_debit') {
+                $summary['transfer_in_total'] -= $amount;
+            }
+
             if ($category === 'transfer_out') {
                 $summary['transfer_out_total'] += $amount;
+            }
+
+            if ($category === 'recall_credit') {
+                $summary['transfer_out_total'] -= $amount;
             }
 
             if ($category === 'spend_money') {
@@ -636,6 +644,10 @@ class WalletController extends Controller
         }
 
         if ($transaction->type === 'withdraw') {
+            if ($refType === 'RecallTransfer') {
+                return 'recall_debit';
+            }
+
             if ($refType === 'BulkTransfer' || !empty($meta['to_user_id'])) {
                 return 'transfer_out';
             }
@@ -651,7 +663,15 @@ class WalletController extends Controller
             return 'spend_money';
         }
 
-        if ($transaction->type === 'rollback' || $transaction->type === 'release') {
+        if ($transaction->type === 'rollback') {
+            if ($refType === 'RecallTransfer') {
+                return 'recall_credit';
+            }
+
+            return 'other_in';
+        }
+
+        if ($transaction->type === 'release') {
             return 'other_in';
         }
 
@@ -712,8 +732,8 @@ class WalletController extends Controller
         $category = $this->resolveTransactionCategory($transaction);
 
         return match ($category) {
-            'deposit_money', 'transfer_in', 'other_in' => $amount,
-            'transfer_out', 'spend_money', 'withdraw_money' => -$amount,
+            'deposit_money', 'transfer_in', 'other_in', 'recall_credit' => $amount,
+            'transfer_out', 'spend_money', 'withdraw_money', 'recall_debit' => -$amount,
             default => 0,
         };
     }
