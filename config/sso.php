@@ -6,7 +6,7 @@ return [
     | Centralized SSO Configuration
     |--------------------------------------------------------------------------
     */
-    'secret' => env('SSO_SECRET', 'idc_sso_shared_secret_2026_change_in_prod'),
+    'secret' => env('SSO_SECRET', 'idc_sso_shared_secret_2026_indochine'),
     'token_ttl' => (int) env('SSO_TOKEN_TTL', 300),
     'portal_url' => rtrim(env('SSO_PORTAL_URL', env('APP_URL', 'https://indochinerealestate.vn')), '/'),
 

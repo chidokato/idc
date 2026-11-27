@@ -240,9 +240,9 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/SsoController.php": {
-    "mtime": 1795763862.099816,
-    "seen": 1795766869.774089,
-    "ast_hash": "fa1e4d5042768b7ab166522a42735f08",
+    "mtime": 1795768211.4034147,
+    "seen": 1795768331.9234152,
+    "ast_hash": "cc003b3ce74dab1aa48022a2a712e784",
     "semantic_hash": ""
   },
   "app/Http/Kernel.php": {
@@ -528,9 +528,9 @@
     "semantic_hash": ""
   },
   "app/Services/SsoAuthService.php": {
-    "mtime": 1795767927.2967362,
-    "seen": 1795767973.228128,
-    "ast_hash": "4b15d9478230eaccc94a253fb1fefcbe",
+    "mtime": 1795768216.0924728,
+    "seen": 1795768331.9234757,
+    "ast_hash": "5743320cefb2c20a847bc3515bae7256",
     "semantic_hash": ""
   },
   "app/Services/TaskFinanceService.php": {
