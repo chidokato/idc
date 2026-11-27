@@ -92,7 +92,7 @@
                                                 type="checkbox"
                                                 class="custom-control-input js-toggle-status"
                                                 id="switch_{{ $item->id }}"
-                                                data-url="{{ route('admin.shared-db-configs.toggle-status', $item) }}"
+                                                data-url="{{ route('admin.shared-db-configs.toggle-status', $item, false) }}"
                                                 {{ $item->is_active ? 'checked' : '' }}
                                             >
                                             <label class="custom-control-label" for="switch_{{ $item->id }}">
@@ -197,7 +197,19 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    const previewModalEl = document.getElementById('sharedDbPreviewModal');
     const previewBody = document.getElementById('sharedDbPreviewBody');
+
+    function openPreviewModal() {
+        if (!previewModalEl) return;
+        if (window.jQuery && typeof window.jQuery.fn.modal === 'function') {
+            window.jQuery(previewModalEl).modal('show');
+        } else {
+            previewModalEl.classList.add('show');
+            previewModalEl.style.display = 'block';
+            previewModalEl.removeAttribute('aria-hidden');
+        }
+    }
 
     document.querySelectorAll('.js-test-row-connection').forEach(function (btn) {
         btn.addEventListener('click', function () {
@@ -212,9 +224,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     <p class="mt-2 text-muted mb-0">Đang kiểm tra kết nối và tải cấu trúc bảng...</p>
                 </div>
             `;
-            $('#sharedDbPreviewModal').modal('show');
+            openPreviewModal();
 
-            fetch("{{ route('admin.shared-db-configs.test-connection') }}", {
+            fetch("{{ route('admin.shared-db-configs.test-connection', [], false) }}", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -224,7 +236,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: JSON.stringify({ config_id: configId })
             })
             .then(async res => {
-                const data = await res.json();
+                const text = await res.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    data = { success: false, message: 'Phản hồi không hợp lệ (HTTP ' + res.status + ').' };
+                }
                 renderPreviewResult(data);
             })
             .catch(err => {

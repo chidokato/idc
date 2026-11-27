@@ -376,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             `;
 
-            fetch("{{ route('admin.shared-db-configs.test-connection') }}", {
+            fetch("{{ route('admin.shared-db-configs.test-connection', [], false) }}", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -386,7 +386,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: JSON.stringify(payload)
             })
             .then(async res => {
-                const data = await res.json();
+                const text = await res.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    data = { success: false, message: 'Phản hồi không hợp lệ (HTTP ' + res.status + ').' };
+                }
                 btnTest.disabled = false;
                 btnTest.innerHTML = '<i class="fas fa-plug mr-1"></i> Kiểm tra kết nối & Xem bảng';
 

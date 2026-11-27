@@ -1,0 +1,23 @@
+{
+  "0": "web.php",
+  "1": "SharedDbConfig",
+  "2": "SsoAuthService",
+  "3": "Illuminate\\Database\\Schema\\Blueprint",
+  "4": "SsoAuthService.php",
+  "5": "Illuminate\\Http\\Request",
+  "6": "SharedDbConfig.php",
+  "7": "AppServiceProvider.php",
+  "8": "create.blade.php",
+  "9": "edit.blade.php",
+  "10": "shared_db_configs/index.blade.php",
+  "11": "sso_apps/index.blade.php",
+  "12": "sso_shared_tables/index.blade.php",
+  "13": "login/index.blade.php",
+  "14": "apps.blade.php",
+  "15": "login.blade.php",
+  "16": "profile.blade.php",
+  "17": "sso.php",
+  "18": "navbar.blade.php",
+  "19": "_form.blade.php",
+  "20": "header.blade.php"
+}
