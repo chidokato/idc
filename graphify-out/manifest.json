@@ -240,9 +240,9 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/SsoController.php": {
-    "mtime": 1795768211.4034147,
-    "seen": 1795768331.9234152,
-    "ast_hash": "cc003b3ce74dab1aa48022a2a712e784",
+    "mtime": 1795773651.8569055,
+    "seen": 1795773720.2554543,
+    "ast_hash": "1b4f64655d6e74e0c0d0ffa3ea973346",
     "semantic_hash": ""
   },
   "app/Http/Kernel.php": {
@@ -528,9 +528,9 @@
     "semantic_hash": ""
   },
   "app/Services/SsoAuthService.php": {
-    "mtime": 1795768216.0924728,
-    "seen": 1795768331.9234757,
-    "ast_hash": "5743320cefb2c20a847bc3515bae7256",
+    "mtime": 1795773641.5268097,
+    "seen": 1795773720.2555165,
+    "ast_hash": "4960da5820634079ad683c599bf05501",
     "semantic_hash": ""
   },
   "app/Services/TaskFinanceService.php": {
@@ -2418,9 +2418,9 @@
     "semantic_hash": ""
   },
   "resources/views/layout/header.blade.php": {
-    "mtime": 1795750236.6566215,
-    "seen": 1795766869.7744935,
-    "ast_hash": "633ea835d0b9d152e4fd8f5f94c4ec51",
+    "mtime": 1795773669.6428783,
+    "seen": 1795773720.2559114,
+    "ast_hash": "3fa38cf709091517abe8f101fd291388",
     "semantic_hash": ""
   },
   "resources/views/layout/index.blade.php": {
@@ -2514,9 +2514,9 @@
     "semantic_hash": ""
   },
   "resources/views/sso/login.blade.php": {
-    "mtime": 1795765574.446412,
-    "seen": 1795766869.7745097,
-    "ast_hash": "a3849a0f58c68e7c4d65d2bafb2cc9ee",
+    "mtime": 1795773668.1351745,
+    "seen": 1795773720.2559307,
+    "ast_hash": "617ef577fae2f4bebb44c60c657521ca",
     "semantic_hash": ""
   },
   "resources/views/sso/profile.blade.php": {

@@ -120,6 +120,7 @@ class SsoController extends Controller
 
         return Socialite::driver('google')
             ->redirectUrl(url('/auth/google/callback'))
+            ->with(['prompt' => 'select_account'])
             ->redirect();
     }
 
