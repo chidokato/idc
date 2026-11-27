@@ -407,6 +407,13 @@
                 </div>
             </div>
 
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <label class="d-inline-flex align-items-center mb-0 small text-secondary" style="cursor: pointer;">
+                    <input type="checkbox" name="remember" value="1" checked class="me-2" style="width: 16px; height: 16px; accent-color: #1a2c5e;">
+                    Ghi nhớ đăng nhập (30 ngày)
+                </label>
+            </div>
+
             <button type="submit" class="btn-idc-primary">
                 <i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP HỆ THỐNG
             </button>

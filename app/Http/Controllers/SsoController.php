@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\SsoAuthService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -35,7 +36,8 @@ class SsoController extends Controller
             session(['sso_pending_redirect' => $request->query('redirect')]);
         }
 
-        // Already logged into SSO portal
+        // Already logged into SSO portal (or restore from 30-day remember cookie)
+        $this->restoreSessionFromCookie($request);
         if (session()->has('sso_employee_code')) {
             $profile = DB::table('sso_profiles')->where('employee_code', session('sso_employee_code'))->first();
             if ($profile) {
@@ -87,6 +89,10 @@ class SsoController extends Controller
             'sso_hcc_user_id' => $result['hcc_user']->id ?? null,
             'sso_matched_source' => $result['matched_source'],
         ]);
+
+        if ($request->boolean('remember', true)) {
+            $this->queueRememberCookie($request, $profile->employee_code, $result['hcc_user']->id ?? null);
+        }
 
         // Always direct to profile standardization page on login if not yet standardized,
         // or if user hasn't confirmed their unified email/phone yet.
@@ -144,6 +150,7 @@ class SsoController extends Controller
             'sso_hcc_user_id' => $result['hcc_user']->id ?? null,
             'sso_matched_source' => 'google',
         ]);
+        $this->queueRememberCookie(request(), $profile->employee_code, $result['hcc_user']->id ?? null);
 
         if (!$profile->standardized_at) {
             return redirect()->route('sso.profile')
@@ -158,8 +165,9 @@ class SsoController extends Controller
         return redirect()->route('sso.apps');
     }
 
-    public function showProfile()
+    public function showProfile(Request $request)
     {
+        $this->restoreSessionFromCookie($request);
         $employeeCode = session('sso_employee_code');
         if (!$employeeCode) {
             return redirect()->route('sso.login');
@@ -217,8 +225,9 @@ class SsoController extends Controller
             ->with('success', 'Đã chuẩn hóa và đồng bộ thông tin đăng nhập thành công!');
     }
 
-    public function apps()
+    public function apps(Request $request)
     {
+        $this->restoreSessionFromCookie($request);
         $employeeCode = session('sso_employee_code');
         if (!$employeeCode) {
             return redirect()->route('sso.login');
@@ -234,8 +243,9 @@ class SsoController extends Controller
         return view('sso.apps', compact('profile', 'apps'));
     }
 
-    public function launch(string $app)
+    public function launch(Request $request, string $app)
     {
+        $this->restoreSessionFromCookie($request);
         $employeeCode = session('sso_employee_code');
         if (!$employeeCode) {
             return redirect()->route('sso.login', ['app' => $app]);
@@ -303,12 +313,34 @@ class SsoController extends Controller
 
     public function logout(Request $request)
     {
+        Cookie::queue(Cookie::forget('sso_remember'));
         session()->forget(['sso_employee_code', 'sso_hcc_user_id', 'sso_matched_source', 'sso_pending_app', 'sso_pending_redirect']);
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return redirect()->route('home')->with('success', 'Bạn đã đăng xuất khỏi hệ thống.');
+    }
+
+    private function queueRememberCookie(Request $request, string $employeeCode, ?int $hccUserId = null): void
+    {
+        $token = $this->ssoService->makeRememberToken($employeeCode, $hccUserId);
+        Cookie::queue('sso_remember', $token, 60 * 24 * 30, '/', null, $request->isSecure(), true);
+    }
+
+    private function restoreSessionFromCookie(Request $request): void
+    {
+        if (session()->has('sso_employee_code')) {
+            return;
+        }
+        $data = $this->ssoService->verifyRememberToken($request->cookie('sso_remember'));
+        if ($data) {
+            session([
+                'sso_employee_code' => $data['employee_code'],
+                'sso_hcc_user_id' => $data['hcc_user_id'] ?? null,
+                'sso_matched_source' => 'remember_cookie',
+            ]);
+        }
     }
 
     private function resolveAppKey(?string $app): ?string

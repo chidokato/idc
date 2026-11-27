@@ -50,9 +50,18 @@
                         <a target="_blank" href="{{$setting->facebook}}"><img src="assets/images/facebook-logo-icon.png"></a>
                         <a target="_blank" href="{{$setting->youtube}}"><img src="assets/images/youtube-logo-icon.png"></a>
                         
-                        @if(session()->has('sso_employee_code') || Auth::check())
+                        @php
+                            $ssoLoggedIn = session()->has('sso_employee_code') || request()->hasCookie('sso_remember') || Auth::check();
+                        @endphp
+                        @if($ssoLoggedIn)
                         <a href="{{ route('sso.apps') }}" title="Chọn phần mềm làm việc">
-                            <img src="{{ (Auth::check() && Auth::user()->avatar) ? Auth::user()->avatar : asset('assets/images/user-icon.png') }}" alt="user">
+                            @if(Auth::check() && Auth::user()->avatar)
+                                <img src="{{ Auth::user()->avatar }}" alt="user">
+                            @else
+                                <span style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:#b1934d;color:#fff;font-size:12px;font-weight:700;border:2px solid #fff;">
+                                    SSO
+                                </span>
+                            @endif
                         </a>
                         @else
                         <a href="{{ route('sso.login') }}" title="Đăng nhập tập trung">

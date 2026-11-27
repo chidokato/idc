@@ -828,4 +828,37 @@ class SsoAuthService
 
         return $payload;
     }
+
+    public function makeRememberToken(string $employeeCode, ?int $hccUserId = null): string
+    {
+        $payload = [
+            'employee_code' => $employeeCode,
+            'hcc_user_id' => $hccUserId,
+            'exp' => now()->addDays(30)->timestamp,
+        ];
+        $encoded = rtrim(strtr(base64_encode(json_encode($payload)), '+/', '-_'), '=');
+        $sig = hash_hmac('sha256', $encoded, (string) config('sso.secret'));
+        return $encoded . '.' . $sig;
+    }
+
+    public function verifyRememberToken(?string $token): ?array
+    {
+        if (!$token || !str_contains($token, '.')) {
+            return null;
+        }
+        [$encoded, $sig] = explode('.', $token, 2);
+        $secret = (string) config('sso.secret');
+        if ($secret === '' || !hash_equals(hash_hmac('sha256', $encoded, $secret), $sig)) {
+            return null;
+        }
+        $json = base64_decode(strtr($encoded, '-_', '+/'), true);
+        $data = $json !== false ? json_decode($json, true) : null;
+        if (!is_array($data) || empty($data['employee_code']) || empty($data['exp'])) {
+            return null;
+        }
+        if (now()->timestamp > (int) $data['exp']) {
+            return null;
+        }
+        return $data;
+    }
 }
