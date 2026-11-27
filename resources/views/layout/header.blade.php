@@ -50,12 +50,12 @@
                         <a target="_blank" href="{{$setting->facebook}}"><img src="assets/images/facebook-logo-icon.png"></a>
                         <a target="_blank" href="{{$setting->youtube}}"><img src="assets/images/youtube-logo-icon.png"></a>
                         
-                        @if(Auth::check())
-                        <a href="{{ Auth::check() ? url('account/main') : url('dangnhap') }}">
-                            <img src="{{ Auth::user()->avatar }}" alt="user">
+                        @if(session()->has('sso_employee_code') || Auth::check())
+                        <a href="{{ route('sso.apps') }}" title="Chọn phần mềm làm việc">
+                            <img src="{{ (Auth::check() && Auth::user()->avatar) ? Auth::user()->avatar : asset('assets/images/user-icon.png') }}" alt="user">
                         </a>
                         @else
-                        <a href="{{ url('dangnhap') }}">
+                        <a href="{{ route('sso.login') }}" title="Đăng nhập tập trung">
                             <img src="{{ asset('assets/images/user-icon.png') }}" alt="user">
                         </a>
                         @endif

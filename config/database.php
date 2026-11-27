@@ -92,6 +92,62 @@ return [
             'prefix_indexes' => true,
         ],
 
+        'izi' => [
+            'driver' => 'mysql',
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => env('DB_IZI_DATABASE', 'izi'),
+            'username' => env('DB_IZI_USERNAME', env('DB_USERNAME', 'root')),
+            'password' => env('DB_IZI_PASSWORD', env('DB_PASSWORD', '')),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => false,
+            'timezone' => '+07:00',
+        ],
+
+        'learning' => [
+            'driver' => 'mysql',
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => env('DB_LEARNING_DATABASE', 'learning'),
+            'username' => env('DB_LEARNING_USERNAME', env('DB_USERNAME', 'root')),
+            'password' => env('DB_LEARNING_PASSWORD', env('DB_PASSWORD', '')),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => false,
+            'timezone' => '+07:00',
+        ],
+
+        'bds_crm' => [
+            'driver' => 'mysql',
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => env('DB_CRM_DATABASE', 'bds_crm'),
+            'username' => env('DB_CRM_USERNAME', env('DB_USERNAME', 'root')),
+            'password' => env('DB_CRM_PASSWORD', env('DB_PASSWORD', '')),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => false,
+            'timezone' => '+07:00',
+        ],
+
+        'idc_tool' => [
+            'driver' => 'mysql',
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => env('DB_IDC_TOOL_DATABASE', 'idc_tool'),
+            'username' => env('DB_IDC_TOOL_USERNAME', env('DB_USERNAME', 'root')),
+            'password' => env('DB_IDC_TOOL_PASSWORD', env('DB_PASSWORD', '')),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => false,
+            'timezone' => '+07:00',
+        ],
+
     ],
 
     /*

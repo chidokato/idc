@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Setting;
 use App\Models\Menu;
-use App\Models\Task;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -38,19 +37,12 @@ class AppServiceProvider extends ServiceProvider
         DB::statement("SET time_zone = '+07:00'");
 
         View::composer('*', function ($view) {
-            $setting = Setting::find(1); // có thể dùng số luôn
+            $setting = Setting::find(1);
             $menu = Menu::orderBy('view', 'asc')->get();
-
-            $sumPrice = Task::where('extra_money', '>', 0)
-                ->where('user', Auth::id())
-                ->where('settled', 0)
-                ->sum('extra_money');
-
 
             view()->share([
                 'setting' => $setting,
                 'menu'    => $menu,
-                'sumPrice'    => $sumPrice,
             ]);
         });
     }

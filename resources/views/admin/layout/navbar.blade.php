@@ -68,9 +68,9 @@
             data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item" href="{{route('setting.index')}}">Cấu hình</a>
-                <a class="collapse-item" href="{{route('departments.index')}}">Phòng ban</a>
-                <a class="collapse-item" href="{{route('suppliers.index')}}">Nhà cung cấp</a>
-                <a class="collapse-item" href="{{route('channels.index')}}">Kênh chạy</a>
+                <a class="collapse-item" href="{{route('admin.sso-apps.index')}}">Link phần mềm SSO</a>
+                <a class="collapse-item" href="{{route('admin.shared-db-configs.index')}}">Cấu hình DB dùng chung</a>
+                <a class="collapse-item" href="{{route('admin.sso-shared-tables.index')}}">Ánh xạ cột SSO</a>
                 <a class="collapse-item" href="{{route('duan.index')}}">Dự án</a>
                 <a class="collapse-item" href="{{route('menu.index')}}">Menu</a>
                 <!-- <a class="collapse-item" href="{{route('option.index')}}">Tùy chọn</a> -->

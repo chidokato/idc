@@ -1,7 +1,5 @@
 <?php
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\Admin\Users\LoginController;
 use App\Http\Controllers\Admin\Users\UserController;
 use App\Http\Controllers\Admin\MainController;
@@ -16,12 +14,12 @@ use App\Http\Controllers\Admin\InternalPostController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\SectionController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\SharedDbConfigController;
+use App\Http\Controllers\Admin\SsoAppController;
+use App\Http\Controllers\Admin\SsoSharedTableController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\PromotionController;
-use App\Http\Controllers\Admin\DepartmentController;
-use App\Http\Controllers\Admin\SupplierController;
-use App\Http\Controllers\Admin\ChannelController;
 use App\Http\Controllers\Admin\DuanController;
 
 use App\Http\Controllers\Admin\ProvinceController;
@@ -30,48 +28,33 @@ use App\Http\Controllers\Admin\WardController;
 use App\Http\Controllers\Admin\StreetController;
 
 use App\Http\Controllers\Admin\UploadController;
-use App\Http\Controllers\Auth\GoogleController;
-
-use App\Http\Controllers\InviteController;
 
 use App\Http\Controllers\AjaxController;
-use App\Http\Controllers\AccountController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HomeSystemController;
-use App\Http\Controllers\TaskController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\WalletController;
-use App\Http\Controllers\DepositController;
-use App\Http\Controllers\WithdrawalController;
-
-use Illuminate\Support\Facades\Mail;
-
-use App\Http\Controllers\Account\ExpenseController;
-use App\Http\Controllers\Account\TaskCostPeriodController;
-use App\Http\Controllers\Account\BulkMailController;
-use App\Http\Controllers\Account\UserManagementController;
-
-// Route::get('/test-mail', function () {
-//     Mail::raw('Hello test', function ($m) {
-//         $m->to('tuannv.idc@dxmb.vn')->subject('Test Gmail SMTP');
-//     });
-
-//     return 'sent';
-// });
-
+use App\Http\Controllers\SsoController;
 
 Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
-     \UniSharp\LaravelFilemanager\Lfm::routes();
- });
+    \UniSharp\LaravelFilemanager\Lfm::routes();
+});
 
 Route::get('admin', [LoginController::class, 'index'])->name('login');
 Route::post('admin', [LoginController::class, 'store']);
 Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.redirect');
-Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback'])->name('google.callback');
-Route::get('auth/google/complete-profile', [GoogleController::class, 'showCompleteProfileForm'])->name('google.complete.form');
-Route::post('auth/google/complete-profile', [GoogleController::class, 'completeProfile'])->name('google.complete.store');
+// Centralized SSO Portal
+Route::prefix('sso')->name('sso.')->group(function () {
+    Route::get('login', [SsoController::class, 'showLogin'])->name('login');
+    Route::post('login', [SsoController::class, 'login'])->name('login.submit');
+    Route::get('google', [SsoController::class, 'redirectToGoogle'])->name('google');
+    Route::get('profile', [SsoController::class, 'showProfile'])->name('profile');
+    Route::post('profile', [SsoController::class, 'updateProfile'])->name('profile.update');
+    Route::get('apps', [SsoController::class, 'apps'])->name('apps');
+    Route::get('launch/{app}', [SsoController::class, 'launch'])->name('launch');
+    Route::get('local-login', [SsoController::class, 'localLogin'])->name('local-login');
+    Route::get('logout', [SsoController::class, 'logout'])->name('logout');
+});
+Route::get('auth/google/callback', [SsoController::class, 'handleGoogleCallback'])->name('sso.google.callback');
 
 Route::post('/upload', [UploadController::class, 'upload'])->name('upload');
 
@@ -79,9 +62,8 @@ Route::get('admin/get-section', function () {
     return view('admin.post.add_section')->render();
 });
 
-
 // ajax
-Route::group(['prefix'=>'ajax'],function(){
+Route::group(['prefix' => 'ajax'], function () {
     Route::get('change_province/{id}', [AjaxController::class, 'change_province']);
     Route::get('change_district/{id}', [AjaxController::class, 'change_district']);
     Route::get('change_district_street/{id}', [AjaxController::class, 'change_district_street']);
@@ -104,242 +86,91 @@ Route::group(['prefix'=>'ajax'],function(){
     Route::get('change_arrange_cat/{id}/{catid}', [AjaxController::class, 'change_arrange_cat']);
 });
 
-
 Route::prefix('admin')->group(function () {
     Route::middleware(['admin:1'])->group(function () {
         // user
-        Route::resource('users',UserController::class);
+        Route::resource('users', UserController::class);
         Route::get('users/member/list', [UserController::class, 'member'])->name('users.member');
         Route::post('user/change-status', [UserController::class, 'changeStatus'])->name('user.changeStatus');
         Route::post('users/update-name', [UserController::class, 'updateName'])->name('users.updateName');
-        Route::post('user/update-work-status', [UserController::class,'updateWorkStatus'])->name('admin.user.updateWorkStatus');
-        
-        // khách hàng
-        Route::resource('customer',CustomerController::class);
-        Route::post('customer/bulk-delete', [CustomerController::class, 'bulkDelete'])->name('customer.bulkDelete');
+        Route::post('user/update-work-status', [UserController::class, 'updateWorkStatus'])->name('admin.user.updateWorkStatus');
 
+        // khách hàng
+        Route::resource('customer', CustomerController::class);
+        Route::post('customer/bulk-delete', [CustomerController::class, 'bulkDelete'])->name('customer.bulkDelete');
     });
 
     Route::middleware(['admin:2'])->group(function () {
         // cấu hình hệ thống
-        Route::resource('setting',SettingController::class);
-        Route::resource('menu',MenuController::class);
-        Route::resource('category',CategoryController::class);
-        Route::resource('province',ProvinceController::class);
-        Route::resource('district',DistrictController::class);
-        Route::resource('ward',WardController::class);
-        Route::resource('street',StreetController::class);
-        Route::resource('slider',SliderController::class);
+        Route::resource('setting', SettingController::class);
+        Route::get('sso-apps', [SsoAppController::class, 'index'])->name('admin.sso-apps.index');
+        Route::post('sso-apps/update-all', [SsoAppController::class, 'updateAll'])->name('admin.sso-apps.update-all');
+        Route::post('sso-apps', [SsoAppController::class, 'store'])->name('admin.sso-apps.store');
+        Route::delete('sso-apps/{id}', [SsoAppController::class, 'destroy'])->name('admin.sso-apps.destroy');
+        Route::get('sso-shared-tables', [SsoSharedTableController::class, 'index'])->name('admin.sso-shared-tables.index');
+        Route::post('sso-shared-tables/update-all', [SsoSharedTableController::class, 'updateAll'])->name('admin.sso-shared-tables.update-all');
+        Route::post('sso-shared-tables', [SsoSharedTableController::class, 'store'])->name('admin.sso-shared-tables.store');
+        Route::delete('sso-shared-tables/{id}', [SsoSharedTableController::class, 'destroy'])->name('admin.sso-shared-tables.destroy');
 
-        Route::resource('internalcategory',InternalCategoryController::class);
-        Route::resource('internalpost',InternalPostController::class);
+        // Cấu hình DB & Bảng dùng chung (giống web learning)
+        Route::post('shared-db-configs/test-connection', [SharedDbConfigController::class, 'testConnection'])->name('admin.shared-db-configs.test-connection');
+        Route::patch('shared-db-configs/{sharedDbConfig}/toggle-status', [SharedDbConfigController::class, 'toggleStatus'])->name('admin.shared-db-configs.toggle-status');
+        Route::resource('shared-db-configs', SharedDbConfigController::class)->names('admin.shared-db-configs');
+        Route::resource('menu', MenuController::class);
+        Route::resource('category', CategoryController::class);
+        Route::resource('province', ProvinceController::class);
+        Route::resource('district', DistrictController::class);
+        Route::resource('ward', WardController::class);
+        Route::resource('street', StreetController::class);
+        Route::resource('slider', SliderController::class);
 
-        // Route::resource('cart',CartController::class);
-        Route::resource('option',OptionController::class);
+        Route::resource('internalcategory', InternalCategoryController::class);
+        Route::resource('internalpost', InternalPostController::class);
+
+        Route::resource('option', OptionController::class);
         Route::get('option/double/{id}', [OptionController::class, 'double']);
-        
-        // Route::resource('promotion',PromotionController::class);
 
-        // account
-        Route::resource('departments',DepartmentController::class);
-        Route::get('departments/{id}/duplicate', [DepartmentController::class, 'duplicate'])->name('departments.duplicate');
-        Route::post('departments/{id}/update-name', [DepartmentController::class, 'updateName'])->name('departments.updateName');
-
-        // nhà cung cấp
-        Route::resource('suppliers', SupplierController::class);
-        Route::get('suppliers/{id}/duplicate', [SupplierController::class, 'duplicate'])->name('suppliers.duplicate');
-
-        // kênh chạy
-        Route::resource('channels', ChannelController::class);
-        Route::get('channels/{id}/duplicate', [ChannelController::class, 'duplicate'])->name('channels.duplicate');
-        Route::post('channels/{id}/update-name', [ChannelController::class, 'updateName'])->name('channels.updateName');
-
-        // dự án
+        // dự án (dùng chung)
         Route::resource('duan', DuanController::class);
         Route::post('duan/update-rate', [DuanController::class, 'updateRate'])->name('duan.updateRate');
         Route::post('duan/{id}/update-name', [DuanController::class, 'updateName'])->name('duan.updateName');
-
-        // deposits
-        // Route::get('deposits', [DepositController::class, 'index'])->name('deposits.index');
-        // Route::post('deposits/{deposit}/update-status', [DepositController::class, 'updateStatus'])->name('admin.deposits.updateStatus');
-        
     });
 
-
     Route::middleware(['admin:3'])->group(function () {
-        // manin
         Route::get('main', [MainController::class, 'index'])->name('admin');
-        // quản lý bài viết
-        Route::resource('post',PostController::class);
+        Route::resource('post', PostController::class);
         Route::post('post/quick-create', [PostController::class, 'quickCreate'])->name('post.quickCreate');
         Route::get('post/search-projects', [PostController::class, 'searchProjects'])->name('post.searchProjects');
         Route::post('post/upfile', [PostController::class, 'upfile'])->name('post.upfile');
-        
-        Route::resource('news',NewsController::class);
+
+        Route::resource('news', NewsController::class);
         Route::get('post/post_up/{id}', [PostController::class, 'post_up'])->name('post_up');
-        Route::group(['prefix'=>'section'],function(){
+        Route::group(['prefix' => 'section'], function () {
             Route::get('index/{pid}', [SectionController::class, 'index']);
         });
-        // Route::resource('product',ProductController::class);
     });
 });
-
-
-
-// account
-Route::get('dangnhap', [AccountController::class, 'dangnhap'])->name('dangnhap');
-Route::post('dangnhap', [AccountController::class, 'postDangnhap'])->name('post.dangnhap');
-Route::middleware(['user'])->group(function () {
-    Route::prefix('account')->group(function () {
-        Route::get('main', [AccountController::class, 'index'])->name('account.dashboard.main');
-        Route::get('opened', [AccountController::class, 'opened'])->name('account.guide.index');
-        Route::get('edit', [AccountController::class, 'edit'])->name('account.profile.edit');
-        Route::post('update', [AccountController::class, 'update'])->name('account.update');
-        Route::post('change-password', [AccountController::class, 'changePassword'])->name('account.change-password');
-        Route::post('update-secondary-email', [AccountController::class, 'updateSecondaryEmail'])->name('account.update-secondary-email');
-        Route::post('verify-secondary-email-otp', [AccountController::class, 'verifySecondaryEmailOtp'])->name('account.verify-secondary-email-otp');
-        
-        // learning sso
-        Route::get('learning', [AccountController::class, 'ssoLearning'])->name('account.learning');
-        Route::get('izi', [AccountController::class, 'ssoIzi'])->name('account.izi');
-
-        // mkt
-        Route::get('mkt-register', [AccountController::class, 'mktregister'])->name('account.marketing.register');
-        Route::post('mkt-tasksstore', [AccountController::class, 'storeTask'])->name('account.tasksstore');
-        Route::get('tasks-stats', [AccountController::class, 'stats'])->name('account.tasks.stats');
-        
-        // task
-        Route::resource('task',TaskController::class);
-        Route::post('tasks/delete/{id}', [AccountController::class, 'delete'])->name('account.tasks.delete');
-        Route::post('task/toggle-approved/{task}', [TaskController::class, 'toggleApproved'])->name('task.toggleApproved');
-        Route::post('tasks/update-rate', [TaskController::class, 'updateRate'])->name('tasks.updateRate');
-        Route::post('task/update-kpi', [TaskController::class, 'updateKpi'])->name('task.updateKpi');
-        Route::post('task/update-video', [TaskController::class, 'updateVideo'])->name('task.updateVideo');
-        Route::post('task/update-livestream', [TaskController::class, 'updateLivestream'])->name('task.updateLivestream');
-        Route::post('task/update-expected-cost', [TaskController::class, 'updateExpectedCost'])->name('task.updateExpectedCost');
-        
-        // Route::post('tasks/{id}/update-paid', [TaskController::class, 'updatePaid'])->name('tasks.updatePaid');
-        Route::post('tasks/bulk-update', [TaskController::class, 'bulkUpdateTasks'])->name('account.tasks.bulkUpdate');
-        Route::post('tasks/bulk-approve', [TaskController::class, 'bulkApproveTasks'])->name('account.tasks.bulkApprove');
-        Route::post('tasks/bulk-delete', [TaskController::class, 'bulkDeleteTasks'])->name('account.tasks.bulkDelete');
-        Route::post('tasks/{task}/update-paid', [TaskController::class, 'updatePaid'])->name('tasks.updatePaid');
-        Route::post('tasks/{task}/up', [TaskController::class, 'upTask'])->name('tasks.up');
-        // Route::get('tasks/user', [TaskController::class, 'tasksuser'])->name('tasks.user');
-        Route::put('tasks/{task}', [TaskController::class, 'updateall'])->name('tasks.update');
-
-        // quản lý chi phí
-        Route::get('actualcosts', [ExpenseController::class, 'actualcosts'])->name('tasks.actualcosts');
-        Route::get('ns-debt', [ExpenseController::class, 'nsDebt'])->name('tasks.nsDebt');
-        Route::post('tasks/bulk-import-actual-costs', [ExpenseController::class, 'bulkImportActualCosts'])->name('tasks.bulkImportActualCosts');
-        Route::post('tasks/{task}/actual-costs', [ExpenseController::class, 'ajaxUpdateActualCosts'])->name('tasks.ajaxUpdateActualCosts');
-        Route::post('tasks/store', [ExpenseController::class, 'store'])->name('account.task.store');
-        Route::get('tasks/expense', [ExpenseController::class, 'expense'])->name('tasks.expense');
-        Route::post('tasks/{task}/toggle-settled', [ExpenseController::class, 'toggleSettled'])->name('tasks.toggleSettled');
-
-
-        // report
-        Route::resource('report',ReportController::class);
-        Route::post('report-store', [ReportController::class, 'store'])->name('account.report.store');
-        Route::post('report-update', [ReportController::class, 'update'])->name('account.report.update');
-        Route::post('report-delete', [ReportController::class, 'delete'])->name('account.report.delete');
-        Route::get('load-report', [ReportController::class, 'loadReport'])->name('account.loadReport');
-        Route::post('report-active', [ReportController::class, 'active'])->name('account.report.active');
-        Route::post('report/{report}/recalc-expected', [ReportController::class, 'recalcExpected'])->name('account.reports.recalcExpected');
-        Route::post('report/{report}/recalc-actual', [ReportController::class, 'recalcActual'])->name('account.reports.recalcActual');
-        Route::post('report/{report}/sync-kpi', [ReportController::class, 'syncKpi'])->name('account.reports.syncKpi');
-
-        // wallet
-        Route::get('wallet', [WalletController::class, 'index'])->name('wallet.index');
-        Route::get('wallet/deposit', [DepositController::class, 'depositForm'])->name('wallet.deposit.form');
-        Route::post('wallet/deposit/create', [DepositController::class, 'depositCreate'])->name('wallet.deposit.create');
-        Route::post('wallet/deposit/{deposit}/upload', [DepositController::class, 'depositUploadProof'])->name('wallet.deposit.upload');
-        Route::post('wallet/deposit/{deposit}/expire', [DepositController::class, 'depositExpire'])->name('wallet.deposit.expire');
-        Route::get('wallet/withdraw', [WithdrawalController::class, 'form'])->name('wallet.withdraw.form');
-        Route::post('wallet/withdraw', [WithdrawalController::class, 'store'])->name('wallet.withdraw.store');
-
-
-        Route::get('wallet/deposits', [WalletController::class, 'myDeposits'])->name('wallet.deposits');
-        Route::get('wallet/transfer', [WalletController::class, 'bulkTransferForm'])->name('wallet.bulk.form');
-        Route::post('wallet/transfer', [WalletController::class, 'bulkTransferSubmit'])->name('wallet.bulk.submit');
-        Route::post('/wallet/transactions/{id}/recall', [WalletController::class, 'recallTransfer'])->name('wallet.transactions.recall');
-
-        Route::get('wallets', [WalletController::class, 'wallets'])->name('account.wallets');
-        Route::get('wallets/{wallet}/histories', [WalletController::class, 'histories'])->name('wallets.histories');
-        Route::get('wallets/{wallet}/detail', [WalletController::class, 'detail'])->name('wallets.detail');
-        Route::post('wallets/{wallet}/update-held-balance', [WalletController::class, 'updateHeldBalance'])->name('wallets.updateHeldBalance');
-        Route::post('wallets/{wallet}/update-balance', [WalletController::class, 'updateBalance'])->name('wallets.updateBalance');
-
-        
-        // quản lý deposit
-        Route::get('deposits', [DepositController::class, 'index'])->name('deposits.index');
-        Route::post('deposits/{deposit}/update-status', [DepositController::class, 'updateStatus'])->name('deposits.updateStatus');
-        Route::post('deposits/{deposit}/bank-name', [DepositController::class, 'updateBankName'])->name('deposits.updateBankName');
-        Route::post('deposits/{deposit}/upload', [DepositController::class, 'depositUploadProofAdmin'])->name('deposits.upload');
-        Route::get('withdrawals', [WithdrawalController::class, 'index'])->name('withdrawals.index');
-        Route::post('withdrawals/{withdrawal}/process', [WithdrawalController::class, 'process'])->name('withdrawals.process');
-
-        // Task Cost Period
-        Route::get('statistical', [TaskCostPeriodController::class, 'index'])->name('task_cost_period.index');
-        Route::post('task-cost-post/update', [TaskCostPeriodController::class, 'updateMonthly'])->name('task_cost_post.update');
-
-
-        // BulkMailController
-        Route::get('bulk-mail', [BulkMailController::class, 'create'])->name('admin.bulk_mail.create');
-        Route::post('bulk-mail/send', [BulkMailController::class, 'send'])->name('admin.bulk_mail.send');
-        Route::post('bulk-mail/process-chunk', [BulkMailController::class, 'processChunk'])->name('admin.bulk_mail.process_chunk');
-
-        // User management in account UI
-        Route::get('users', [UserManagementController::class, 'index'])->name('account.users.index');
-        Route::get('users/members', [UserManagementController::class, 'members'])->name('account.users.members');
-        Route::get('users/create', [UserManagementController::class, 'create'])->name('account.users.create');
-        Route::post('users', [UserManagementController::class, 'store'])->name('account.users.store');
-        Route::get('users/{user}/edit', [UserManagementController::class, 'edit'])->name('account.users.edit');
-        Route::put('users/{user}', [UserManagementController::class, 'update'])->name('account.users.update');
-        Route::delete('users/{user}', [UserManagementController::class, 'destroy'])->name('account.users.destroy');
-        Route::post('users/{user}/toggle-status', [UserManagementController::class, 'toggleStatus'])->name('account.users.toggleStatus');
-        Route::post('users/{user}/toggle-marketing', [UserManagementController::class, 'toggleMarketing'])->name('account.users.toggleMarketing');
-        Route::post('users/import-kpi', [UserManagementController::class, 'importKpi'])->name('account.users.importKpi');
-
-        // thư mời
-        Route::get('invite', [InviteController::class, 'create'])->name('invite.create');
-        Route::post('invite', [InviteController::class, 'store'])->name('invite.store');
-        Route::get('invite/{invite}/download', [InviteController::class, 'download'])->name('invite.download');
-    });
-});
-
-// Route::prefix('account')->group(function () {
-//     Route::get('info', [HomeController::class, 'account'])->name('account');
-//     Route::POST('update/{id}', [HomeController::class, 'update_account'])->name('update_account'); // cập nhật thông tin người dùng
-//     Route::get('order', [HomeController::class, 'account_cart'])->name('account_cart');
-//     Route::get('order/{id}', [HomeController::class, 'account_order_dital'])->name('account_order_dital');
-// });
 
 // home view
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('sitemap.xml', [HomeController::class, 'sitemap'])->name('pages.sitemap');
-// Route::get('search', [HomeController::class, 'search'])->name('search');
 
 // home system
 Route::get('sendmail', [HomeSystemController::class, 'sendmail'])->name('sendmail');
 Route::post('question', [HomeSystemController::class, 'question'])->name('question');
-// Route::get('seach/filter/posts', [HomeSystemController::class, 'filterPosts'])->name('posts.filter');
 
 // add to cart
 Route::prefix('product')->group(function () {
-    Route::get('add-to-cart/{id}', [HomeController::class, 'addTocart'])->name('addTocart'); // thêm sản phẩm vào giỏ hàng
-    Route::get('addtocart_munti', [HomeController::class, 'addTocart_munti'])->name('addTocart_munti'); // thêm sản phẩm vào giỏ hàng
-    Route::get('showCart', [HomeController::class, 'showCart'])->name('showCart'); // show giỏ hàng
-    Route::POST('updateCart', [HomeController::class, 'updateCart'])->name('updateCart'); // update giỏ hàng
-    Route::get('delCart', [HomeController::class, 'delCart'])->name('delCart'); // delete sản phẩm trong giỏ hàng
-    Route::get('checkout', [HomeController::class, 'checkout'])->name('checkout'); // thanh toán
-    Route::get('get_checkout', [HomeController::class, 'checkout'])->name('get_checkout'); // thanh toán
-    Route::POST('order', [HomeController::class, 'order'])->name('order'); // thanh toán
+    Route::get('add-to-cart/{id}', [HomeController::class, 'addTocart'])->name('addTocart');
+    Route::get('addtocart_munti', [HomeController::class, 'addTocart_munti'])->name('addTocart_munti');
+    Route::get('showCart', [HomeController::class, 'showCart'])->name('showCart');
+    Route::POST('updateCart', [HomeController::class, 'updateCart'])->name('updateCart');
+    Route::get('delCart', [HomeController::class, 'delCart'])->name('delCart');
+    Route::get('checkout', [HomeController::class, 'checkout'])->name('checkout');
+    Route::get('get_checkout', [HomeController::class, 'checkout'])->name('get_checkout');
+    Route::POST('order', [HomeController::class, 'order'])->name('order');
 });
-
-
 
 Route::get('location/{slug}', [HomeController::class, 'province']);
 Route::get('{slug}', [HomeController::class, 'category']);
 Route::get('{catslug}/{slug}', [HomeController::class, 'post']);
-
-

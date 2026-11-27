@@ -80,12 +80,8 @@
             </div>
             <div class="col-lg-6 d-flex align-items-center gradient-custom-2">
               <div class="text-white px-3 py-4 p-md-5 mx-md-4">
-                <a href="{{ route('google.redirect') }}">
-                    <button class="btn btn-light btn-lg d-flex align-items-center shadow-sm border rounded-pill px-4 py-2">
-                      <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google Logo" class="me-2" width="24" height="24">
-                      <span class="">Sign in with Google</span>
-                    </button>
-                    </a>
+                <h4 class="mb-3">Indochine Real Estate CMS</h4>
+                <p class="small mb-0">Hệ thống quản trị nội dung website chính.</p>
               </div>
             </div>
           </div>
