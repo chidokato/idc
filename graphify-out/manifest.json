@@ -660,9 +660,9 @@
     "semantic_hash": ""
   },
   "config/sso.php": {
-    "mtime": 1795765419.815341,
-    "seen": 1795766869.7741697,
-    "ast_hash": "2193328a0fb3be8cfe359135cbd9a247",
+    "mtime": 1795768406.5587764,
+    "seen": 1795768452.7726781,
+    "ast_hash": "242709aaf57824162688176fd7246cd6",
     "semantic_hash": ""
   },
   "config/translatable.php": {
