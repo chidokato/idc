@@ -5,7 +5,6 @@
   "3": "Illuminate\\Database\\Schema\\Blueprint",
   "4": "SsoAuthService.php",
   "5": "Illuminate\\Http\\Request",
-  "6": "SharedDbConfig.php",
   "7": "AppServiceProvider.php",
   "8": "create.blade.php",
   "9": "edit.blade.php",

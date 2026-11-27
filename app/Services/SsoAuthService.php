@@ -35,6 +35,21 @@ class SsoAuthService
         return DB::connection('izi');
     }
 
+    private function getSystemConnection(string $systemKey, string $fallbackConnection): ConnectionInterface
+    {
+        try {
+            $tbl = SsoSharedTable::where('system_key', $systemKey)
+                ->where('is_active', true)
+                ->first();
+            if ($tbl) {
+                return $tbl->getDbConnection();
+            }
+        } catch (Throwable $e) {
+        }
+
+        return DB::connection($fallbackConnection);
+    }
+
     public function normalizePhone(?string $phone): string
     {
         $digits = preg_replace('/[^0-9]/', '', (string) $phone);
@@ -693,7 +708,7 @@ class SsoAuthService
             if ($hashedPassword) {
                 $learningUpdate['password'] = $hashedPassword;
             }
-            DB::connection('learning')->table('users')
+            $this->getSystemConnection('learning_users', 'learning')->table('users')
                 ->where('employee_code', $employeeCode)
                 ->when($oldEmail, fn ($q) => $q->orWhere('email', $oldEmail))
                 ->update($learningUpdate);
@@ -707,21 +722,22 @@ class SsoAuthService
                 'phone' => $this->normalizePhone($primaryPhone) ?: $primaryPhone,
                 'updated_at' => now(),
             ];
-            if (Schema::connection('bds_crm')->hasColumn('users', 'employee_code')) {
+            $crmConn = $this->getSystemConnection('crm_users', 'bds_crm');
+            if ($crmConn->getSchemaBuilder()->hasColumn('users', 'employee_code')) {
                 $crmUpdate['employee_code'] = $employeeCode;
             }
             if ($hashedPassword) {
                 $crmUpdate['password_hash'] = $hashedPassword;
             }
-            DB::connection('bds_crm')->table('users')
-                ->where(function ($q) use ($oldEmail, $oldPhone, $employeeCode) {
+            $crmConn->table('users')
+                ->where(function ($q) use ($oldEmail, $oldPhone, $employeeCode, $crmConn) {
                     if ($oldEmail) {
                         $q->where('email', $oldEmail);
                     }
                     if ($oldPhone) {
                         $q->orWhere('phone', $oldPhone)->orWhere('phone', $this->normalizePhone($oldPhone));
                     }
-                    if (Schema::connection('bds_crm')->hasColumn('users', 'employee_code')) {
+                    if ($crmConn->getSchemaBuilder()->hasColumn('users', 'employee_code')) {
                         $q->orWhere('employee_code', $employeeCode);
                     }
                 })
@@ -736,21 +752,22 @@ class SsoAuthService
                 'phone' => $primaryPhone,
                 'updated_at' => now(),
             ];
-            if (Schema::connection('idc_tool')->hasColumn('users', 'employee_code')) {
+            $toolConn = $this->getSystemConnection('idc_tool_users', 'idc_tool');
+            if ($toolConn->getSchemaBuilder()->hasColumn('users', 'employee_code')) {
                 $toolUpdate['employee_code'] = $employeeCode;
             }
             if ($hashedPassword) {
                 $toolUpdate['password'] = $hashedPassword;
             }
-            DB::connection('idc_tool')->table('users')
-                ->where(function ($q) use ($oldEmail, $oldPhone, $employeeCode) {
+            $toolConn->table('users')
+                ->where(function ($q) use ($oldEmail, $oldPhone, $employeeCode, $toolConn) {
                     if ($oldEmail) {
                         $q->where('email', $oldEmail);
                     }
                     if ($oldPhone) {
                         $q->orWhere('phone', $oldPhone);
                     }
-                    if (Schema::connection('idc_tool')->hasColumn('users', 'employee_code')) {
+                    if ($toolConn->getSchemaBuilder()->hasColumn('users', 'employee_code')) {
                         $q->orWhere('employee_code', $employeeCode);
                     }
                 })

@@ -324,9 +324,14 @@ class SsoController extends Controller
     {
         $appConfig = SsoApp::findActiveByKey($appKey);
         abort_unless($appConfig, 404, 'Ứng dụng không tồn tại hoặc đang tạm khóa.');
-        $hccUser = session('sso_hcc_user_id')
-            ? DB::connection('izi')->table('users')->find(session('sso_hcc_user_id'))
-            : null;
+        $hccUser = null;
+        if (session('sso_hcc_user_id')) {
+            try {
+                $hccUser = $this->ssoService->getHccConnection()->table('users')->find(session('sso_hcc_user_id'));
+            } catch (Throwable $e) {
+                $hccUser = null;
+            }
+        }
 
         $url = $this->ssoService->buildSignedCallbackUrl($appConfig, $profile, $hccUser);
         return redirect()->away($url);
