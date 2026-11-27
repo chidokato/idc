@@ -2274,9 +2274,9 @@
     "semantic_hash": ""
   },
   "resources/views/admin/shared_db_configs/_form.blade.php": {
-    "mtime": 1795762363.8380768,
-    "seen": 1795766869.7744663,
-    "ast_hash": "26ba7013cc8824c15e8e77a626d29f6e",
+    "mtime": 1795767638.2944746,
+    "seen": 1795767670.980347,
+    "ast_hash": "5768b921e7e4e4667e38987ff71cc2f2",
     "semantic_hash": ""
   },
   "resources/views/admin/shared_db_configs/create.blade.php": {
@@ -2292,9 +2292,9 @@
     "semantic_hash": ""
   },
   "resources/views/admin/shared_db_configs/index.blade.php": {
-    "mtime": 1795762361.068964,
-    "seen": 1795766869.7744694,
-    "ast_hash": "e5001cc0bb4d2af6e76b004fe7a6312b",
+    "mtime": 1795767622.68064,
+    "seen": 1795767670.9803514,
+    "ast_hash": "58e6920710e70ca7162c7310692c71bf",
     "semantic_hash": ""
   },
   "resources/views/admin/slider/create.blade.php": {

@@ -44,12 +44,20 @@ class SsoSharedTable extends Model
     public function getDbConnection(): ConnectionInterface
     {
         $connKey = 'sso_dyn_' . $this->id;
-        if (!Config::has("database.connections.{$connKey}")) {
-            $base = Config::get('database.connections.mysql');
-            $base['database'] = $this->database_name;
-            $base['strict'] = false;
-            Config::set("database.connections.{$connKey}", $base);
+        $sharedCfg = SharedDbConfig::where('database', $this->database_name)
+            ->where('is_active', true)
+            ->first();
+
+        if ($sharedCfg) {
+            $cfg = $sharedCfg->toConnectionConfig();
+        } else {
+            $cfg = Config::get('database.connections.mysql');
+            $cfg['database'] = $this->database_name;
+            $cfg['strict'] = false;
         }
+
+        Config::set("database.connections.{$connKey}", $cfg);
+        DB::purge($connKey);
         return DB::connection($connKey);
     }
 

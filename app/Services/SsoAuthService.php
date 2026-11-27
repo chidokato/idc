@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\SharedDbConfig;
 use App\Models\SsoSharedTable;
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
@@ -11,6 +13,28 @@ use Throwable;
 
 class SsoAuthService
 {
+    public function getHccConnection(): ConnectionInterface
+    {
+        try {
+            $tbl = SsoSharedTable::whereIn('system_key', ['izi_employees', 'izi_users'])
+                ->where('is_active', true)
+                ->first();
+            if ($tbl) {
+                return $tbl->getDbConnection();
+            }
+
+            $cfg = SharedDbConfig::where('code', 'hcc_izi')
+                ->where('is_active', true)
+                ->first();
+            if ($cfg) {
+                return $cfg->connectSharedDb();
+            }
+        } catch (Throwable $e) {
+        }
+
+        return DB::connection('izi');
+    }
+
     public function normalizePhone(?string $phone): string
     {
         $digits = preg_replace('/[^0-9]/', '', (string) $phone);
@@ -100,7 +124,7 @@ class SsoAuthService
             ];
         }
 
-        $hccUser = DB::connection('izi')->table('users')
+        $hccUser = $this->getHccConnection()->table('users')
             ->where('employee_id', $hccEmployee->id)
             ->first();
 
@@ -214,7 +238,7 @@ class SsoAuthService
             ];
         }
 
-        $hccUser = DB::connection('izi')->table('users')
+        $hccUser = $this->getHccConnection()->table('users')
             ->where('employee_id', $hccEmployee->id)
             ->first();
 
@@ -312,7 +336,7 @@ class SsoAuthService
     private function findAndVerifyIzi(string $raw, string $lower, string $normPhone, string $password, ?string $hintCode): ?array
     {
         try {
-            $query = DB::connection('izi')->table('users as u')
+            $query = $this->getHccConnection()->table('users as u')
                 ->leftJoin('employees as e', 'u.employee_id', '=', 'e.id')
                 ->select('u.*', 'e.employee_code', 'e.email as emp_email', 'e.phone as emp_phone', 'e.name as emp_name');
 
@@ -477,7 +501,7 @@ class SsoAuthService
 
     public function resolveHccEmployee(?string $employeeCode, ?string $email, ?string $phone): ?object
     {
-        $db = DB::connection('izi');
+        $db = $this->getHccConnection();
 
         if (!empty($employeeCode)) {
             $emp = $db->table('employees')->where('employee_code', trim($employeeCode))->whereNull('deleted_at')->first();
@@ -607,9 +631,10 @@ class SsoAuthService
 
         $hashedPassword = $newPassword ? Hash::make($newPassword) : null;
 
-        // 1. Update HCC (izi.employees & izi.users)
+        // 1. Update HCC (employees & users)
         try {
-            DB::connection('izi')->table('employees')
+            $hccConn = $this->getHccConnection();
+            $hccConn->table('employees')
                 ->where('employee_code', $employeeCode)
                 ->update([
                     'email' => $primaryEmail,
@@ -617,7 +642,7 @@ class SsoAuthService
                     'updated_at' => now(),
                 ]);
 
-            $emp = DB::connection('izi')->table('employees')->where('employee_code', $employeeCode)->first();
+            $emp = $hccConn->table('employees')->where('employee_code', $employeeCode)->first();
             if ($emp) {
                 $userUpdate = [
                     'email' => $primaryEmail,
@@ -629,7 +654,7 @@ class SsoAuthService
                 if ($hashedPassword) {
                     $userUpdate['password'] = $hashedPassword;
                 }
-                DB::connection('izi')->table('users')
+                $hccConn->table('users')
                     ->where('employee_id', $emp->id)
                     ->update($userUpdate);
             }
